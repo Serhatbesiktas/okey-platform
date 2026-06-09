@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIP Okey Salonu</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0f5132;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .container {
+            text-align: center;
+            background: rgba(0,0,0,0.4);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+        }
+        h1 { margin-bottom: 10px; color: #ffc107; }
+        p { color: #e0e0e0; }
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            background: #198754;
+            border-radius: 5px;
+            display: inline-block;
+        }
+    </style>
+    <!-- Socket.io istemci kütüphanesi - Sunucu çalışınca otomatik yüklenir -->
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>VIP Okey Oyunu</h1>
+        <p>Sunucu bağlantısı kuruluyor...</p>
+        <div class="status" id="connection-status">Bağlanıyor...</div>
+    </div>
+
+    <script>
+        // Sunucuya anlık bağlantı açıyoruz
+        const socket = io();
+
+        const statusDiv = document.getElementById('connection-status');
+
+        socket.on('connect', () => {
+            statusDiv.innerText = 'Sunucuya Bağlandı! (Oyun Aktif)';
+            statusDiv.style.backgroundColor = '#198754';
+        });
+
+        socket.on('disconnect', () => {
+            statusDiv.innerText = 'Bağlantı Kesildi!';
+            statusDiv.style.backgroundColor = '#dc3545';
+        });
+    </script>
+</body>
+</html>
