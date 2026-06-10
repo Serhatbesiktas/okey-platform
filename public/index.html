@@ -40,7 +40,6 @@
         .player-table td { padding: 8px 0; border-bottom: 1px solid #0d2e1d; }
         .status-dot { width: 8px; height: 8px; background-color: #20c997; border-radius: 50%; display: inline-block; margin-right: 5px; }
 
-        /* MASA EKRANI */
         #masaEkrani { display: none; flex: 1; background-color: #0a2014; position: relative; padding: 10px; flex-direction: column; }
         .okey-table-ui { background-color: #1a5c38; border: 4px solid #0d2e1d; border-radius: 20px; width: 100%; flex: 1; position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; margin-bottom: 10px; overflow: hidden; }
         
@@ -50,7 +49,7 @@
         .seat-right { right: -10px; top: 50%; transform: translateY(-50%) rotate(90deg); border-color: #0dcaf0; color: #0dcaf0; }
         .return-lobby-btn { position: absolute; top: 5px; right: 5px; background-color: #dc3545; color: white; border: none; padding: 6px 10px; border-radius: 5px; font-size: 11px; font-weight: bold; z-index: 10; cursor: pointer; }
 
-        .masa-ortasi { display: flex; flex-direction: column; align-items: center; gap: 15px; background: rgba(0,0,0,0.2); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); }
+        .masa-ortasi { display: flex; flex-direction: column; align-items: center; gap: 15px; background: rgba(0,0,0,0.2); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); z-index: 4; }
         .masa-isim-ortasi { color: rgba(255,255,255,0.3); font-weight: bold; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; }
         .oyun-baslat-btn { background-color: #ffc107; color: #000; border: none; padding: 10px 25px; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.4); }
         .oyun-baslat-btn:active { transform: scale(0.95); }
@@ -58,16 +57,15 @@
         .kalan-tas-bilgi-container { display: none; flex-direction: column; align-items: center; gap: 8px; }
         .kapali-deste { width: 34px; height: 48px; background-color: #fdf6e3; border: 1px solid #d3c9b3; border-bottom: 5px solid #c0b396; border-radius: 6px; box-shadow: -2px 3px 6px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; color: #000; font-weight: bold; font-size: 13px;}
 
-        /* --- ÇÖZÜLEN TAŞ ATMA ISKARTASI --- */
+        /* --- ÇÖZÜLEN VE KONUMLANDIRILAN TAŞ ATMA ISKARTASI (Siyah 7'nin yanı) --- */
         .tas-atma-iskartasi { 
             position: absolute; 
-            right: 75px; /* Koltuğun altından kurtarıldı, masanın içine alındı */
-            top: 50%; 
-            transform: translateY(-50%); 
-            width: 46px; 
-            height: 62px; 
+            bottom: 115px; /* İstakanın hemen üstünde */
+            right: 25px; /* Masanın sağ köşesi (Siyah 7'nin olduğu yer) */
+            width: 48px; 
+            height: 64px; 
             background-color: rgba(0,0,0,0.4); 
-            border: 2px dashed #ffc107; /* Belirgin sarı çizgi */
+            border: 3px dashed #ffc107; /* Belirgin sarı çizgili hedef */
             border-radius: 8px; 
             display: flex; 
             flex-direction: column; 
@@ -75,20 +73,24 @@
             justify-content: center; 
             color: #ffc107; 
             font-weight: bold; 
-            font-size: 10px; 
+            font-size: 11px; 
             text-align: center; 
-            z-index: 10; /* Tıklanabilirliği garanti edildi */
+            z-index: 10; 
         }
         .iskarta-yazi { pointer-events: none; }
         
         /* Taş içine girdiğinde tam otursun diye */
         .tas-atma-iskartasi .okey-tasi {
-            width: 100%;
-            height: 100%;
-            max-width: 100%;
-            font-size: 18px;
-            border-bottom-width: 2px;
-            border-radius: 6px;
+            width: 100% !important;
+            height: 100% !important;
+            max-width: 100% !important;
+            font-size: 18px !important;
+            border-bottom-width: 2px !important;
+            border-radius: 6px !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            transform: none !important;
         }
 
         /* PRO TUŞ TAKIMI */
@@ -213,7 +215,7 @@
         const sendBtn = document.getElementById('sendBtn');
         const chatMessages = document.getElementById('chatMessages');
 
-        // ISTAKA HÜCRELERİ (fallbackOnBody eklendi)
+        // ISTAKA HÜCRELERİ
         const sortableOptions = {
             group: { name: 'istaka', put: (to) => to.el.children.length === 0 },
             animation: 100, delay: 0, forceFallback: true, fallbackOnBody: true, fallbackClass: 'sortable-drag', ghostClass: 'sortable-ghost', easing: "cubic-bezier(0.25, 1, 0.5, 1)"
@@ -226,16 +228,26 @@
             const yAlt = document.createElement('div'); yAlt.className = 'yuva'; yAlt.id = 'y'+(i+12); altRaf.appendChild(yAlt); new Sortable(yAlt, sortableOptions);
         }
 
-        // ÇÖZÜLEN TAŞ ATMA KUTUSU FONKSİYONU
+        // ÇÖZÜLEN TAŞ ATMA KUTUSU FONKSİYONU (YENİLENMİŞ SINIRLAYICI)
         new Sortable(document.getElementById('tasAtmaAlani'), {
-            group: { name: 'istaka', pull: false }, // Taşı atarsın ama geri alamazsın
+            group: {
+                name: 'istaka',
+                put: function (to) {
+                    // EFSANE KURAL DÜZELTİLDİ: Eğer hücrede zaten BİR TAŞ varsa, 2. taşı koymaya izin VERME!
+                    // 'to.el.querySelector(".okey-tasi")' null değilse içeride taş var demektir.
+                    return to.el.querySelector('.okey-tasi') === null;
+                },
+                pull: false // Taşı atarsın ama geri alamazsın
+            },
             animation: 150,
             forceFallback: true,
             fallbackOnBody: true,
             onAdd: function (evt) {
+                // Taşı kutuya bıraktığında çalışacak kod
                 document.getElementById('iskartaYazi').style.display = 'none'; // Yazıyı gizle
                 const atilanTas = evt.item;
                 console.log("Taş çöpe atıldı: " + atilanTas.innerText);
+                // İleride buraya: socket.emit('tas_atildi', {masaAdi: suAnkiMasam, tasId: atilanTas.id}); kodunu koyacağız.
             }
         });
 
