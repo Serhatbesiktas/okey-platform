@@ -49,6 +49,7 @@ io.on('connection', (socket) => {
         const bosKoltukIndex = masa.koltuklar.indexOf(null);
         if (bosKoltukIndex !== -1) {
             masa.koltuklar[bosKoltukIndex] = data.isim;
+            socket.kullaniciAdi = data.isim; // HAYALET AVCISI İÇİN KİMLİK KAYDI
             
             const guncelLobi = {};
             for(let m in masalar) guncelLobi[m] = masalar[m].koltuklar;
@@ -61,7 +62,7 @@ io.on('connection', (socket) => {
 
   socket.on('oyunu_baslat', (masaAdi) => {
     const masa = masalar[masaAdi];
-    if (masa && !masa.oyunBasladi) {
+    if (masa) { // "oyunBasladi" KİLİDİ KALDIRILDI, İSTEDİĞİN ZAMAN YENİDEN BAŞLATABİLİRSİN
         masa.oyunBasladi = true;
         masa.deste = desteYaratVeKaristir(); 
         
@@ -76,13 +77,13 @@ io.on('connection', (socket) => {
                 const kacTasAlacak = (oyuncuIsmi === baslayacakOyuncu) ? 15 : 14;
                 const oyuncununTaslari = masa.deste.splice(0, kacTasAlacak); 
                 
-                // Frekans düzeltildi: Sadece o oyuncuya özel kanaldan taşları fırlat
-                io.emit('taslari_al_' + oyuncuIsmi, oyuncununTaslari);
+                // KURŞUN GEÇİRMEZ FREKANS:
+                io.emit('taslari_al', { kime: oyuncuIsmi, taslar: oyuncununTaslari });
             }
         });
         
-        io.emit('masa_ortasi_guncelle_' + masaAdi, { kalanTas: masa.deste.length });
-        io.emit('sira_guncelle_' + masaAdi, masa.siradakiOyuncu);
+        io.emit('masa_ortasi_guncelle', { masaAdi: masaAdi, kalanTas: masa.deste.length });
+        io.emit('sira_guncelle', { masaAdi: masaAdi, kimde: masa.siradakiOyuncu });
     }
   });
 
@@ -99,7 +100,7 @@ io.on('connection', (socket) => {
           
           masa.siradakiOyuncu = masa.koltuklar[nextIndex];
           io.emit('sistem_mesaji', `Hamle yapıldı. Sıra ${masa.siradakiOyuncu}'da!`);
-          io.emit('sira_guncelle_' + data.masaAdi, masa.siradakiOyuncu);
+          io.emit('sira_guncelle', { masaAdi: data.masaAdi, kimde: masa.siradakiOyuncu });
       }
   });
 
@@ -108,27 +109,36 @@ io.on('connection', (socket) => {
       if(masa && masa.siradakiOyuncu === data.isim && masa.deste.length > 0) {
           const cekilenTas = masa.deste.shift(); 
           socket.emit('tas_cekildi', cekilenTas); 
-          io.emit('masa_ortasi_guncelle_' + data.masaAdi, { kalanTas: masa.deste.length });
+          io.emit('masa_ortasi_guncelle', { masaAdi: data.masaAdi, kalanTas: masa.deste.length });
       }
   });
 
   socket.on('masadan_kalk', (data) => {
-    const masa = masalar[data.masaAdi];
-    if (masa) {
-        const koltukIndex = masa.koltuklar.indexOf(data.isim);
-        if (koltukIndex !== -1) {
-            masa.koltuklar[koltukIndex] = null;
-            if(masa.koltuklar.every(k => k === null)) {
-                masa.oyunBasladi = false;
-                masa.deste = [];
-                masa.siradakiOyuncu = null;
-            }
-            const guncelLobi = {};
-            for(let m in masalar) guncelLobi[m] = masalar[m].koltuklar;
-            io.emit('masalari_guncelle', guncelLobi);
-        }
-    }
+    kullaniciyiMasadanKaldir(data.isim);
   });
+
+  // SAYFA YENİLENDİĞİNDE VEYA KAPANDIĞINDA HAYALETİ SİL
+  socket.on('disconnect', () => {
+      if(socket.kullaniciAdi) kullaniciyiMasadanKaldir(socket.kullaniciAdi);
+  });
+
+  function kullaniciyiMasadanKaldir(isim) {
+      for(let m in masalar) {
+          let index = masalar[m].koltuklar.indexOf(isim);
+          if(index !== -1) {
+              masalar[m].koltuklar[index] = null;
+              if(masalar[m].koltuklar.every(k => k === null)) {
+                  masalar[m].oyunBasladi = false;
+                  masalar[m].deste = [];
+                  masalar[m].siradakiOyuncu = null;
+              }
+              const guncelLobi = {};
+              for(let m in masalar) guncelLobi[m] = masalar[m].koltuklar;
+              io.emit('masalari_guncelle', guncelLobi);
+              break;
+          }
+      }
+  }
 
   socket.on('lobi_mesaji_gonder', (data) => {
     io.emit('lobi_mesaji_geldi', { isim: data.isim, mesaj: data.mesaj });
