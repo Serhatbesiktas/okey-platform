@@ -12,49 +12,54 @@
         .stats-box { background-color: #14422b; padding: 5px 10px; border-radius: 5px; border: 1px solid #198754; font-size: 11px; text-align: center; }
         .stats-box span { color: #20c997; display: block; font-weight: bold; }
         .user-box { background-color: #ffc107; color: #000; padding: 5px 10px; border-radius: 20px; font-weight: bold; font-size: 12px; }
-        
+
         .main-container { display: flex; flex-direction: column; flex: 1; overflow-y: auto; }
-        
+
         /* LOBİ EKRANI */
         #lobiEkrani { display: flex; flex-direction: column; flex: 1; }
         .tables-panel { padding: 10px; display: flex; flex-direction: column; gap: 10px; }
-        .table-card { background-color: #14422b; border: 2px solid #198754; border-radius: 10px; padding: 10px; text-align: center; }
+        .table-card { background-color: #14422b; border: 2px solid #198754; border-radius: 10px; padding: 12px; text-align: center; }
         .table-title { color: #ffc107; font-weight: bold; margin-bottom: 8px; font-size: 14px; }
-        .table-spots { display: flex; justify-content: center; gap: 15px; margin-bottom: 8px; }
-        .spot { width: 14px; height: 14px; background-color: #6c757d; border-radius: 50%; transition: 0.3s;}
-        .spot.active { background-color: #0dcaf0; box-shadow: 0 0 8px #0dcaf0; }
-        .sit-btn { background-color: #ffc107; color: #000; border: none; padding: 8px 20px; border-radius: 5px; font-weight: bold; font-size: 13px; cursor: pointer; width: 100%; transition: 0.3s; }
-        .sit-btn.disabled { background-color: #6c757d; color: #fff; cursor: not-allowed; }
         
+        /* Lobideki Masanın Koltuk Listesi Tasarımı */
+        .table-slots-list { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 10px; font-size: 11px; text-align: left; background: rgba(0,0,0,0.2); padding: 6px; border-radius: 5px; }
+        .slot-item { color: #a0a0a0; padding: 2px 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .slot-item.occupied { color: #0dcaf0; font-weight: bold; }
+
+        .sit-btn { background-color: #ffc107; color: #000; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; font-size: 14px; cursor: pointer; width: 100%; transition: 0.3s; }
+        .sit-btn.disabled { background-color: #6c757d; color: #fff; cursor: not-allowed; }
+
         .players-panel { background-color: #0b2417; border-top: 2px solid #14422b; padding: 10px; }
         .panel-title { font-size: 14px; margin-bottom: 10px; color: #0dcaf0; display: flex; gap: 5px; }
         .player-table { width: 100%; font-size: 12px; text-align: left; border-collapse: collapse; }
         .player-table th { color: #a0a0a0; padding-bottom: 5px; border-bottom: 1px solid #14422b; }
         .player-table td { padding: 8px 0; border-bottom: 1px solid #0d2e1d; }
         .status-dot { width: 8px; height: 8px; background-color: #20c997; border-radius: 50%; display: inline-block; margin-right: 5px; }
-        
+
         /* MASA EKRANI */
-        #masaEkrani { display: none; flex: 1; background-color: #0a2014; position: relative; padding: 20px; }
+        #masaEkrani { display: none; flex: 1; background-color: #0a2014; position: relative; padding: 25px 15px; }
         .okey-table-ui { background-color: #1a5c38; border: 4px solid #0d2e1d; border-radius: 20px; width: 100%; height: 100%; position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; }
-        .table-center-info { text-align: center; color: rgba(255,255,255,0.2); font-weight: bold; font-size: 24px;}
-        .player-seat { position: absolute; background-color: rgba(0,0,0,0.6); padding: 5px 15px; border-radius: 10px; color: #ffc107; font-size: 12px; font-weight: bold; border: 1px solid #ffc107; }
-        .seat-top { top: -15px; left: 50%; transform: translateX(-50%); }
-        .seat-bottom { bottom: -15px; left: 50%; transform: translateX(-50%); background-color: #ffc107; color: #000;}
-        .seat-left { left: -15px; top: 50%; transform: translateY(-50%); }
-        .seat-right { right: -15px; top: 50%; transform: translateY(-50%); }
-        .return-lobby-btn { position: absolute; top: 10px; right: 10px; background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 5px; font-size: 11px; font-weight: bold; z-index: 10; }
+        .table-center-info { text-align: center; color: rgba(255,255,255,0.15); font-weight: bold; font-size: 20px; padding: 10px; }
+        
+        .player-seat { position: absolute; background-color: rgba(0,0,0,0.75); padding: 6px 12px; border-radius: 8px; color: #ffc107; font-size: 12px; font-weight: bold; border: 1px solid #ffc107; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .seat-top { top: -15px; left: 50%; transform: translateX(-50%); border-color: #0dcaf0; color: #0dcaf0; }
+        .seat-bottom { bottom: -15px; left: 50%; transform: translateX(-50%); background-color: #ffc107; color: #000; font-size: 13px; }
+        .seat-left { left: -15px; top: 50%; transform: translateY(-50%); border-color: #0dcaf0; color: #0dcaf0; }
+        .seat-right { right: -15px; top: 50%; transform: translateY(-50%); border-color: #0dcaf0; color: #0dcaf0; }
+        .return-lobby-btn { position: absolute; top: 5px; right: 5px; background-color: #dc3545; color: white; border: none; padding: 6px 10px; border-radius: 5px; font-size: 11px; font-weight: bold; z-index: 10; }
 
         /* SOHBET */
-        .chat-panel { background-color: #081e13; border-top: 2px solid #14422b; display: flex; flex-direction: column; height: 220px; flex-shrink: 0; }
+        .chat-panel { background-color: #081e13; border-top: 2px solid #14422b; display: flex; flex-direction: column; height: 240px; flex-shrink: 0; z-index: 999; }
         .chat-header { font-size: 12px; padding: 5px 10px; background-color: #05140d; color: #a0a0a0; }
         .chat-messages { flex: 1; padding: 10px; overflow-y: auto; font-size: 13px; display: flex; flex-direction: column; gap: 5px; }
         .msg-line { line-height: 1.4; padding-bottom: 3px;}
         .msg-author { color: #0dcaf0; font-weight: bold; }
         .msg-author.system { color: #ffc107; }
-        .chat-input-area { display: flex; padding: 10px; gap: 8px; background-color: #0b2417; }
-        .chat-input-area input { flex: 1; background-color: #0d2e1d; border: 1px solid #198754; color: #fff; padding: 12px; border-radius: 5px; outline: none; font-size: 14px; }
-        .chat-input-area button { background-color: #0dcaf0; color: #000; border: none; padding: 0 15px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 14px; }
         
+        .chat-input-area { display: flex; padding: 10px; gap: 8px; background-color: #0b2417; padding-bottom: calc(10px + env(safe-area-inset-bottom, 15px)); }
+        .chat-input-area input { flex: 1; background-color: #0d2e1d; border: 1px solid #198754; color: #fff; padding: 14px; border-radius: 5px; outline: none; font-size: 16px; }
+        .chat-input-area button { background-color: #0dcaf0; color: #000; border: none; padding: 0 20px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 15px; }
+
         @media (min-width: 768px) {
             #lobiEkrani { flex-direction: row; }
             .tables-panel { flex: 1; overflow-y: auto; }
@@ -68,19 +73,17 @@
     <div class="header">
         <div class="logo">🏆 VIP OKEY<br>SUNUCUSU</div>
         <div class="stats-box">250.000<span>ÇİP</span></div>
-        <div class="user-box" id="benimAdimKutusu">Sen (Gold)</div>
+        <div class="user-box" id="benimAdimKutusu">Bağlanıyor...</div>
     </div>
 
     <div id="lobiEkrani">
-        <div class="tables-panel" id="masalarAlani">
-            </div>
-
+        <div class="tables-panel" id="masalarAlani"></div>
         <div class="players-panel">
             <div class="panel-title">👥 Lobideki Oyuncular</div>
             <table class="player-table">
                 <thead><tr><th>DRM</th><th>TAKMA AD</th><th>PUAN</th></tr></thead>
                 <tbody>
-                    <tr><td><span class="status-dot"></span></td><td style="color:#ffc107; font-weight:bold;">👑 Sen</td><td>250K</td></tr>
+                    <tr><td><span class="status-dot"></span></td><td style="color:#ffc107; font-weight:bold;" id="lobiBenimAdim">👑 Yükleniyor...</td><td>250K</td></tr>
                     <tr><td><span class="status-dot"></span></td><td>Gamze</td><td>120K</td></tr>
                     <tr><td><span class="status-dot"></span></td><td>Deniz</td><td>45K</td></tr>
                 </tbody>
@@ -92,10 +95,10 @@
         <button class="return-lobby-btn" id="lobiyeDonBtn">⬅ Lobiye Dön</button>
         <div class="okey-table-ui">
             <div class="table-center-info" id="masaOrtasiYazi">MASA</div>
-            <div class="player-seat seat-top">Bekleniyor...</div>
-            <div class="player-seat seat-bottom" id="benimKoltugum">👑 Sen</div>
-            <div class="player-seat seat-left">Bekleniyor...</div>
-            <div class="player-seat seat-right">Bekleniyor...</div>
+            <div class="player-seat seat-top" id="seatTop">Bekleniyor...</div>
+            <div class="player-seat seat-bottom" id="seatBottom">👑 Sen</div>
+            <div class="player-seat seat-left" id="seatLeft">Bekleniyor...</div>
+            <div class="player-seat seat-right" id="seatRight">Bekleniyor...</div>
         </div>
     </div>
 
@@ -111,10 +114,10 @@
     <script>
         const socket = io();
         const aktifKullaniciAdi = "Oyuncu_" + Math.floor(Math.random() * 900 + 100);
-        let suAnkiMasam = null; // Hangi masadayız onu takip edeceğiz
+        let suAnkiMasam = null; 
 
         document.getElementById('benimAdimKutusu').innerText = aktifKullaniciAdi;
-        document.getElementById('benimKoltugum').innerText = "👑 " + aktifKullaniciAdi;
+        document.getElementById('lobiBenimAdim').innerText = "👑 " + aktifKullaniciAdi;
 
         const lobiEkrani = document.getElementById('lobiEkrani');
         const masaEkrani = document.getElementById('masaEkrani');
@@ -125,25 +128,28 @@
         const sendBtn = document.getElementById('sendBtn');
         const chatMessages = document.getElementById('chatMessages');
 
-        // MASALARI SUNUCUDAN GELEN VERİYE GÖRE ÇİZ
+        // SUNUCUDAN GELEN MASALARI VE KOLTUKLARI TAKİP ET
         socket.on('masalari_guncelle', (masalarData) => {
-            masalarAlani.innerHTML = ''; // Eski masaları temizle
+            masalarAlani.innerHTML = ''; 
             
-            for (const [masaAdi, detay] of Object.entries(masalarData)) {
-                const doluKoltukSayisi = detay.oyuncular.length;
-                const kapasite = detay.kapasite;
-                const benBuMasadaMiyim = detay.oyuncular.includes(aktifKullaniciAdi);
+            for (const [masaAdi, koltuklar] of Object.entries(masalarData)) {
+                // Kaç koltuk dolu hesapla
+                const doluKoltuklar = koltuklar.filter(k => k !== null);
+                const doluKoltukSayisi = doluKoltuklar.length;
+                const benBuMasadaMiyim = koltuklar.includes(aktifKullaniciAdi);
 
-                // Noktaları oluştur (Mavi veya Gri)
-                let spotsHTML = '';
-                for(let i=0; i < kapasite; i++) {
-                    if(i < doluKoltukSayisi) spotsHTML += `<div class="spot active"></div>`;
-                    else spotsHTML += `<div class="spot"></div>`;
-                }
+                // Lobide isimleri gösteren HTML'i inşa et
+                let slotsHTML = '';
+                koltuklar.forEach((kullanici, i) => {
+                    if (kullanici !== null) {
+                        slotsHTML += `<div class="slot-item occupied">${i+1}: ${kullanici}</div>`;
+                    } else {
+                        slotsHTML += `<div class="slot-item">${i+1}: Boş</div>`;
+                    }
+                });
 
-                // Buton durumunu ayarla
                 let btnClass = "sit-btn";
-                let btnText = `OTUR (${doluKoltukSayisi}/${kapasite})`;
+                let btnText = `OTUR (${doluKoltukSayisi}/4)`;
                 let btnStyle = "";
                 let disabledAttr = "";
 
@@ -152,17 +158,19 @@
                     btnText = "OTURDUN ✓";
                     btnStyle = "background-color: #20c997; color: white;";
                     disabledAttr = "disabled";
-                } else if (doluKoltukSayisi >= kapasite) {
+                    
+                    // EĞER MASADAYSAK, MASADAKİ DİĞER OYUNCULARI KENDİ AÇIMIZA GÖRE HİZALA
+                    gelişmişKoltukHizala(koltuklar);
+                } else if (doluKoltukSayisi >= 4) {
                     btnClass += " disabled";
-                    btnText = `DOLU (${kapasite}/${kapasite})`;
+                    btnText = "MASA DOLU (4/4)";
                     disabledAttr = "disabled";
                 }
 
-                // Masayı HTML olarak yarat
                 const masaHTML = `
                     <div class="table-card">
                         <div class="table-title">${masaAdi}</div>
-                        <div class="table-spots">${spotsHTML}</div>
+                        <div class="table-slots-list">${slotsHTML}</div>
                         <button class="${btnClass}" style="${btnStyle}" ${disabledAttr} onclick="masayaOtur('${masaAdi}')">${btnText}</button>
                     </div>
                 `;
@@ -170,7 +178,24 @@
             }
         });
 
-        // MASAYA OTURMA FONKSİYONU
+        // OYUNCUYU KENDİ EKRANINDA EN ALTA, DİĞERLERİNİ SAĞA/SOLA/KARŞIYA DİZEN MATEMATİKSEL FORMÜL
+        function gelişmişKoltukHizala(koltuklar) {
+            const benimIndexim = koltuklar.indexOf(aktifKullaniciAdi);
+            if (benimIndexim === -1) return;
+
+            // Saat yönüne göre bağıntılı koltuk index hesaplamaları
+            const sagIndex = (benimIndexim + 1) % 4;
+            const karsiIndex = (benimIndexim + 2) % 4;
+            const solIndex = (benimIndexim + 3) % 4;
+
+            // Ekrana yerleştir
+            document.getElementById('seatBottom').innerText = "👑 " + aktifKullaniciAdi;
+            document.getElementById('seatRight').innerText = koltuklar[sagIndex] ? koltuklar[sagIndex] : "Bekleniyor...";
+            document.getElementById('seatTop').innerText = koltuklar[karsiIndex] ? koltuklar[karsiIndex] : "Bekleniyor...";
+            document.getElementById('seatLeft').innerText = koltuklar[solIndex] ? koltuklar[solIndex] : "Bekleniyor...";
+        }
+
+        // MASAYA OTUR
         window.masayaOtur = function(masaAdi) {
             suAnkiMasam = masaAdi;
             socket.emit('masaya_otur', { isim: aktifKullaniciAdi, masaAdi: masaAdi });
@@ -180,7 +205,7 @@
             masaOrtasiYazi.innerText = masaAdi.toUpperCase();
         };
 
-        // LOBİYE DÖNME FONKSİYONU (Kalkma İşlemi)
+        // LOBİYE DÖN (Masadan Kalkma)
         lobiyeDonBtn.addEventListener('click', () => {
             if(suAnkiMasam) {
                 socket.emit('masadan_kalk', { isim: aktifKullaniciAdi, masaAdi: suAnkiMasam });
@@ -190,8 +215,8 @@
             lobiEkrani.style.display = 'flex';
         });
 
-        // SOHBET İŞLEMLERİ
-        socket.on('connect', () => { ekranaMesajEkle("Sistem", "Sunucu bağlantısı başarıyla kuruldu!", true); });
+        // SOHBET MOTORU
+        socket.on('connect', () => { ekranaMesajEkle("Sistem", "Sunucu bağlantısı kuruldu!", true); });
         socket.on('lobi_mesaji_geldi', (data) => { ekranaMesajEkle(data.isim, data.mesaj, false); });
         socket.on('sistem_mesaji', (mesaj) => { ekranaMesajEkle("Sistem", mesaj, true); });
 
@@ -203,6 +228,7 @@
             if (metin !== '') {
                 socket.emit('lobi_mesaji_gonder', { isim: aktifKullaniciAdi, mesaj: metin });
                 chatInput.value = ''; 
+                chatInput.blur(); // Mesaj gidince klavyeyi kapat, ekran rahatlasın
             }
         }
 
