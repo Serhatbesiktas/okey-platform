@@ -40,16 +40,44 @@
         .player-table td { padding: 8px 0; border-bottom: 1px solid #0d2e1d; }
         .status-dot { width: 8px; height: 8px; background-color: #20c997; border-radius: 50%; display: inline-block; margin-right: 5px; }
 
+        /* --- PROFESYONEL MASA EKRANI ANATOMİSİ --- */
         #masaEkrani { display: none; flex: 1; background-color: #0a2014; position: relative; padding: 10px; flex-direction: column; }
-        .okey-table-ui { background-color: #1a5c38; border: 4px solid #0d2e1d; border-radius: 20px; width: 100%; flex: 1; position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; margin-bottom: 10px; overflow: hidden; }
+        .okey-table-ui { background-color: #1a5c38; border: 4px solid #0d2e1d; border-radius: 20px; width: 100%; flex: 1; position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); margin-bottom: 5px; overflow: hidden; }
         
-        .player-seat { position: absolute; background-color: rgba(0,0,0,0.75); padding: 6px 12px; border-radius: 8px; color: #ffc107; font-size: 12px; font-weight: bold; border: 1px solid #ffc107; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; z-index: 5;}
-        .seat-top { top: 10px; left: 50%; transform: translateX(-50%); border-color: #0dcaf0; color: #0dcaf0; }
-        .seat-left { left: -10px; top: 50%; transform: translateY(-50%) rotate(-90deg); border-color: #0dcaf0; color: #0dcaf0; }
-        .seat-right { right: -10px; top: 50%; transform: translateY(-50%) rotate(90deg); border-color: #0dcaf0; color: #0dcaf0; }
         .return-lobby-btn { position: absolute; top: 5px; right: 5px; background-color: #dc3545; color: white; border: none; padding: 6px 10px; border-radius: 5px; font-size: 11px; font-weight: bold; z-index: 10; cursor: pointer; }
 
-        .masa-ortasi { display: flex; flex-direction: column; align-items: center; gap: 15px; background: rgba(0,0,0,0.2); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); z-index: 4; }
+        /* OYUNCU İSİMLERİ (Kenarlara çekildi, ortalığı kapatmaz) */
+        .player-seat { position: absolute; background-color: rgba(0,0,0,0.75); padding: 6px 12px; border-radius: 8px; color: #ffc107; font-size: 12px; font-weight: bold; border: 1px solid #ffc107; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; z-index: 5; text-align: center;}
+        .seat-top { top: 10px; left: 50%; transform: translateX(-50%); border-color: #0dcaf0; color: #0dcaf0; }
+        .seat-right { top: 25%; right: -25px; transform: translateY(-50%) rotate(-90deg); border-color: #0dcaf0; color: #0dcaf0; }
+        .seat-left { bottom: 25%; left: -25px; transform: translateY(-50%) rotate(90deg); border-color: #0dcaf0; color: #0dcaf0; }
+
+        /* ISKARTALAR (Taş Atma Yerleri) */
+        .iskarta-alani { position: absolute; width: 44px; height: 60px; background-color: rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.1); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.3); font-size: 10px; text-align: center; z-index: 4; }
+        
+        #iskartaUst { top: 15px; left: 25%; }
+        #iskartaSag { top: 25%; right: 25px; transform: translateY(-50%); }
+        #iskartaSol { bottom: 25%; left: 25px; transform: translateY(50%); }
+        
+        /* BENİM ISKARTAM (SARI ÇİZGİLİ AKTİF HEDEF) */
+        #benimIskartam { bottom: 15px; right: 25px; border: 3px dashed #ffc107; color: #ffc107; font-weight: bold; z-index: 10; }
+        .iskarta-yazi { pointer-events: none; }
+
+        /* Taş içine girdiğinde üst üste yığılması için */
+        .iskarta-alani .okey-tasi {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            transform: none !important;
+            border-bottom-width: 3px !important;
+        }
+
+        /* MASA ORTASI DİZAYNI */
+        .masa-ortasi { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 15px; background: rgba(0,0,0,0.2); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); z-index: 4; }
         .masa-isim-ortasi { color: rgba(255,255,255,0.3); font-weight: bold; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; }
         .oyun-baslat-btn { background-color: #ffc107; color: #000; border: none; padding: 10px 25px; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.4); }
         .oyun-baslat-btn:active { transform: scale(0.95); }
@@ -57,47 +85,12 @@
         .kalan-tas-bilgi-container { display: none; flex-direction: column; align-items: center; gap: 8px; }
         .kapali-deste { width: 34px; height: 48px; background-color: #fdf6e3; border: 1px solid #d3c9b3; border-bottom: 5px solid #c0b396; border-radius: 6px; box-shadow: -2px 3px 6px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; color: #000; font-weight: bold; font-size: 13px;}
 
-        /* --- ÇÖZÜLEN VE KONUMLANDIRILAN TAŞ ATMA ISKARTASI (Siyah 7'nin yanı) --- */
-        .tas-atma-iskartasi { 
-            position: absolute; 
-            bottom: 115px; /* İstakanın hemen üstünde */
-            right: 25px; /* Masanın sağ köşesi (Siyah 7'nin olduğu yer) */
-            width: 48px; 
-            height: 64px; 
-            background-color: rgba(0,0,0,0.4); 
-            border: 3px dashed #ffc107; /* Belirgin sarı çizgili hedef */
-            border-radius: 8px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            color: #ffc107; 
-            font-weight: bold; 
-            font-size: 11px; 
-            text-align: center; 
-            z-index: 10; 
-        }
-        .iskarta-yazi { pointer-events: none; }
-        
-        /* Taş içine girdiğinde tam otursun diye */
-        .tas-atma-iskartasi .okey-tasi {
-            width: 100% !important;
-            height: 100% !important;
-            max-width: 100% !important;
-            font-size: 18px !important;
-            border-bottom-width: 2px !important;
-            border-radius: 6px !important;
-            position: absolute !important;
-            top: 0 !important;
-            left: 0 !important;
-            transform: none !important;
-        }
-
         /* PRO TUŞ TAKIMI */
-        .pro-tus-takimi { width: 100%; display: flex; justify-content: flex-start; align-items: center; padding: 5px 10px; margin-bottom: 5px; z-index: 10; gap: 10px; }
+        .pro-tus-takimi { width: 100%; display: flex; justify-content: flex-start; align-items: center; padding: 2px 10px; margin-bottom: 4px; z-index: 10; gap: 10px; }
         .pro-tus { padding: 0 15px; height: 35px; background-color: #14422b; border: 1px solid #198754; color: #ffc107; border-radius: 6px; font-weight: bold; font-size: 12px; text-transform: uppercase; cursor: pointer; box-shadow: 0 3px 5px rgba(0,0,0,0.5); }
         .pro-tus:active { transform: scale(0.95); background-color: #0d2e1d; }
 
+        /* ISTAKA VE TAŞLAR */
         .istaka-container { width: 100%; height: 140px; background-color: #8b5a2b; border-radius: 10px; border: 4px solid #4a2c10; box-shadow: 0 10px 25px rgba(0,0,0,0.7); display: flex; flex-direction: column; padding: 4px; gap: 4px; position: relative; z-index: 20;}
         .istaka-raf { display: flex; flex: 1; width: 100%; gap: 2px; border-radius: 5px; padding: 3px 2px; }
         .raf-ust { background: linear-gradient(to bottom, #5a3819, #784c25); box-shadow: inset 0 6px 12px rgba(0,0,0,0.6); }
@@ -107,6 +100,7 @@
         .okey-tasi { width: 100%; height: 92%; max-width: 38px; background-color: #fcf5e3; border-radius: 6px; border: 1px solid #d3c9b3; border-bottom: 5px solid #c0b396; box-shadow: 0 4px 6px rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 900; font-size: clamp(15px, 4.5vw, 22px); font-family: Arial, sans-serif; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-user-drag: none; z-index: 30;}
         .okey-tasi:active { cursor: grabbing; border-bottom-width: 2px; transform: translateY(3px); }
         .okey-tasi::after { content: ''; position: absolute; top: 2px; left: 2px; right: 2px; bottom: 2px; border: 1px solid rgba(0,0,0,0.05); border-radius: 4px; }
+        
         .sortable-ghost { opacity: 0.3; } 
         .sortable-drag { box-shadow: 5px 15px 25px rgba(0,0,0,0.8) !important; transform: scale(1.15) translateY(-20px) !important; z-index: 99999 !important; border-bottom-width: 8px !important; }
         
@@ -156,6 +150,7 @@
     <div id="masaEkrani">
         <div class="okey-table-ui">
             <button class="return-lobby-btn" id="lobiyeDonBtn">⬅ Lobiye Dön</button>
+            
             <div class="player-seat seat-top" id="seatTop">Bekleniyor...</div>
             <div class="player-seat seat-left" id="seatLeft">Bekleniyor...</div>
             <div class="player-seat seat-right" id="seatRight">Bekleniyor...</div>
@@ -168,7 +163,11 @@
                 </div>
             </div>
 
-            <div class="tas-atma-iskartasi" id="tasAtmaAlani">
+            <div class="iskarta-alani" id="iskartaUst"></div>
+            <div class="iskarta-alani" id="iskartaSag"></div>
+            <div class="iskarta-alani" id="iskartaSol"></div>
+            
+            <div class="iskarta-alani" id="benimIskartam">
                 <div class="iskarta-yazi" id="iskartaYazi">TAŞ AT<br>⬇</div>
             </div>
         </div>
@@ -228,26 +227,22 @@
             const yAlt = document.createElement('div'); yAlt.className = 'yuva'; yAlt.id = 'y'+(i+12); altRaf.appendChild(yAlt); new Sortable(yAlt, sortableOptions);
         }
 
-        // ÇÖZÜLEN TAŞ ATMA KUTUSU FONKSİYONU (YENİLENMİŞ SINIRLAYICI)
-        new Sortable(document.getElementById('tasAtmaAlani'), {
-            group: {
-                name: 'istaka',
-                put: function (to) {
-                    // EFSANE KURAL DÜZELTİLDİ: Eğer hücrede zaten BİR TAŞ varsa, 2. taşı koymaya izin VERME!
-                    // 'to.el.querySelector(".okey-tasi")' null değilse içeride taş var demektir.
-                    return to.el.querySelector('.okey-tasi') === null;
-                },
-                pull: false // Taşı atarsın ama geri alamazsın
-            },
+        // BENİM ISKARTAM (SARI ÇİZGİLİ ALAN - ÜST ÜSTE BİNME DESTEKLİ)
+        new Sortable(document.getElementById('benimIskartam'), {
+            group: { name: 'istaka', pull: false }, // Taşı atarsın ama geri alamazsın
             animation: 150,
             forceFallback: true,
             fallbackOnBody: true,
             onAdd: function (evt) {
-                // Taşı kutuya bıraktığında çalışacak kod
-                document.getElementById('iskartaYazi').style.display = 'none'; // Yazıyı gizle
+                // Taş atıldığında yazıyı gizle ve taşın position'ını absolute yaparak tam oturmasını sağla
+                document.getElementById('iskartaYazi').style.display = 'none'; 
                 const atilanTas = evt.item;
+                atilanTas.style.position = 'absolute';
+                atilanTas.style.top = '0';
+                atilanTas.style.left = '0';
+                atilanTas.style.margin = '0';
+                
                 console.log("Taş çöpe atıldı: " + atilanTas.innerText);
-                // İleride buraya: socket.emit('tas_atildi', {masaAdi: suAnkiMasam, tasId: atilanTas.id}); kodunu koyacağız.
             }
         });
 
@@ -295,8 +290,8 @@
             
             oyunuBaslatBtn.style.display = 'block';
             oyunAlanObjeleri.style.display = 'none';
-            // Kutuyu sıfırla
-            document.getElementById('tasAtmaAlani').innerHTML = '<div class="iskarta-yazi" id="iskartaYazi">TAŞ AT<br>⬇</div>';
+            // Iskartayı sıfırla
+            document.getElementById('benimIskartam').innerHTML = '<div class="iskarta-yazi" id="iskartaYazi">TAŞ AT<br>⬇</div>';
         };
 
         lobiyeDonBtn.addEventListener('click', () => {
