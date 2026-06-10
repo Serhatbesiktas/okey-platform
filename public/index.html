@@ -57,7 +57,7 @@
         #iskartaSag { top: 25%; right: 30px; transform: translateY(-50%); }
         #iskartaSol { bottom: 25%; left: 30px; transform: translateY(50%); }
         
-        /* BENİM ISKARTAM */
+        /* BENİM ISKARTAM (Mıknatıs Alanı Büyütüldü) */
         #benimIskartam { 
             position: absolute;
             bottom: 100px; 
@@ -108,11 +108,11 @@
         .raf-alt { background: linear-gradient(to bottom, #a06b3c, #8b5a2b); box-shadow: inset 0 3px 8px rgba(0,0,0,0.4); border-top: 2px solid #a87648; }
         .yuva { flex: 1; height: 100%; background: rgba(0,0,0,0.15); border-radius: 4px; display: flex; align-items: center; justify-content: center; position: relative; }
         
-        .okey-tasi { width: 100%; height: 92%; max-width: 38px; background-color: #fcf5e3; border-radius: 6px; border: 1px solid #d3c9b3; border-bottom: 5px solid #c0b396; box-shadow: 0 4px 6px rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 900; font-size: clamp(15px, 4.5vw, 22px); font-family: Arial, sans-serif; cursor: grab; touch-action: manipulation; user-select: none; -webkit-user-select: none; -webkit-user-drag: none; z-index: 30; transition: transform 0.1s;}
+        .okey-tasi { width: 100%; height: 92%; max-width: 38px; background-color: #fcf5e3; border-radius: 6px; border: 1px solid #d3c9b3; border-bottom: 5px solid #c0b396; box-shadow: 0 4px 6px rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 900; font-size: clamp(15px, 4.5vw, 22px); font-family: Arial, sans-serif; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-user-drag: none; z-index: 30;}
         .okey-tasi:active { cursor: grabbing; border-bottom-width: 2px; transform: translateY(3px); }
         .okey-tasi::after { content: ''; position: absolute; top: 2px; left: 2px; right: 2px; bottom: 2px; border: 1px solid rgba(0,0,0,0.05); border-radius: 4px; }
         
-        .sortable-ghost { opacity: 0.1; } 
+        .sortable-ghost { opacity: 0.3; } 
         .sortable-drag { box-shadow: 5px 15px 25px rgba(0,0,0,0.8) !important; transform: scale(1.15) translateY(-20px) !important; z-index: 99999 !important; border-bottom-width: 8px !important; }
         
         .tas-kirmizi { color: #d32f2f; } .tas-siyah { color: #212529; } .tas-mavi { color: #1976d2; } .tas-sari { color: #e65100; }
@@ -226,17 +226,9 @@
         const sendBtn = document.getElementById('sendBtn');
         const chatMessages = document.getElementById('chatMessages');
 
-        // SÜZÜLME DİRENCİ (Friction) SIFIRLANDI!
         const sortableOptions = {
             group: { name: 'istaka', put: (to) => to.el.children.length === 0 },
-            animation: 100, 
-            delay: 0, 
-            forceFallback: true, 
-            fallbackOnBody: true, 
-            fallbackTolerance: 2, // 2px parmak hareketi anında taşı koparır (Akıcılığın Sırrı)
-            ghostClass: 'sortable-ghost', 
-            dragClass: 'sortable-drag',
-            easing: "cubic-bezier(0.25, 1, 0.5, 1)"
+            animation: 100, delay: 0, forceFallback: true, fallbackOnBody: true, fallbackClass: 'sortable-drag', ghostClass: 'sortable-ghost', easing: "cubic-bezier(0.25, 1, 0.5, 1)"
         };
 
         const ustRaf = document.getElementById('ustRaf');
@@ -246,16 +238,19 @@
             const yAlt = document.createElement('div'); yAlt.className = 'yuva'; yAlt.id = 'y'+(i+12); altRaf.appendChild(yAlt); new Sortable(yAlt, sortableOptions);
         }
 
+        // ÇÖZÜLEN TAŞ ATMA KUTUSU (Mıknatıs Etkisi Çok Artırıldı)
         new Sortable(document.getElementById('benimIskartam'), {
             group: {
                 name: 'istaka',
-                put: function (to) { return !hamleYapildi; },
+                put: function (to) {
+                    return !hamleYapildi; 
+                },
                 pull: false
             },
             animation: 150,
             forceFallback: true,
             fallbackOnBody: true,
-            emptyInsertThreshold: 100, 
+            emptyInsertThreshold: 100, // <--- İŞTE BURASI! Mıknatıs etkisi 5 kat artırıldı.
             onAdd: function (evt) {
                 hamleYapildi = true; 
                 document.getElementById('iskartaYazi').style.display = 'none';
@@ -267,29 +262,6 @@
                 atilanTas.style.margin = '0';
             }
         });
-
-        // EFSANE ÖZELLİK: Çift Tıklama / Dokunma İle Otomatik Taş Atma Fonksiyonu
-        function otomatikTasAt(tasElementi) {
-            if (hamleYapildi) return; // Zaten atıldıysa kilitli
-            
-            const iskartaKutusu = document.getElementById('benimIskartam');
-            
-            // Eğer iskartada taş yoksa at
-            if (iskartaKutusu.querySelector('.okey-tasi') === null) {
-                iskartaKutusu.appendChild(tasElementi);
-                
-                // Tam oturtma CSS'i
-                tasElementi.style.position = 'absolute';
-                tasElementi.style.top = '50%';
-                tasElementi.style.left = '50%';
-                tasElementi.style.transform = 'translate(-50%, -50%)';
-                tasElementi.style.margin = '0';
-                
-                document.getElementById('iskartaYazi').style.display = 'none';
-                hamleYapildi = true; // KİLİTLE
-                console.log("Çift dokunuşla mermi gibi atıldı: " + tasElementi.innerText);
-            }
-        }
 
         socket.on('masalari_guncelle', (lobidekiMasalar) => {
             masalarAlani.innerHTML = ''; 
@@ -364,16 +336,6 @@
                 div.className = `okey-tasi tas-${tas.renk}`;
                 div.innerText = tas.sayi;
                 div.id = tas.id; 
-
-                // HER TAŞA ÇİFT TIKLAMA ÖZELLİĞİ EKLENDİ
-                let sonDokunma = 0;
-                div.addEventListener('touchend', function(e) {
-                    const simdi = new Date().getTime();
-                    if (simdi - sonDokunma < 300) { otomatikTasAt(this); }
-                    sonDokunma = simdi;
-                });
-                div.addEventListener('dblclick', function() { otomatikTasAt(this); });
-
                 document.getElementById('y'+index).appendChild(div);
             });
         });
