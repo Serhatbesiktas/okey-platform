@@ -40,8 +40,9 @@
         .player-table td { padding: 8px 0; border-bottom: 1px solid #0d2e1d; }
         .status-dot { width: 8px; height: 8px; background-color: #20c997; border-radius: 50%; display: inline-block; margin-right: 5px; }
 
+        /* MASA EKRANI */
         #masaEkrani { display: none; flex: 1; background-color: #0a2014; position: relative; padding: 10px; flex-direction: column; }
-        .okey-table-ui { background-color: #1a5c38; border: 4px solid #0d2e1d; border-radius: 20px; width: 100%; flex: 1; position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
+        .okey-table-ui { background-color: #1a5c38; border: 4px solid #0d2e1d; border-radius: 20px; width: 100%; flex: 1; position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; margin-bottom: 10px; overflow: hidden; }
         
         .player-seat { position: absolute; background-color: rgba(0,0,0,0.75); padding: 6px 12px; border-radius: 8px; color: #ffc107; font-size: 12px; font-weight: bold; border: 1px solid #ffc107; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; z-index: 5;}
         .seat-top { top: 10px; left: 50%; transform: translateX(-50%); border-color: #0dcaf0; color: #0dcaf0; }
@@ -55,31 +56,57 @@
         .oyun-baslat-btn:active { transform: scale(0.95); }
         
         .kalan-tas-bilgi-container { display: none; flex-direction: column; align-items: center; gap: 8px; }
-        .kapali-deste { width: 34px; height: 48px; background-color: #fdf6e3; border: 1px solid #d3c9b3; border-bottom: 5px solid #c0b396; border-radius: 6px; box-shadow: -2px 3px 6px rgba(0,0,0,0.6); position: relative; display: flex; align-items: center; justify-content: center; color: #000; font-weight: bold; font-size: 13px;}
-        .gosterge-tasi { display: none; width: 34px; height: 48px; background-color: #fdf6e3; border: 1px solid #d3c9b3; border-bottom: 5px solid #c0b396; border-radius: 6px; box-shadow: 0 3px 6px rgba(0,0,0,0.6); align-items: center; justify-content: center; color: #d32f2f; font-weight: bold; font-size: 20px;}
+        .kapali-deste { width: 34px; height: 48px; background-color: #fdf6e3; border: 1px solid #d3c9b3; border-bottom: 5px solid #c0b396; border-radius: 6px; box-shadow: -2px 3px 6px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; color: #000; font-weight: bold; font-size: 13px;}
 
-        /* --- SAĞDAKİ TAŞ ATMA ISKARTASI (Çalışan Kutu) --- */
-        .tas-atma-iskartasi { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 60px; height: 90px; background-color: rgba(0,0,0,0.4); border: 2px dashed rgba(255,255,255,0.3); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: rgba(255,255,255,0.4); font-weight: bold; font-size: 11px; text-align: center; }
-        .tas-atma-iskartasi.highlight { background-color: rgba(255, 193, 7, 0.3); border-color: #ffc107; } /* Sürüklerken parlar */
-        .iskarta-yazi { pointer-events: none; position: absolute; z-index: 1; }
+        /* --- ÇÖZÜLEN TAŞ ATMA ISKARTASI --- */
+        .tas-atma-iskartasi { 
+            position: absolute; 
+            right: 75px; /* Koltuğun altından kurtarıldı, masanın içine alındı */
+            top: 50%; 
+            transform: translateY(-50%); 
+            width: 46px; 
+            height: 62px; 
+            background-color: rgba(0,0,0,0.4); 
+            border: 2px dashed #ffc107; /* Belirgin sarı çizgi */
+            border-radius: 8px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            color: #ffc107; 
+            font-weight: bold; 
+            font-size: 10px; 
+            text-align: center; 
+            z-index: 10; /* Tıklanabilirliği garanti edildi */
+        }
+        .iskarta-yazi { pointer-events: none; }
+        
+        /* Taş içine girdiğinde tam otursun diye */
+        .tas-atma-iskartasi .okey-tasi {
+            width: 100%;
+            height: 100%;
+            max-width: 100%;
+            font-size: 18px;
+            border-bottom-width: 2px;
+            border-radius: 6px;
+        }
 
-        /* --- PRO TUŞ TAKIMI --- */
+        /* PRO TUŞ TAKIMI */
         .pro-tus-takimi { width: 100%; display: flex; justify-content: flex-start; align-items: center; padding: 5px 10px; margin-bottom: 5px; z-index: 10; gap: 10px; }
         .pro-tus { padding: 0 15px; height: 35px; background-color: #14422b; border: 1px solid #198754; color: #ffc107; border-radius: 6px; font-weight: bold; font-size: 12px; text-transform: uppercase; cursor: pointer; box-shadow: 0 3px 5px rgba(0,0,0,0.5); }
         .pro-tus:active { transform: scale(0.95); background-color: #0d2e1d; }
-        /* BİTİR Butonu Kasten Kaldırıldı! */
 
-        .istaka-container { width: 100%; height: 140px; background-color: #8b5a2b; border-radius: 10px; border: 4px solid #4a2c10; box-shadow: 0 10px 25px rgba(0,0,0,0.7); display: flex; flex-direction: column; padding: 4px; gap: 4px; position: relative; }
+        .istaka-container { width: 100%; height: 140px; background-color: #8b5a2b; border-radius: 10px; border: 4px solid #4a2c10; box-shadow: 0 10px 25px rgba(0,0,0,0.7); display: flex; flex-direction: column; padding: 4px; gap: 4px; position: relative; z-index: 20;}
         .istaka-raf { display: flex; flex: 1; width: 100%; gap: 2px; border-radius: 5px; padding: 3px 2px; }
         .raf-ust { background: linear-gradient(to bottom, #5a3819, #784c25); box-shadow: inset 0 6px 12px rgba(0,0,0,0.6); }
         .raf-alt { background: linear-gradient(to bottom, #a06b3c, #8b5a2b); box-shadow: inset 0 3px 8px rgba(0,0,0,0.4); border-top: 2px solid #a87648; }
         .yuva { flex: 1; height: 100%; background: rgba(0,0,0,0.15); border-radius: 4px; display: flex; align-items: center; justify-content: center; position: relative; }
         
-        .okey-tasi { width: 100%; height: 92%; max-width: 38px; background-color: #fcf5e3; border-radius: 6px; border: 1px solid #d3c9b3; border-bottom: 5px solid #c0b396; box-shadow: 0 4px 6px rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 900; font-size: clamp(15px, 4.5vw, 22px); font-family: Arial, sans-serif; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-user-drag: none; z-index: 20;}
+        .okey-tasi { width: 100%; height: 92%; max-width: 38px; background-color: #fcf5e3; border-radius: 6px; border: 1px solid #d3c9b3; border-bottom: 5px solid #c0b396; box-shadow: 0 4px 6px rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 900; font-size: clamp(15px, 4.5vw, 22px); font-family: Arial, sans-serif; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-user-drag: none; z-index: 30;}
         .okey-tasi:active { cursor: grabbing; border-bottom-width: 2px; transform: translateY(3px); }
         .okey-tasi::after { content: ''; position: absolute; top: 2px; left: 2px; right: 2px; bottom: 2px; border: 1px solid rgba(0,0,0,0.05); border-radius: 4px; }
         .sortable-ghost { opacity: 0.3; } 
-        .sortable-drag { box-shadow: 5px 15px 25px rgba(0,0,0,0.8) !important; transform: scale(1.15) translateY(-20px) !important; z-index: 9999 !important; border-bottom-width: 8px !important; }
+        .sortable-drag { box-shadow: 5px 15px 25px rgba(0,0,0,0.8) !important; transform: scale(1.15) translateY(-20px) !important; z-index: 99999 !important; border-bottom-width: 8px !important; }
         
         .tas-kirmizi { color: #d32f2f; } .tas-siyah { color: #212529; } .tas-mavi { color: #1976d2; } .tas-sari { color: #e65100; }
 
@@ -140,7 +167,7 @@
             </div>
 
             <div class="tas-atma-iskartasi" id="tasAtmaAlani">
-                <div class="iskarta-yazi">TAŞ AT<br>⬇</div>
+                <div class="iskarta-yazi" id="iskartaYazi">TAŞ AT<br>⬇</div>
             </div>
         </div>
 
@@ -148,7 +175,7 @@
             <div class="pro-tus-takimi">
                 <button class="pro-tus" onclick="alert('Seri dizme algoritması kodlanıyor...')">SERİ DİZ</button>
                 <button class="pro-tus" onclick="alert('Çift dizme algoritması kodlanıyor...')">ÇİFT DİZ</button>
-                </div>
+            </div>
 
             <div class="istaka-container" id="benimIstakam">
                 <div class="istaka-raf raf-ust" id="ustRaf"></div>
@@ -186,10 +213,10 @@
         const sendBtn = document.getElementById('sendBtn');
         const chatMessages = document.getElementById('chatMessages');
 
-        // ISTAKA HÜCRELERİ
+        // ISTAKA HÜCRELERİ (fallbackOnBody eklendi)
         const sortableOptions = {
             group: { name: 'istaka', put: (to) => to.el.children.length === 0 },
-            animation: 100, delay: 0, forceFallback: true, fallbackClass: 'sortable-drag', ghostClass: 'sortable-ghost', easing: "cubic-bezier(0.25, 1, 0.5, 1)"
+            animation: 100, delay: 0, forceFallback: true, fallbackOnBody: true, fallbackClass: 'sortable-drag', ghostClass: 'sortable-ghost', easing: "cubic-bezier(0.25, 1, 0.5, 1)"
         };
 
         const ustRaf = document.getElementById('ustRaf');
@@ -199,16 +226,16 @@
             const yAlt = document.createElement('div'); yAlt.className = 'yuva'; yAlt.id = 'y'+(i+12); altRaf.appendChild(yAlt); new Sortable(yAlt, sortableOptions);
         }
 
-        // YENİ: TAŞ ATMA KUTUSUNU AKTİF ET
+        // ÇÖZÜLEN TAŞ ATMA KUTUSU FONKSİYONU
         new Sortable(document.getElementById('tasAtmaAlani'), {
-            group: { name: 'istaka', pull: false }, // Taşı oraya bırakabilirsin ama geri alamazsın!
+            group: { name: 'istaka', pull: false }, // Taşı atarsın ama geri alamazsın
             animation: 150,
+            forceFallback: true,
+            fallbackOnBody: true,
             onAdd: function (evt) {
-                // Taşı kutuya bıraktığında çalışacak kod
+                document.getElementById('iskartaYazi').style.display = 'none'; // Yazıyı gizle
                 const atilanTas = evt.item;
-                atilanTas.style.position = "static"; // Kutunun içine oturt
-                console.log("Taş atıldı: " + atilanTas.innerText);
-                // İleride buraya: socket.emit('tas_atildi', tasId); kodunu koyacağız.
+                console.log("Taş çöpe atıldı: " + atilanTas.innerText);
             }
         });
 
@@ -256,7 +283,8 @@
             
             oyunuBaslatBtn.style.display = 'block';
             oyunAlanObjeleri.style.display = 'none';
-            document.getElementById('tasAtmaAlani').innerHTML = '<div class="iskarta-yazi">TAŞ AT<br>⬇</div>'; // Kutuyu sıfırla
+            // Kutuyu sıfırla
+            document.getElementById('tasAtmaAlani').innerHTML = '<div class="iskarta-yazi" id="iskartaYazi">TAŞ AT<br>⬇</div>';
         };
 
         lobiyeDonBtn.addEventListener('click', () => {
