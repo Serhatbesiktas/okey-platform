@@ -6,141 +6,37 @@
     <title>VIP Okey Sunucusu</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            background-color: #0d2e1d;
-            color: #fff;
-            font-family: sans-serif;
-            display: flex;
-            flex-direction: column;
-            /* Safari'nin alt menü sorununu çözen sihirli kod: */
-            height: 100dvh; 
-            overflow: hidden;
-        }
-        /* Üst Panel */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            background-color: #081e13;
-            border-bottom: 2px solid #14422b;
-            flex-shrink: 0;
-        }
+        body { background-color: #0d2e1d; color: #fff; font-family: sans-serif; display: flex; flex-direction: column; height: 100dvh; overflow: hidden; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 10px; background-color: #081e13; border-bottom: 2px solid #14422b; flex-shrink: 0; }
         .logo { color: #ffc107; font-weight: bold; font-size: 14px; }
-        .stats-box {
-            background-color: #14422b;
-            padding: 5px 10px;
-            border-radius: 5px;
-            border: 1px solid #198754;
-            font-size: 11px;
-            text-align: center;
-        }
+        .stats-box { background-color: #14422b; padding: 5px 10px; border-radius: 5px; border: 1px solid #198754; font-size: 11px; text-align: center; }
         .stats-box span { color: #20c997; display: block; font-weight: bold; }
-        .user-box {
-            background-color: #ffc107;
-            color: #000;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 12px;
-        }
-
-        /* Ana Alan (Mobilde alt alta, bilgisayarda yan yana) */
-        .main-container {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            overflow-y: auto; /* Mobilde aşağı kaydırmaya izin ver */
-        }
-        
-        .tables-panel {
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .table-card {
-            background-color: #14422b;
-            border: 2px solid #198754;
-            border-radius: 10px;
-            padding: 10px;
-            text-align: center;
-        }
+        .user-box { background-color: #ffc107; color: #000; padding: 5px 10px; border-radius: 20px; font-weight: bold; font-size: 12px; }
+        .main-container { display: flex; flex-direction: column; flex: 1; overflow-y: auto; }
+        .tables-panel { padding: 10px; display: flex; flex-direction: column; gap: 10px; }
+        .table-card { background-color: #14422b; border: 2px solid #198754; border-radius: 10px; padding: 10px; text-align: center; }
         .table-title { color: #ffc107; font-weight: bold; margin-bottom: 8px; font-size: 14px; }
         .table-spots { display: flex; justify-content: center; gap: 15px; margin-bottom: 8px; }
         .spot { width: 14px; height: 14px; background-color: #6c757d; border-radius: 50%; }
         .spot.active { background-color: #0dcaf0; }
-        .sit-btn {
-            background-color: #ffc107;
-            color: #000;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 5px;
-            font-weight: bold;
-            font-size: 13px;
-            cursor: pointer;
-            width: 100%; /* Mobilde butonları büyüt */
-        }
+        .sit-btn { background-color: #ffc107; color: #000; border: none; padding: 8px 20px; border-radius: 5px; font-weight: bold; font-size: 13px; cursor: pointer; width: 100%; transition: 0.3s; }
         .sit-btn.disabled { background-color: #6c757d; color: #fff; cursor: not-allowed; }
-
-        /* Oyuncular Paneli */
-        .players-panel {
-            background-color: #0b2417;
-            border-top: 2px solid #14422b;
-            padding: 10px;
-        }
+        .players-panel { background-color: #0b2417; border-top: 2px solid #14422b; padding: 10px; }
         .panel-title { font-size: 14px; margin-bottom: 10px; color: #0dcaf0; display: flex; gap: 5px; }
         .player-table { width: 100%; font-size: 12px; text-align: left; border-collapse: collapse; }
         .player-table th { color: #a0a0a0; padding-bottom: 5px; border-bottom: 1px solid #14422b; }
         .player-table td { padding: 8px 0; border-bottom: 1px solid #0d2e1d; }
-        .status-dot { inline-block; width: 8px; height: 8px; background-color: #20c997; border-radius: 50%; display: inline-block; margin-right: 5px; }
+        .status-dot { width: 8px; height: 8px; background-color: #20c997; border-radius: 50%; display: inline-block; margin-right: 5px; }
         .status-dot.offline { background-color: #6c757d; }
-
-        /* Alt Panel (Canlı Sohbet) */
-        .chat-panel {
-            background-color: #081e13;
-            border-top: 2px solid #14422b;
-            display: flex;
-            flex-direction: column;
-            height: 220px; /* Mobilde sohbet alanını garantiye al */
-            flex-shrink: 0;
-        }
+        .chat-panel { background-color: #081e13; border-top: 2px solid #14422b; display: flex; flex-direction: column; height: 220px; flex-shrink: 0; }
         .chat-header { font-size: 12px; padding: 5px 10px; background-color: #05140d; color: #a0a0a0; }
-        .chat-messages {
-            flex: 1;
-            padding: 10px;
-            overflow-y: auto;
-            font-size: 13px;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
+        .chat-messages { flex: 1; padding: 10px; overflow-y: auto; font-size: 13px; display: flex; flex-direction: column; gap: 5px; }
         .msg-line { line-height: 1.4; padding-bottom: 3px;}
         .msg-author { color: #0dcaf0; font-weight: bold; }
         .msg-author.system { color: #ffc107; }
         .chat-input-area { display: flex; padding: 10px; gap: 8px; background-color: #0b2417; }
-        .chat-input-area input {
-            flex: 1;
-            background-color: #0d2e1d;
-            border: 1px solid #198754;
-            color: #fff;
-            padding: 12px;
-            border-radius: 5px;
-            outline: none;
-            font-size: 14px; /* Klavyenin gereksiz zoom yapmasını engeller */
-        }
-        .chat-input-area button {
-            background-color: #0dcaf0;
-            color: #000;
-            border: none;
-            padding: 0 15px;
-            border-radius: 5px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        /* Bilgisayar Ekranı İçin Düzen (768px ve üzeri) */
+        .chat-input-area input { flex: 1; background-color: #0d2e1d; border: 1px solid #198754; color: #fff; padding: 12px; border-radius: 5px; outline: none; font-size: 14px; }
+        .chat-input-area button { background-color: #0dcaf0; color: #000; border: none; padding: 0 15px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 14px; }
         @media (min-width: 768px) {
             .main-container { flex-direction: row; overflow: hidden; }
             .tables-panel { flex: 1; overflow-y: auto; }
@@ -162,30 +58,21 @@
             <div class="table-card">
                 <div class="table-title">Acemiler (20K Bahis)</div>
                 <div class="table-spots">
-                    <div class="spot active"></div>
-                    <div class="spot active"></div>
-                    <div class="spot active"></div>
-                    <div class="spot"></div>
+                    <div class="spot active"></div><div class="spot active"></div><div class="spot active"></div><div class="spot"></div>
                 </div>
                 <button class="sit-btn">OTUR (3/4)</button>
             </div>
             <div class="table-card">
                 <div class="table-title">Usta Masası (50K Bahis)</div>
                 <div class="table-spots">
-                    <div class="spot active"></div>
-                    <div class="spot active"></div>
-                    <div class="spot active"></div>
-                    <div class="spot active"></div>
+                    <div class="spot active"></div><div class="spot active"></div><div class="spot active"></div><div class="spot active"></div>
                 </div>
                 <button class="sit-btn disabled" disabled>DOLU (4/4)</button>
             </div>
             <div class="table-card">
                 <div class="table-title">Hızlı Oyun (10K Bahis)</div>
                 <div class="table-spots">
-                    <div class="spot"></div>
-                    <div class="spot"></div>
-                    <div class="spot"></div>
-                    <div class="spot active"></div>
+                    <div class="spot"></div><div class="spot"></div><div class="spot"></div><div class="spot active"></div>
                 </div>
                 <button class="sit-btn">OTUR (1/4)</button>
             </div>
@@ -194,13 +81,7 @@
         <div class="players-panel">
             <div class="panel-title">👥 Lobideki Oyuncular</div>
             <table class="player-table">
-                <thead>
-                    <tr>
-                        <th>DRM</th>
-                        <th>TAKMA AD</th>
-                        <th>PUAN</th>
-                    </tr>
-                </thead>
+                <thead><tr><th>DRM</th><th>TAKMA AD</th><th>PUAN</th></tr></thead>
                 <tbody>
                     <tr><td><span class="status-dot"></span></td><td style="color:#ffc107; font-weight:bold;">👑 Sen</td><td>250K</td></tr>
                     <tr><td><span class="status-dot"></span></td><td>Gamze</td><td>120K</td></tr>
@@ -213,8 +94,7 @@
 
     <div class="chat-panel">
         <div class="chat-header">💬 Sunucu Genel Sohbet</div>
-        <div class="chat-messages" id="chatMessages">
-            </div>
+        <div class="chat-messages" id="chatMessages"></div>
         <div class="chat-input-area">
             <input type="text" id="chatInput" placeholder="Genel lobiye yaz...">
             <button id="sendBtn">GÖNDER</button>
@@ -233,24 +113,15 @@
             ekranaMesajEkle("Sistem", "Sunucu bağlantısı başarıyla kuruldu!", true);
         });
 
+        // 1. SOHBET GÖNDERME
         sendBtn.addEventListener('click', mesajGonder);
-
-        chatInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                mesajGonder();
-            }
-        });
+        chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') mesajGonder(); });
 
         function mesajGonder() {
             const metin = chatInput.value.trim();
             if (metin !== '') {
-                socket.emit('lobi_mesaji_gonder', {
-                    isim: aktifKullaniciAdi,
-                    mesaj: metin
-                });
+                socket.emit('lobi_mesaji_gonder', { isim: aktifKullaniciAdi, mesaj: metin });
                 chatInput.value = ''; 
-                // Mobilde klavyeyi kapatmak istersen alttaki satırın başındaki yorumu kaldırabilirsin
-                // chatInput.blur(); 
             }
         }
 
@@ -258,17 +129,43 @@
             ekranaMesajEkle(data.isim, data.mesaj, false);
         });
 
+        // 2. MASAYA OTURMA İŞLEMİ
+        const sitButtons = document.querySelectorAll('.sit-btn');
+        sitButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                if(this.classList.contains('disabled')) return; // Zaten oturduysa veya doluysa iptal
+
+                const masaAdi = this.parentElement.querySelector('.table-title').innerText;
+
+                // Butonun rengini ve yazısını değiştir (Sadece sana özel görünür)
+                this.innerText = "OTURDUN ✓";
+                this.style.backgroundColor = "#20c997";
+                this.style.color = "#fff";
+                this.classList.add('disabled');
+
+                // Sunucuya haber ver, o da herkese duyursun
+                socket.emit('masaya_otur', {
+                    isim: aktifKullaniciAdi,
+                    masaAdi: masaAdi
+                });
+            });
+        });
+
+        // 3. SİSTEM MESAJLARINI DİNLE (Masaya oturma duyuruları vb.)
+        socket.on('sistem_mesaji', (mesaj) => {
+            ekranaMesajEkle("Sistem", mesaj, true);
+        });
+
+        // EKRANA MESAJ YAZDIRAN YARDIMCI FONKSİYON
         function ekranaMesajEkle(yazar, icerik, isSystem) {
             const yeniSatir = document.createElement('div');
             yeniSatir.className = "msg-line";
-            
             if (isSystem) {
                 yeniSatir.innerHTML = `<span class="msg-author system">[${yazar}]:</span> <i>${icerik}</i>`;
             } else {
                 const renk = (yazar === aktifKullaniciAdi) ? "#ffc107" : "#0dcaf0";
                 yeniSatir.innerHTML = `<span class="msg-author" style="color:${renk};">${yazar}:</span> ${icerik}`;
             }
-            
             chatMessages.appendChild(yeniSatir);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
