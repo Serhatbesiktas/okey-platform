@@ -52,67 +52,97 @@
         .seat-right { right: -10px; top: 50%; transform: translateY(-50%) rotate(90deg); border-color: #0dcaf0; color: #0dcaf0; }
         .return-lobby-btn { position: absolute; top: 5px; right: 5px; background-color: #dc3545; color: white; border: none; padding: 6px 10px; border-radius: 5px; font-size: 11px; font-weight: bold; z-index: 10; cursor: pointer; }
 
-        /* ISTAKA VE TAŞLAR (ÖZGÜR ALAN) */
+        /* --- 3D ISTAKA VE HÜCRE (SLOT) SİSTEMİ --- */
         .istaka-container {
             width: 100%;
-            height: 120px;
-            background: linear-gradient(to bottom, #d4a373, #8b5a2b);
+            height: 140px; /* Rahat kullanım için yükseklik arttı */
+            background-color: #8b5a2b;
             border-radius: 10px;
-            border: 3px solid #5c3a21;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5), inset 0 5px 10px rgba(0,0,0,0.3);
+            border: 4px solid #4a2c10;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.7);
             display: flex;
             flex-direction: column;
-            padding: 5px;
+            padding: 4px;
+            gap: 4px;
             position: relative;
         }
         
-        .istaka-row { 
+        .istaka-raf { 
             display: flex; 
-            height: 50%; 
+            flex: 1; 
             width: 100%; 
-            align-items: center; 
-            justify-content: flex-start; /* Taşlar soldan sağa dizilir */
-            padding: 0 5px;
-            gap: 2px; /* Taşlar arası milimetrik hava boşluğu */
-            min-height: 50px; /* Satır boş olsa bile taş bırakılabilmesi için alan */
+            gap: 2px; 
+            border-radius: 5px;
+            padding: 3px 2px;
+        }
+
+        /* Üst Kat Derinliği (İçeri gömülü hissi) */
+        .raf-ust {
+            background: linear-gradient(to bottom, #5a3819, #784c25);
+            box-shadow: inset 0 6px 12px rgba(0,0,0,0.6);
+        }
+
+        /* Alt Kat Derinliği (Daha önde hissi) */
+        .raf-alt {
+            background: linear-gradient(to bottom, #a06b3c, #8b5a2b);
+            box-shadow: inset 0 3px 8px rgba(0,0,0,0.4);
+            border-top: 2px solid #a87648; /* Ahşap pah kenarı */
         }
         
-        /* Okey Taşı - Ekrandan Taşmayı Önleyen Dinamik Yapı */
+        /* Her Taşın Oturacağı Sabit Hücreler */
+        .yuva {
+            flex: 1; 
+            height: 100%;
+            background: rgba(0,0,0,0.15); /* Hafif gölgeli zemin */
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        /* Gerçekçi 3D Okey Taşı */
         .okey-tasi {
-            /* Flex: 0 1 auto demek; ideal boyutta ol, ama sığmazsan KÜÇÜL demektir! */
-            flex: 0 1 36px; 
-            height: 48px;
-            background-color: #fdf6e3;
-            border-radius: 5px;
+            width: 100%;
+            height: 92%;
+            max-width: 38px; /* Desktop'ta çok büyümesini engeller */
+            background-color: #fcf5e3; /* Fildişi beyazı */
+            border-radius: 6px;
             border: 1px solid #d3c9b3;
-            box-shadow: 1px 2px 3px rgba(0,0,0,0.4);
+            /* 3D Etkisi (Taşın Kalınlığı) */
+            border-bottom: 5px solid #c0b396; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+            
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            font-size: clamp(16px, 5vw, 22px);
+            font-weight: 900;
+            font-size: clamp(15px, 4.5vw, 22px);
             font-family: Arial, sans-serif;
-            position: relative;
             cursor: grab;
             
-            /* Sürükleme Akıcılığı İçin Zorunlu Safari Kodları */
             touch-action: none; 
             user-select: none; 
             -webkit-user-select: none;
             -webkit-user-drag: none;
         }
-        .okey-tasi:active { cursor: grabbing; }
-        .okey-tasi::after { content: ''; position: absolute; top: 2px; left: 2px; right: 2px; bottom: 2px; border: 1px solid rgba(0,0,0,0.05); border-radius: 3px; }
-
-        /* Sürükleme Anı Efektleri */
-        .sortable-ghost { opacity: 0.2; background-color: #e9ecef; } /* Taşı aldığında altı hafif belli olsun ki hizayı kaybetme */
-        .sortable-drag { box-shadow: 5px 5px 15px rgba(0,0,0,0.8); transform: scale(1.1) translateY(-10px); z-index: 9999 !important; cursor: grabbing; }
+        .okey-tasi:active { cursor: grabbing; border-bottom-width: 2px; transform: translateY(3px); /* Tıklayınca çökme efekti */ }
+        .okey-tasi::after { content: ''; position: absolute; top: 2px; left: 2px; right: 2px; bottom: 2px; border: 1px solid rgba(0,0,0,0.05); border-radius: 4px; }
         
-        .tas-kirmizi { color: #dc3545; }
+        /* Sürükleme Efektleri */
+        .sortable-ghost { opacity: 0.3; } 
+        .sortable-drag { 
+            box-shadow: 5px 15px 25px rgba(0,0,0,0.8) !important; 
+            transform: scale(1.15) translateY(-20px) !important; 
+            z-index: 9999 !important; 
+            border-bottom-width: 8px !important; /* Havaya kalktığı için kalınlığı artar */
+        }
+        
+        .tas-kirmizi { color: #d32f2f; }
         .tas-siyah { color: #212529; }
-        .tas-mavi { color: #0d6efd; }
-        .tas-sari { color: #e67e22; }
+        .tas-mavi { color: #1976d2; }
+        .tas-sari { color: #e65100; } /* Mobilde okunabilmesi için koyu turuncu */
 
         /* SOHBET */
         .chat-panel { background-color: #081e13; border-top: 2px solid #14422b; display: flex; flex-direction: column; height: 180px; flex-shrink: 0; z-index: 999; }
@@ -129,8 +159,7 @@
             #lobiEkrani { flex-direction: row; }
             .tables-panel { flex: 1; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; align-content: start; }
             .players-panel { width: 350px; border-top: none; border-left: 2px solid #14422b; overflow-y: auto; }
-            .okey-tasi { flex-basis: 42px; height: 55px; }
-            .istaka-container { height: 140px; max-width: 800px; margin: 0 auto; }
+            .istaka-container { height: 160px; max-width: 800px; margin: 0 auto; }
         }
     </style>
     <script src="/socket.io/socket.io.js"></script>
@@ -169,8 +198,8 @@
         </div>
 
         <div class="istaka-container" id="benimIstakam">
-            <div class="istaka-row" id="istakaUstSira"></div>
-            <div class="istaka-row" id="istakaAltSira"></div>
+            <div class="istaka-raf raf-ust" id="ustRaf"></div>
+            <div class="istaka-raf raf-alt" id="altRaf"></div>
         </div>
     </div>
 
@@ -200,21 +229,35 @@
         const sendBtn = document.getElementById('sendBtn');
         const chatMessages = document.getElementById('chatMessages');
 
-        // ÖZGÜR VE SIFIR GECİKMELİ SÜRÜKLEME
+        // --- HÜCRE (SLOT) SİSTEMİ OLUŞTURMA ---
+        // Üst rafa 12, Alt rafa 12 hücre açıyoruz (Toplam 24 Hücre)
+        const ustRaf = document.getElementById('ustRaf');
+        const altRaf = document.getElementById('altRaf');
         const sortableOptions = {
-            group: 'shared', 
-            animation: 150, // Yağ gibi kayma efekti
-            delay: 0, // Dokunduğun an taş senin
-            touchStartThreshold: 3, // Hassasiyet artırıldı
-            forceFallback: true, 
+            group: {
+                name: 'istaka',
+                put: function (to) {
+                    // EFSANE KURAL: Eğer hücrede zaten taş varsa, 2. taşı koymaya izin VERME!
+                    return to.el.children.length === 0;
+                }
+            },
+            animation: 100,
+            delay: 0,
+            forceFallback: true,
             fallbackClass: 'sortable-drag',
             ghostClass: 'sortable-ghost',
             easing: "cubic-bezier(0.25, 1, 0.5, 1)"
         };
 
-        // Üst ve Alt sırayı Sortable yap (Oyuklar olmadığı için filtre de yok, her şey çok akıcı)
-        new Sortable(document.getElementById('istakaUstSira'), sortableOptions);
-        new Sortable(document.getElementById('istakaAltSira'), sortableOptions);
+        for(let i=0; i<12; i++) {
+            const yUst = document.createElement('div'); yUst.className = 'yuva'; yUst.id = 'y'+i;
+            ustRaf.appendChild(yUst);
+            new Sortable(yUst, sortableOptions);
+            
+            const yAlt = document.createElement('div'); yAlt.className = 'yuva'; yAlt.id = 'y'+(i+12);
+            altRaf.appendChild(yAlt);
+            new Sortable(yAlt, sortableOptions);
+        }
 
         socket.on('masalari_guncelle', (masalarData) => {
             masalarAlani.innerHTML = ''; 
@@ -301,40 +344,41 @@
             masaEkrani.style.display = 'none';
             lobiEkrani.style.display = 'flex';
             
-            document.getElementById('istakaUstSira').innerHTML = '';
-            document.getElementById('istakaAltSira').innerHTML = '';
+            // Masadan kalkınca tüm hücreleri temizle
+            for(let i=0; i<24; i++) {
+                document.getElementById('y'+i).innerHTML = '';
+            }
         });
 
-        // OYUKLAR İPTAL - SADECE TAŞLAR (Tam 15 Taş)
+        // HÜCRELERE (SLOTLARA) TAŞ DAĞITIMI
         function ilkOyuncuTaslariniDiz() {
-            const ustSira = document.getElementById('istakaUstSira');
-            const altSira = document.getElementById('istakaAltSira');
+            // Önce tüm hücreleri temizle
+            for(let i=0; i<24; i++) document.getElementById('y'+i).innerHTML = '';
+
+            const tas = (renk, sayi) => `<div class="okey-tasi tas-${renk}">${sayi}</div>`;
+
+            // Üst Raf Hücrelerine (y0 - y11 arası) yerleştiriyoruz
+            document.getElementById('y0').innerHTML = tas('kirmizi', 7);
+            document.getElementById('y1').innerHTML = tas('kirmizi', 8);
+            document.getElementById('y2').innerHTML = tas('kirmizi', 9);
             
-            ustSira.innerHTML = '';
-            altSira.innerHTML = '';
+            document.getElementById('y4').innerHTML = tas('siyah', 12);
+            document.getElementById('y5').innerHTML = tas('siyah', 13);
+            document.getElementById('y6').innerHTML = tas('siyah', 1);
 
-            // Üst Sıra (8 Taş)
-            ustSira.innerHTML += `<div class="okey-tasi tas-kirmizi">7</div>`;
-            ustSira.innerHTML += `<div class="okey-tasi tas-kirmizi">8</div>`;
-            ustSira.innerHTML += `<div class="okey-tasi tas-kirmizi">9</div>`;
-            
-            ustSira.innerHTML += `<div class="okey-tasi tas-siyah">12</div>`;
-            ustSira.innerHTML += `<div class="okey-tasi tas-siyah">13</div>`;
-            ustSira.innerHTML += `<div class="okey-tasi tas-siyah">1</div>`;
+            document.getElementById('y9').innerHTML = tas('mavi', 2);
+            document.getElementById('y10').innerHTML = tas('mavi', 3);
 
-            ustSira.innerHTML += `<div class="okey-tasi tas-mavi">2</div>`;
-            ustSira.innerHTML += `<div class="okey-tasi tas-mavi">3</div>`;
+            // Alt Raf Hücrelerine (y12 - y23 arası) yerleştiriyoruz
+            document.getElementById('y13').innerHTML = tas('mavi', 4);
+            document.getElementById('y14').innerHTML = tas('sari', 4);
+            document.getElementById('y15').innerHTML = tas('siyah', 4);
 
-            // Alt Sıra (7 Taş) Toplam: 15
-            altSira.innerHTML += `<div class="okey-tasi tas-mavi">4</div>`;
-            altSira.innerHTML += `<div class="okey-tasi tas-sari">4</div>`;
-            altSira.innerHTML += `<div class="okey-tasi tas-siyah">4</div>`;
-            
-            altSira.innerHTML += `<div class="okey-tasi tas-kirmizi">11</div>`;
-            altSira.innerHTML += `<div class="okey-tasi tas-siyah">11</div>`;
+            document.getElementById('y18').innerHTML = tas('kirmizi', 11);
+            document.getElementById('y19').innerHTML = tas('siyah', 11);
 
-            altSira.innerHTML += `<div class="okey-tasi tas-sari">13</div>`;
-            altSira.innerHTML += `<div class="okey-tasi tas-sari">13</div>`; 
+            document.getElementById('y21').innerHTML = tas('sari', 13);
+            document.getElementById('y22').innerHTML = tas('sari', 13);
         }
 
         socket.on('connect', () => { ekranaMesajEkle("Sistem", "Sunucu bağlantısı kuruldu!", true); });
