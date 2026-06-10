@@ -1,151 +1,43 @@
 const express = require('express');
 const app = express();
 const http = require('http').createServer(app);
-
-const io = require('socket.io')(http, {
-  cors: { origin: "*", methods: ["GET", "POST"] }
-});
+const io = require('socket.io')(http);
 
 app.use(express.static('public'));
 
+// Her şeyden önce masaları tertemiz başlat
 const masalar = {
-    'Acemiler (20K Bahis)': { koltuklar: [null, null, null, null], deste: [], okeyTasi: null, oyunBasladi: false, siradakiOyuncu: null },
-    'Usta Masası (50K Bahis)': { koltuklar: [null, null, null, null], deste: [], okeyTasi: null, oyunBasladi: false, siradakiOyuncu: null },
-    'Hızlı Oyun (10K Bahis)': { koltuklar: [null, null, null, null], deste: [], okeyTasi: null, oyunBasladi: false, siradakiOyuncu: null }
+    'Acemiler': { koltuklar: [null, null, null, null], oyunBasladi: false },
+    'Usta': { koltuklar: [null, null, null, null], oyunBasladi: false }
 };
 
-function desteYaratVeKaristir() {
-    let yeniDeste = [];
-    let idSayaci = 1;
-    const renkler = ['kirmizi', 'siyah', 'mavi', 'sari'];
-    
-    for(let set = 0; set < 2; set++) {
-        for(let r of renkler) {
-            for(let s = 1; s <= 13; s++) {
-                yeniDeste.push({ id: 'tas_' + idSayaci++, renk: r, sayi: s });
-            }
-        }
-    }
-    yeniDeste.push({ id: 'tas_' + idSayaci++, renk: 'sahte', sayi: 'S' });
-    yeniDeste.push({ id: 'tas_' + idSayaci++, renk: 'sahte', sayi: 'S' });
-
-    for (let i = yeniDeste.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [yeniDeste[i], yeniDeste[j]] = [yeniDeste[j], yeniDeste[i]];
-    }
-    return yeniDeste;
-}
-
 io.on('connection', (socket) => {
-  console.log('Oyuncu bağlandı: ' + socket.id);
-
-  const lobiVerisi = {};
-  for(let m in masalar) lobiVerisi[m] = masalar[m].koltuklar;
-  socket.emit('masalari_guncelle', lobiVerisi);
-
-  socket.on('masaya_otur', (data) => {
-    const masa = masalar[data.masaAdi];
-    if (masa && !masa.koltuklar.includes(data.isim)) {
-        const bosKoltukIndex = masa.koltuklar.indexOf(null);
-        if (bosKoltukIndex !== -1) {
-            masa.koltuklar[bosKoltukIndex] = data.isim;
-            socket.kullaniciAdi = data.isim; // HAYALET AVCISI İÇİN KİMLİK KAYDI
-            
-            const guncelLobi = {};
-            for(let m in masalar) guncelLobi[m] = masalar[m].koltuklar;
-            
-            io.emit('masalari_guncelle', guncelLobi);
-            io.emit('sistem_mesaji', `${data.isim}, ${data.masaAdi} masasına oturdu!`);
-        }
-    }
-  });
-
-  socket.on('oyunu_baslat', (masaAdi) => {
-    const masa = masalar[masaAdi];
-    if (masa) { // "oyunBasladi" KİLİDİ KALDIRILDI, İSTEDİĞİN ZAMAN YENİDEN BAŞLATABİLİRSİN
-        masa.oyunBasladi = true;
-        masa.deste = desteYaratVeKaristir(); 
-        
-        const doluKoltuklar = masa.koltuklar.filter(k => k !== null);
-        const baslayacakOyuncu = doluKoltuklar[Math.floor(Math.random() * doluKoltuklar.length)];
-        masa.siradakiOyuncu = baslayacakOyuncu;
-        
-        io.emit('sistem_mesaji', `${masaAdi} masasında oyun başladı! Taşlar dağıtılıyor... (İlk oynayacak: ${baslayacakOyuncu})`);
-
-        masa.koltuklar.forEach(oyuncuIsmi => {
-            if(oyuncuIsmi !== null) {
-                const kacTasAlacak = (oyuncuIsmi === baslayacakOyuncu) ? 15 : 14;
-                const oyuncununTaslari = masa.deste.splice(0, kacTasAlacak); 
-                
-                // KURŞUN GEÇİRMEZ FREKANS:
-                io.emit('taslari_al', { kime: oyuncuIsmi, taslar: oyuncununTaslari });
+    socket.on('masaya_otur', (data) => {
+        const masa = masalar[data.masaAdi];
+        if (masa) {
+            let index = masa.koltuklar.indexOf(null);
+            if (index !== -1) {
+                masa.koltuklar[index] = data.isim;
+                socket.kullaniciAdi = data.isim;
+                io.emit('masalari_guncelle', masalar);
             }
-        });
-        
-        io.emit('masa_ortasi_guncelle', { masaAdi: masaAdi, kalanTas: masa.deste.length });
-        io.emit('sira_guncelle', { masaAdi: masaAdi, kimde: masa.siradakiOyuncu });
-    }
-  });
+        }
+    });
 
-  socket.on('tas_atildi', (data) => {
-      const masa = masalar[data.masaAdi];
-      if(masa && masa.siradakiOyuncu === data.isim) {
-          let currentIndex = masa.koltuklar.indexOf(data.isim);
-          let nextIndex = (currentIndex + 1) % 4;
-          
-          while(masa.koltuklar[nextIndex] === null) {
-              nextIndex = (nextIndex + 1) % 4;
-              if(nextIndex === currentIndex) break; 
-          }
-          
-          masa.siradakiOyuncu = masa.koltuklar[nextIndex];
-          io.emit('sistem_mesaji', `Hamle yapıldı. Sıra ${masa.siradakiOyuncu}'da!`);
-          io.emit('sira_guncelle', { masaAdi: data.masaAdi, kimde: masa.siradakiOyuncu });
-      }
-  });
+    socket.on('disconnect', () => {
+        if(socket.kullaniciAdi) {
+            for(let m in masalar) {
+                let idx = masalar[m].koltuklar.indexOf(socket.kullaniciAdi);
+                if(idx !== -1) {
+                    masalar[m].koltuklar[idx] = null;
+                    masalar[m].oyunBasladi = false;
+                }
+            }
+            io.emit('masalari_guncelle', masalar);
+        }
+    });
 
-  socket.on('ortadan_tas_cek', (data) => {
-      const masa = masalar[data.masaAdi];
-      if(masa && masa.siradakiOyuncu === data.isim && masa.deste.length > 0) {
-          const cekilenTas = masa.deste.shift(); 
-          socket.emit('tas_cekildi', cekilenTas); 
-          io.emit('masa_ortasi_guncelle', { masaAdi: data.masaAdi, kalanTas: masa.deste.length });
-      }
-  });
-
-  socket.on('masadan_kalk', (data) => {
-    kullaniciyiMasadanKaldir(data.isim);
-  });
-
-  // SAYFA YENİLENDİĞİNDE VEYA KAPANDIĞINDA HAYALETİ SİL
-  socket.on('disconnect', () => {
-      if(socket.kullaniciAdi) kullaniciyiMasadanKaldir(socket.kullaniciAdi);
-  });
-
-  function kullaniciyiMasadanKaldir(isim) {
-      for(let m in masalar) {
-          let index = masalar[m].koltuklar.indexOf(isim);
-          if(index !== -1) {
-              masalar[m].koltuklar[index] = null;
-              if(masalar[m].koltuklar.every(k => k === null)) {
-                  masalar[m].oyunBasladi = false;
-                  masalar[m].deste = [];
-                  masalar[m].siradakiOyuncu = null;
-              }
-              const guncelLobi = {};
-              for(let m in masalar) guncelLobi[m] = masalar[m].koltuklar;
-              io.emit('masalari_guncelle', guncelLobi);
-              break;
-          }
-      }
-  }
-
-  socket.on('lobi_mesaji_gonder', (data) => {
-    io.emit('lobi_mesaji_geldi', { isim: data.isim, mesaj: data.mesaj });
-  });
+    socket.emit('masalari_guncelle', masalar);
 });
 
-const PORT = process.env.PORT || 3000;
-http.listen(PORT, () => {
-  console.log(`Sunucu ${PORT} portunda aktif...`);
-});
+http.listen(3000, () => console.log('Sunucu 3000 portunda hazır.'));
