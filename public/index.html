@@ -15,19 +15,17 @@
 
         .main-container { display: flex; flex-direction: column; flex: 1; overflow-y: auto; }
 
-        /* --- YENİLENEN LOBİ EKRANI --- */
+        /* --- LOBİ EKRANI --- */
         #lobiEkrani { display: flex; flex-direction: column; flex: 1; }
         .tables-panel { padding: 10px; display: flex; flex-direction: column; gap: 15px; }
         .table-card { background-color: #14422b; border: 2px solid #198754; border-radius: 10px; padding: 15px 10px; text-align: center; }
         .table-title { color: #ffc107; font-weight: bold; margin-bottom: 15px; font-size: 14px; }
         
-        /* Kuşbakışı Mini Masa Tasarımı */
         .mini-table-container { position: relative; height: 130px; margin: 0 auto 15px auto; width: 100%; max-width: 250px; background-color: rgba(0,0,0,0.15); border-radius: 10px; }
         .mini-okey-table { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80px; height: 50px; background-color: #1a5c38; border: 2px solid #0a2014; border-radius: 25px; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
         .mini-seat { position: absolute; font-size: 10px; line-height: 1.2; text-align: center; width: 60px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .mini-seat.occupied { color: #0dcaf0; font-weight: bold; }
         .mini-seat.empty { color: #a0a0a0; font-style: italic; }
-        
         .mini-top { top: 5px; left: 50%; transform: translateX(-50%); }
         .mini-bottom { bottom: 5px; left: 50%; transform: translateX(-50%); }
         .mini-left { top: 50%; left: 5px; transform: translateY(-50%); }
@@ -36,7 +34,6 @@
         .sit-btn { background-color: #ffc107; color: #000; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; font-size: 14px; cursor: pointer; width: 100%; transition: 0.3s; }
         .sit-btn.disabled { background-color: #6c757d; color: #fff; cursor: not-allowed; }
 
-        /* Oyuncular Paneli */
         .players-panel { background-color: #0b2417; border-top: 2px solid #14422b; padding: 10px; }
         .panel-title { font-size: 14px; margin-bottom: 10px; color: #0dcaf0; display: flex; gap: 5px; }
         .player-table { width: 100%; font-size: 12px; text-align: left; border-collapse: collapse; }
@@ -44,19 +41,63 @@
         .player-table td { padding: 8px 0; border-bottom: 1px solid #0d2e1d; }
         .status-dot { width: 8px; height: 8px; background-color: #20c997; border-radius: 50%; display: inline-block; margin-right: 5px; }
 
-        /* MASA EKRANI */
-        #masaEkrani { display: none; flex: 1; background-color: #0a2014; position: relative; padding: 25px 15px; }
-        .okey-table-ui { background-color: #1a5c38; border: 4px solid #0d2e1d; border-radius: 20px; width: 100%; height: 100%; position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; }
+        /* --- MASA EKRANI --- */
+        #masaEkrani { display: none; flex: 1; background-color: #0a2014; position: relative; padding: 10px; flex-direction: column; }
+        
+        /* Okey Masası Alanı (Üst Kısım) */
+        .okey-table-ui { background-color: #1a5c38; border: 4px solid #0d2e1d; border-radius: 20px; width: 100%; flex: 1; position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
         .table-center-info { text-align: center; color: rgba(255,255,255,0.15); font-weight: bold; font-size: 20px; padding: 10px; }
         .player-seat { position: absolute; background-color: rgba(0,0,0,0.75); padding: 6px 12px; border-radius: 8px; color: #ffc107; font-size: 12px; font-weight: bold; border: 1px solid #ffc107; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .seat-top { top: -15px; left: 50%; transform: translateX(-50%); border-color: #0dcaf0; color: #0dcaf0; }
-        .seat-bottom { bottom: -15px; left: 50%; transform: translateX(-50%); background-color: #ffc107; color: #000; font-size: 13px; }
-        .seat-left { left: -15px; top: 50%; transform: translateY(-50%); border-color: #0dcaf0; color: #0dcaf0; }
-        .seat-right { right: -15px; top: 50%; transform: translateY(-50%); border-color: #0dcaf0; color: #0dcaf0; }
-        .return-lobby-btn { position: absolute; top: 5px; right: 5px; background-color: #dc3545; color: white; border: none; padding: 6px 10px; border-radius: 5px; font-size: 11px; font-weight: bold; z-index: 10; }
+        .seat-top { top: 10px; left: 50%; transform: translateX(-50%); border-color: #0dcaf0; color: #0dcaf0; }
+        .seat-left { left: -10px; top: 50%; transform: translateY(-50%) rotate(-90deg); border-color: #0dcaf0; color: #0dcaf0; }
+        .seat-right { right: -10px; top: 50%; transform: translateY(-50%) rotate(90deg); border-color: #0dcaf0; color: #0dcaf0; }
+        
+        .return-lobby-btn { position: absolute; top: 5px; right: 5px; background-color: #dc3545; color: white; border: none; padding: 6px 10px; border-radius: 5px; font-size: 11px; font-weight: bold; z-index: 10; cursor: pointer; }
 
-        /* SOHBET */
-        .chat-panel { background-color: #081e13; border-top: 2px solid #14422b; display: flex; flex-direction: column; height: 240px; flex-shrink: 0; z-index: 999; }
+        /* --- ISTAKA VE TAŞLAR (Alt Kısım) --- */
+        .istaka-container {
+            width: 100%;
+            height: 110px;
+            background: linear-gradient(to bottom, #d4a373, #8b5a2b);
+            border-radius: 10px;
+            border: 3px solid #5c3a21;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5), inset 0 5px 10px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            padding: 5px;
+            position: relative;
+        }
+        
+        /* Istakanın 2 katlı dizilim alanı */
+        .istaka-row { display: flex; height: 50%; width: 100%; justify-content: center; align-items: center; gap: 2px; }
+        
+        /* Okey Taşı Tasarımı */
+        .okey-tasi {
+            width: 32px;
+            height: 44px;
+            background-color: #fdf6e3;
+            border-radius: 6px;
+            border: 1px solid #d3c9b3;
+            box-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 20px;
+            font-family: Arial, sans-serif;
+            position: relative;
+        }
+        .okey-tasi::after { content: ''; position: absolute; top: 3px; left: 3px; right: 3px; bottom: 3px; border: 1px solid rgba(0,0,0,0.05); border-radius: 3px; }
+        
+        /* Taş Renkleri */
+        .tas-kirmizi { color: #dc3545; }
+        .tas-siyah { color: #212529; }
+        .tas-mavi { color: #0d6efd; }
+        .tas-sari { color: #e67e22; } /* Beyaz zemin üstünde daha net okunması için koyu turuncu/sarı */
+
+        /* --- SOHBET --- */
+        .chat-panel { background-color: #081e13; border-top: 2px solid #14422b; display: flex; flex-direction: column; height: 200px; flex-shrink: 0; z-index: 999; }
         .chat-header { font-size: 12px; padding: 5px 10px; background-color: #05140d; color: #a0a0a0; }
         .chat-messages { flex: 1; padding: 10px; overflow-y: auto; font-size: 13px; display: flex; flex-direction: column; gap: 5px; }
         .msg-line { line-height: 1.4; padding-bottom: 3px;}
@@ -70,6 +111,8 @@
             #lobiEkrani { flex-direction: row; }
             .tables-panel { flex: 1; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; align-content: start; }
             .players-panel { width: 350px; border-top: none; border-left: 2px solid #14422b; overflow-y: auto; }
+            .okey-tasi { width: 40px; height: 55px; font-size: 24px; }
+            .istaka-container { height: 140px; max-width: 800px; margin: 0 auto; }
         }
     </style>
     <script src="/socket.io/socket.io.js"></script>
@@ -98,14 +141,22 @@
     </div>
 
     <div id="masaEkrani">
-        <button class="return-lobby-btn" id="lobiyeDonBtn">⬅ Lobiye Dön</button>
+        
         <div class="okey-table-ui">
+            <button class="return-lobby-btn" id="lobiyeDonBtn">⬅ Lobiye Dön</button>
             <div class="table-center-info" id="masaOrtasiYazi">MASA</div>
             <div class="player-seat seat-top" id="seatTop">Bekleniyor...</div>
-            <div class="player-seat seat-bottom" id="seatBottom">👑 Sen</div>
             <div class="player-seat seat-left" id="seatLeft">Bekleniyor...</div>
             <div class="player-seat seat-right" id="seatRight">Bekleniyor...</div>
         </div>
+
+        <div class="istaka-container" id="benimIstakam">
+            <div class="istaka-row" id="istakaUstSira">
+                </div>
+            <div class="istaka-row" id="istakaAltSira">
+                </div>
+        </div>
+
     </div>
 
     <div class="chat-panel">
@@ -142,17 +193,12 @@
                 const doluKoltukSayisi = doluKoltuklar.length;
                 const benBuMasadaMiyim = koltuklar.includes(aktifKullaniciAdi);
 
-                // --- NOSTALJİK MİNİ MASA ÇİZİMİ ---
-                // koltuklar[0]: Alt, koltuklar[1]: Sağ, koltuklar[2]: Üst, koltuklar[3]: Sol
                 const pBottom = koltuklar[0] ? `<span style="font-size:14px;">👤</span><br>${koltuklar[0]}` : `Boş`;
                 const cBottom = koltuklar[0] ? 'occupied' : 'empty';
-                
                 const pRight = koltuklar[1] ? `<span style="font-size:14px;">👤</span><br>${koltuklar[1]}` : `Boş`;
                 const cRight = koltuklar[1] ? 'occupied' : 'empty';
-                
                 const pTop = koltuklar[2] ? `<span style="font-size:14px;">👤</span><br>${koltuklar[2]}` : `Boş`;
                 const cTop = koltuklar[2] ? 'occupied' : 'empty';
-                
                 const pLeft = koltuklar[3] ? `<span style="font-size:14px;">👤</span><br>${koltuklar[3]}` : `Boş`;
                 const cLeft = koltuklar[3] ? 'occupied' : 'empty';
 
@@ -202,7 +248,7 @@
             const karsiIndex = (benimIndexim + 2) % 4;
             const solIndex = (benimIndexim + 3) % 4;
 
-            document.getElementById('seatBottom').innerText = "👑 " + aktifKullaniciAdi;
+            // Kendi adımız ıstakada belli olacağı için masa altına ekstra "Sen" yazmıyoruz.
             document.getElementById('seatRight').innerText = koltuklar[sagIndex] ? koltuklar[sagIndex] : "Bekleniyor...";
             document.getElementById('seatTop').innerText = koltuklar[karsiIndex] ? koltuklar[karsiIndex] : "Bekleniyor...";
             document.getElementById('seatLeft').innerText = koltuklar[solIndex] ? koltuklar[solIndex] : "Bekleniyor...";
@@ -214,6 +260,9 @@
             lobiEkrani.style.display = 'none';
             masaEkrani.style.display = 'flex';
             masaOrtasiYazi.innerText = masaAdi.toUpperCase();
+            
+            // Masaya oturduğumuzda Test Taşlarını Dizin
+            testTaslariniDiz();
         };
 
         lobiyeDonBtn.addEventListener('click', () => {
@@ -223,7 +272,41 @@
             }
             masaEkrani.style.display = 'none';
             lobiEkrani.style.display = 'flex';
+            
+            // Masadan kalkınca ıstakayı temizle
+            document.getElementById('istakaUstSira').innerHTML = '';
+            document.getElementById('istakaAltSira').innerHTML = '';
         });
+
+        // GEÇİCİ GÖRSEL TEST: Istakaya rastgele perler diz
+        function testTaslariniDiz() {
+            const ustSira = document.getElementById('istakaUstSira');
+            const altSira = document.getElementById('istakaAltSira');
+            
+            ustSira.innerHTML = '';
+            altSira.innerHTML = '';
+
+            // Örnek: Kırmızı 7-8-9 ve Siyah 12-13-1
+            ustSira.innerHTML += `<div class="okey-tasi tas-kirmizi">7</div>`;
+            ustSira.innerHTML += `<div class="okey-tasi tas-kirmizi">8</div>`;
+            ustSira.innerHTML += `<div class="okey-tasi tas-kirmizi">9</div>`;
+            
+            ustSira.innerHTML += `<div style="width:10px;"></div>`; // Boşluk
+            
+            ustSira.innerHTML += `<div class="okey-tasi tas-siyah">12</div>`;
+            ustSira.innerHTML += `<div class="okey-tasi tas-siyah">13</div>`;
+            ustSira.innerHTML += `<div class="okey-tasi tas-siyah">1</div>`;
+
+            // Alt sıraya karışık taşlar
+            altSira.innerHTML += `<div class="okey-tasi tas-mavi">4</div>`;
+            altSira.innerHTML += `<div class="okey-tasi tas-sari">4</div>`;
+            altSira.innerHTML += `<div class="okey-tasi tas-siyah">4</div>`;
+            
+            altSira.innerHTML += `<div style="width:20px;"></div>`; // Boşluk
+            
+            altSira.innerHTML += `<div class="okey-tasi tas-mavi">11</div>`;
+            altSira.innerHTML += `<div class="okey-tasi tas-kirmizi">11</div>`;
+        }
 
         socket.on('connect', () => { ekranaMesajEkle("Sistem", "Sunucu bağlantısı kuruldu!", true); });
         socket.on('lobi_mesaji_geldi', (data) => { ekranaMesajEkle(data.isim, data.mesaj, false); });
