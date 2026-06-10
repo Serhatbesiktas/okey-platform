@@ -8,20 +8,18 @@ const io = require('socket.io')(http, {
 
 app.use(express.static('public'));
 
-// MASALARIN GELİŞMİŞ HAFIZASI
+// MASALARIN HAFIZASI (Sıradaki oyuncu bilgisi eklendi)
 const masalar = {
-    'Acemiler (20K Bahis)': { koltuklar: [null, null, null, null], deste: [], okeyTasi: null, oyunBasladi: false },
-    'Usta Masası (50K Bahis)': { koltuklar: [null, null, null, null], deste: [], okeyTasi: null, oyunBasladi: false },
-    'Hızlı Oyun (10K Bahis)': { koltuklar: [null, null, null, null], deste: [], okeyTasi: null, oyunBasladi: false }
+    'Acemiler (20K Bahis)': { koltuklar: [null, null, null, null], deste: [], okeyTasi: null, oyunBasladi: false, siradakiOyuncu: null },
+    'Usta Masası (50K Bahis)': { koltuklar: [null, null, null, null], deste: [], okeyTasi: null, oyunBasladi: false, siradakiOyuncu: null },
+    'Hızlı Oyun (10K Bahis)': { koltuklar: [null, null, null, null], deste: [], okeyTasi: null, oyunBasladi: false, siradakiOyuncu: null }
 };
 
-// YAZIM HATASI DÜZELTİLDİ (Boşluk silindi)
 function desteYaratVeKaristir() {
     let yeniDeste = [];
     let idSayaci = 1;
     const renkler = ['kirmizi', 'siyah', 'mavi', 'sari'];
     
-    // Her renkten 1-13 arası 2'şer set (104 taş)
     for(let set = 0; set < 2; set++) {
         for(let r of renkler) {
             for(let s = 1; s <= 13; s++) {
@@ -29,11 +27,9 @@ function desteYaratVeKaristir() {
             }
         }
     }
-    // 2 Adet Sahte Okey (106 taş tamamlandı)
     yeniDeste.push({ id: 'tas_' + idSayaci++, renk: 'sahte', sayi: 'S' });
     yeniDeste.push({ id: 'tas_' + idSayaci++, renk: 'sahte', sayi: 'S' });
 
-    // Taşları Karıştır
     for (let i = yeniDeste.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [yeniDeste[i], yeniDeste[j]] = [yeniDeste[j], yeniDeste[i]];
@@ -64,31 +60,67 @@ io.on('connection', (socket) => {
     }
   });
 
-  // OYUNU BAŞLATMA VE TAŞ DAĞITMA EMRİ
+  // OYUNU BAŞLAT
   socket.on('oyunu_baslat', (masaAdi) => {
     const masa = masalar[masaAdi];
     if (masa && !masa.oyunBasladi) {
         masa.oyunBasladi = true;
-        masa.deste = desteYaratVeKaristir(); // Hatasız fonksiyon çağırılıyor
+        masa.deste = desteYaratVeKaristir(); 
         
-        // Rastgele birini ilk oyuncu seç
+        // İlk oynayacak kişiyi seç ve sırayı ona ver
         const doluKoltuklar = masa.koltuklar.filter(k => k !== null);
         const baslayacakOyuncu = doluKoltuklar[Math.floor(Math.random() * doluKoltuklar.length)];
+        masa.siradakiOyuncu = baslayacakOyuncu;
         
-        io.emit('sistem_mesaji', `${masaAdi} masasında oyun başladı! Taşlar dağıtılıyor... (İlk oynayacak: ${baslayacakOyuncu})`);
+        io.emit('sistem_mesaji', `${masaAdi} masasında oyun başladı! (İlk oynayacak: ${baslayacakOyuncu})`);
 
-        // Taşları Dağıt
         masa.koltuklar.forEach(oyuncuIsmi => {
             if(oyuncuIsmi !== null) {
                 const kacTasAlacak = (oyuncuIsmi === baslayacakOyuncu) ? 15 : 14;
                 const oyuncununTaslari = masa.deste.splice(0, kacTasAlacak); 
                 
-                io.emit('taslari_al_' + oyuncuIsmi, oyuncununTaslari);
+                // Oyunculara kendi taşlarını gönder
+                io.sockets.sockets.forEach(s => {
+                    if(s.kullaniciAdi === oyuncuIsmi) s.emit('taslari_al', oyuncununTaslari);
+                });
+                io.emit('taslari_al_' + oyuncuIsmi, oyuncununTaslari); // Yedek yakalayıcı
             }
         });
         
+        // Herkese masanın ortasını ve SIRANIN KİMDE OLDUĞUNU bildir
         io.emit('masa_ortasi_guncelle_' + masaAdi, { kalanTas: masa.deste.length });
+        io.emit('sira_guncelle_' + masaAdi, masa.siradakiOyuncu);
     }
+  });
+
+  // BİR OYUNCU TAŞ ATTIĞINDA SIRAYI SAĞDAKİNE GEÇİR
+  socket.on('tas_atildi', (data) => {
+      const masa = masalar[data.masaAdi];
+      if(masa && masa.siradakiOyuncu === data.isim) {
+          let currentIndex = masa.koltuklar.indexOf(data.isim);
+          let nextIndex = (currentIndex + 1) % 4;
+          
+          // Eğer koltuk boşsa bir sonrakine atla (Test için)
+          while(masa.koltuklar[nextIndex] === null) {
+              nextIndex = (nextIndex + 1) % 4;
+              if(nextIndex === currentIndex) break; 
+          }
+          
+          masa.siradakiOyuncu = masa.koltuklar[nextIndex]; // Sıra sağdakine geçti!
+          io.emit('sistem_mesaji', `Hamle yapıldı. Sıra ${masa.siradakiOyuncu}'da!`);
+          io.emit('sira_guncelle_' + data.masaAdi, masa.siradakiOyuncu);
+      }
+  });
+
+  // OYUNCU ORTADAN TAŞ ÇEKTİĞİNDE
+  socket.on('ortadan_tas_cek', (data) => {
+      const masa = masalar[data.masaAdi];
+      if(masa && masa.siradakiOyuncu === data.isim && masa.deste.length > 0) {
+          const cekilenTas = masa.deste.shift(); // Desteden en üstteki taşı al
+          
+          socket.emit('tas_cekildi', cekilenTas); // Sadece o oyuncuya taşı yolla
+          io.emit('masa_ortasi_guncelle_' + data.masaAdi, { kalanTas: masa.deste.length });
+      }
   });
 
   socket.on('masadan_kalk', (data) => {
@@ -97,12 +129,11 @@ io.on('connection', (socket) => {
         const koltukIndex = masa.koltuklar.indexOf(data.isim);
         if (koltukIndex !== -1) {
             masa.koltuklar[koltukIndex] = null;
-            
             if(masa.koltuklar.every(k => k === null)) {
                 masa.oyunBasladi = false;
                 masa.deste = [];
+                masa.siradakiOyuncu = null;
             }
-
             const guncelLobi = {};
             for(let m in masalar) guncelLobi[m] = masalar[m].koltuklar;
             io.emit('masalari_guncelle', guncelLobi);
