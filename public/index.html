@@ -12,7 +12,12 @@
         .stats-box { background-color: #14422b; padding: 5px 10px; border-radius: 5px; border: 1px solid #198754; font-size: 11px; text-align: center; }
         .stats-box span { color: #20c997; display: block; font-weight: bold; }
         .user-box { background-color: #ffc107; color: #000; padding: 5px 10px; border-radius: 20px; font-weight: bold; font-size: 12px; }
+        
+        /* Ekran Geçişleri İçin Konteynerler */
         .main-container { display: flex; flex-direction: column; flex: 1; overflow-y: auto; }
+        
+        /* --- LOBİ EKRANI CSS --- */
+        #lobiEkrani { display: flex; flex-direction: column; flex: 1; }
         .tables-panel { padding: 10px; display: flex; flex-direction: column; gap: 10px; }
         .table-card { background-color: #14422b; border: 2px solid #198754; border-radius: 10px; padding: 10px; text-align: center; }
         .table-title { color: #ffc107; font-weight: bold; margin-bottom: 8px; font-size: 14px; }
@@ -27,7 +32,57 @@
         .player-table th { color: #a0a0a0; padding-bottom: 5px; border-bottom: 1px solid #14422b; }
         .player-table td { padding: 8px 0; border-bottom: 1px solid #0d2e1d; }
         .status-dot { width: 8px; height: 8px; background-color: #20c997; border-radius: 50%; display: inline-block; margin-right: 5px; }
-        .status-dot.offline { background-color: #6c757d; }
+        
+        /* --- MASA EKRANI CSS --- */
+        #masaEkrani { 
+            display: none; /* Başlangıçta gizli */
+            flex: 1; 
+            background-color: #0a2014; 
+            position: relative;
+            padding: 20px;
+        }
+        .okey-table-ui {
+            background-color: #1a5c38;
+            border: 4px solid #0d2e1d;
+            border-radius: 20px;
+            width: 100%;
+            height: 100%;
+            position: relative;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .table-center-info { text-align: center; color: rgba(255,255,255,0.2); font-weight: bold; font-size: 24px;}
+        .player-seat {
+            position: absolute;
+            background-color: rgba(0,0,0,0.6);
+            padding: 5px 15px;
+            border-radius: 10px;
+            color: #ffc107;
+            font-size: 12px;
+            font-weight: bold;
+            border: 1px solid #ffc107;
+        }
+        .seat-top { top: -15px; left: 50%; transform: translateX(-50%); }
+        .seat-bottom { bottom: -15px; left: 50%; transform: translateX(-50%); background-color: #ffc107; color: #000;}
+        .seat-left { left: -15px; top: 50%; transform: translateY(-50%); }
+        .seat-right { right: -15px; top: 50%; transform: translateY(-50%); }
+        .return-lobby-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 11px;
+            font-weight: bold;
+            z-index: 10;
+        }
+
+        /* --- SOHBET PANELI CSS --- */
         .chat-panel { background-color: #081e13; border-top: 2px solid #14422b; display: flex; flex-direction: column; height: 220px; flex-shrink: 0; }
         .chat-header { font-size: 12px; padding: 5px 10px; background-color: #05140d; color: #a0a0a0; }
         .chat-messages { flex: 1; padding: 10px; overflow-y: auto; font-size: 13px; display: flex; flex-direction: column; gap: 5px; }
@@ -37,8 +92,9 @@
         .chat-input-area { display: flex; padding: 10px; gap: 8px; background-color: #0b2417; }
         .chat-input-area input { flex: 1; background-color: #0d2e1d; border: 1px solid #198754; color: #fff; padding: 12px; border-radius: 5px; outline: none; font-size: 14px; }
         .chat-input-area button { background-color: #0dcaf0; color: #000; border: none; padding: 0 15px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 14px; }
+        
         @media (min-width: 768px) {
-            .main-container { flex-direction: row; overflow: hidden; }
+            #lobiEkrani { flex-direction: row; }
             .tables-panel { flex: 1; overflow-y: auto; }
             .players-panel { width: 350px; border-top: none; border-left: 2px solid #14422b; overflow-y: auto; }
         }
@@ -53,7 +109,7 @@
         <div class="user-box">Sen (Gold)</div>
     </div>
 
-    <div class="main-container">
+    <div id="lobiEkrani">
         <div class="tables-panel">
             <div class="table-card">
                 <div class="table-title">Acemiler (20K Bahis)</div>
@@ -85,10 +141,21 @@
                 <tbody>
                     <tr><td><span class="status-dot"></span></td><td style="color:#ffc107; font-weight:bold;">👑 Sen</td><td>250K</td></tr>
                     <tr><td><span class="status-dot"></span></td><td>Gamze</td><td>120K</td></tr>
-                    <tr><td><span class="status-dot offline"></span></td><td>Deniz</td><td>45K</td></tr>
+                    <tr><td><span class="status-dot"></span></td><td>Deniz</td><td>45K</td></tr>
                     <tr><td><span class="status-dot"></span></td><td>Kemal</td><td>890K</td></tr>
                 </tbody>
             </table>
+        </div>
+    </div>
+
+    <div id="masaEkrani">
+        <button class="return-lobby-btn" id="lobiyeDonBtn">⬅ Lobiye Dön</button>
+        <div class="okey-table-ui">
+            <div class="table-center-info" id="masaOrtasiYazi">MASA BEKLENİYOR...</div>
+            <div class="player-seat seat-top">Bekleniyor...</div>
+            <div class="player-seat seat-bottom">👑 Sen</div>
+            <div class="player-seat seat-left">Bekleniyor...</div>
+            <div class="player-seat seat-right">Bekleniyor...</div>
         </div>
     </div>
 
@@ -105,6 +172,13 @@
         const socket = io();
         const aktifKullaniciAdi = "Oyuncu_" + Math.floor(Math.random() * 900 + 100);
 
+        // Ekran elementleri
+        const lobiEkrani = document.getElementById('lobiEkrani');
+        const masaEkrani = document.getElementById('masaEkrani');
+        const masaOrtasiYazi = document.getElementById('masaOrtasiYazi');
+        const lobiyeDonBtn = document.getElementById('lobiyeDonBtn');
+
+        // Sohbet elementleri
         const chatInput = document.getElementById('chatInput');
         const sendBtn = document.getElementById('sendBtn');
         const chatMessages = document.getElementById('chatMessages');
@@ -113,7 +187,7 @@
             ekranaMesajEkle("Sistem", "Sunucu bağlantısı başarıyla kuruldu!", true);
         });
 
-        // 1. SOHBET GÖNDERME
+        // --- SOHBET İŞLEMLERİ ---
         sendBtn.addEventListener('click', mesajGonder);
         chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') mesajGonder(); });
 
@@ -129,34 +203,40 @@
             ekranaMesajEkle(data.isim, data.mesaj, false);
         });
 
-        // 2. MASAYA OTURMA İŞLEMİ
+        // --- MASAYA OTURMA VE EKRAN DEĞİŞTİRME İŞLEMLERİ ---
         const sitButtons = document.querySelectorAll('.sit-btn');
         sitButtons.forEach(btn => {
             btn.addEventListener('click', function() {
-                if(this.classList.contains('disabled')) return; // Zaten oturduysa veya doluysa iptal
+                if(this.classList.contains('disabled')) return; 
 
                 const masaAdi = this.parentElement.querySelector('.table-title').innerText;
 
-                // Butonun rengini ve yazısını değiştir (Sadece sana özel görünür)
-                this.innerText = "OTURDUN ✓";
-                this.style.backgroundColor = "#20c997";
-                this.style.color = "#fff";
-                this.classList.add('disabled');
-
-                // Sunucuya haber ver, o da herkese duyursun
+                // Sunucuya haber ver
                 socket.emit('masaya_otur', {
                     isim: aktifKullaniciAdi,
                     masaAdi: masaAdi
                 });
+
+                // EKRAN GEÇİŞİ YAP (Lobi gizle, Masayı göster)
+                lobiEkrani.style.display = 'none';
+                masaEkrani.style.display = 'flex';
+                masaOrtasiYazi.innerText = masaAdi.toUpperCase();
             });
         });
 
-        // 3. SİSTEM MESAJLARINI DİNLE (Masaya oturma duyuruları vb.)
+        // Lobiye Geri Dön Butonu İşlemi
+        lobiyeDonBtn.addEventListener('click', () => {
+            masaEkrani.style.display = 'none';
+            lobiEkrani.style.display = 'flex';
+            
+            // Eğer istersen lobiye dönünce butonu sıfırlayabiliriz ama şimdilik sadece ekranı döndürüyoruz.
+            ekranaMesajEkle("Sistem", "Lobiye geri döndün.", true);
+        });
+
         socket.on('sistem_mesaji', (mesaj) => {
             ekranaMesajEkle("Sistem", mesaj, true);
         });
 
-        // EKRANA MESAJ YAZDIRAN YARDIMCI FONKSİYON
         function ekranaMesajEkle(yazar, icerik, isSystem) {
             const yeniSatir = document.createElement('div');
             yeniSatir.className = "msg-line";
