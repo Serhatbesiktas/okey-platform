@@ -49,7 +49,6 @@
         .seat-right { top: 25%; right: -25px; transform: translateY(-50%) rotate(-90deg); border-color: #0dcaf0; color: #0dcaf0; }
         .seat-left { bottom: 25%; left: -25px; transform: translateY(-50%) rotate(90deg); border-color: #0dcaf0; color: #0dcaf0; }
         
-        /* SIRA ONDAYKEN PARLAMA EFEKTİ */
         .aktif-sira { box-shadow: 0 0 15px 5px #20c997; border-color: #20c997 !important; color: #fff !important; }
 
         /* ISKARTALAR */
@@ -62,7 +61,6 @@
         #benimIskartam.sortable-drag-over { background-color: rgba(255, 193, 7, 0.3); border-color: #fff; }
         .iskarta-yazi { pointer-events: none; color: #ffc107; font-weight: bold; font-size: 11px; text-align: center; }
         
-        /* Yasaklıysa (Sırası değilse) kırmızı yap */
         .kilitli-iskarta { border-color: #dc3545 !important; opacity: 0.5; }
 
         .iskarta-alani .okey-tasi { position: absolute !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; width: 38px !important; height: 52px !important; font-size: 18px !important; border-bottom-width: 3px !important; pointer-events: none !important; }
@@ -75,7 +73,6 @@
         
         .kalan-tas-bilgi-container { display: none; flex-direction: column; align-items: center; gap: 8px; }
         
-        /* ÇEKİLEBİLİR KAPALI DESTE */
         .kapali-deste { width: 44px; height: 58px; background-color: #fdf6e3; border: 1px solid #d3c9b3; border-bottom: 6px solid #c0b396; border-radius: 6px; box-shadow: -3px 4px 8px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; color: #000; font-weight: bold; font-size: 18px; cursor: pointer; transition: 0.1s;}
         .kapali-deste:active { transform: translateY(3px); border-bottom-width: 3px; }
 
@@ -193,7 +190,6 @@
         const aktifKullaniciAdi = "Oyuncu_" + Math.floor(Math.random() * 900 + 100);
         let suAnkiMasam = null; 
         
-        // --- OYUN KURALLARI MOTORU ---
         let benimSiramMi = false;
 
         document.getElementById('benimAdimKutusu').innerText = aktifKullaniciAdi;
@@ -214,7 +210,6 @@
         const ustRaf = document.getElementById('ustRaf');
         const altRaf = document.getElementById('altRaf');
 
-        // Istakadaki anlık taş sayısını hesaplar
         function elimdekiTasSayisi() {
             let sayi = 0;
             for(let i=0; i<24; i++) {
@@ -233,7 +228,6 @@
             const yAlt = document.createElement('div'); yAlt.className = 'yuva'; yAlt.id = 'y'+(i+12); altRaf.appendChild(yAlt); new Sortable(yAlt, sortableOptions);
         }
 
-        // ÇÖP KUTUSU (Sadece sıra sendeyken ve elinde 15 taş varken atabilirsin)
         new Sortable(document.getElementById('benimIskartam'), {
             group: {
                 name: 'istaka',
@@ -254,12 +248,10 @@
                 atilanTas.style.transform = 'translate(-50%, -50%)';
                 atilanTas.style.margin = '0';
                 
-                // SUNUCUYA HABER VER: TAŞ ATTIM, SIRA SAĞDAKİNE GEÇSİN!
                 socket.emit('tas_atildi', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi, tasId: atilanTas.id });
             }
         });
 
-        // ÇİFT TIKLAMA İLE OTOMATİK ATMA
         function otomatikTasAt(tasElementi) {
             if (!benimSiramMi || elimdekiTasSayisi() !== 15) return; 
             
@@ -279,7 +271,6 @@
             }
         }
 
-        // ORTADAKİ DESTEYE TIKLAYIP TAŞ ÇEKME
         kalanTasBilgi.addEventListener('click', () => {
             if (benimSiramMi && elimdekiTasSayisi() === 14) {
                 socket.emit('ortadan_tas_cek', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi });
@@ -320,7 +311,6 @@
         function gelişmişKoltukHizala(koltuklar) {
             const index = koltuklar.indexOf(aktifKullaniciAdi);
             if (index === -1) return;
-            // Koltuk ID'lerine isimleri yaz
             document.getElementById('benimAdimKutusu').innerText = "Ben: " + koltuklar[index];
             document.getElementById('seatRight').innerText = koltuklar[(index + 1) % 4] || "Bekleniyor...";
             document.getElementById('seatTop').innerText = koltuklar[(index + 2) % 4] || "Bekleniyor...";
@@ -351,8 +341,8 @@
             socket.emit('oyunu_baslat', suAnkiMasam);
         });
 
-        // 1- İLK DAĞITIMDA TAŞLARI AL
-        socket.on('taslari_al', (gercekTaslar) => {
+        // FREKANS DÜZELTİLDİ: Artık taşlar havada kalmayacak!
+        socket.on('taslari_al_' + aktifKullaniciAdi, (gercekTaslar) => {
             oyunuBaslatBtn.style.display = 'none';
             oyunAlanObjeleri.style.display = 'flex';
 
@@ -363,9 +353,7 @@
             });
         });
 
-        // 2- ORTADAN ÇEKİLEN TAŞI AL
         socket.on('tas_cekildi', (tas) => {
-            // Boş bir yuva bul ve taşı oraya koy
             for(let i=0; i<24; i++) {
                 if(document.getElementById('y'+i).children.length === 0) {
                     tasEkle(tas, 'y'+i);
@@ -374,7 +362,6 @@
             }
         });
 
-        // HTML'E TAŞ OLUŞTURMA FONKSİYONU
         function tasEkle(tasData, yuvaId) {
             const div = document.createElement('div');
             div.className = `okey-tasi tas-${tasData.renk}`;
@@ -392,17 +379,14 @@
             document.getElementById(yuvaId).appendChild(div);
         }
 
-        // 3- SIRA KİMDE TAKİBİ (PARLAMA EFEKTİ)
         socket.onAny((eventName, data) => {
             if(suAnkiMasam && eventName === 'sira_guncelle_' + suAnkiMasam) {
                 benimSiramMi = (data === aktifKullaniciAdi);
                 
-                // Benim sıramsa ıskartamı kırmızıdan kurtar, değilse kırmızı (kilitli) yap
                 const iskarta = document.getElementById('benimIskartam');
                 if(benimSiramMi) iskarta.classList.remove('kilitli-iskarta');
                 else iskarta.classList.add('kilitli-iskarta');
 
-                // Koltukları dolaş, kimin sırasıysa onu yeşil parlat
                 const koltuklar = [
                     { id: 'benimAdimKutusu', isim: "Ben: " + aktifKullaniciAdi, gercekIsim: aktifKullaniciAdi },
                     { id: 'seatRight', isim: document.getElementById('seatRight').innerText },
@@ -412,7 +396,6 @@
                 
                 koltuklar.forEach(k => {
                     const el = document.getElementById(k.id);
-                    // Kutudaki isim ile sıradaki isim eşleşiyorsa parlat
                     if(k.isim === data || k.gercekIsim === data) el.classList.add('aktif-sira');
                     else el.classList.remove('aktif-sira');
                 });
