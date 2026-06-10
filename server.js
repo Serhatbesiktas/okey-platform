@@ -8,53 +8,59 @@ const io = require('socket.io')(http, {
 
 app.use(express.static('public'));
 
-// SUNUCUNUN HAFIZASI: Masaların anlık durumu
+// SUNUCU HAFIZASI: Her masada tam 4 koltuk var (null = Boş koltuk)
 const masalar = {
-    'Acemiler (20K Bahis)': { kapasite: 4, oyuncular: [] },
-    'Usta Masası (50K Bahis)': { kapasite: 4, oyuncular: [] },
-    'Hızlı Oyun (10K Bahis)': { kapasite: 4, oyuncular: [] }
+    'Acemiler (20K Bahis)': [null, null, null, null],
+    'Usta Masası (50K Bahis)': [null, null, null, null],
+    'Hızlı Oyun (10K Bahis)': [null, null, null, null]
 };
 
 io.on('connection', (socket) => {
   console.log('Oyuncu bağlandı: ' + socket.id);
 
-  // Biri bağlandığı an, masaların GÜNCEL durumunu ona gönder
+  // Yeni gelen oyuncuya mevcut masaların durumunu gönder
   socket.emit('masalari_guncelle', masalar);
 
+  // Genel Sohbet
   socket.on('lobi_mesaji_gonder', (data) => {
     io.emit('lobi_mesaji_geldi', { isim: data.isim, mesaj: data.mesaj });
   });
 
-  // Biri masaya oturduğunda çalışacak mantık
+  // Masaya Oturma Mantığı
   socket.on('masaya_otur', (data) => {
     const masa = masalar[data.masaAdi];
-    
-    // Masa varsa ve boş yer varsa oyuncuyu ekle
-    if (masa && masa.oyuncular.length < masa.kapasite) {
-        // Aynı oyuncu iki kere oturmasın diye kontrol
-        if (!masa.oyuncular.includes(data.isim)) {
-            masa.oyuncular.push(data.isim);
+    if (masa) {
+        // Oyuncu zaten bu masada bir yerde oturuyorsa işlem yapma
+        if (masa.includes(data.isim)) return;
+
+        // İlk boş koltuğu bul (null olan ilk index)
+        const bosKoltukIndex = masa.findIndex(koltuk => koltuk === null);
+
+        if (bosKoltukIndex !== -1) {
+            masa[bosKoltukIndex] = data.isim; // Koltuğu rezerve et
             
-            // Masaların YENİ durumunu herkese (lobiye) gönder
             io.emit('masalari_guncelle', masalar);
-            io.emit('sistem_mesaji', `${data.isim}, ${data.masaAdi} masasına oturdu!`);
+            io.emit('sistem_mesaji', `${data.isim}, ${data.masaAdi} masasında ${bosKoltukIndex + 1}. koltuğa oturdu!`);
         }
     }
   });
 
+  // Masadan Kalkma Mantığı
   socket.on('masadan_kalk', (data) => {
     const masa = masalar[data.masaAdi];
-    if(masa) {
-        // Oyuncuyu masadan sil
-        masa.oyuncular = masa.oyuncular.filter(oyuncu => oyuncu !== data.isim);
-        io.emit('masalari_guncelle', masalar);
-        io.emit('sistem_mesaji', `${data.isim}, masadan ayrıldı.`);
+    if (masa) {
+        const koltukIndex = masa.indexOf(data.isim);
+        if (koltukIndex !== -1) {
+            masa[koltukIndex] = null; // Koltuğu boşalt
+            
+            io.emit('masalari_guncelle', masalar);
+            io.emit('sistem_mesaji', `${data.isim} masadan ayrıldı.`);
+        }
     }
   });
 
   socket.on('disconnect', () => {
     console.log('Oyuncu ayrıldı: ' + socket.id);
-    // İleride oyuncu internetten kopunca masadan otomatik kalkmasını buraya ekleyeceğiz.
   });
 });
 
