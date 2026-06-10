@@ -1,64 +1,712 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VIP Okey Salonu</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #0f5132;
-            color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-        }
-        .container {
-            text-align: center;
-            background: rgba(0,0,0,0.4);
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
-        }
-        h1 { margin-bottom: 10px; color: #ffc107; }
-        p { color: #e0e0e0; }
-        .status {
-            margin-top: 20px;
-            padding: 10px;
-            background: #198754;
-            border-radius: 5px;
-            display: inline-block;
-        }
-    </style>
-    <!-- Socket.io istemci kütüphanesi - Sunucu çalışınca otomatik yüklenir -->
-    <script src="/socket.io/socket.io.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+    /* =========================================
+       GENEL YAPI VE DOKULAR
+       ========================================= */
+    body { position: fixed; top: 0; left: 0; right: 0; bottom: 0; margin: 0; background-color: #1f4221; background-image: url('https://www.transparenttextures.com/patterns/dark-leather.png'), radial-gradient(circle, #2a5a2c, #15381a); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; overflow: hidden; color: white; touch-action: none; }
+    
+    /* =========================================
+       1. LOBİ EKRANI (SPA MİMARİSİ)
+       ========================================= */
+    #lobi-ekrani { display: flex; flex-direction: column; width: 100%; height: 100%; overflow: hidden; }
+    
+    .lobi-header { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.8); padding: 8px 20px; border-bottom: 2px solid #f1c40f; box-shadow: 0 4px 10px rgba(0,0,0,0.5); flex-shrink: 0; z-index: 10; }
+    .lobi-baslik { font-size: 16px; font-weight: bold; color: #f1c40f; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; }
+    .lobi-profil { display: flex; align-items: center; gap: 15px; }
+    .lobi-cip { font-weight: bold; color: #2ecc71; background: rgba(46,204,113,0.2); padding: 4px 10px; border-radius: 6px; border: 1px solid #2ecc71; font-size: 12px; }
+    
+    /* LOBİ ANA GÖVDE (MASALAR, AYIRICI VE TABLO) */
+    .lobi-ana-govde { display: flex; flex-grow: 1; gap: 5px; padding: 10px; overflow: hidden; }
+    
+    /* SOL TARAFTA MASALAR */
+    .masalar-alani { flex-grow: 1; background: rgba(0,0,0,0.4); border-radius: 10px; padding: 15px; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; border: 1px solid rgba(255,255,255,0.1); min-width: 150px; }
+    .masalar-alani::-webkit-scrollbar { width: 8px; } .masalar-alani::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+    
+    .masa-karti { background: linear-gradient(145deg, #27612f, #15381a); border: 3px solid #4a2408; border-radius: 15px; padding: 8px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.6); position: relative; }
+    .masa-baslik { font-size: 11px; font-weight: bold; background: #4a2408; width: 100%; text-align: center; padding: 3px 0; border-radius: 4px; margin-bottom: 8px; color: #f1c40f; }
+    .masa-oturma-duzeni { width: 110px; height: 70px; background: rgba(0,0,0,0.2); border-radius: 35px; position: relative; margin-bottom: 12px; border: 2px solid rgba(255,255,255,0.1); }
+    .sandalye { width: 22px; height: 22px; background: #555; border-radius: 50%; position: absolute; border: 2px solid #333; display: flex; justify-content: center; align-items: center; font-size: 9px; color: #888; }
+    .sandalye.dolu { background: #3498db; border-color: #2980b9; color: white; box-shadow: 0 0 5px rgba(52,152,219,0.5); }
+    .s-ust { top: -11px; left: 44px; } .s-alt { bottom: -11px; left: 44px; } .s-sol { top: 24px; left: -11px; } .s-sag { top: 24px; right: -11px; }
+    
+    .otur-btn { background: linear-gradient(to bottom, #f1c40f, #f39c12); color: black; border: none; padding: 5px 18px; border-radius: 15px; font-weight: bold; cursor: pointer; box-shadow: 0 3px 5px rgba(0,0,0,0.4); text-transform: uppercase; font-size: 10px; transition: 0.1s; border: 1px solid #a04000; }
+    .otur-btn:active { transform: scale(0.95); }
+    .izle-btn { background: rgba(127,140,141,0.5); color: #bdc3c7; border: none; padding: 5px 18px; border-radius: 15px; font-weight: bold; font-size: 10px; cursor: not-allowed; text-transform: uppercase; }
+
+    /* YENİ: SÜRÜKLENEBİLİR AYIRICI ÇUBUK (SPLITTER) */
+    .ayirici-cubuk { width: 12px; background: #2c3e50; cursor: col-resize; display: flex; justify-content: center; align-items: center; border-radius: 4px; border: 1px solid #34495e; color: #7f8c8d; transition: background 0.2s, color 0.2s; flex-shrink: 0; box-shadow: inset 0 0 5px rgba(0,0,0,0.5); }
+    .ayirici-cubuk:hover, .ayirici-cubuk:active { background: #3498db; color: white; border-color: #2980b9; }
+
+    /* SAĞ TARAFTA EXCEL TABLOSU GİBİ KULLANICI LİSTESİ */
+    .kullanici-tablo-konteyner { width: 240px; min-width: 150px; background: rgba(0,0,0,0.6); border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; overflow: hidden; flex-shrink: 0; box-shadow: 5px 0 15px rgba(0,0,0,0.3); }
+    .tablo-baslik { font-size: 12px; font-weight: bold; color: #3498db; padding: 10px; background: rgba(0,0,0,0.3); border-bottom: 1px solid #34495e; display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    
+    .excel-tablo-wrapper { flex-grow: 1; overflow-y: auto; overflow-x: auto; display: block; }
+    .excel-tablo-wrapper::-webkit-scrollbar { width: 6px; height: 6px; } .excel-tablo-wrapper::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+    
+    .kullanici-tablosu { width: 100%; border-collapse: collapse; font-size: 11px; color: #ecf0f1; table-layout: auto; }
+    .kullanici-tablosu thead { position: sticky; top: 0; z-index: 2; background-color: #2c3e50; }
+    .kullanici-tablosu th { text-align: left; padding: 8px 5px; border-bottom: 1px solid #34495e; border-right: 1px solid #34495e; color: #bdc3c7; font-weight: bold; text-transform: uppercase; white-space: nowrap; }
+    .kullanici-tablosu th:last-child { border-right: none; }
+    .kullanici-tablosu td { padding: 6px 5px; border-bottom: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05); vertical-align: middle; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .kullanici-tablosu td:last-child { border-right: none; }
+    .kullanici-tablosu tr:nth-child(even) { background-color: rgba(255,255,255,0.02); }
+    .kullanici-tablosu tr:hover { background-color: rgba(52, 152, 219, 0.1); cursor: pointer; }
+    
+    .online-nokta { width: 7px; height: 7px; background: #2ecc71; border-radius: 50%; box-shadow: 0 0 5px #2ecc71; display: inline-block; margin-right: 3px; }
+    .liste-avatar { width: 18px; height: 18px; border-radius: 50%; background-size: cover; display: inline-block; vertical-align: middle; margin-right: 5px; border: 1px solid rgba(255,255,255,0.3); }
+
+    /* ALT TARAFTA YATAY BANT ŞEKLİNDE GENEL SOHBET */
+    .lobi-sohbet-altti { height: 110px; background: rgba(0,0,0,0.8); border-top: 2px solid #3498db; display: flex; flex-direction: column; overflow: hidden; flex-shrink: 0; }
+    .sohbet-ust-bar { background: rgba(0,0,0,0.3); padding: 3px 15px; border-bottom: 1px solid #34495e; font-size: 11px; font-weight: bold; color: #bdc3c7; display: flex; align-items: center; gap: 6px; }
+    .lobi-sohbet-gecmis-yatay { flex-grow: 1; padding: 5px 15px; overflow-y: auto; font-size: 11px; display: flex; flex-direction: column; gap: 3px; color: #bdc3c7; }
+    .lobi-sohbet-gecmis-yatay::-webkit-scrollbar { width: 6px; } .lobi-sohbet-gecmis-yatay::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+    
+    .lobi-girdi-yatay { display: flex; padding: 5px 15px; background: #1a252f; gap: 8px; }
+    .lobi-girdi-yatay input { flex-grow: 1; padding: 6px 12px; border: none; border-radius: 4px; outline: none; font-size: 12px; background: #ecf0f1; color: black; }
+    .lobi-girdi-yatay button { background: #3498db; border: none; color: white; padding: 0 15px; border-radius: 4px; cursor: pointer; font-size: 12px; transition: 0.1s; }
+    .lobi-girdi-yatay button:active { background: #2980b9; }
+
+    /* =========================================
+       2. OYUN EKRANI (LOBİDEN GEÇİNCE AÇILIR)
+       ========================================= */
+    #oyun-ekrani { display: none; width: 100%; height: 100%; position: relative; }
+    
+    #masadan-kalk-btn { position: absolute; top: 10px; left: 10px; background: #c0392b; border: 2px solid #e74c3c; color: white; padding: 6px 12px; border-radius: 8px; font-weight: bold; z-index: 50; cursor: pointer; font-size: 11px; box-shadow: 0 4px 6px rgba(0,0,0,0.5); text-transform: uppercase; }
+    #masadan-kalk-btn:hover { background: #e74c3c; }
+    #ekonomi-panel { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.8); padding: 8px 12px; border-radius: 15px; border: 1px solid #ffd700; color: #ffd700; font-weight: bold; font-size: 13px; z-index: 10; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 8px rgba(0,0,0,0.5); }
+
+    .profil { position: absolute; background: rgba(0, 0, 0, 0.7); border-radius: 20px; display: flex; align-items: center; padding: 4px 10px; color: white; box-shadow: 0 4px 8px rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.1); z-index: 5; }
+    .avatar { width: 30px; height: 30px; background: #ddd; border-radius: 50%; margin-right: 8px; border: 2px solid #e67e22; background-size: cover; box-shadow: inset 0 0 5px rgba(0,0,0,0.5); }
+    .isim { font-size: 12px; font-weight: bold; text-shadow: 1px 1px 2px black; }
+    .profil.aktif-sira { border: 2px solid #2ecc71; box-shadow: 0 0 20px #2ecc71; background: rgba(46, 204, 113, 0.3); transform: scale(1.05); }
+
+    .benim-profilim { display: flex; align-items: center; background: linear-gradient(135deg, rgba(0,0,0,0.9), rgba(40,30,0,0.9)); padding: 5px 12px; border-radius: 20px; color: #ffd700; border: 2px solid #ffd700; font-size: 13px; font-weight: bold; box-shadow: 0 0 15px #ffd700; }
+    .benim-profilim .avatar { border-color: #ffd700; }
+    .profil-ust { top: 15px; left: 50%; transform: translateX(-50%); }
+    .profil-sol { top: 40%; left: -25px; transform: rotate(90deg); }
+    .profil-sag { top: 40%; right: -25px; transform: rotate(-90deg); }
+    
+    .rakip-istaka { position: absolute; background-color: #4a2408; background-image: url('https://www.transparenttextures.com/patterns/wood-pattern.png'); border: 4px solid #2d1404; border-radius: 6px; display: flex; justify-content: center; align-items: center; box-shadow: 0 8px 15px rgba(0,0,0,0.6); z-index: 4; }
+    .rakip-tas { background: linear-gradient(to bottom, #fdfdfa, #e8e3d3); border: 1px solid #a39b82; border-radius: 2px; box-shadow: inset -1px -1px 2px rgba(0,0,0,0.1), 1px 2px 3px rgba(0,0,0,0.4); }
+    .istaka-ust { top: 55px; left: 50%; transform: translateX(-50%); width: 220px; height: 32px; gap: 2px; padding: 4px; }
+    .istaka-sol { top: 50%; left: 35px; transform: translateY(-50%); width: 32px; height: 200px; flex-direction: column; gap: 2px; padding: 4px; }
+    .istaka-sag { top: 50%; right: 35px; transform: translateY(-50%); width: 32px; height: 200px; flex-direction: column; gap: 2px; padding: 4px; }
+
+    .konusma-balonu { position: absolute; background: rgba(255,255,255,0.95); color: black; padding: 8px 12px; border-radius: 12px; font-size: 12px; font-weight: bold; max-width: 150px; box-shadow: 0 6px 12px rgba(0,0,0,0.4); z-index: 20; opacity: 0; transition: opacity 0.3s ease; display: none; word-wrap: break-word; }
+    .konusma-balonu::after { content: ''; position: absolute; border-width: 6px; border-style: solid; }
+    #balonu-gamze { top: 20px; left: 65%; } #balonu-gamze::after { top: 10px; left: -12px; border-color: transparent rgba(255,255,255,0.95) transparent transparent; }
+    #balonu-deniz { top: 32%; left: 45px; } #balonu-deniz::after { bottom: -12px; left: 15px; border-color: rgba(255,255,255,0.95) transparent transparent transparent; }
+    #balonu-kemal { top: 32%; right: 50px; } #balonu-kemal::after { bottom: -12px; right: 15px; border-color: rgba(255,255,255,0.95) transparent transparent transparent; }
+    #balonu-sen { bottom: 70px; left: 35px; } #balonu-sen::after { bottom: -12px; left: 15px; border-color: rgba(255,255,255,0.95) transparent transparent transparent; }
+
+    #orta-alan { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); display: flex; gap: 20px; align-items: center; background: rgba(0,0,0,0.3); padding: 20px 30px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.15); width: max-content; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
+    .orta-kutu { display: flex; flex-direction: column; align-items: center; color: rgba(255,255,255,0.9); font-size: 12px; font-weight: bold; text-shadow: 1px 1px 2px black; gap: 8px; }
+    .orta-tas-alani { width: 44px; height: 66px; display: flex; justify-content: center; align-items: center; border-radius: 6px; }
+    .kapali-deste { background: linear-gradient(to bottom, #fdfdfa, #e8e3d3); border: 2px solid #a39b82; box-shadow: -2px -2px 0 #d1cbbd, -4px -4px 0 #b5af9f, 0 5px 10px rgba(0,0,0,0.4); cursor: pointer; color: #888; font-size: 24px; }
+    .bosh-alan { border: 2px dashed rgba(255,255,255,0.3); cursor: pointer; transition: background 0.3s; }
+    .bitis-alani { cursor: pointer; border: 2px dashed transparent; transition: all 0.3s; }
+    #bahis-etiket { position: absolute; top: -25px; left: 50%; transform: translateX(-50%); background: linear-gradient(to right, #d35400, #e67e22); color: white; font-size: 11px; padding: 4px 12px; border-radius: 12px; white-space: nowrap; box-shadow: 0 4px 8px rgba(0,0,0,0.4); border: 1px solid #ff9f43; }
+
+    #gelismis-sohbet-paneli { position: absolute; bottom: 80px; right: 10px; background: rgba(20, 30, 40, 0.95); border: 1px solid #3498db; border-radius: 10px; display: none; flex-direction: column; z-index: 100; box-shadow: 0 10px 25px rgba(0,0,0,0.8); width: 280px; overflow: hidden; }
+    .sohbet-header { background: linear-gradient(to right, #2980b9, #3498db); color: white; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: bold; }
+    .kapat-btn { background: none; border: none; color: white; font-size: 18px; cursor: pointer; padding: 0; box-shadow: none; }
+    .sekmeler { display: flex; background: #2c3e50; border-bottom: 1px solid #34495e; overflow-x: auto; scrollbar-width: none; }
+    .sekmeler::-webkit-scrollbar { display: none; }
+    .sekme { flex: 1; background: none; border: none; color: #bdc3c7; padding: 10px 5px; font-size: 11px; font-weight: bold; cursor: pointer; box-shadow: none; border-radius: 0; text-transform: none; white-space: nowrap; transition: 0.2s; }
+    .sekme.aktif { color: #f1c40f; border-bottom: 3px solid #f1c40f; background: rgba(255,255,255,0.05); }
+    #sohbet-gecmisi { height: 140px; overflow-y: auto; background: rgba(0,0,0,0.6); padding: 10px; font-size: 12px; color: #ecf0f1; display: flex; flex-direction: column; gap: 8px; }
+    .mesaj-satiri { line-height: 1.4; }
+    .mesaj-isim { font-weight: bold; color: #3498db; }
+    .mesaj-dm { color: #e74c3c; font-style: italic; }
+    .girdi-alani { display: flex; padding: 10px; background: #1a252f; gap: 8px; }
+    .girdi-alani input { flex-grow: 1; background: #ecf0f1; border: none; border-radius: 6px; padding: 10px; font-size: 13px; outline: none; }
+    .girdi-alani button { padding: 10px 14px; background: #3498db; border-radius: 6px; font-size: 13px; margin: 0; border: none; color: white; cursor: pointer; }
+
+    #benim-alanim { position: absolute; bottom: 20px; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .alt-kontroller { width: 96%; max-width: 800px; display: flex; justify-content: space-between; align-items: flex-end; padding: 0 5px; box-sizing: border-box; }
+    .buton-grubu { display: flex; gap: 6px; }
+    button { padding: 12px 16px; cursor: pointer; background: linear-gradient(to bottom, #f39c12, #d35400); border: 2px solid #a04000; border-radius: 8px; color: white; font-weight: bold; font-size: 12px; text-transform: uppercase; box-shadow: 0 5px 10px rgba(0,0,0,0.5); transition: transform 0.1s, box-shadow 0.1s; }
+    button:active { transform: translateY(2px); box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+    button.mavi-btn { background: linear-gradient(to bottom, #3498db, #2980b9); border-color: #1f618d; }
+    button.yesil-btn { background: linear-gradient(to bottom, #2ecc71, #27ae60); border-color: #1e8449; }
+    
+    #istaka { background-color: #5d2e0a; background-image: url('https://www.transparenttextures.com/patterns/wood-pattern.png'), linear-gradient(145deg, #7b3e10, #381a04); height: 165px; width: 98%; max-width: 800px; display: flex; flex-direction: column; justify-content: space-between; border: 8px solid #2d1404; border-radius: 12px; padding: 5px; box-shadow: 0 15px 25px rgba(0,0,0,0.8), inset 0 5px 15px rgba(0,0,0,0.5); }
+    .istaka-sira { display: flex; justify-content: center; align-items: flex-end; height: 48%; width: 100%; gap: 3px; border-bottom: 14px solid rgba(0,0,0,0.6); padding-bottom: 2px; }
+    .slot { width: 42px; height: 68px; background: rgba(0,0,0,0.2); border-radius: 4px; display: flex; justify-content: center; align-items: flex-end; cursor: pointer; box-shadow: inset 0 2px 5px rgba(0,0,0,0.3); }
+    
+    .tas { width: 42px; height: 68px; background: linear-gradient(135deg, #ffffff 0%, #fdfdfa 50%, #e8e3d3 100%); border-radius: 5px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: bold; cursor: pointer; box-shadow: 2px 4px 6px rgba(0,0,0,0.5), inset -1px -1px 3px rgba(0,0,0,0.1); position: relative; transition: transform 0.2s; border: 1px solid #d1cbbd; }
+    .renk-seridi { width: 100%; height: 6px; position: absolute; top: 0; left: 0; border-radius: 4px 4px 0 0; opacity: 0.9; }
+    .tas .sayi { font-size: 22px; margin-top: 8px; text-shadow: 1px 1px 0px rgba(255,255,255,0.8); }
+    .tas .sembol { font-size: 11px; margin-top: -2px; }
+    .tas.secili { transform: translateY(-15px) scale(1.05); border: 2px solid #f1c40f; box-shadow: 0 10px 20px rgba(241, 196, 15, 0.6); z-index: 10; }
+    .tas.ters-donmus { transform: rotate(180deg); opacity: 0.95; }
+    .tas.secili.ters-donmus { transform: translateY(15px) rotate(180deg) scale(1.05); }
+    .tas.gercek-okey::after { content: ''; position: absolute; width: 8px; height: 8px; background: #2ecc71; border-radius: 50%; top: 8px; right: 8px; box-shadow: 0 0 6px #2ecc71; border: 1px solid white; }
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>VIP Okey Oyunu</h1>
-        <p>Sunucu bağlantısı kuruluyor...</p>
-        <div class="status" id="connection-status">Bağlanıyor...</div>
+
+<div id="lobi-ekrani">
+    <div class="lobi-header">
+        <div class="lobi-baslik"><i class="fa-solid fa-trophy"></i> Vip Okey Sunucusu</div>
+        <div class="lobi-profil">
+            <span class="lobi-cip"><i class="fa-solid fa-coins"></i> 250.000 ÇİP</span>
+            <div class="benim-profilim" style="box-shadow:none; padding: 2px 10px;">
+                <div class="avatar" style="background-image: url('https://api.dicebear.com/7.x/avataaars/svg?seed=Sen'); width: 22px; height: 22px;"></div>
+                Sen (Gold)
+            </div>
+        </div>
+    </div>
+    
+    <div class="lobi-ana-govde">
+        <div class="masalar-alani" id="sol-masalar">
+            <div class="masa-karti">
+                <div class="masa-baslik">Acemiler (20K Bahis)</div>
+                <div class="masa-oturma-duzeni">
+                    <div class="sandalye s-ust dolu"><i class="fa-solid fa-user"></i></div>
+                    <div class="sandalye s-alt dolu"><i class="fa-solid fa-user"></i></div>
+                    <div class="sandalye s-sol dolu"><i class="fa-solid fa-user"></i></div>
+                    <div class="sandalye s-sag"></div>
+                </div>
+                <button class="otur-btn" onclick="masayaGec()">Otur (3/4)</button>
+            </div>
+            <div class="masa-karti">
+                <div class="masa-baslik">Usta Masası (50K Bahis)</div>
+                <div class="masa-oturma-duzeni">
+                    <div class="sandalye s-ust dolu"><i class="fa-solid fa-user"></i></div>
+                    <div class="sandalye s-alt dolu"><i class="fa-solid fa-user"></i></div>
+                    <div class="sandalye s-sol dolu"><i class="fa-solid fa-user"></i></div>
+                    <div class="sandalye s-sag dolu"><i class="fa-solid fa-user"></i></div>
+                </div>
+                <button class="izle-btn">Dolu (4/4)</button>
+            </div>
+            <div class="masa-karti">
+                <div class="masa-baslik">Hızlı Oyun (10K Bahis)</div>
+                <div class="masa-oturma-duzeni">
+                    <div class="sandalye s-ust"></div>
+                    <div class="sandalye s-alt dolu"><i class="fa-solid fa-user"></i></div>
+                    <div class="sandalye s-sol"></div>
+                    <div class="sandalye s-sag"></div>
+                </div>
+                <button class="otur-btn" onclick="masayaGec()">Otur (1/4)</button>
+            </div>
+            <div class="masa-karti">
+                <div class="masa-baslik">Yeni Masa (Kuruluyor)</div>
+                <div class="masa-oturma-duzeni">
+                    <div class="sandalye s-ust"></div><div class="sandalye s-alt"></div><div class="sandalye s-sol"></div><div class="sandalye s-sag"></div>
+                </div>
+                <button class="otur-btn" onclick="masayaGec()">Otur (0/4)</button>
+            </div>
+        </div>
+
+        <div class="ayirici-cubuk" id="ayirici">
+            <i class="fa-solid fa-grip-lines-vertical"></i>
+        </div>
+
+        <div class="kullanici-tablo-konteyner" id="sag-tablo">
+            <div class="tablo-baslik"><i class="fa-solid fa-users"></i> Lobideki Oyuncular</div>
+            <div class="excel-tablo-wrapper">
+                <table class="kullanici-tablosu">
+                    <thead>
+                        <tr>
+                            <th style="width: 15%">Durum</th>
+                            <th style="width: 45%">Takma Ad</th>
+                            <th style="width: 20%">Puan</th>
+                            <th style="width: 20%">Şehir</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><div class="online-nokta"></div></td>
+                            <td><i class="fa-solid fa-crown" style="color:#f1c40f"></i> <span style="color:#f1c40f; font-weight:bold;">Sen</span></td>
+                            <td>250K</td>
+                            <td>İstanbul</td>
+                        </tr>
+                        <tr>
+                            <td><div class="online-nokta"></div></td>
+                            <td><div class="liste-avatar" style="background-image: url('https://api.dicebear.com/7.x/avataaars/svg?seed=Gamze');"></div> Gamze</td>
+                            <td>120K</td>
+                            <td>Ankara</td>
+                        </tr>
+                        <tr>
+                            <td><div class="online-nokta" style="background:#888; box-shadow:none;"></div></td>
+                            <td><div class="liste-avatar" style="background-image: url('https://api.dicebear.com/7.x/avataaars/svg?seed=Deniz');"></div> Deniz</td>
+                            <td>45K</td>
+                            <td>İzmir</td>
+                        </tr>
+                        <tr>
+                            <td><div class="online-nokta"></div></td>
+                            <td><div class="liste-avatar" style="background-image: url('https://api.dicebear.com/7.x/avataaars/svg?seed=Kemal');"></div> Kemal</td>
+                            <td>890K</td>
+                            <td>Bursa</td>
+                        </tr>
+                        <tr>
+                            <td><div class="online-nokta"></div></td>
+                            <td>Ayşe_34</td>
+                            <td>12K</td>
+                            <td>İstanbul</td>
+                        </tr>
+                        <tr>
+                            <td><div class="online-nokta" style="background:#888; box-shadow:none;"></div></td>
+                            <td>Okeyci_Baba</td>
+                            <td>55K</td>
+                            <td>Adana</td>
+                        </tr>
+                        <tr>
+                            <td><div class="online-nokta"></div></td>
+                            <td>Gece_Yarısı</td>
+                            <td>90K</td>
+                            <td>Antalya</td>
+                        </tr>
+                        <tr>
+                            <td><div class="online-nokta"></div></td>
+                            <td>Seri_Oyna</td>
+                            <td>30K</td>
+                            <td>Eskişehir</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="lobi-sohbet-altti">
+        <div class="sohbet-ust-bar"><i class="fa-solid fa-comments"></i> Sunucu Genel Sohbet</div>
+        <div class="lobi-sohbet-gecmis-yatay" id="lobi-genel-sohbet">
+            <div style="color:#2ecc71; text-align:center;">[SİSTEM] Okey sunucusuna bağlandınız. Keyifli oyunlar!</div>
+            <div><span style="color:#3498db; font-weight:bold;">Kral06:</span> 100K masaya adam aranıyor, seri okeyciler gelsin.</div>
+            <div><span style="color:#e67e22; font-weight:bold;">Ayşe_Yılmaz:</span> slm herkese</div>
+            <div><span style="color:#3498db; font-weight:bold;">Kemal:</span> a.s ayşe gel bizim masaya boş yer var</div>
+            <div><span style="color:#bdc3c7; font-weight:bold;">Seri_Oyna:</span> Gamze nerdesin, rövanşı yapalım mı?</div>
+        </div>
+        <div class="lobi-girdi-yatay">
+            <input type="text" placeholder="Genel lobiye yaz..." id="lobi-mesaj-input" onkeypress="if(event.key==='Enter') lobiMesajGonder()">
+            <button onclick="lobiMesajGonder()"><i class="fa-solid fa-paper-plane"></i> GÖNDER</button>
+        </div>
+    </div>
+</div>
+
+<div id="oyun-ekrani">
+    <button id="masadan-kalk-btn" onclick="lobiyeDon()"><i class="fa-solid fa-door-open"></i> Masadan Kalk</button>
+    
+    <div id="ekonomi-panel"><i class="fa-solid fa-coins" style="color: #ffd700;"></i><span>ÇİP: 250.000</span></div>
+
+    <div id="balonu-gamze" class="konusma-balonu"></div>
+    <div id="balonu-deniz" class="konusma-balonu"></div>
+    <div id="balonu-kemal" class="konusma-balonu"></div>
+    <div id="balonu-sen" class="konusma-balonu"></div>
+
+    <div id="profil-gamze" class="profil profil-ust"><div class="avatar" style="background-image: url('https://api.dicebear.com/7.x/avataaars/svg?seed=Gamze');"></div><div class="isim">Gamze</div></div>
+    <div class="rakip-istaka istaka-ust" id="ust-taslar"></div>
+    <div id="profil-deniz" class="profil profil-sol"><div class="avatar" style="background-image: url('https://api.dicebear.com/7.x/avataaars/svg?seed=Deniz');"></div><div class="isim">Deniz</div></div>
+    <div class="rakip-istaka istaka-sol" id="sol-taslar"></div>
+    <div id="profil-kemal" class="profil profil-sag"><div class="avatar" style="background-image: url('https://api.dicebear.com/7.x/avataaars/svg?seed=Kemal');"></div><div class="isim">Kemal</div></div>
+    <div class="rakip-istaka istaka-sag" id="sag-taslar"></div>
+
+    <div id="orta-alan">
+        <div id="bahis-etiket"><i class="fa-solid fa-trophy"></i> ÖDÜL: 20.000 ÇİP</div>
+        <div class="orta-kutu">DESTE (<span id="deste-sayac">0</span>)<div class="orta-tas-alani kapali-deste" onclick="tasCek()">O</div></div>
+        <div class="orta-kutu" style="color:#e67e22;">GÖSTERGE/BİT<div class="orta-tas-alani bitis-alani" id="gosterge-alani" onclick="bitisYap()"></div></div>
+        <div class="orta-kutu">AL / AT<div class="orta-tas-alani bosh-alan" onclick="yerAlaninaTiklandi()" id="yerdeki-tas"></div></div>
     </div>
 
-    <script>
-        // Sunucuya anlık bağlantı açıyoruz
-        const socket = io();
+    <div id="gelismis-sohbet-paneli">
+        <div class="sohbet-header">
+            <span id="sohbet-baslik">Masa Sohbeti</span>
+            <button class="kapat-btn" onclick="sohbetPaneliKapat()"><i class="fa-solid fa-times"></i></button>
+        </div>
+        <div class="sekmeler">
+            <button id="sekme-herkes" class="sekme aktif" onclick="sekmeDegistir('herkes')">Masa</button>
+            <button id="sekme-gamze" class="sekme" onclick="sekmeDegistir('gamze')">Gamze</button>
+            <button id="sekme-deniz" class="sekme" onclick="sekmeDegistir('deniz')">Deniz</button>
+            <button id="sekme-kemal" class="sekme" onclick="sekmeDegistir('kemal')">Kemal</button>
+        </div>
+        <div id="sohbet-gecmisi"></div>
+        <div class="girdi-alani">
+            <input type="text" id="mesaj-girdisi" placeholder="Masada yaz..." onkeypress="if(event.key==='Enter') mesajGonderSerbest()">
+            <button onclick="mesajGonderSerbest()"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+    </div>
 
-        const statusDiv = document.getElementById('connection-status');
+    <div id="benim-alanim">
+        <div class="alt-kontroller">
+            <div id="profil-sen" class="benim-profilim">
+                <div class="avatar" style="background-image: url('https://api.dicebear.com/7.x/avataaars/svg?seed=Sen');"></div>
+                <i class="fa-solid fa-crown" style="margin-right: 5px;"></i> <span id="benim-isim">Sen (GOLD)</span>
+            </div>
+            <div class="buton-grubu">
+                <button id="sohbet-ac-btn" class="yesil-btn" onclick="sohbetPaneliAc()"><i class="fa-solid fa-message"></i> SOHBET</button>
+                <button class="mavi-btn" onclick="tasTersCevir()">ÇEVİR</button>
+                <button onclick="sirala()">SIRALA</button>
+            </div>
+        </div>
+        <div id="istaka">
+            <div id="ust-sira" class="istaka-sira"></div>
+            <div id="alt-sira" class="istaka-sira"></div>
+        </div>
+    </div>
+</div>
 
-        socket.on('connect', () => {
-            statusDiv.innerText = 'Sunucuya Bağlandı! (Oyun Aktif)';
-            statusDiv.style.backgroundColor = '#198754';
+<script>
+    window.onerror = function(msg) { alert("Sistem Hatası: " + msg); return false; };
+
+    // =========================================
+    // YENİ: SÜRÜKLE - BIRAK BÖLÜCÜ (SPLITTER)
+    // =========================================
+    const ayirici = document.getElementById('ayirici');
+    const sagTablo = document.getElementById('sag-tablo');
+    let isDragging = false;
+
+    function baslaDrag(e) {
+        isDragging = true;
+        document.body.style.cursor = 'col-resize';
+        // Sürüklerken metin seçimini engelle
+        e.preventDefault(); 
+    }
+
+    function yapDrag(e) {
+        if (!isDragging) return;
+        // Fare veya dokunmatik (mobil) pozisyonunu al
+        let clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+        
+        // Sağ panelin yeni genişliğini hesapla (Toplam ekran genişliği - Fare pozisyonu - Paddingler)
+        let newWidth = window.innerWidth - clientX - 25; 
+        
+        // Çok küçülmesini veya çok büyümesini engelle
+        if(newWidth > 150 && newWidth < window.innerWidth * 0.7) {
+            sagTablo.style.width = newWidth + 'px';
+        }
+    }
+
+    function bitirDrag() {
+        isDragging = false;
+        document.body.style.cursor = 'default';
+    }
+
+    ayirici.addEventListener('mousedown', baslaDrag);
+    ayirici.addEventListener('touchstart', baslaDrag);
+    document.addEventListener('mousemove', yapDrag);
+    document.addEventListener('touchmove', yapDrag);
+    document.addEventListener('mouseup', bitirDrag);
+    document.addEventListener('touchend', bitirDrag);
+
+    // =========================================
+    // LOBİ - OYUN GEÇİŞ MANTIĞI
+    // =========================================
+    function masayaGec() {
+        document.getElementById('lobi-ekrani').style.display = 'none';
+        document.getElementById('oyun-ekrani').style.display = 'block';
+        oyunuBaslat();
+    }
+
+    function lobiyeDon() {
+        if(confirm("Masadan kalkmak istediğine emin misin? Oyun sıfırlanacak.")) {
+            window.location.reload(); 
+        }
+    }
+
+    function lobiMesajGonder() {
+        let input = document.getElementById('lobi-mesaj-input');
+        let metin = input.value.trim();
+        if(!metin) return;
+        
+        let gecmis = document.getElementById('lobi-genel-sohbet');
+        gecmis.innerHTML += `<div><span style="color:#f1c40f; font-weight:bold;">Sen:</span> ${metin}</div>`;
+        input.value = '';
+        gecmis.scrollTop = gecmis.scrollHeight;
+    }
+
+    // =========================================
+    // OYUN MOTORU KODLARI
+    // =========================================
+    let istakaSlotlari = []; let deste = []; let botElleri = [[], [], []];
+    let seciliSlotIndex = null; let yerdekiTasData = null; let okey = null; let gosterge = null;
+    const TOPLAM_SLOT = 24; let siraKimde = 0; let elindekiTasSayisi = 15; let oyunBittiMi = false;
+
+    const renkler = ['Sarı', 'Kırmızı', 'Siyah', 'Mavi'];
+    const renkKodlari = {'Sarı': '#d4ac0d', 'Kırmızı': '#c0392b', 'Siyah': '#2c3e50', 'Mavi': '#2980b9'};
+    const semboller = {'Sarı': '★', 'Kırmızı': '✦', 'Siyah': '●', 'Mavi': '✖'};
+
+    function desteyiKaristir(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        } return array;
+    }
+
+    function oyunuBaslat() {
+        gosterge = { renk: renkler[Math.floor(Math.random()*4)], sayi: Math.floor(Math.random()*13)+1, ters: false };
+        okey = { renk: gosterge.renk, sayi: gosterge.sayi === 13 ? 1 : gosterge.sayi + 1 };
+        document.getElementById('gosterge-alani').innerHTML = `<div class="tas" style="transform: scale(0.9); box-shadow:none;"><div class="renk-seridi" style="background:${renkKodlari[gosterge.renk]}"></div><div class="sayi" style="color:${renkKodlari[gosterge.renk]}">${gosterge.sayi}</div><div class="sembol" style="color:${renkKodlari[gosterge.renk]}">${semboller[gosterge.renk]}</div></div>`;
+
+        deste = [];
+        for(let r of renkler) { for(let i=1; i<=13; i++) { deste.push({renk: r, sayi: i, ters: false}); deste.push({renk: r, sayi: i, ters: false}); } }
+        deste.push({renk: 'Sahte', sayi: '★', ters: false}); deste.push({renk: 'Sahte', sayi: '★', ters: false});
+        
+        let gIndex = deste.findIndex(t => t.renk === gosterge.renk && t.sayi === gosterge.sayi);
+        if(gIndex !== -1) deste.splice(gIndex, 1);
+        deste = desteyiKaristir(deste);
+
+        botElleri = [[], [], []];
+        for(let b=0; b<3; b++) {
+            let kutu = document.getElementById(['sag-taslar','ust-taslar','sol-taslar'][b]);
+            kutu.innerHTML = '';
+            for(let i=0; i<14; i++) { 
+                botElleri[b].push(deste.pop()); 
+                let t = document.createElement('div'); t.className = 'rakip-tas'; kutu.appendChild(t);
+            } 
+        }
+
+        istakaSlotlari = new Array(TOPLAM_SLOT).fill(null);
+        for(let i=0; i<15; i++) { istakaSlotlari[i] = deste.pop(); }
+        
+        oyunBittiMi = false; siraKimde = 0; elindekiTasSayisi = 15;
+        document.getElementById('yerdeki-tas').innerHTML = ''; yerdekiTasData = null;
+        seciliSlotIndex = null;
+        
+        guncelleUI(); siraGuncelleUI();
+        
+        mesajGecmisi = { herkes: [{isim: "[SİSTEM]", metin: "Oyun başladı, ilk sıra sende.", tip: "sistem"}], gamze: [], deniz: [], kemal: [] };
+        aktifSekme = 'herkes';
+        sekmeDegistir('herkes');
+    }
+
+    let aktifSekme = 'herkes';
+    let mesajGecmisi = { herkes: [], gamze: [], deniz: [], kemal: [] };
+
+    window.sohbetPaneliAc = function() { 
+        document.getElementById('gelismis-sohbet-paneli').style.display = 'flex'; 
+        document.getElementById('mesaj-girdisi').focus();
+        document.getElementById('sohbet-ac-btn').style.boxShadow = "0 5px 10px rgba(0,0,0,0.5)"; 
+    };
+    window.sohbetPaneliKapat = function() { document.getElementById('gelismis-sohbet-paneli').style.display = 'none'; };
+
+    window.sekmeDegistir = function(hedef) {
+        aktifSekme = hedef;
+        document.querySelectorAll('.sekme').forEach(btn => btn.classList.remove('aktif'));
+        document.getElementById('sekme-' + hedef).classList.add('aktif');
+        document.getElementById('sohbet-baslik').innerText = hedef === 'herkes' ? 'Masa Sohbeti' : 'DM: ' + hedef.charAt(0).toUpperCase() + hedef.slice(1);
+        sohbetiCiz();
+    };
+
+    function balonGoster(id, metin) {
+        let balon = document.getElementById(id);
+        balon.innerText = metin; balon.style.display = "block"; balon.style.opacity = "1";
+        setTimeout(() => { balon.style.opacity = "0"; setTimeout(() => { balon.style.display = "none"; }, 300); }, 4500);
+    }
+
+    function sohbeteEkle(oda, isim, metin, tip) {
+        mesajGecmisi[oda].push({isim, metin, tip});
+        if(aktifSekme === oda) sohbetiCiz();
+        let panel = document.getElementById('gelismis-sohbet-paneli');
+        if(tip === 'dm-gelen' && (panel.style.display !== 'flex' || aktifSekme !== oda)) {
+            document.getElementById('sohbet-ac-btn').style.boxShadow = "0 0 20px #e74c3c";
+        }
+    }
+
+    function sohbetiCiz() {
+        let gecmis = document.getElementById('sohbet-gecmisi'); gecmis.innerHTML = '';
+        mesajGecmisi[aktifSekme].forEach(m => {
+            let div = document.createElement('div'); div.className = 'mesaj-satiri';
+            if(m.tip === 'sistem') div.innerHTML = `<span style="color:#2ecc71; text-align:center; display:block;">${m.metin}</span>`;
+            else if(m.tip === 'dm-giden') div.innerHTML = `<span class="mesaj-isim">Sen:</span> <span class="mesaj-dm">${m.metin}</span>`;
+            else if(m.tip === 'dm-gelen') div.innerHTML = `<span class="mesaj-isim" style="color:#e74c3c;">${m.isim}:</span> <span class="mesaj-dm">${m.metin}</span>`;
+            else div.innerHTML = `<span class="mesaj-isim">${m.isim}:</span> ${m.metin}`; 
+            gecmis.appendChild(div);
         });
+        gecmis.scrollTop = gecmis.scrollHeight;
+    }
 
-        socket.on('disconnect', () => {
-            statusDiv.innerText = 'Bağlantı Kesildi!';
-            statusDiv.style.backgroundColor = '#dc3545';
-        });
-    </script>
+    window.mesajGonderSerbest = function() {
+        let input = document.getElementById('mesaj-girdisi'); let metin = input.value.trim(); if(!metin) return;
+        balonGoster('balonu-sen', metin);
+        let tip = aktifSekme === 'herkes' ? 'genel' : 'dm-giden';
+        sohbeteEkle(aktifSekme, 'Sen', metin, tip); input.value = '';
+        setTimeout(() => { botYapayZekaCevap(metin, aktifSekme); }, 1500 + Math.random()*1500);
+    };
+
+    function botYapayZekaCevap(metin, hedefOdasi) {
+        let m = metin.toLowerCase(); let cevap = "";
+        let cevaplayan = hedefOdasi !== "herkes" ? hedefOdasi : ["gamze", "deniz", "kemal"][Math.floor(Math.random()*3)];
+
+        if(m.includes("selam") || m.includes("merhaba") || m.includes("sa")) cevap = "Selam, bol şans!";
+        else if (m.includes("hadi") || m.includes("yavaş") || m.includes("seri")) cevap = "Düşünüyoruz herhalde, acele ettirme!";
+        else if (m.includes("okey")) cevap = "Okey bende boşuna bekleme :)";
+        else cevap = ["Hadi bakalım göreceğiz.", "Sen işine bak :)", "Sıranı oyna usta.", "VIP gelmiş masaya."][Math.floor(Math.random()*4)];
+
+        balonGoster('balonu-' + cevaplayan, cevap);
+        
+        let hedef = hedefOdasi === 'herkes' ? 'herkes' : cevaplayan;
+        let isim = cevaplayan.charAt(0).toUpperCase() + cevaplayan.slice(1);
+        let tip = hedefOdasi === 'herkes' ? 'genel' : 'dm-gelen';
+        sohbeteEkle(hedef, isim, cevap, tip);
+    }
+
+    function guncelleDesteSayaci() { let s = document.getElementById('deste-sayac'); if(s) s.innerText = deste.length; }
+
+    function siraGuncelleUI() {
+        if(oyunBittiMi) return;
+        document.getElementById('profil-sen').className = 'benim-profilim';
+        document.getElementById('profil-kemal').className = 'profil profil-sag';
+        document.getElementById('profil-gamze').className = 'profil profil-ust';
+        document.getElementById('profil-deniz').className = 'profil profil-sol';
+
+        if(siraKimde === 0) document.getElementById('profil-sen').classList.add('aktif-sira');
+        else if(siraKimde === 1) document.getElementById('profil-kemal').classList.add('aktif-sira');
+        else if(siraKimde === 2) document.getElementById('profil-gamze').classList.add('aktif-sira');
+        else if(siraKimde === 3) document.getElementById('profil-deniz').classList.add('aktif-sira');
+    }
+
+    function oyunBittiKontrol() {
+        if(deste.length === 0) { alert("OYUN BİTTİ! Deste tükendi, kazanan yok."); oyunBittiMi = true; siraKimde = -1; return true; }
+        return false;
+    }
+
+    function botHamlesiYap() {
+        if(oyunBittiMi) return; siraGuncelleUI(); if (siraKimde === 0) return; 
+        let botIndex = siraKimde - 1; 
+
+        setTimeout(() => {
+            if(oyunBittiKontrol()) return; 
+            let yerdenAldiMi = false;
+            if (yerdekiTasData !== null && Math.random() < 0.25) {
+                botElleri[botIndex].push(yerdekiTasData); yerdekiTasData = null;
+                document.getElementById('yerdeki-tas').innerHTML = ''; yerdenAldiMi = true;
+            }
+            if (!yerdenAldiMi && deste.length > 0) { botElleri[botIndex].push(deste.pop()); guncelleDesteSayaci(); }
+
+            setTimeout(() => {
+                let atilacakIndex = Math.floor(Math.random() * botElleri[botIndex].length);
+                yerdekiTasData = botElleri[botIndex].splice(atilacakIndex, 1)[0];
+                let renkKodu = yerdekiTasData.renk === 'Sahte' ? '#555' : renkKodlari[yerdekiTasData.renk];
+                document.getElementById('yerdeki-tas').innerHTML = `<div class="tas" style="transform: scale(0.9); box-shadow:none;"><div class="renk-seridi" style="background:${renkKodu}"></div><div class="sayi" style="color:${renkKodu}">${yerdekiTasData.sayi}</div></div>`;
+                
+                siraKimde = (siraKimde + 1) % 4;
+                if(!oyunBittiMi) { if (siraKimde === 0) siraGuncelleUI(); else botHamlesiYap(); }
+            }, 800);
+        }, 1200);
+    }
+
+    window.tasCek = function() {
+        if(oyunBittiMi || siraKimde !== 0) return;
+        if(elindekiTasSayisi >= 15) return;
+        if(oyunBittiKontrol()) return;
+
+        let bosSlot = istakaSlotlari.findIndex(s => s === null);
+        if(bosSlot !== -1 && deste.length > 0) { istakaSlotlari[bosSlot] = deste.pop(); elindekiTasSayisi++; guncelleUI(); }
+    };
+
+    window.yerAlaninaTiklandi = function() {
+        if(oyunBittiMi || siraKimde !== 0) return;
+
+        if (seciliSlotIndex !== null) {
+            if(elindekiTasSayisi < 15) { alert("Önce taş çekmeli veya yerden almalısın!"); return; }
+            yerdekiTasData = istakaSlotlari[seciliSlotIndex];
+            istakaSlotlari[seciliSlotIndex] = null; seciliSlotIndex = null; elindekiTasSayisi--;
+            
+            let renkKodu = yerdekiTasData.renk === 'Sahte' ? '#555' : renkKodlari[yerdekiTasData.renk];
+            document.getElementById('yerdeki-tas').innerHTML = `<div class="tas" style="transform: scale(0.9); box-shadow:none;"><div class="renk-seridi" style="background:${renkKodu}"></div><div class="sayi" style="color:${renkKodu}">${yerdekiTasData.sayi}</div></div>`;
+            guncelleUI(); siraKimde = 1; if(!oyunBittiMi) botHamlesiYap();
+        } else {
+            if(elindekiTasSayisi >= 15 || yerdekiTasData === null) return;
+            let bosSlot = istakaSlotlari.findIndex(s => s === null);
+            if(bosSlot !== -1) { istakaSlotlari[bosSlot] = yerdekiTasData; yerdekiTasData = null; elindekiTasSayisi++; document.getElementById('yerdeki-tas').innerHTML = ''; guncelleUI(); }
+        }
+    };
+
+    window.bitisYap = function() {
+        if(oyunBittiMi || siraKimde !== 0 || seciliSlotIndex === null || elindekiTasSayisi < 15) return;
+        if(elGecerliMi()) {
+            let atilanTas = istakaSlotlari[seciliSlotIndex];
+            let okeyMi = (atilanTas.renk === okey.renk && atilanTas.sayi === okey.sayi);
+            
+            if(okeyMi) alert("🎉 OKEY ATARAK ÇİFTE PUANLA KAZANDIN!");
+            else alert("🎉 TEBRİKLER! KAZANDIN!");
+
+            oyunBittiMi = true; siraKimde = -1; 
+            let rKodu = atilanTas.renk === 'Sahte' ? '#555' : renkKodlari[atilanTas.renk];
+            document.getElementById('gosterge-alani').innerHTML = `<div class="tas" style="transform: scale(0.9); border: 3px solid #2ecc71;"><div class="renk-seridi" style="background:${rKodu}"></div><div class="sayi" style="color:${rKodu}">${atilanTas.sayi}</div></div>`;
+            istakaSlotlari[seciliSlotIndex] = null; seciliSlotIndex = null; guncelleUI();
+        } else { alert("❌ DİKKAT! Elin bitmemiş."); }
+    };
+
+    function elGecerliMi() {
+        let mevcutGrup = [];
+        for(let i=0; i<=TOPLAM_SLOT; i++) {
+            let t = (i === TOPLAM_SLOT || i === seciliSlotIndex) ? null : istakaSlotlari[i];
+            if(t !== null) { mevcutGrup.push(t); } else if(mevcutGrup.length > 0) { if(!grupGecerliMi(mevcutGrup)) return false; mevcutGrup = []; }
+        } return true;
+    }
+
+    function grupGecerliMi(grup) {
+        if(grup.length < 3) return false;
+        let okeySayisi = 0; let nTaslar = [];
+        for(let t of grup) {
+            if(t.renk === okey.renk && t.sayi === okey.sayi) { okeySayisi++; } 
+            else { let n = {renk: t.renk, sayi: t.sayi}; if(t.renk === 'Sahte') { n.renk = okey.renk; n.sayi = okey.sayi; } nTaslar.push(n); }
+        }
+        if(nTaslar.length === 0) return true;
+
+        let isGroup = true; let hedefSayi = nTaslar[0].sayi; let rSet = new Set();
+        for(let t of nTaslar) { if(t.sayi !== hedefSayi || rSet.has(t.renk)) { isGroup = false; break; } rSet.add(t.renk); }
+        if(isGroup && (nTaslar.length + okeySayisi <= 4)) return true;
+
+        let isSeri = true; let hedefRenk = nTaslar[0].renk;
+        for(let t of nTaslar) { if(t.renk !== hedefRenk) { isSeri = false; break; } }
+        if(isSeri) {
+            let sayilar = nTaslar.map(t => t.sayi).sort((a,b) => a - b);
+            let altSayilar = [...sayilar];
+            if(altSayilar.includes(1) && altSayilar.includes(13)) { altSayilar.splice(altSayilar.indexOf(1), 1); altSayilar.push(14); altSayilar.sort((a,b) => a - b); }
+            function siraliMi(dizi, joker) {
+                for(let i=0; i<dizi.length-1; i++) { let fark = dizi[i+1] - dizi[i]; if(fark === 0) return false; joker -= (fark - 1); if(joker < 0) return false; }
+                return true;
+            }
+            if(siraliMi(sayilar, okeySayisi) || siraliMi(altSayilar, okeySayisi)) return true;
+        } return false;
+    }
+
+    window.tasTersCevir = function() { if(seciliSlotIndex !== null) { istakaSlotlari[seciliSlotIndex].ters = !istakaSlotlari[seciliSlotIndex].ters; seciliSlotIndex = null; guncelleUI(); } };
+    window.sirala = function() {
+        let dolu = istakaSlotlari.filter(t => t !== null);
+        dolu.sort((a, b) => { if(a.renk === 'Sahte') return 1; if(b.renk === 'Sahte') return -1; return renkler.indexOf(a.renk) - renkler.indexOf(b.renk) || a.sayi - b.sayi; });
+        istakaSlotlari = new Array(TOPLAM_SLOT).fill(null);
+        for(let i=0; i<dolu.length; i++) istakaSlotlari[i] = dolu[i];
+        seciliSlotIndex = null; guncelleUI();
+    };
+    window.slotaTikla = function(index) {
+        if(oyunBittiMi) return; let tiklanan = istakaSlotlari[index];
+        if (seciliSlotIndex !== null) {
+            if (seciliSlotIndex === index) { seciliSlotIndex = null; } 
+            else { let gecici = istakaSlotlari[seciliSlotIndex]; istakaSlotlari[seciliSlotIndex] = istakaSlotlari[index]; istakaSlotlari[index] = gecici; seciliSlotIndex = null; }
+        } else { if (tiklanan !== null) seciliSlotIndex = index; }
+        guncelleUI();
+    };
+
+    function guncelleUI() {
+        const ustSira = document.getElementById('ust-sira'); const altSira = document.getElementById('alt-sira');
+        if(!ustSira || !altSira) return; ustSira.innerHTML = ''; altSira.innerHTML = ''; guncelleDesteSayaci();
+
+        for (let i = 0; i < TOPLAM_SLOT; i++) {
+            const tasData = istakaSlotlari[i]; const slotDiv = document.createElement('div'); slotDiv.className = 'slot'; slotDiv.onclick = () => window.slotaTikla(i);
+            if (tasData !== null) {
+                let isOkey = (tasData.renk === okey.renk && tasData.sayi === okey.sayi);
+                const tasDiv = document.createElement('div');
+                tasDiv.className = 'tas' + (seciliSlotIndex === i ? ' secili' : '') + (tasData.ters ? ' ters-donmus' : '') + (isOkey ? ' gercek-okey' : '');
+                let renkKodu = tasData.renk === 'Sahte' ? '#555' : renkKodlari[tasData.renk];
+                const serit = document.createElement('div'); serit.className = 'renk-seridi'; serit.style.backgroundColor = renkKodu; tasDiv.appendChild(serit);
+                const sayiDiv = document.createElement('div'); sayiDiv.className = 'sayi'; sayiDiv.innerText = tasData.sayi; sayiDiv.style.color = renkKodu; tasDiv.appendChild(sayiDiv);
+                const sembolDiv = document.createElement('div'); sembolDiv.className = 'sembol'; sembolDiv.innerText = tasData.renk === 'Sahte' ? 'SAHTE' : semboller[tasData.renk]; sembolDiv.style.color = renkKodu; tasDiv.appendChild(sembolDiv);
+                slotDiv.appendChild(tasDiv);
+            }
+            if (i < 12) ustSira.appendChild(slotDiv); else altSira.appendChild(slotDiv);
+        }
+    }
+</script>
+
 </body>
 </html>
