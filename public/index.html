@@ -51,19 +51,19 @@
         .seat-right { top: 25%; right: -25px; transform: translateY(-50%) rotate(-90deg); border-color: #0dcaf0; color: #0dcaf0; }
         .seat-left { bottom: 25%; left: -25px; transform: translateY(-50%) rotate(90deg); border-color: #0dcaf0; color: #0dcaf0; }
 
-        /* ISKARTALAR (Diğer Oyuncularınki) */
+        /* ISKARTALAR */
         .iskarta-alani { position: absolute; width: 44px; height: 60px; background-color: rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.1); border-radius: 6px; display: flex; align-items: center; justify-content: center; z-index: 4; }
         #iskartaUst { top: 15px; left: 25%; }
         #iskartaSag { top: 25%; right: 30px; transform: translateY(-50%); }
         #iskartaSol { bottom: 25%; left: 30px; transform: translateY(50%); }
         
-        /* BENİM ISKARTAM (Daha büyük, mıknatıs etkili hedef) */
+        /* BENİM ISKARTAM (Mıknatıs Alanı Büyütüldü) */
         #benimIskartam { 
             position: absolute;
-            bottom: 100px; /* Istakaya biraz daha yakınlaştı */
+            bottom: 100px; 
             right: 15px; 
-            width: 56px;  /* Daha kolay atılsın diye büyütüldü */
-            height: 76px; 
+            width: 60px;  
+            height: 80px; 
             background-color: rgba(0,0,0,0.4);
             border: 3px dashed #ffc107; 
             border-radius: 8px;
@@ -72,24 +72,19 @@
             justify-content: center;
             z-index: 10;
         }
-        /* Taş yaklaşınca kutu parlasın (Mıknatıs hissi) */
-        #benimIskartam.sortable-drag-over {
-            background-color: rgba(255, 193, 7, 0.3);
-            border-color: #fff;
-        }
+        #benimIskartam.sortable-drag-over { background-color: rgba(255, 193, 7, 0.3); border-color: #fff; }
         .iskarta-yazi { pointer-events: none; color: #ffc107; font-weight: bold; font-size: 11px; text-align: center; }
 
-        /* Taş içine girdiğinde tam otursun ve alttaki taşları engellemesin diye */
         .iskarta-alani .okey-tasi {
             position: absolute !important;
             top: 50% !important;
             left: 50% !important;
             transform: translate(-50%, -50%) !important;
-            width: 38px !important; /* Gerçek taş boyutuna küçülsün */
+            width: 38px !important;
             height: 52px !important;
             font-size: 18px !important;
             border-bottom-width: 3px !important;
-            pointer-events: none !important; /* Sürüklenen yeni taşı engellemesin */
+            pointer-events: none !important;
         }
 
         /* MASA ORTASI DİZAYNI */
@@ -214,8 +209,6 @@
         const socket = io();
         const aktifKullaniciAdi = "Oyuncu_" + Math.floor(Math.random() * 900 + 100);
         let suAnkiMasam = null; 
-        
-        // YENİ: Taş atma kilidi!
         let hamleYapildi = false; 
 
         document.getElementById('benimAdimKutusu').innerText = aktifKullaniciAdi;
@@ -233,7 +226,6 @@
         const sendBtn = document.getElementById('sendBtn');
         const chatMessages = document.getElementById('chatMessages');
 
-        // ISTAKA HÜCRELERİ (Sürükleme her yere serbest)
         const sortableOptions = {
             group: { name: 'istaka', put: (to) => to.el.children.length === 0 },
             animation: 100, delay: 0, forceFallback: true, fallbackOnBody: true, fallbackClass: 'sortable-drag', ghostClass: 'sortable-ghost', easing: "cubic-bezier(0.25, 1, 0.5, 1)"
@@ -246,26 +238,28 @@
             const yAlt = document.createElement('div'); yAlt.className = 'yuva'; yAlt.id = 'y'+(i+12); altRaf.appendChild(yAlt); new Sortable(yAlt, sortableOptions);
         }
 
-        // ÇÖZÜLEN TAŞ ATMA KUTUSU (Tek Atış Kilidi + Mıknatıs)
+        // ÇÖZÜLEN TAŞ ATMA KUTUSU (Mıknatıs Etkisi Çok Artırıldı)
         new Sortable(document.getElementById('benimIskartam'), {
             group: {
                 name: 'istaka',
                 put: function (to) {
-                    // EĞER ZATEN BİR TAŞ ATTIYSAN İKİNCİYE İZİN VERME!
                     return !hamleYapildi; 
                 },
-                pull: false // Atılan taş geri alınamaz
+                pull: false
             },
             animation: 150,
             forceFallback: true,
             fallbackOnBody: true,
-            emptyInsertThreshold: 20, // Kutuya yaklaşınca mıknatıs gibi çeker
+            emptyInsertThreshold: 100, // <--- İŞTE BURASI! Mıknatıs etkisi 5 kat artırıldı.
             onAdd: function (evt) {
-                // Taşı bıraktığımız an KİLİTLE
                 hamleYapildi = true; 
-                
                 document.getElementById('iskartaYazi').style.display = 'none';
-                console.log("Taş çöpe atıldı, sistem kilitlendi: " + evt.item.innerText);
+                const atilanTas = evt.item;
+                atilanTas.style.position = 'absolute';
+                atilanTas.style.top = '50%';
+                atilanTas.style.left = '50%';
+                atilanTas.style.transform = 'translate(-50%, -50%)';
+                atilanTas.style.margin = '0';
             }
         });
 
@@ -313,9 +307,8 @@
             
             oyunuBaslatBtn.style.display = 'block';
             oyunAlanObjeleri.style.display = 'none';
-            
             document.getElementById('benimIskartam').innerHTML = '<div class="iskarta-yazi" id="iskartaYazi">TAŞ AT<br>⬇</div>';
-            hamleYapildi = false; // Masaya oturunca kilidi sıfırla
+            hamleYapildi = false; 
         };
 
         lobiyeDonBtn.addEventListener('click', () => {
@@ -334,7 +327,7 @@
             oyunuBaslatBtn.style.display = 'none';
             oyunAlanObjeleri.style.display = 'flex';
             
-            hamleYapildi = false; // Yeni el başladı, kilidi aç
+            hamleYapildi = false; 
 
             for(let i=0; i<24; i++) document.getElementById('y'+i).innerHTML = '';
 
