@@ -71,11 +71,15 @@
             height: 50%; 
             width: 100%; 
             align-items: center; 
-            gap: 2px; 
+            justify-content: flex-start;
+            gap: 3px; 
             padding: 0 5px;
-            min-height: 50px;
+            overflow-x: auto; /* Taşlar ekrana sığmazsa yatay kaydırma sağlar */
+            overflow-y: hidden;
+            white-space: nowrap;
         }
         
+        /* Gerçek Okey Taşı */
         .okey-tasi {
             width: 32px;
             height: 46px;
@@ -94,19 +98,30 @@
             cursor: grab;
             flex-shrink: 0;
             
-            /* İŞTE MOBİL SAFARİ'Yİ DİZE GETİREN KODLAR BURADA */
-            touch-action: none; /* Kaydırmayı engeller */
-            user-select: none; /* Yazı seçmeyi engeller */
+            /* Mobil Sürükleme Akıcılığı İçin */
+            touch-action: none; 
+            user-select: none; 
             -webkit-user-select: none;
             -webkit-user-drag: none;
         }
         .okey-tasi:active { cursor: grabbing; }
         .okey-tasi::after { content: ''; position: absolute; top: 3px; left: 3px; right: 3px; bottom: 3px; border: 1px solid rgba(0,0,0,0.05); border-radius: 3px; }
         
-        .sortable-ghost { opacity: 0.4; background-color: #e9ecef; }
-        .sortable-drag { box-shadow: 5px 5px 15px rgba(0,0,0,0.6); transform: scale(1.1); z-index: 9999; }
-        .sortable-fallback { opacity: 1 !important; }
+        /* Aralara Koyduğumuz Boş Yuvalar (Oymalar) */
+        .bos-yuva {
+            width: 32px;
+            height: 46px;
+            background-color: rgba(0,0,0,0.15); /* Tahtaya kazınmış hissi */
+            border-radius: 6px;
+            box-shadow: inset 2px 2px 4px rgba(0,0,0,0.4);
+            flex-shrink: 0;
+            /* Boş yuvalar sürüklenemesin ama aralarına taş konabilsin */
+            pointer-events: none; 
+        }
 
+        .sortable-ghost { opacity: 0; } /* Sürüklerken altta kalan kopyayı gizle */
+        .sortable-drag { box-shadow: 5px 5px 15px rgba(0,0,0,0.6); transform: scale(1.15) translateY(-10px); z-index: 9999; }
+        
         .tas-kirmizi { color: #dc3545; }
         .tas-siyah { color: #212529; }
         .tas-mavi { color: #0d6efd; }
@@ -127,7 +142,7 @@
             #lobiEkrani { flex-direction: row; }
             .tables-panel { flex: 1; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; align-content: start; }
             .players-panel { width: 350px; border-top: none; border-left: 2px solid #14422b; overflow-y: auto; }
-            .okey-tasi { width: 40px; height: 55px; font-size: 24px; }
+            .okey-tasi, .bos-yuva { width: 40px; height: 55px; font-size: 24px; }
             .istaka-container { height: 140px; max-width: 800px; margin: 0 auto; }
         }
     </style>
@@ -198,14 +213,18 @@
         const sendBtn = document.getElementById('sendBtn');
         const chatMessages = document.getElementById('chatMessages');
 
-        // MOBİL İÇİN ÖZEL SÜRÜKLE BIRAK AYARLARI EKLENDİ
+        // YENİDEN DÜZENLENMİŞ AKICI SÜRÜKLEME AYARLARI
         const sortableOptions = {
             group: 'shared', 
-            animation: 150,
-            delay: 150, // Yanlışlıkla tıklamayı sürükleme sanmasın diye gecikme
+            animation: 250, // Taşlar artık kayarak yerleşecek
+            delay: 50,      // Bekleme süresi 150'den 50'ye düştü (Çok daha akıcı)
             delayOnTouchOnly: true,
-            forceFallback: true, // HTML5 sürüklemesini yoksay, özel mobil kütüphaneyi kullan
-            fallbackTolerance: 5 // Parmağı azıcık kaydırınca hemen işlemi iptal etmesin
+            touchStartThreshold: 5, // Parmağın ufak titremelerini kaydırma sanmasın
+            forceFallback: true, 
+            fallbackTolerance: 3,
+            filter: '.bos-yuva', // Boş yuvalar sürüklenemez
+            preventOnFilter: false, // AMA boş yuvaların arasına / üstüne taş BIRAKILABİLİR
+            easing: "cubic-bezier(0.25, 1, 0.5, 1)"
         };
 
         new Sortable(document.getElementById('istakaUstSira'), sortableOptions);
@@ -213,7 +232,6 @@
 
         socket.on('masalari_guncelle', (masalarData) => {
             masalarAlani.innerHTML = ''; 
-            
             for (const [masaAdi, koltuklar] of Object.entries(masalarData)) {
                 const doluKoltuklar = koltuklar.filter(k => k !== null);
                 const doluKoltukSayisi = doluKoltuklar.length;
@@ -301,6 +319,7 @@
             document.getElementById('istakaAltSira').innerHTML = '';
         });
 
+        // BOŞ YUVALARLA BİRLİKTE 15 TAŞI DİZME FONKSİYONU
         function ilkOyuncuTaslariniDiz() {
             const ustSira = document.getElementById('istakaUstSira');
             const altSira = document.getElementById('istakaAltSira');
@@ -308,26 +327,48 @@
             ustSira.innerHTML = '';
             altSira.innerHTML = '';
 
+            // Üst Sıra: Taşlar ve aralarına kazınmış "Boş Yuvalar"
             ustSira.innerHTML += `<div class="okey-tasi tas-kirmizi">7</div>`;
             ustSira.innerHTML += `<div class="okey-tasi tas-kirmizi">8</div>`;
             ustSira.innerHTML += `<div class="okey-tasi tas-kirmizi">9</div>`;
+            
+            ustSira.innerHTML += `<div class="bos-yuva"></div>`; // Araya Boşluk
             
             ustSira.innerHTML += `<div class="okey-tasi tas-siyah">12</div>`;
             ustSira.innerHTML += `<div class="okey-tasi tas-siyah">13</div>`;
             ustSira.innerHTML += `<div class="okey-tasi tas-siyah">1</div>`;
 
+            ustSira.innerHTML += `<div class="bos-yuva"></div>`; // Araya Boşluk
+            ustSira.innerHTML += `<div class="bos-yuva"></div>`;
+
             ustSira.innerHTML += `<div class="okey-tasi tas-mavi">2</div>`;
             ustSira.innerHTML += `<div class="okey-tasi tas-mavi">3</div>`;
+            
+            // Ekstra boşluklar
+            ustSira.innerHTML += `<div class="bos-yuva"></div>`;
+            ustSira.innerHTML += `<div class="bos-yuva"></div>`;
+            ustSira.innerHTML += `<div class="bos-yuva"></div>`;
 
+            // Alt Sıra: Taşlar ve Boş Yuvalar
+            altSira.innerHTML += `<div class="bos-yuva"></div>`;
+            
             altSira.innerHTML += `<div class="okey-tasi tas-mavi">4</div>`;
             altSira.innerHTML += `<div class="okey-tasi tas-sari">4</div>`;
             altSira.innerHTML += `<div class="okey-tasi tas-siyah">4</div>`;
             
+            altSira.innerHTML += `<div class="bos-yuva"></div>`; 
+            
             altSira.innerHTML += `<div class="okey-tasi tas-kirmizi">11</div>`;
             altSira.innerHTML += `<div class="okey-tasi tas-siyah">11</div>`;
 
+            altSira.innerHTML += `<div class="bos-yuva"></div>`;
+            
             altSira.innerHTML += `<div class="okey-tasi tas-sari">13</div>`;
             altSira.innerHTML += `<div class="okey-tasi tas-sari">13</div>`; 
+            
+            altSira.innerHTML += `<div class="bos-yuva"></div>`;
+            altSira.innerHTML += `<div class="bos-yuva"></div>`;
+            altSira.innerHTML += `<div class="bos-yuva"></div>`;
         }
 
         socket.on('connect', () => { ekranaMesajEkle("Sistem", "Sunucu bağlantısı kuruldu!", true); });
