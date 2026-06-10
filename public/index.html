@@ -15,7 +15,7 @@
 
         .main-container { display: flex; flex-direction: column; flex: 1; overflow-y: auto; }
 
-        /* --- LOBİ EKRANI --- */
+        /* LOBİ EKRANI */
         #lobiEkrani { display: flex; flex-direction: column; flex: 1; }
         .tables-panel { padding: 10px; display: flex; flex-direction: column; gap: 15px; }
         .table-card { background-color: #14422b; border: 2px solid #198754; border-radius: 10px; padding: 15px 10px; text-align: center; }
@@ -41,7 +41,7 @@
         .player-table td { padding: 8px 0; border-bottom: 1px solid #0d2e1d; }
         .status-dot { width: 8px; height: 8px; background-color: #20c997; border-radius: 50%; display: inline-block; margin-right: 5px; }
 
-        /* --- MASA EKRANI --- */
+        /* MASA EKRANI */
         #masaEkrani { display: none; flex: 1; background-color: #0a2014; position: relative; padding: 10px; flex-direction: column; }
         
         .okey-table-ui { background-color: #1a5c38; border: 4px solid #0d2e1d; border-radius: 20px; width: 100%; flex: 1; position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
@@ -52,10 +52,10 @@
         .seat-right { right: -10px; top: 50%; transform: translateY(-50%) rotate(90deg); border-color: #0dcaf0; color: #0dcaf0; }
         .return-lobby-btn { position: absolute; top: 5px; right: 5px; background-color: #dc3545; color: white; border: none; padding: 6px 10px; border-radius: 5px; font-size: 11px; font-weight: bold; z-index: 10; cursor: pointer; }
 
-        /* --- ISTAKA VE TAŞLAR --- */
+        /* ISTAKA VE TAŞLAR */
         .istaka-container {
             width: 100%;
-            height: 120px; /* Taşların rahat sığması için biraz büyüttüm */
+            height: 120px;
             background: linear-gradient(to bottom, #d4a373, #8b5a2b);
             border-radius: 10px;
             border: 3px solid #5c3a21;
@@ -73,7 +73,7 @@
             align-items: center; 
             gap: 2px; 
             padding: 0 5px;
-            min-height: 50px; /* Boşken çökmesin diye */
+            min-height: 50px;
         }
         
         .okey-tasi {
@@ -91,22 +91,28 @@
             font-size: 20px;
             font-family: Arial, sans-serif;
             position: relative;
-            cursor: grab; /* Sürüklenebilir imleci */
+            cursor: grab;
             flex-shrink: 0;
+            
+            /* İŞTE MOBİL SAFARİ'Yİ DİZE GETİREN KODLAR BURADA */
+            touch-action: none; /* Kaydırmayı engeller */
+            user-select: none; /* Yazı seçmeyi engeller */
+            -webkit-user-select: none;
+            -webkit-user-drag: none;
         }
         .okey-tasi:active { cursor: grabbing; }
         .okey-tasi::after { content: ''; position: absolute; top: 3px; left: 3px; right: 3px; bottom: 3px; border: 1px solid rgba(0,0,0,0.05); border-radius: 3px; }
         
-        /* SortableJS sürükleme anı efektleri */
         .sortable-ghost { opacity: 0.4; background-color: #e9ecef; }
-        .sortable-drag { box-shadow: 5px 5px 15px rgba(0,0,0,0.6); transform: scale(1.1); }
+        .sortable-drag { box-shadow: 5px 5px 15px rgba(0,0,0,0.6); transform: scale(1.1); z-index: 9999; }
+        .sortable-fallback { opacity: 1 !important; }
 
         .tas-kirmizi { color: #dc3545; }
         .tas-siyah { color: #212529; }
         .tas-mavi { color: #0d6efd; }
         .tas-sari { color: #e67e22; }
 
-        /* --- SOHBET --- */
+        /* SOHBET */
         .chat-panel { background-color: #081e13; border-top: 2px solid #14422b; display: flex; flex-direction: column; height: 200px; flex-shrink: 0; z-index: 999; }
         .chat-header { font-size: 12px; padding: 5px 10px; background-color: #05140d; color: #a0a0a0; }
         .chat-messages { flex: 1; padding: 10px; overflow-y: auto; font-size: 13px; display: flex; flex-direction: column; gap: 5px; }
@@ -192,20 +198,18 @@
         const sendBtn = document.getElementById('sendBtn');
         const chatMessages = document.getElementById('chatMessages');
 
-        // Sürükle Bırak Kütüphanesini Aktif Et (İki sıra arası geçiş serbest)
-        new Sortable(document.getElementById('istakaUstSira'), {
+        // MOBİL İÇİN ÖZEL SÜRÜKLE BIRAK AYARLARI EKLENDİ
+        const sortableOptions = {
             group: 'shared', 
             animation: 150,
-            delayOnTouchOnly: true, // Telefondan kaydırırken sayfanın hareket etmemesi için
-            delay: 100
-        });
-        
-        new Sortable(document.getElementById('istakaAltSira'), {
-            group: 'shared',
-            animation: 150,
+            delay: 150, // Yanlışlıkla tıklamayı sürükleme sanmasın diye gecikme
             delayOnTouchOnly: true,
-            delay: 100
-        });
+            forceFallback: true, // HTML5 sürüklemesini yoksay, özel mobil kütüphaneyi kullan
+            fallbackTolerance: 5 // Parmağı azıcık kaydırınca hemen işlemi iptal etmesin
+        };
+
+        new Sortable(document.getElementById('istakaUstSira'), sortableOptions);
+        new Sortable(document.getElementById('istakaAltSira'), sortableOptions);
 
         socket.on('masalari_guncelle', (masalarData) => {
             masalarAlani.innerHTML = ''; 
@@ -282,7 +286,6 @@
             masaEkrani.style.display = 'flex';
             masaOrtasiYazi.innerText = masaAdi.toUpperCase();
             
-            // Masaya oturduğumuzda 15 Taşı Diz
             ilkOyuncuTaslariniDiz();
         };
 
@@ -298,7 +301,6 @@
             document.getElementById('istakaAltSira').innerHTML = '';
         });
 
-        // İLK OYUNCU İÇİN TAM 15 TAŞ OLUŞTURMA FONKSİYONU
         function ilkOyuncuTaslariniDiz() {
             const ustSira = document.getElementById('istakaUstSira');
             const altSira = document.getElementById('istakaAltSira');
@@ -306,7 +308,6 @@
             ustSira.innerHTML = '';
             altSira.innerHTML = '';
 
-            // Üst Sıra (8 Taş)
             ustSira.innerHTML += `<div class="okey-tasi tas-kirmizi">7</div>`;
             ustSira.innerHTML += `<div class="okey-tasi tas-kirmizi">8</div>`;
             ustSira.innerHTML += `<div class="okey-tasi tas-kirmizi">9</div>`;
@@ -318,7 +319,6 @@
             ustSira.innerHTML += `<div class="okey-tasi tas-mavi">2</div>`;
             ustSira.innerHTML += `<div class="okey-tasi tas-mavi">3</div>`;
 
-            // Alt Sıra (7 Taş) Toplam: 15 Taş
             altSira.innerHTML += `<div class="okey-tasi tas-mavi">4</div>`;
             altSira.innerHTML += `<div class="okey-tasi tas-sari">4</div>`;
             altSira.innerHTML += `<div class="okey-tasi tas-siyah">4</div>`;
@@ -327,7 +327,7 @@
             altSira.innerHTML += `<div class="okey-tasi tas-siyah">11</div>`;
 
             altSira.innerHTML += `<div class="okey-tasi tas-sari">13</div>`;
-            altSira.innerHTML += `<div class="okey-tasi tas-sari">13</div>`; // Çifte giden adam :)
+            altSira.innerHTML += `<div class="okey-tasi tas-sari">13</div>`; 
         }
 
         socket.on('connect', () => { ekranaMesajEkle("Sistem", "Sunucu bağlantısı kuruldu!", true); });
