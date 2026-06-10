@@ -87,7 +87,7 @@
             pointer-events: none !important;
         }
 
-        /* MASA ORTASI DİZAYNI */
+        /* MASA ORTASI */
         .masa-ortasi { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 15px; background: rgba(0,0,0,0.2); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); z-index: 4; }
         .masa-isim-ortasi { color: rgba(255,255,255,0.3); font-weight: bold; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; }
         .oyun-baslat-btn { background-color: #ffc107; color: #000; border: none; padding: 10px 25px; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.4); }
@@ -226,17 +226,9 @@
         const sendBtn = document.getElementById('sendBtn');
         const chatMessages = document.getElementById('chatMessages');
 
-        // SÜZÜLME DİRENCİ (Friction) SIFIRLANDI!
         const sortableOptions = {
             group: { name: 'istaka', put: (to) => to.el.children.length === 0 },
-            animation: 100, 
-            delay: 0, 
-            forceFallback: true, 
-            fallbackOnBody: true, 
-            fallbackTolerance: 2, // 2px parmak hareketi anında taşı koparır (Akıcılığın Sırrı)
-            ghostClass: 'sortable-ghost', 
-            dragClass: 'sortable-drag',
-            easing: "cubic-bezier(0.25, 1, 0.5, 1)"
+            animation: 100, delay: 0, forceFallback: true, fallbackOnBody: true, fallbackTolerance: 2, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag', easing: "cubic-bezier(0.25, 1, 0.5, 1)"
         };
 
         const ustRaf = document.getElementById('ustRaf');
@@ -246,10 +238,13 @@
             const yAlt = document.createElement('div'); yAlt.className = 'yuva'; yAlt.id = 'y'+(i+12); altRaf.appendChild(yAlt); new Sortable(yAlt, sortableOptions);
         }
 
+        // ÇÖZÜLEN TAŞ ATMA KUTUSU 
         new Sortable(document.getElementById('benimIskartam'), {
             group: {
                 name: 'istaka',
-                put: function (to) { return !hamleYapildi; },
+                put: function (to) {
+                    return !hamleYapildi; 
+                },
                 pull: false
             },
             animation: 150,
@@ -258,7 +253,9 @@
             emptyInsertThreshold: 100, 
             onAdd: function (evt) {
                 hamleYapildi = true; 
-                document.getElementById('iskartaYazi').style.display = 'none';
+                const yazi = document.getElementById('iskartaYazi');
+                if(yazi) yazi.style.display = 'none';
+                
                 const atilanTas = evt.item;
                 atilanTas.style.position = 'absolute';
                 atilanTas.style.top = '50%';
@@ -268,25 +265,25 @@
             }
         });
 
-        // EFSANE ÖZELLİK: Çift Tıklama / Dokunma İle Otomatik Taş Atma Fonksiyonu
+        // ÇİFT TIKLAMA İLE OTOMATİK ATMA FONKSİYONU
         function otomatikTasAt(tasElementi) {
-            if (hamleYapildi) return; // Zaten atıldıysa kilitli
+            if (hamleYapildi) return; 
             
             const iskartaKutusu = document.getElementById('benimIskartam');
             
-            // Eğer iskartada taş yoksa at
-            if (iskartaKutusu.querySelector('.okey-tasi') === null) {
+            if (iskartaKutusu && iskartaKutusu.querySelector('.okey-tasi') === null) {
                 iskartaKutusu.appendChild(tasElementi);
                 
-                // Tam oturtma CSS'i
                 tasElementi.style.position = 'absolute';
                 tasElementi.style.top = '50%';
                 tasElementi.style.left = '50%';
                 tasElementi.style.transform = 'translate(-50%, -50%)';
                 tasElementi.style.margin = '0';
                 
-                document.getElementById('iskartaYazi').style.display = 'none';
-                hamleYapildi = true; // KİLİTLE
+                const yazi = document.getElementById('iskartaYazi');
+                if(yazi) yazi.style.display = 'none';
+                
+                hamleYapildi = true; 
                 console.log("Çift dokunuşla mermi gibi atıldı: " + tasElementi.innerText);
             }
         }
@@ -365,11 +362,14 @@
                 div.innerText = tas.sayi;
                 div.id = tas.id; 
 
-                // HER TAŞA ÇİFT TIKLAMA ÖZELLİĞİ EKLENDİ
+                // ÇİFT TIKLAMA ÖZELLİĞİ
                 let sonDokunma = 0;
                 div.addEventListener('touchend', function(e) {
                     const simdi = new Date().getTime();
-                    if (simdi - sonDokunma < 300) { otomatikTasAt(this); }
+                    if (simdi - sonDokunma < 300) { 
+                        e.preventDefault(); // Ekranın zoom yapmasını engeller
+                        otomatikTasAt(this); 
+                    }
                     sonDokunma = simdi;
                 });
                 div.addEventListener('dblclick', function() { otomatikTasAt(this); });
@@ -402,4 +402,8 @@
         function ekranaMesajEkle(yazar, icerik, isSystem) {
             const yeniSatir = document.createElement('div');
             yeniSatir.className = "msg-line";
-            if (isSystem
+            if (isSystem) {
+                yeniSatir.innerHTML = `<span class="msg-author system">[${yazar}]:</span> <i>${icerik}</i>`;
+            } else {
+                const renk = (yazar === aktifKullaniciAdi) ? "#ffc107" : "#0dcaf0";
+                yeniSatir.innerHTML = `<span class="msg-author
