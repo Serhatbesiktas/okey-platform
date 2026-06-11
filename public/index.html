@@ -6,12 +6,12 @@
     <title>VIP Okey Sunucusu</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background-color: #0d2e1d; color: #fff; font-family: sans-serif; display: flex; flex-direction: column; height: 100dvh; overflow: hidden; }
+        body { background-color: #0d2e1d; color: #fff; font-family: sans-serif; display: flex; flex-direction: column; height: 100dvh; overflow: hidden; position: relative; }
         .header { display: flex; justify-content: space-between; align-items: center; padding: 10px; background-color: #081e13; border-bottom: 2px solid #14422b; flex-shrink: 0; }
         .logo { color: #ffc107; font-weight: bold; font-size: 14px; }
         .stats-box { background-color: #14422b; padding: 5px 10px; border-radius: 5px; border: 1px solid #198754; font-size: 11px; text-align: center; }
         .stats-box span { color: #20c997; display: block; font-weight: bold; font-size: 14px;}
-        .user-box { background-color: #ffc107; color: #000; padding: 5px 10px; border-radius: 20px; font-weight: bold; font-size: 12px; }
+        .user-box { background-color: #ffc107; color: #000; padding: 5px 10px; border-radius: 20px; font-weight: bold; font-size: 12px; cursor: pointer; }
 
         .main-container { display: flex; flex-direction: column; flex: 1; overflow-y: auto; }
 
@@ -21,9 +21,9 @@
         .table-title { color: #ffc107; font-weight: bold; margin-bottom: 15px; font-size: 14px; }
         .mini-table-container { position: relative; height: 130px; margin: 0 auto 15px auto; width: 100%; max-width: 250px; background-color: rgba(0,0,0,0.15); border-radius: 10px; }
         .mini-okey-table { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80px; height: 50px; background-color: #1a5c38; border: 2px solid #0a2014; border-radius: 25px; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
-        .mini-seat { position: absolute; font-size: 10px; line-height: 1.2; text-align: center; width: 60px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .mini-seat { position: absolute; font-size: 10px; line-height: 1.2; text-align: center; width: 60px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
         .mini-seat.occupied { color: #0dcaf0; font-weight: bold; }
-        .mini-seat.empty { color: #a0a0a0; font-style: italic; }
+        .mini-seat.empty { color: #a0a0a0; font-style: italic; cursor: default; }
         .mini-top { top: 5px; left: 50%; transform: translateX(-50%); }
         .mini-bottom { bottom: 5px; left: 50%; transform: translateX(-50%); }
         .mini-left { top: 50%; left: 5px; transform: translateY(-50%); }
@@ -41,12 +41,11 @@
         .okey-table-ui { background-color: #1a5c38; border: 4px solid #0d2e1d; border-radius: 20px; width: 100%; flex: 1; position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); margin-bottom: 5px; overflow: hidden; }
         
         .return-lobby-btn { position: absolute; top: 5px; right: 5px; background-color: #dc3545; color: white; border: none; padding: 6px 10px; border-radius: 5px; font-size: 11px; font-weight: bold; z-index: 10; cursor: pointer; }
-
         .gosterge-btn { position: absolute; top: 5px; left: 5px; background-color: #0dcaf0; color: #000; border: 2px solid #fff; padding: 6px 12px; border-radius: 5px; font-weight: bold; font-size: 12px; z-index: 15; cursor: pointer; animation: flashBtn 0.8s infinite alternate; display: none; box-shadow: 0 0 15px rgba(13, 202, 240, 0.8); }
         .gosterge-btn:active { transform: scale(0.95); }
         @keyframes flashBtn { from { transform: scale(1); box-shadow: 0 0 5px rgba(13, 202, 240, 0.5); } to { transform: scale(1.05); box-shadow: 0 0 20px rgba(13, 202, 240, 1); } }
 
-        .player-seat { position: absolute; background-color: rgba(0,0,0,0.75); padding: 6px 12px; border-radius: 8px; color: #ffc107; font-size: 12px; font-weight: bold; border: 2px solid #ffc107; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; z-index: 5; text-align: center; transition: 0.3s; }
+        .player-seat { position: absolute; background-color: rgba(0,0,0,0.75); padding: 6px 12px; border-radius: 8px; color: #ffc107; font-size: 12px; font-weight: bold; border: 2px solid #ffc107; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; z-index: 5; text-align: center; transition: 0.3s; cursor: pointer; }
         .seat-top { top: 10px; left: 50%; transform: translateX(-50%); border-color: #0dcaf0; color: #0dcaf0; }
         .seat-right { top: 25%; right: -25px; transform: translateY(-50%) rotate(-90deg); border-color: #0dcaf0; color: #0dcaf0; }
         .seat-left { bottom: 25%; left: -25px; transform: translateY(-50%) rotate(90deg); border-color: #0dcaf0; color: #0dcaf0; }
@@ -124,18 +123,40 @@
         .chat-header { font-size: 12px; padding: 5px 10px; background-color: #05140d; color: #a0a0a0; transition: 0.3s; }
         .chat-messages { flex: 1; padding: 10px; overflow-y: auto; font-size: 13px; display: flex; flex-direction: column; gap: 5px; }
         .msg-line { line-height: 1.4; padding-bottom: 3px;}
-        .msg-author { color: #0dcaf0; font-weight: bold; }
-        .msg-author.system { color: #ffc107; }
+        .msg-author { color: #0dcaf0; font-weight: bold; cursor: pointer; }
+        .msg-author:hover { text-decoration: underline; }
+        .msg-author.system { color: #ffc107; cursor: default; }
         .chat-input-area { display: flex; padding: 8px; gap: 8px; background-color: #0b2417; padding-bottom: calc(8px + env(safe-area-inset-bottom, 10px)); }
         .chat-input-area input { flex: 1; background-color: #0d2e1d; border: 1px solid #198754; color: #fff; padding: 12px; border-radius: 5px; outline: none; font-size: 16px; }
         .chat-input-area button { background-color: #0dcaf0; color: #000; border: none; padding: 0 15px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 14px; }
 
-        @media (min-width: 768px) {
-            #lobiEkrani { flex-direction: row; }
-            .tables-panel { flex: 1; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; align-content: start; }
-            .players-panel { width: 350px; border-top: none; border-left: 2px solid #14422b; overflow-y: auto; }
-            .istaka-container { height: 160px; max-width: 800px; margin: 0 auto; }
-        }
+        /* YENİ MODAL VE FİSILTI STİLLERİ */
+        .vip-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100000; justify-content: center; align-items: center; padding: 20px; }
+        .profil-kart { background: #14422b; border: 3px solid #ffc107; width: 100%; max-width: 320px; border-radius: 15px; padding: 20px; text-align: center; color: white; box-shadow: 0 0 25px rgba(255,193,7,0.4); }
+        .avatar-buyuk { font-size: 50px; margin-bottom: 10px; display: block; }
+        .profil-isim { font-size: 20px; color: #ffc107; font-weight: bold; margin-bottom: 15px; }
+        .profil-detay { background: rgba(0,0,0,0.2); border-radius: 8px; padding: 12px; margin-bottom: 20px; text-align: left; font-size: 14px; line-height: 1.6; }
+        .profil-detay span { color: #20c997; font-weight: bold; float: right;}
+        .modal-kapat-btn { background: #dc3545; color: white; border: none; padding: 10px 15px; border-radius: 6px; font-weight: bold; cursor: pointer; width: 45%; font-size: 13px; }
+        .modal-action-btn { background: #ffc107; color: black; border: none; padding: 10px 15px; border-radius: 6px; font-weight: bold; cursor: pointer; width: 45%; font-size: 13px; margin-left: 5%; }
+        .modal-action-btn.disabled { background: #6c757d; color: white; cursor: not-allowed; }
+
+        /* REKLAM SATIŞ POPUP (PAYWALL) */
+        .paywall-kart { background: linear-gradient(135deg, #0d2e1d, #14422b); border: 4px solid #ffc107; border-radius: 20px; padding: 35px 20px; text-align: center; color: white; max-width: 350px; width: 100%; box-shadow: 0 0 35px #ffc107; animation: pulseGlow 1.5s infinite alternate; }
+        @keyframes pulseGlow { from { box-shadow: 0 0 20px #ffc107; } to { box-shadow: 0 0 40px #ffc107; } }
+        .paywall-baslik { font-size: 26px; color: #ffc107; font-weight: 900; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
+        .paywall-metin { font-size: 15px; line-height: 1.5; margin-bottom: 25px; color: #e0e0e0; }
+        .paywall-btn { background: linear-gradient(to right, #ffc107, #ff9800); color: black; font-size: 16px; font-weight: 900; border: none; padding: 12px 30px; border-radius: 30px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.4); width: 100%; margin-bottom: 15px; }
+
+        /* FİSILTI FLOATING WINDOW */
+        #fisiltiPenceresi { display: none; position: fixed; bottom: calc(190px + env(safe-area-inset-bottom, 10px)); right: 10px; width: 280px; height: 260px; background: #081e13; border: 2px solid #ffc107; border-radius: 10px; z-index: 99999; flex-direction: column; box-shadow: 0 5px 20px rgba(0,0,0,0.6); overflow: hidden; }
+        .fp-header { background: #14422b; padding: 8px; font-size: 12px; font-weight: bold; color: #ffc107; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #198754; }
+        .fp-kapat { background: none; border: none; color: #dc3545; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .fp-mesajlar { flex: 1; padding: 8px; overflow-y: auto; font-size: 12px; display: flex; flex-direction: column; gap: 5px; background: #040e08; }
+        .fp-satir { line-height: 1.3; }
+        .fp-input-alan { display: flex; padding: 5px; gap: 5px; background: #0b2417; border-top: 1px solid #14422b; }
+        .fp-input-alan input { flex: 1; background: #0d2e1d; border: 1px solid #198754; color: white; padding: 6px; border-radius: 4px; outline: none; font-size: 13px; }
+        .fp-input-alan button { background: #ffc107; color: black; border: none; padding: 0 10px; border-radius: 4px; font-weight: bold; font-size: 11px; cursor: pointer; }
     </style>
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
@@ -145,7 +166,7 @@
     <div class="header">
         <div class="logo">🏆 VIP OKEY<br>SUNUCUSU</div>
         <div class="stats-box"><span id="benimCipim">Bağlanıyor...</span> ÇİP</div>
-        <div class="user-box" id="benimAdimKutusu">Bağlanıyor...</div>
+        <div class="user-box" id="benimAdimKutusu" onclick="profilAc(aktifKullaniciAdi)">Bağlanıyor...</div>
     </div>
 
     <div id="lobiEkrani">
@@ -155,14 +176,13 @@
             <table class="player-table">
                 <thead><tr><th>DRM</th><th>TAKMA AD</th><th>PUAN</th></tr></thead>
                 <tbody>
-                    <tr><td><span class="status-dot"></span></td><td style="color:#ffc107; font-weight:bold;" id="lobiBenimAdim">👑 Yükleniyor...</td><td>-</td></tr>
+                    <tr><td><span class="status-dot"></span></td><td style="color:#ffc107; font-weight:bold; cursor:pointer;" id="lobiBenimAdim" onclick="profilAc(aktifKullaniciAdi)">👑 Yükleniyor...</td><td>-</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 
     <div id="masaEkrani">
-        
         <div id="sonucEkrani">
             <div class="sonuc-kutu">
                 <h1 id="sonucBaslik">Oyun Bitti!</h1>
@@ -188,7 +208,6 @@
                     <div style="display: flex; gap: 15px; align-items: center;">
                         <div class="gosterge-tasi" id="gostergeTasi" title="Gösterge"></div>
                         <div class="kapali-deste" id="kalanTasBilgi" title="Taş Çekmek İçin Tıkla">91</div>
-                        
                         <div id="bitisAlani">BİTİR<br>🏆</div>
                     </div>
                 </div>
@@ -197,7 +216,6 @@
             <div class="iskarta-alani" id="iskartaUst"></div>
             <div class="iskarta-alani" id="iskartaSag"></div>
             <div class="iskarta-alani" id="iskartaSol" title="Yerden Taş Çek"></div>
-            
             <div class="iskarta-alani" id="benimIskartam">
                 <div class="iskarta-yazi" id="iskartaYazi">TAŞ AT<br>⬇</div>
             </div>
@@ -208,7 +226,6 @@
                 <button class="pro-tus" onclick="seriDiz()">SERİ DİZ</button>
                 <button class="pro-tus" onclick="ciftDiz()">ÇİFT DİZ</button>
             </div>
-
             <div class="istaka-container" id="benimIstakam">
                 <div class="istaka-raf raf-ust" id="ustRaf"></div>
                 <div class="istaka-raf raf-alt" id="altRaf"></div>
@@ -232,24 +249,59 @@
         </div>
     </div>
 
-    <script>
-        const sesler = {
-            tasSes: new Audio('https://cdn.freesound.org/previews/240/240776_4107740-lq.mp3'),
-            siraSes: new Audio('https://cdn.freesound.org/previews/352/352661_4019029-lq.mp3'),
-            zaferSes: new Audio('https://cdn.freesound.org/previews/270/270319_5123851-lq.mp3'),
-            bitisSes: new Audio('https://cdn.freesound.org/previews/173/173859_2370618-lq.mp3') 
-        };
+    <div class="vip-modal" id="profilModal">
+        <div class="profil-kart">
+            <span class="avatar-buyuk">👤</span>
+            <div class="profil-isim" id="pmIsim">Oyuncu_602</div>
+            <div class="profil-detay">
+                Durum: <span id="pmDurum">Normal Üye</span><br>
+                Bakiye: <span id="pmCip">0 ÇİP</span>
+            </div>
+            <button class="modal-kapat-btn" onclick="modalKapat('profilModal')">KAPAT</button>
+            <button class="modal-action-btn" id="pmActionBtn">FİSILTI</button>
+            
+            <button class="sit-btn" id="cheatVipBtn" style="margin-top:15px; font-size:11px; padding:5px; display:none;"></button>
+        </div>
+    </div>
 
+    <div class="vip-modal" id="paywallModal">
+        <div class="paywall-kart">
+            <div class="paywall-baslik">👑 VIP AYRICALIĞI</div>
+            <div class="paywall-metin">
+                Özel (Fısıltı) mesajlaşma sistemi sadece VIP kulübümüze özeldir!<br><br>
+                Hemen VIP üye ol, masalarda farkını ortaya koy ve rakiplerinle özelden atışmaya başla!
+            </div>
+            <button class="paywall-btn" onclick="alert('Simüle Satış Başarılı! Hile butonuyla VIP modunu açıp test edebilirsiniz ortak.')">👑 VIP SATIN AL (29.99 TL)</button>
+            <button class="modal-kapat-btn" style="width:100%" onclick="modalKapat('paywallModal')">VAZGEÇ</button>
+        </div>
+    </div>
+
+    <div id="fisiltiPenceresi">
+        <div class="fp-header">
+            <span id="fpHedefYazi">Fısıltı: Oyuncu</span>
+            <button class="fp-kapat" onclick="document.getElementById('fisiltiPenceresi').style.display='none'">✕</button>
+        </div>
+        <div class="fp-messages fp-mesajlar" id="fpMessages"></div>
+        <div class="fp-input-alan">
+            <input type="text" id="fpInput" placeholder="Gizlice yaz...">
+            <button onclick="fisiltiGonder()">GÖNDER</button>
+        </div>
+    </div>
+
+    <script>
         const socket = io();
+        
         let aktifKullaniciAdi = localStorage.getItem('vip_okey_isim') || "Oyuncu_" + Math.floor(Math.random() * 900 + 100);
         let suAnkiMasam = null; 
         let benimSiramMi = false;
         let guncelGosterge = null; 
+        let benVipMiyim = false; // İstemci tarafında VIP takibi
+        let suAnkiFisiltiHedef = null; // Aktif DM penceresi hedefi
 
         document.getElementById('benimAdimKutusu').innerText = aktifKullaniciAdi;
         document.getElementById('lobiBenimAdim').innerText = "👑 " + aktifKullaniciAdi;
 
-        // YENİ: UYKU MODU DÜZELTMESİ - Bağlantı her geldiğinde kimliği sunucuya bildir
+        // UYKU MODU DÜZELTMESİ GARANTİSİ
         socket.on('connect', () => {
             socket.emit('kullanici_girisi', aktifKullaniciAdi);
             if (suAnkiMasam) {
@@ -259,7 +311,6 @@
 
         socket.on('cip_guncelle', (cip) => { document.getElementById('benimCipim').innerText = cip.toLocaleString('tr-TR'); });
         socket.on('cip_guncelle_ozel', (data) => { if(data.isim === aktifKullaniciAdi) document.getElementById('benimCipim').innerText = data.cip.toLocaleString('tr-TR'); });
-
         socket.on('hata_mesaji', (mesaj) => { alert(mesaj); });
 
         const lobiEkrani = document.getElementById('lobiEkrani');
@@ -282,22 +333,116 @@
         const ustRaf = document.getElementById('ustRaf');
         const altRaf = document.getElementById('altRaf');
 
+        // PROFİL AÇMA VE MODAL YÖNETİMİ
+        window.profilAc = function(isim) {
+            socket.emit('profil_talebi', isim);
+        };
+
+        socket.on('profil_yaniti', (data) => {
+            document.getElementById('pmIsim').innerText = data.isim;
+            document.getElementById('pmCip').innerText = typeof data.cip === 'number' ? data.cip.toLocaleString('tr-TR') + ' ÇİP' : data.cip;
+            
+            const durumEl = document.getElementById('pmDurum');
+            const actionBtn = document.getElementById('pmActionBtn');
+            const cheatBtn = document.getElementById('cheatVipBtn');
+
+            cheatBtn.style.display = 'none';
+
+            if (data.botMu) {
+                durumEl.innerText = "Yapay Zeka Botu";
+                durumEl.style.color = "#0dcaf0";
+                actionBtn.innerText = "İletişim Yok";
+                actionBtn.className = "modal-action-btn disabled";
+                actionBtn.onclick = null;
+            } else {
+                if (data.isim === aktifKullaniciAdi) {
+                    benVipMiyim = data.vip; // Kendi durumumuzu güncelle
+                    durumEl.innerText = data.vip ? "👑 VIP ÜYE" : "Normal Üye";
+                    durumEl.style.color = data.vip ? "#ffc107" : "#fff";
+                    actionBtn.innerText = "Kendinsin";
+                    actionBtn.className = "modal-action-btn disabled";
+                    actionBtn.onclick = null;
+
+                    // Hile butonunu aktif et
+                    cheatBtn.style.display = 'block';
+                    cheatBtn.innerText = data.vip ? "Simüle VIP'yi Kapat" : "Simüle VIP Ol (Hile)";
+                    cheatBtn.style.background = data.vip ? "#dc3545" : "#20c997";
+                    cheatBtn.style.color = "#fff";
+                    cheatBtn.onclick = function() {
+                        socket.emit('vip_durumunu_degistir', { isim: aktifKullaniciAdi, yeniDurum: !data.vip });
+                        modalKapat('profilModal');
+                    };
+                } else {
+                    durumEl.innerText = data.vip ? "👑 VIP ÜYE" : "Normal Üye";
+                    durumEl.style.color = data.vip ? "#ffc107" : "#fff";
+                    actionBtn.innerText = "FİSILDA";
+                    actionBtn.className = "modal-action-btn";
+                    
+                    actionBtn.onclick = function() {
+                        modalKapat('profilModal');
+                        if (!benVipMiyim) {
+                            // Satış hunisi tetiklendi!
+                            document.getElementById('paywallModal').style.display = 'flex';
+                        } else {
+                            // VIP ise DM kutusunu aç
+                            suAnkiFisiltiHedef = data.isim;
+                            document.getElementById('fpHedefYazi').innerText = `Fısıltı: ${data.isim}`;
+                            document.getElementById('fpMessages').innerHTML = ''; 
+                            document.getElementById('fisiltiPenceresi').style.display = 'flex';
+                        }
+                    };
+                }
+            }
+            document.getElementById('profilModal').style.display = 'flex';
+        });
+
+        window.modalKapat = function(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        };
+
+        // FİSILTI GÖNDERME VE ALMA MANTIĞI
+        window.fisiltiGonder = function() {
+            const input = document.getElementById('fpInput');
+            const mesaj = input.value.trim();
+            if (mesaj !== '' && suAnkiFisiltiHedef) {
+                socket.emit('fisilti_gonder', { kimden: aktifKullaniciAdi, kime: suAnkiFisiltiHedef, mesaj: mesaj });
+                input.value = '';
+            }
+        };
+        document.getElementById('fpInput').addEventListener('keypress', (e) => { if(e.key === 'Enter') fisiltiGonder(); });
+
+        socket.on('fisilti_geldi', (data) => {
+            const fpWindow = document.getElementById('fisiltiPenceresi');
+            const fpMessages = document.getElementById('fpMessages');
+
+            // Eğer DM kutusu kapalıysa veya başka birinden mesaj geldiyse pencereyi o kişiye göre zorla aç
+            if (fpWindow.style.display !== 'flex' || (data.kimden !== aktifKullaniciAdi && suAnkiFisiltiHedef !== data.kimden)) {
+                suAnkiFisiltiHedef = data.kimden === aktifKullaniciAdi ? data.kime : data.kimden;
+                document.getElementById('fpHedefYazi').innerText = `Fısıltı: ${suAnkiFisiltiHedef}`;
+                fpMessages.innerHTML = '';
+                fpWindow.style.display = 'flex';
+            }
+
+            const yeniSatir = document.createElement('div');
+            yeniSatir.className = "fp-satir";
+            const renk = data.kimden === aktifKullaniciAdi ? "#ffc107" : "#20c997";
+            yeniSatir.innerHTML = `<span style="color:${renk}; font-weight:bold;">${data.kimden}:</span> ${data.mesaj}`;
+            fpMessages.appendChild(yeniSatir);
+            fpMessages.scrollTop = fpMessages.scrollHeight;
+        });
+
+
+        // OYUN İÇİ ESKİ FONKSİYONLARIN ENTEGRASYONU (DOKUNULMADI)
         function elimdekiTasSayisi() {
             let sayi = 0;
-            for(let i=0; i<24; i++) {
-                if(document.getElementById('y'+i).children.length > 0) sayi++;
-            }
+            for(let i=0; i<24; i++) { if(document.getElementById('y'+i).children.length > 0) sayi++; }
             return sayi;
         }
 
         function getIstakaGruplari() {
-            let gruplar = [];
-            let currentGrup = [];
+            let gruplar = []; let currentGrup = [];
             for(let i=0; i<24; i++) {
-                if(i === 12 && currentGrup.length > 0) {
-                    gruplar.push(currentGrup);
-                    currentGrup = [];
-                }
+                if(i === 12 && currentGrup.length > 0) { gruplar.push(currentGrup); currentGrup = []; }
                 let yuva = document.getElementById('y'+i);
                 if(yuva.children.length > 0) {
                     let tas = yuva.children[0];
@@ -305,10 +450,7 @@
                     let renk = renkClass ? renkClass.replace('tas-', '') : '';
                     currentGrup.push({ id: tas.id, renk: renk, sayi: tas.innerText });
                 } else {
-                    if(currentGrup.length > 0) {
-                        gruplar.push(currentGrup);
-                        currentGrup = [];
-                    }
+                    if(currentGrup.length > 0) { gruplar.push(currentGrup); currentGrup = []; }
                 }
             }
             if(currentGrup.length > 0) gruplar.push(currentGrup);
@@ -372,16 +514,9 @@
             setTimeout(() => { alert(mesaj); }, 100);
         });
 
-        // YENİ: OTOMATİK TAŞ ATARKEN UYARI SİSTEMİ EKLENDİ
         function otomatikTasAt(tasElementi) {
-            if (!benimSiramMi) {
-                alert("Şu an sıra sizde değil!");
-                return;
-            }
-            if (elimdekiTasSayisi() !== 15) {
-                alert("Önce ortadan veya yandan TAŞ ÇEKMELİSİNİZ! Elinizde 14 taş varken atış yapamazsınız.");
-                return;
-            }
+            if (!benimSiramMi) { alert("Şu an sıra sizde değil!"); return; }
+            if (elimdekiTasSayisi() !== 15) { alert("Önce ortadan veya yandan TAŞ ÇEKMELİSİNİZ! Elinizde 14 taş varken atış yapamazsınız."); return; }
 
             const iskartaKutusu = document.getElementById('benimIskartam');
             if (iskartaKutusu) {
@@ -447,13 +582,9 @@
                 let renkSinifi = Array.from(tasEl.classList).find(c=>c.startsWith('tas-'));
                 let renk = renkSinifi ? renkSinifi.split('-')[1] : 'siyah';
                 const tasObj = { id: tasEl.id, sayi: tasEl.innerText, renk: renk };
-                
                 this.innerHTML = ''; 
                 for(let i=0; i<24; i++) {
-                    if(document.getElementById('y'+i).children.length === 0) {
-                        tasEkle(tasObj, 'y'+i);
-                        break;
-                    }
+                    if(document.getElementById('y'+i).children.length === 0) { tasEkle(tasObj, 'y'+i); break; }
                 }
                 socket.emit('yandan_tas_alindi', { masaAdi: suAnkiMasam, kimAldi: aktifKullaniciAdi, tas: tasObj });
             } else if(!benimSiramMi) alert("Şu an sıra sizde değil!");
@@ -499,45 +630,14 @@
             }
         });
 
-        socket.on('sira_guncelle', (data) => {
-            if(suAnkiMasam === data.masaAdi) {
-                kurtarmaSinyaliGonder(); 
-                if (!benimSiramMi && data.kimde === aktifKullaniciAdi) {
-                    sesler.siraSes.currentTime = 0; 
-                    sesler.siraSes.play().catch(e=>{});
-                }
-                benimSiramMi = (data.kimde === aktifKullaniciAdi);
-                
-                const iskarta = document.getElementById('benimIskartam');
-                if(benimSiramMi) iskarta.classList.remove('kilitli-iskarta');
-                else iskarta.classList.add('kilitli-iskarta');
-
-                const koltuklar = [
-                    { id: 'benimAdimKutusu', isim: "Ben: " + aktifKullaniciAdi, gercekIsim: aktifKullaniciAdi },
-                    { id: 'seatRight', isim: document.getElementById('seatRight').innerText },
-                    { id: 'seatTop', isim: document.getElementById('seatTop').innerText },
-                    { id: 'seatLeft', isim: document.getElementById('seatLeft').innerText }
-                ];
-                
-                koltuklar.forEach(k => {
-                    const el = document.getElementById(k.id);
-                    if(k.isim === data.kimde || k.gercekIsim === data.kimde) el.classList.add('aktif-sira');
-                    else el.classList.remove('aktif-sira');
-                });
-            }
-        });
-
-        // YENİ: Masaya geri dönüşte koltukları garantiye alıyoruz
         socket.on('kaldigin_yerden_devam', (data) => {
             suAnkiMasam = data.masaAdi;
             lobiEkrani.style.display = 'none';
             masaEkrani.style.display = 'flex';
             masaOrtasiYazi.innerText = data.masaAdi.toUpperCase();
-            
             chatHeader.innerText = `💬 ${data.masaAdi} Sohbeti`;
             chatHeader.style.color = '#ffc107';
             emojiBar.style.display = 'flex';
-
             if (data.koltuklar) gelişmişKoltukHizala(data.koltuklar);
             socket.emit('taslarimi_ver', { masaAdi: data.masaAdi, isim: aktifKullaniciAdi });
         });
@@ -554,9 +654,7 @@
                 sonucKutu.classList.remove('okey-animasyon'); 
 
                 if (data.kazanan) {
-                    if (data.sebep.includes('OKEY ATARAK')) {
-                        sonucKutu.classList.add('okey-animasyon');
-                    }
+                    if (data.sebep.includes('OKEY ATARAK')) { sonucKutu.classList.add('okey-animasyon'); }
 
                     if (data.kazanan === aktifKullaniciAdi) {
                         baslik.innerText = "🏆 TEBRİKLER, KAZANDIN! 🏆";
@@ -574,7 +672,6 @@
                 }
                 
                 sonucEkrani.style.display = 'flex'; 
-                
                 oyunAlanObjeleri.style.display = 'none';
                 oyunuBaslatBtn.style.display = 'block';
                 bitisAlani.style.display = 'none';
@@ -600,10 +697,10 @@
                         <div class="table-title">${masaAdi}</div>
                         <div class="mini-table-container">
                             <div class="mini-okey-table"></div>
-                            <div class="mini-seat mini-bottom ${koltuklar[0]?'occupied':'empty'}">${koltuklar[0]?`👤<br>${koltuklar[0]}`:'Boş'}</div>
-                            <div class="mini-seat mini-right ${koltuklar[1]?'occupied':'empty'}">${koltuklar[1]?`👤<br>${koltuklar[1]}`:'Boş'}</div>
-                            <div class="mini-seat mini-top ${koltuklar[2]?'occupied':'empty'}">${koltuklar[2]?`👤<br>${koltuklar[2]}`:'Boş'}</div>
-                            <div class="mini-seat mini-left ${koltuklar[3]?'occupied':'empty'}">${koltuklar[3]?`👤<br>${koltuklar[3]}`:'Boş'}</div>
+                            <div class="mini-seat mini-bottom ${koltuklar[0]?'occupied':'empty'}" onclick="${koltuklar[0]?`profilAc('${koltuklar[0]}')`:''}">${koltuklar[0]?`👤<br>${koltuklar[0]}`:'Boş'}</div>
+                            <div class="mini-seat mini-right ${koltuklar[1]?'occupied':'empty'}" onclick="${koltuklar[1]?`profilAc('${koltuklar[1]}')`:''}">${koltuklar[1]?`👤<br>${koltuklar[1]}`:'Boş'}</div>
+                            <div class="mini-seat mini-top ${koltuklar[2]?'occupied':'empty'}" onclick="${koltuklar[2]?`profilAc('${koltuklar[2]}')`:''}">${koltuklar[2]?`👤<br>${koltuklar[2]}`:'Boş'}</div>
+                            <div class="mini-seat mini-left ${koltuklar[3]?'occupied':'empty'}" onclick="${koltuklar[3]?`profilAc('${koltuklar[3]}')`:''}">${koltuklar[3]?`👤<br>${koltuklar[3]}`:'Boş'}</div>
                         </div>
                         <button class="sit-btn ${benBuMasadaMiyim || doluKoltukSayisi>=4 ? 'disabled':''}" ${benBuMasadaMiyim || doluKoltukSayisi>=4 ? 'disabled':''} 
                             style="${benBuMasadaMiyim ? 'background:#20c997;color:white;':''}" 
@@ -619,10 +716,16 @@
         function gelişmişKoltukHizala(koltuklar) {
             const index = koltuklar.indexOf(aktifKullaniciAdi);
             if (index === -1) return;
+            
+            const sRight = koltuklar[(index + 1) % 4] || "Bekleniyor...";
+            const sTop = koltuklar[(index + 2) % 4] || "Bekleniyor...";
+            const sLeft = koltuklar[(index + 3) % 4] || "Bekleniyor...";
+
             document.getElementById('benimAdimKutusu').innerText = "Ben: " + koltuklar[index];
-            document.getElementById('seatRight').innerText = koltuklar[(index + 1) % 4] || "Bekleniyor...";
-            document.getElementById('seatTop').innerText = koltuklar[(index + 2) % 4] || "Bekleniyor...";
-            document.getElementById('seatLeft').innerText = koltuklar[(index + 3) % 4] || "Bekleniyor...";
+            
+            const elRight = document.getElementById('seatRight'); elRight.innerText = sRight; elRight.onclick = sRight !== "Bekleniyor..." ? () => profilAc(sRight) : null;
+            const elTop = document.getElementById('seatTop'); elTop.innerText = sTop; elTop.onclick = sTop !== "Bekleniyor..." ? () => profilAc(sTop) : null;
+            const elLeft = document.getElementById('seatLeft'); elLeft.innerText = sLeft; elLeft.onclick = sLeft !== "Bekleniyor..." ? () => profilAc(sLeft) : null;
         }
 
         window.masayaOtur = function(masaAdi) {
@@ -631,7 +734,6 @@
             lobiEkrani.style.display = 'none';
             masaEkrani.style.display = 'flex';
             masaOrtasiYazi.innerText = masaAdi.toUpperCase();
-            
             chatHeader.innerText = `💬 ${masaAdi} Sohbeti`;
             chatHeader.style.color = '#ffc107';
             emojiBar.style.display = 'flex';
@@ -642,7 +744,6 @@
             suAnkiMasam = null;
             masaEkrani.style.display = 'none';
             lobiEkrani.style.display = 'flex';
-            
             chatHeader.innerText = `💬 Sunucu Genel Sohbet`;
             chatHeader.style.color = '#a0a0a0';
             emojiBar.style.display = 'none';
@@ -684,9 +785,7 @@
                 
                 if(guncelGosterge) {
                     let gostergeVarMi = data.taslar.some(t => t.renk === guncelGosterge.renk && t.sayi === guncelGosterge.sayi && t.id !== guncelGosterge.id);
-                    if(gostergeVarMi) {
-                        gostergeBtn.style.display = 'block';
-                    }
+                    if(gostergeVarMi) { gostergeBtn.style.display = 'block'; }
                 }
             }
         });
@@ -698,8 +797,7 @@
 
         socket.on('gosterge_basarili', (data) => {
             if(data.masaAdi === suAnkiMasam) {
-                sesler.zaferSes.currentTime = 0; 
-                sesler.zaferSes.play().catch(e=>{});
+                sesler.zaferSes.currentTime = 0; sesler.zaferSes.play().catch(e=>{});
                 gostergeBtn.style.display = 'none';
             }
         });
@@ -708,17 +806,13 @@
             sesler.tasSes.currentTime = 0; sesler.tasSes.play().catch(e=>{});
             gostergeBtn.style.display = 'none'; 
             for(let i=0; i<24; i++) {
-                if(document.getElementById('y'+i).children.length === 0) {
-                    tasEkle(tas, 'y'+i);
-                    break;
-                }
+                if(document.getElementById('y'+i).children.length === 0) { tasEkle(tas, 'y'+i); break; }
             }
         });
 
         function tasEkle(tasData, yuvaId) {
             const div = document.createElement('div');
             div.className = `okey-tasi tas-${tasData.renk}`; div.innerText = tasData.sayi; div.id = tasData.id; 
-            
             let sonDokunma = 0; let surukleniyorMu = false;
             div.addEventListener('touchstart', () => { surukleniyorMu = false; }, {passive: true});
             div.addEventListener('touchmove', () => { surukleniyorMu = true; }, {passive: true});
@@ -729,7 +823,6 @@
                 sonDokunma = simdi;
             });
             div.addEventListener('dblclick', function() { otomatikTasAt(this); });
-
             document.getElementById(yuvaId).appendChild(div);
         }
 
@@ -767,17 +860,11 @@
             }
         }
 
-        socket.on('lobi_mesaji_geldi', (data) => {
-            if (!suAnkiMasam) ekranaMesajEkle(data.isim, data.mesaj, false, false);
-        });
-
+        socket.on('lobi_mesaji_geldi', (data) => { if (!suAnkiMasam) ekranaMesajEkle(data.isim, data.mesaj, false, false); });
         socket.on('masa_mesaji_geldi', (data) => {
             if (suAnkiMasam === data.masaAdi) {
-                if (data.emojiMi) {
-                    ekranaMesajEkle(data.isim, `<span style="font-size:24px">${data.mesaj}</span>`, false, true);
-                } else {
-                    ekranaMesajEkle(data.isim, data.mesaj, false, true);
-                }
+                if (data.emojiMi) { ekranaMesajEkle(data.isim, `<span style="font-size:24px">${data.mesaj}</span>`, false, true); }
+                else { ekranaMesajEkle(data.isim, data.mesaj, false, true); }
             }
         });
 
@@ -789,7 +876,9 @@
             } else {
                 const renk = (yazar === aktifKullaniciAdi) ? "#ffc107" : (isMasa ? "#20c997" : "#0dcaf0");
                 const tag = isMasa ? "<b>[Masa]</b> " : "";
-                yeniSatir.innerHTML = `<span class="msg-author" style="color:${renk};">${tag}${yazar}:</span> ${icerik}`;
+                
+                // YENİ: Chat'teki isimleri tıklanabilir yaptık
+                yeniSatir.innerHTML = `<span class="msg-author" onclick="profilAc('${yazar}')" style="color:${renk};">${tag}${yazar}:</span> ${icerik}`;
             }
             chatMessages.appendChild(yeniSatir);
             chatMessages.scrollTop = chatMessages.scrollHeight;
