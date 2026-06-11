@@ -82,7 +82,6 @@
         #bitisAlani.sortable-drag-over { background-color: rgba(220, 53, 69, 0.6); color: white; border-color: white;}
         #bitisAlani .okey-tasi { position: absolute !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; width: 38px !important; height: 52px !important; font-size: 18px !important; border-bottom-width: 3px !important; pointer-events: none !important; }
 
-        /* YENİ: ZAFER / BİTİŞ EKRANI (OVERLAY) */
         #sonucEkrani { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
         .sonuc-kutu { background: #14422b; border: 4px solid #ffc107; padding: 30px; border-radius: 20px; text-align: center; color: white; width: 100%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
         #sonucBaslik { color: #ffc107; font-size: 28px; margin-bottom: 15px; font-weight: 900; text-transform: uppercase; }
@@ -216,7 +215,14 @@
 
     <script>
         const socket = io();
-        const aktifKullaniciAdi = "Oyuncu_" + Math.floor(Math.random() * 900 + 100);
+        
+        // YENİ: Oyuncu adını tarayıcı hafızasına (localStorage) kaydet, böylece sayfayı yenileyince değişmez
+        let aktifKullaniciAdi = localStorage.getItem('vip_okey_isim');
+        if (!aktifKullaniciAdi) {
+            aktifKullaniciAdi = "Oyuncu_" + Math.floor(Math.random() * 900 + 100);
+            localStorage.setItem('vip_okey_isim', aktifKullaniciAdi);
+        }
+
         let suAnkiMasam = null; 
         let benimSiramMi = false;
 
@@ -437,11 +443,19 @@
             }
         });
 
-        // BİLDİRİM (POPUP) SİSTEMİ ÇALIŞIYOR
+        // YENİ: Bağlantı Koptuğunda Kaldığın Yerden Devam Etme Sistemi
+        socket.on('kaldigin_yerden_devam', (data) => {
+            suAnkiMasam = data.masaAdi;
+            lobiEkrani.style.display = 'none';
+            masaEkrani.style.display = 'flex';
+            masaOrtasiYazi.innerText = data.masaAdi.toUpperCase();
+            
+            // Masaya oturduk, sunucudan taşlarımızı ve masanın son halini istiyoruz
+            socket.emit('taslarimi_ver', { masaAdi: data.masaAdi, isim: aktifKullaniciAdi });
+        });
+
         socket.on('oyun_bitti', (data) => {
             if(suAnkiMasam === data.masaAdi) {
-                
-                // POPUP EKRANINI GÜNCELLE VE GÖSTER
                 const sonucEkrani = document.getElementById('sonucEkrani');
                 const baslik = document.getElementById('sonucBaslik');
                 const metin = document.getElementById('sonucMetin');
@@ -461,9 +475,8 @@
                     odul.innerText = "";
                 }
                 
-                sonucEkrani.style.display = 'flex'; // Ekranı aç
+                sonucEkrani.style.display = 'flex'; 
                 
-                // Masayı arka planda sıfırla
                 oyunAlanObjeleri.style.display = 'none';
                 oyunuBaslatBtn.style.display = 'block';
                 bitisAlani.style.display = 'none';
