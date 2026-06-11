@@ -5,29 +5,70 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>VIP Okey Sunucusu</title>
     <style>
-        /* ... (CSS kısmını önceki kusursuz halinden aynen kullanmaya devam ediyoruz) ... */
+        /* ... (CSS kısmını önceki kusursuz halinden aynen kullanmaya devam ediyoruz, buraya mevcut CSS'ini koyabilirsin) ... */
     </style>
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 </head>
 <body>
+
+    <div id="arayuz">
+        <button id="oyunuBaslatBtn" style="display:none; padding: 15px; background: green; color: white; border: none; border-radius: 5px; font-size: 16px; margin-bottom: 20px;" onclick="oyunuBaslat()">Oyunu Başlat (Botları Ekle)</button>
+        <div id="oyunAlanObjeleri" style="display:none;">Oyun Alanı (Taşlar Burada Olacak)</div>
+        <div id="benimIskartam" style="display:none;"><div class="iskarta-yazi" id="iskartaYazi">TAŞ AT<br>⬇</div></div>
+    </div>
+
     <script>
         const socket = io();
         let suAnkiMasam = null;
         let benimSiramMi = false;
         let hamleYapildi = false;
+        let kullaniciAdim = "Oyuncu_" + Math.floor(Math.random() * 1000); // Test için rastgele isim
+
+        // Masaya oturma simülasyonu (Bunu kendi arayüzündeki butona bağlayabilirsin)
+        // Şimdilik sayfa açılınca otomatik "Acemiler" masasına otursun test için
+        setTimeout(() => {
+            suAnkiMasam = 'Acemiler';
+            socket.emit('masaya_otur', { masaAdi: suAnkiMasam, isim: kullaniciAdim });
+            document.getElementById('oyunuBaslatBtn').style.display = 'block';
+        }, 500);
 
         // EKRANI SIFIRLAMA (Takılmaları önlemek için)
         function masayiSifirla() {
             hamleYapildi = false;
             document.getElementById('oyunAlanObjeleri').style.display = 'none';
             document.getElementById('oyunuBaslatBtn').style.display = 'block';
-            for(let i=0; i<24; i++) document.getElementById('y'+i).innerHTML = '';
-            document.getElementById('benimIskartam').innerHTML = '<div class="iskarta-yazi" id="iskartaYazi">TAŞ AT<br>⬇</div>';
+            for(let i=0; i<24; i++) {
+                let slot = document.getElementById('y'+i);
+                if(slot) slot.innerHTML = '';
+            }
+            let iskarta = document.getElementById('benimIskartam');
+            if(iskarta) iskarta.innerHTML = '<div class="iskarta-yazi" id="iskartaYazi">TAŞ AT<br>⬇</div>';
         }
 
-        // TAŞ ATILDIĞINDA SUNUCUYA BİLDİR
-        // ... (Socket dinleyicilerini güncelleyip masayı daha akıllı hale getireceğiz)
+        // OYUNU BAŞLAT BUTONUNA TIKLANINCA ÇALIŞACAK FONKSİYON
+        function oyunuBaslat() {
+            if (suAnkiMasam) {
+                socket.emit('oyunu_baslat', { masaAdi: suAnkiMasam });
+                document.getElementById('oyunuBaslatBtn').style.display = 'none';
+            }
+        }
+
+        // SUNUCUDAN GELEN OYUN BAŞLADI SİNYALİ
+        socket.on('oyun_basladi', (data) => {
+            if (data.masaAdi === suAnkiMasam) {
+                alert("Oyun Başladı! Botlar masaya eklendi.");
+                document.getElementById('oyunAlanObjeleri').style.display = 'block';
+                document.getElementById('benimIskartam').style.display = 'block';
+                // İlerleyen adımlarda buraya tasDagit() fonksiyonunu bağlayacağız
+            }
+        });
+
+        // MASALAR GÜNCELLENDİĞİNDE BİLGİ ALMA (Test için konsola yazdırıyoruz)
+        socket.on('masalari_guncelle', (masalarData) => {
+            console.log("Güncel Masalar:", masalarData);
+        });
+
     </script>
 </body>
 </html>
