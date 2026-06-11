@@ -289,7 +289,14 @@ io.on('connection', (socket) => {
         io.emit('masa_kasa_guncelle', { masaAdi: masaAdi, kasa: masa.kasa });
 
         masa.deste = desteYaratVeKaristir(); 
-        masa.gosterge = masa.deste.pop();
+        
+        // DÜZELTME: Gösterge kesinlikle Sahte Okey ('S') olamaz!
+        let gIndex = masa.deste.length - 1;
+        while(masa.deste[gIndex].renk === 'sahte') {
+            gIndex--; // Sahteyse bir öncekine bak
+        }
+        masa.gosterge = masa.deste.splice(gIndex, 1)[0]; // Uygun taşı gösterge yap ve desteden çıkar
+        
         const baslayacakOyuncu = masa.koltuklar[Math.floor(Math.random() * 4)];
         masa.siradakiOyuncu = baslayacakOyuncu;
         masa.eller = {}; 
