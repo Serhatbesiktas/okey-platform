@@ -86,20 +86,14 @@
         .raf-alt { background: linear-gradient(to bottom, #a06b3c, #8b5a2b); box-shadow: inset 0 3px 8px rgba(0,0,0,0.4); border-top: 2px solid #a87648; }
         .yuva { flex: 1; height: 100%; background: rgba(0,0,0,0.15); border-radius: 4px; display: flex; align-items: center; justify-content: center; position: relative; }
         
-        .okey-tasi { width: 100%; height: 92%; max-width: 38px; background-color: #fcf5e3; border-radius: 6px; border: 1px solid #d3c9b3; border-bottom: 5px solid #c0b396; box-shadow: 0 4px 6px rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 900; font-size: clamp(15px, 4.5vw, 22px); font-family: Arial, sans-serif; cursor: grab; touch-action: manipulation; user-select: none; -webkit-user-select: none; -webkit-user-drag: none; z-index: 30; transition: transform 0.1s;}
+        .okey-tasi { width: 100%; height: 92%; max-width: 38px; background-color: #fcf5e3; border-radius: 6px; border: 1px solid #d3c9b3; border-bottom: 5px solid #c0b396; box-shadow: 0 4px 6px rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 900; font-size: clamp(15px, 4.5vw, 22px); font-family: Arial, sans-serif; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-user-drag: none; z-index: 30; transition: transform 0.1s;}
         .okey-tasi:active { cursor: grabbing; border-bottom-width: 2px; transform: translateY(3px); }
         .okey-tasi::after { content: ''; position: absolute; top: 2px; left: 2px; right: 2px; bottom: 2px; border: 1px solid rgba(0,0,0,0.05); border-radius: 4px; }
         
         .sortable-ghost { opacity: 0.1; } 
         .sortable-drag { box-shadow: 5px 15px 25px rgba(0,0,0,0.8) !important; transform: scale(1.15) translateY(-20px) !important; z-index: 99999 !important; border-bottom-width: 8px !important; }
         
-        /* ---------------------------------------------------- */
-        /* HARİKA RENK GÜNCELLEMESİ (TURUNCU -> YEŞİL OLDU)     */
-        /* ---------------------------------------------------- */
-        .tas-kirmizi { color: #d32f2f; } 
-        .tas-siyah { color: #212529; } 
-        .tas-mavi { color: #1976d2; } 
-        .tas-sari { color: #198754; } /* Sarı/Turuncu kodu tamamen net bir yeşil renge çevrildi! */
+        .tas-kirmizi { color: #d32f2f; } .tas-siyah { color: #212529; } .tas-mavi { color: #1976d2; } .tas-sari { color: #198754; } 
 
         .chat-panel { background-color: #081e13; border-top: 2px solid #14422b; display: flex; flex-direction: column; height: 180px; flex-shrink: 0; z-index: 999; }
         .chat-header { font-size: 12px; padding: 5px 10px; background-color: #05140d; color: #a0a0a0; }
@@ -226,7 +220,7 @@
 
         const sortableOptions = {
             group: { name: 'istaka', put: (to) => to.el.children.length === 0 },
-            animation: 100, delay: 0, forceFallback: true, fallbackOnBody: true, fallbackTolerance: 2, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag', easing: "cubic-bezier(0.25, 1, 0.5, 1)"
+            animation: 100, delay: 0, forceFallback: true, fallbackOnBody: true, fallbackTolerance: 3, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag', easing: "cubic-bezier(0.25, 1, 0.5, 1)"
         };
 
         for(let i=0; i<12; i++) {
@@ -283,9 +277,6 @@
             }
         }
 
-        /* ---------------------------------------------------- */
-        /* YENİ: OTOMATİK DİZME ALGORİTMALARI                   */
-        /* ---------------------------------------------------- */
         function getIstakaTaslari() {
             let taslar = [];
             for(let i=0; i<24; i++) {
@@ -304,15 +295,12 @@
         window.seriDiz = function() {
             let taslar = getIstakaTaslari();
             const renkDeger = { 'kirmizi': 1, 'siyah': 2, 'mavi': 3, 'sari': 4, 'sahte': 5 };
-            
-            // Renk gruplarına ve kendi içinde sayılara göre sıralar
             taslar.sort((a, b) => {
                 if (renkDeger[a.renk] !== renkDeger[b.renk]) {
                     return renkDeger[a.renk] - renkDeger[b.renk];
                 }
                 return a.sayi - b.sayi;
             });
-
             taslar.forEach((tasObj, index) => {
                 document.getElementById('y'+index).appendChild(tasObj.el);
             });
@@ -320,18 +308,14 @@
 
         window.ciftDiz = function() {
             let taslar = getIstakaTaslari();
-            
-            // Aynı sayıları yan yana, kendi içlerinde renge göre sıralar
             taslar.sort((a, b) => {
                 if (a.sayi !== b.sayi) return a.sayi - b.sayi;
                 return a.renk.localeCompare(b.renk);
             });
-
             taslar.forEach((tasObj, index) => {
                 document.getElementById('y'+index).appendChild(tasObj.el);
             });
         };
-        /* ---------------------------------------------------- */
 
         kalanTasBilgi.addEventListener('click', () => {
             if (benimSiramMi && elimdekiTasSayisi() === 14) {
@@ -495,12 +479,23 @@
             div.innerText = tasData.sayi;
             div.id = tasData.id; 
             
+            // SÜRÜKLEME VE TIKLAMA AYIRICISI (Zeka eklendi)
             let sonDokunma = 0;
+            let surukleniyorMu = false;
+
+            div.addEventListener('touchstart', () => { surukleniyorMu = false; }, {passive: true});
+            div.addEventListener('touchmove', () => { surukleniyorMu = true; }, {passive: true});
+
             div.addEventListener('touchend', function(e) {
+                if(surukleniyorMu) return; // Sürükleme varsa çift tıklama yapma!
                 const simdi = new Date().getTime();
-                if (simdi - sonDokunma < 300) { e.preventDefault(); otomatikTasAt(this); }
+                if (simdi - sonDokunma < 300) { 
+                    e.preventDefault(); 
+                    otomatikTasAt(this); 
+                }
                 sonDokunma = simdi;
             });
+            
             div.addEventListener('dblclick', function() { otomatikTasAt(this); });
 
             document.getElementById(yuvaId).appendChild(div);
