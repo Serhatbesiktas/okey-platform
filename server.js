@@ -114,6 +114,47 @@ function eliKontrolEt(gruplar, gosterge) {
     return true;
 }
 
+// YENİ EKLENEN BOT ZEKASI: En gereksiz (çöp) taşı bulur
+function enCopTasiBul(el, gosterge) {
+    if (!el || el.length === 0) return 0;
+    
+    let okeySayi = gosterge ? (gosterge.sayi === 13 ? 1 : parseInt(gosterge.sayi) + 1) : -1;
+    let okeyRenk = gosterge ? gosterge.renk : '';
+
+    // Her taşa bir işlevsellik skoru veriyoruz
+    let skorlar = el.map((tas, index) => {
+        let skor = 0;
+        
+        // 1. KURAL: Okey taşı mı? Kesinlikle atma!
+        let isOkey = (tas.renk === okeyRenk && parseInt(tas.sayi) === okeySayi);
+        if (isOkey) return { index: index, skor: 9999 }; 
+        
+        // 2. KURAL: Sahte okeyi zorda kalmadıkça atma
+        if (tas.renk === 'sahte') return { index: index, skor: 900 }; 
+
+        // 3. KURAL: Farklı renklerde aynı sayılar var mı? (Örn: Kırmızı 7, Siyah 7) -> 10 Puan
+        let ayniSayiBaskaRenk = el.filter(t => t.sayi === tas.sayi && t.renk !== tas.renk).length;
+        skor += (ayniSayiBaskaRenk * 10);
+
+        // 4. KURAL: Aynı renkten ardışık/yakın sayılar var mı? (Örn: Kırmızı 5, Kırmızı 6) -> 15 Puan
+        let tasSayi = parseInt(tas.sayi);
+        let ardisik = el.filter(t => t.renk === tas.renk && Math.abs(parseInt(t.sayi) - tasSayi) <= 2 && t.id !== tas.id).length;
+        skor += (ardisik * 15);
+
+        // 5. KURAL: Çifte gitme ihtimaline karşı aynı taştan var mı? -> 5 Puan
+        let ayniTas = el.filter(t => t.renk === tas.renk && t.sayi === tas.sayi && t.id !== tas.id).length;
+        skor += (ayniTas * 5);
+
+        return { index: index, skor: skor };
+    });
+
+    // Skorları en düşükten en yükseğe sırala
+    skorlar.sort((a, b) => a.skor - b.skor);
+    
+    // En düşük skoru alan çöp taşın indexini döndür
+    return skorlar[0].index; 
+}
+
 function botHamlesiYap(masaAdi) {
     const masa = masalar[masaAdi];
     if(!masa || !masa.oyunBasladi) return;
@@ -137,7 +178,7 @@ function botHamlesiYap(masaAdi) {
                 if(!masa.oyunBasladi) return;
                 
                 const botunEli = masa.eller[siradaki];
-                const atilacakIndex = Math.floor(Math.random() * botunEli.length);
+                const atilacakIndex = enCopTasiBul(botunEli, masa.gosterge); // Zeka eklendi
                 const atilanTas = botunEli.splice(atilacakIndex, 1)[0]; 
 
                 io.emit('ortaya_tas_atildi', { masaAdi: masaAdi, kimAtti: siradaki, tas: atilanTas });
