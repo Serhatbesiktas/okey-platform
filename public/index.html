@@ -130,7 +130,7 @@
         .chat-input-area input { flex: 1; background-color: #0d2e1d; border: 1px solid #198754; color: #fff; padding: 12px; border-radius: 5px; outline: none; font-size: 16px; }
         .chat-input-area button { background-color: #0dcaf0; color: #000; border: none; padding: 0 15px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 14px; }
 
-        /* YENİ MODAL VE FİSILTI STİLLERİ */
+        /* VIP MODAL VE FİSILTI STİLLERİ */
         .vip-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100000; justify-content: center; align-items: center; padding: 20px; }
         .profil-kart { background: #14422b; border: 3px solid #ffc107; width: 100%; max-width: 320px; border-radius: 15px; padding: 20px; text-align: center; color: white; box-shadow: 0 0 25px rgba(255,193,7,0.4); }
         .avatar-buyuk { font-size: 50px; margin-bottom: 10px; display: block; }
@@ -271,7 +271,7 @@
                 Özel (Fısıltı) mesajlaşma sistemi sadece VIP kulübümüze özeldir!<br><br>
                 Hemen VIP üye ol, masalarda farkını ortaya koy ve rakiplerinle özelden atışmaya başla!
             </div>
-            <button class="paywall-btn" onclick="alert('Simüle Satış Başarılı! Hile butonuyla VIP modunu açıp test edebilirsiniz ortak.')">👑 VIP SATIN AL (29.99 TL)</button>
+            <button class="paywall-btn" onclick="alert('Simüle Satış Başarılı! Kendi isminize tıklayıp Hile butonuyla VIP modunu açabilirsiniz.')">👑 VIP SATIN AL (29.99 TL)</button>
             <button class="modal-kapat-btn" style="width:100%" onclick="modalKapat('paywallModal')">VAZGEÇ</button>
         </div>
     </div>
@@ -295,13 +295,12 @@
         let suAnkiMasam = null; 
         let benimSiramMi = false;
         let guncelGosterge = null; 
-        let benVipMiyim = false; // İstemci tarafında VIP takibi
-        let suAnkiFisiltiHedef = null; // Aktif DM penceresi hedefi
+        let benVipMiyim = false; 
+        let suAnkiFisiltiHedef = null; 
 
         document.getElementById('benimAdimKutusu').innerText = aktifKullaniciAdi;
         document.getElementById('lobiBenimAdim').innerText = "👑 " + aktifKullaniciAdi;
 
-        // UYKU MODU DÜZELTMESİ GARANTİSİ
         socket.on('connect', () => {
             socket.emit('kullanici_girisi', aktifKullaniciAdi);
             if (suAnkiMasam) {
@@ -333,7 +332,6 @@
         const ustRaf = document.getElementById('ustRaf');
         const altRaf = document.getElementById('altRaf');
 
-        // PROFİL AÇMA VE MODAL YÖNETİMİ
         window.profilAc = function(isim) {
             socket.emit('profil_talebi', isim);
         };
@@ -356,20 +354,21 @@
                 actionBtn.onclick = null;
             } else {
                 if (data.isim === aktifKullaniciAdi) {
-                    benVipMiyim = data.vip; // Kendi durumumuzu güncelle
+                    benVipMiyim = data.vip; 
                     durumEl.innerText = data.vip ? "👑 VIP ÜYE" : "Normal Üye";
                     durumEl.style.color = data.vip ? "#ffc107" : "#fff";
                     actionBtn.innerText = "Kendinsin";
                     actionBtn.className = "modal-action-btn disabled";
                     actionBtn.onclick = null;
 
-                    // Hile butonunu aktif et
                     cheatBtn.style.display = 'block';
                     cheatBtn.innerText = data.vip ? "Simüle VIP'yi Kapat" : "Simüle VIP Ol (Hile)";
                     cheatBtn.style.background = data.vip ? "#dc3545" : "#20c997";
                     cheatBtn.style.color = "#fff";
                     cheatBtn.onclick = function() {
-                        socket.emit('vip_durumunu_degistir', { isim: aktifKullaniciAdi, yeniDurum: !data.vip });
+                        // İŞTE ÇÖZÜM BURADA: Tarayıcıya VIP olduğunu hemen öğretiyoruz!
+                        benVipMiyim = !data.vip; 
+                        socket.emit('vip_durumunu_degistir', { isim: aktifKullaniciAdi, yeniDurum: benVipMiyim });
                         modalKapat('profilModal');
                     };
                 } else {
@@ -381,10 +380,8 @@
                     actionBtn.onclick = function() {
                         modalKapat('profilModal');
                         if (!benVipMiyim) {
-                            // Satış hunisi tetiklendi!
                             document.getElementById('paywallModal').style.display = 'flex';
                         } else {
-                            // VIP ise DM kutusunu aç
                             suAnkiFisiltiHedef = data.isim;
                             document.getElementById('fpHedefYazi').innerText = `Fısıltı: ${data.isim}`;
                             document.getElementById('fpMessages').innerHTML = ''; 
@@ -400,7 +397,6 @@
             document.getElementById(modalId).style.display = 'none';
         };
 
-        // FİSILTI GÖNDERME VE ALMA MANTIĞI
         window.fisiltiGonder = function() {
             const input = document.getElementById('fpInput');
             const mesaj = input.value.trim();
@@ -415,7 +411,6 @@
             const fpWindow = document.getElementById('fisiltiPenceresi');
             const fpMessages = document.getElementById('fpMessages');
 
-            // Eğer DM kutusu kapalıysa veya başka birinden mesaj geldiyse pencereyi o kişiye göre zorla aç
             if (fpWindow.style.display !== 'flex' || (data.kimden !== aktifKullaniciAdi && suAnkiFisiltiHedef !== data.kimden)) {
                 suAnkiFisiltiHedef = data.kimden === aktifKullaniciAdi ? data.kime : data.kimden;
                 document.getElementById('fpHedefYazi').innerText = `Fısıltı: ${suAnkiFisiltiHedef}`;
@@ -431,8 +426,6 @@
             fpMessages.scrollTop = fpMessages.scrollHeight;
         });
 
-
-        // OYUN İÇİ ESKİ FONKSİYONLARIN ENTEGRASYONU (DOKUNULMADI)
         function elimdekiTasSayisi() {
             let sayi = 0;
             for(let i=0; i<24; i++) { if(document.getElementById('y'+i).children.length > 0) sayi++; }
@@ -471,7 +464,6 @@
             group: { name: 'istaka', put: function (to) { return benimSiramMi && elimdekiTasSayisi() === 15; }, pull: false },
             animation: 150, forceFallback: true, fallbackOnBody: true, emptyInsertThreshold: 100, 
             onAdd: function (evt) {
-                sesler.tasSes.currentTime = 0; sesler.tasSes.play().catch(e=>{});
                 gostergeBtn.style.display = 'none'; 
                 document.getElementById('iskartaYazi').style.display = 'none';
                 
@@ -520,7 +512,6 @@
 
             const iskartaKutusu = document.getElementById('benimIskartam');
             if (iskartaKutusu) {
-                sesler.tasSes.currentTime = 0; sesler.tasSes.play().catch(e=>{});
                 gostergeBtn.style.display = 'none'; 
                 
                 iskartaKutusu.appendChild(tasElementi);
@@ -577,7 +568,6 @@
 
         document.getElementById('iskartaSol').addEventListener('click', function() {
             if (benimSiramMi && elimdekiTasSayisi() === 14 && this.children.length > 0) {
-                sesler.tasSes.currentTime = 0; sesler.tasSes.play().catch(e=>{});
                 const tasEl = this.lastElementChild;
                 let renkSinifi = Array.from(tasEl.classList).find(c=>c.startsWith('tas-'));
                 let renk = renkSinifi ? renkSinifi.split('-')[1] : 'siyah';
@@ -594,8 +584,6 @@
         socket.on('ortaya_tas_atildi', (data) => {
             if(suAnkiMasam === data.masaAdi) {
                 gostergeBtn.style.display = 'none'; 
-                if(data.kimAtti !== aktifKullaniciAdi) { sesler.tasSes.currentTime = 0; sesler.tasSes.play().catch(e=>{}); }
-                
                 let target = null;
                 if(data.kimAtti === document.getElementById('seatRight').innerText) target = 'iskartaSag';
                 else if(data.kimAtti === document.getElementById('seatTop').innerText) target = 'iskartaUst';
@@ -630,6 +618,30 @@
             }
         });
 
+        socket.on('sira_guncelle', (data) => {
+            if(suAnkiMasam === data.masaAdi) {
+                kurtarmaSinyaliGonder(); 
+                benimSiramMi = (data.kimde === aktifKullaniciAdi);
+                
+                const iskarta = document.getElementById('benimIskartam');
+                if(benimSiramMi) iskarta.classList.remove('kilitli-iskarta');
+                else iskarta.classList.add('kilitli-iskarta');
+
+                const koltuklar = [
+                    { id: 'benimAdimKutusu', isim: "Ben: " + aktifKullaniciAdi, gercekIsim: aktifKullaniciAdi },
+                    { id: 'seatRight', isim: document.getElementById('seatRight').innerText },
+                    { id: 'seatTop', isim: document.getElementById('seatTop').innerText },
+                    { id: 'seatLeft', isim: document.getElementById('seatLeft').innerText }
+                ];
+                
+                koltuklar.forEach(k => {
+                    const el = document.getElementById(k.id);
+                    if(k.isim === data.kimde || k.gercekIsim === data.kimde) el.classList.add('aktif-sira');
+                    else el.classList.remove('aktif-sira');
+                });
+            }
+        });
+
         socket.on('kaldigin_yerden_devam', (data) => {
             suAnkiMasam = data.masaAdi;
             lobiEkrani.style.display = 'none';
@@ -658,10 +670,8 @@
 
                     if (data.kazanan === aktifKullaniciAdi) {
                         baslik.innerText = "🏆 TEBRİKLER, KAZANDIN! 🏆";
-                        sesler.zaferSes.currentTime = 0; sesler.zaferSes.play().catch(e=>{});
                     } else {
                         baslik.innerText = "🎉 OYUN BİTTİ 🎉";
-                        sesler.bitisSes.currentTime = 0; sesler.bitisSes.play().catch(e=>{});
                     }
                     metin.innerText = `Kazanan: ${data.kazanan}\nSebep: ${data.sebep}`;
                     odul.innerText = `+${data.odul.toLocaleString('tr-TR')} ÇİP`;
@@ -797,13 +807,11 @@
 
         socket.on('gosterge_basarili', (data) => {
             if(data.masaAdi === suAnkiMasam) {
-                sesler.zaferSes.currentTime = 0; sesler.zaferSes.play().catch(e=>{});
                 gostergeBtn.style.display = 'none';
             }
         });
 
         socket.on('tas_cekildi', (tas) => {
-            sesler.tasSes.currentTime = 0; sesler.tasSes.play().catch(e=>{});
             gostergeBtn.style.display = 'none'; 
             for(let i=0; i<24; i++) {
                 if(document.getElementById('y'+i).children.length === 0) { tasEkle(tas, 'y'+i); break; }
@@ -876,8 +884,6 @@
             } else {
                 const renk = (yazar === aktifKullaniciAdi) ? "#ffc107" : (isMasa ? "#20c997" : "#0dcaf0");
                 const tag = isMasa ? "<b>[Masa]</b> " : "";
-                
-                // YENİ: Chat'teki isimleri tıklanabilir yaptık
                 yeniSatir.innerHTML = `<span class="msg-author" onclick="profilAc('${yazar}')" style="color:${renk};">${tag}${yazar}:</span> ${icerik}`;
             }
             chatMessages.appendChild(yeniSatir);
