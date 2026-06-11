@@ -9,6 +9,7 @@ const io = require('socket.io')(http, {
 app.use(express.static('public'));
 
 const oyuncuCipleri = {};
+const oyuncuVipDurumu = {}; // YENİ: Oyuncuların VIP statüsünü tutar
 const kopanOyuncular = {}; 
 
 const masalar = {
@@ -107,7 +108,6 @@ function eliKontrolEt(gruplar, gosterge) {
             for (let i = firstNormalIdx + 1; i < grup.length; i++) {
                 if (expectedForward === 1) { isSeri = false; break; }
                 expectedForward = expectedForward === 13 ? 1 : expectedForward + 1;
-                
                 let eff = getEffectiveTile(grup[i]);
                 if (!eff.isOkey) { if (eff.renk !== cRenk || eff.sayi !== expectedForward) { isSeri = false; break; } }
             }
@@ -115,7 +115,6 @@ function eliKontrolEt(gruplar, gosterge) {
             for (let i = firstNormalIdx - 1; i >= 0; i--) {
                 if (expectedBackward === 1) { isSeri = false; break; }
                 expectedBackward = expectedBackward === 1 ? 13 : expectedBackward - 1;
-                
                 let eff = getEffectiveTile(grup[i]);
                 if (!eff.isOkey) { if (eff.renk !== cRenk || eff.sayi !== expectedBackward) { isSeri = false; break; } }
             }
@@ -206,7 +205,10 @@ io.on('connection', (socket) => {
 
   socket.on('kullanici_girisi', (isim) => {
       socket.kullaniciAdi = isim;
-      if(!oyuncuCipleri[isim]) oyuncuCipleri[isim] = 250000; 
+      if(!oyuncuCipleri[isim]) {
+          oyuncuCipleri[isim] = 250000;
+          oyuncuVipDurumu[isim] = false; // Varsayılan olarak normal üye
+      }
       socket.emit('cip_guncelle', oyuncuCipleri[isim]);
 
       let masadaBulundu = false;
@@ -241,6 +243,43 @@ io.on('connection', (socket) => {
                   io.emit('sira_guncelle', { masaAdi: data.masaAdi, kimde: masa.siradakiOyuncu });
               }
           } else { delete kopanOyuncular[isim]; }
+      }
+  });
+
+  // YENİ: PROFİL TALEBİ ROTASI
+  socket.on('profil_talebi', (hedefIsim) => {
+      if (hedefIsim.startsWith('Bot_')) {
+          socket.emit('profil_yaniti', { isim: hedefIsim, cip: 'Sınırsız', vip: true, botMu: true });
+      } else {
+          socket.emit('profil_yaniti', { 
+              isim: hedefIsim, 
+              cip: oyuncuCipleri[hedefIsim] || 0, 
+              vip: oyuncuVipDurumu[hedefIsim] || false,
+              botMu: false 
+          });
+      }
+  });
+
+  // YENİ: HİLE/TEST AMAÇLI VIP TOGGLED ROTASI
+  socket.on('vip_durumunu_degistir', (data) => {
+      oyuncuVipDurumu[data.isim] = data.yeniDurum;
+      socket.emit('sistem_mesaji', `👑 VIP Durumunuz Güncellendi: ${data.yeniDurum ? 'VIP ÜYE' : 'Normal Üye'}`);
+  });
+
+  // YENİ: ÖZEL FİSILTI MESAJLAŞMA ROTASI
+  socket.on('fisilti_gonder', (data) => {
+      // Sadece VIP olanlar fısıldayabilir (Güvenlik kontrolü)
+      if (!oyuncuVipDurumu[data.kimden]) {
+          socket.emit('hata_mesaji', "Fısıltı göndermek için VIP üye olmalısınız!");
+          return;
+      }
+      
+      const hedefSocket = Array.from(io.of("/").sockets.values()).find(s => s.kullaniciAdi === data.kime);
+      if (hedefSocket) {
+          hedefSocket.emit('fisilti_geldi', { kimden: data.kimden, kime: data.kime, mesaj: data.mesaj });
+          socket.emit('fisilti_geldi', { kimden: data.kimden, kime: data.kime, mesaj: data.mesaj });
+      } else {
+          socket.emit('sistem_mesaji', `⚠️ Fısıltı başarısız: ${data.kime} şu an çevrimdışı.`);
       }
   });
 
@@ -290,12 +329,9 @@ io.on('connection', (socket) => {
 
         masa.deste = desteYaratVeKaristir(); 
         
-        // DÜZELTME: Gösterge kesinlikle Sahte Okey ('S') olamaz!
         let gIndex = masa.deste.length - 1;
-        while(masa.deste[gIndex].renk === 'sahte') {
-            gIndex--; // Sahteyse bir öncekine bak
-        }
-        masa.gosterge = masa.deste.splice(gIndex, 1)[0]; // Uygun taşı gösterge yap ve desteden çıkar
+        while(masa.deste[gIndex].renk === 'sahte') { gIndex--; }
+        masa.gosterge = masa.deste.splice(gIndex, 1)[0]; 
         
         const baslayacakOyuncu = masa.koltuklar[Math.floor(Math.random() * 4)];
         masa.siradakiOyuncu = baslayacakOyuncu;
@@ -330,7 +366,7 @@ io.on('connection', (socket) => {
               let kesilecekCip = masa.bahis / 2; 
               let toplamKazanilan = 0;
 
-              masa.koltuklar.forEach(k => {
+              this.masalar[data.masaAdi].koltuklar.forEach(k => {
                   if (k !== data.isim) {
                       if (!k.startsWith('Bot_')) {
                           oyuncuCipleri[k] -= kesilecekCip;
