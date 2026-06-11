@@ -214,9 +214,16 @@
     </div>
 
     <script>
+        // YENİ EKLENEN: Ses Efektleri Motoru
+        const sesler = {
+            tasSes: new Audio('https://cdn.freesound.org/previews/240/240776_4107740-lq.mp3'),
+            siraSes: new Audio('https://cdn.freesound.org/previews/352/352661_4019029-lq.mp3'),
+            zaferSes: new Audio('https://cdn.freesound.org/previews/270/270319_5123851-lq.mp3'),
+            bitisSes: new Audio('https://cdn.freesound.org/previews/173/173859_2370618-lq.mp3') 
+        };
+
         const socket = io();
         
-        // GÜNCELLEME: Oyuncu adını artık girişte soruyoruz. Böylece gizli sekme bile olsa adını yazıp dönebilir.
         let aktifKullaniciAdi = localStorage.getItem('vip_okey_isim');
         if (!aktifKullaniciAdi) {
             let rastgeleIsim = "Oyuncu_" + Math.floor(Math.random() * 900 + 100);
@@ -307,6 +314,9 @@
             group: { name: 'istaka', put: function (to) { return benimSiramMi && elimdekiTasSayisi() === 15; }, pull: false },
             animation: 150, forceFallback: true, fallbackOnBody: true, emptyInsertThreshold: 100, 
             onAdd: function (evt) {
+                // SÜRÜKLEYİP TAŞ ATMA SESİ
+                sesler.tasSes.currentTime = 0; sesler.tasSes.play().catch(e=>{});
+
                 document.getElementById('iskartaYazi').style.display = 'none';
                 const atilanTas = evt.item;
                 atilanTas.style.position = 'absolute'; atilanTas.style.top = '50%'; atilanTas.style.left = '50%'; atilanTas.style.transform = 'translate(-50%, -50%)'; atilanTas.style.margin = '0';
@@ -346,6 +356,9 @@
             if (!benimSiramMi || elimdekiTasSayisi() !== 15) return; 
             const iskartaKutusu = document.getElementById('benimIskartam');
             if (iskartaKutusu) {
+                // ÇİFT TIKLAYARAK TAŞ ATMA SESİ
+                sesler.tasSes.currentTime = 0; sesler.tasSes.play().catch(e=>{});
+
                 iskartaKutusu.appendChild(tasElementi);
                 tasElementi.style.position = 'absolute'; tasElementi.style.top = '50%'; tasElementi.style.left = '50%'; tasElementi.style.transform = 'translate(-50%, -50%)'; tasElementi.style.margin = '0';
                 document.getElementById('iskartaYazi').style.display = 'none';
@@ -400,6 +413,9 @@
 
         document.getElementById('iskartaSol').addEventListener('click', function() {
             if (benimSiramMi && elimdekiTasSayisi() === 14 && this.children.length > 0) {
+                // YANDAN TAŞ ÇEKME SESİ
+                sesler.tasSes.currentTime = 0; sesler.tasSes.play().catch(e=>{});
+
                 const tasEl = this.lastElementChild;
                 let renkSinifi = Array.from(tasEl.classList).find(c=>c.startsWith('tas-'));
                 let renk = renkSinifi ? renkSinifi.split('-')[1] : 'siyah';
@@ -419,6 +435,12 @@
 
         socket.on('ortaya_tas_atildi', (data) => {
             if(suAnkiMasam === data.masaAdi) {
+                
+                // BAŞKASI TAŞ ATINCA ÇIKACAK SES
+                if(data.kimAtti !== aktifKullaniciAdi) {
+                    sesler.tasSes.currentTime = 0; sesler.tasSes.play().catch(e=>{});
+                }
+
                 let target = null;
                 if(data.kimAtti === document.getElementById('seatRight').innerText) target = 'iskartaSag';
                 else if(data.kimAtti === document.getElementById('seatTop').innerText) target = 'iskartaUst';
@@ -469,8 +491,12 @@
                 if (data.kazanan) {
                     if (data.kazanan === aktifKullaniciAdi) {
                         baslik.innerText = "🏆 TEBRİKLER, KAZANDIN! 🏆";
+                        // ZAFER SESİ
+                        sesler.zaferSes.currentTime = 0; sesler.zaferSes.play().catch(e=>{});
                     } else {
                         baslik.innerText = "🎉 OYUN BİTTİ 🎉";
+                        // KAYBETME / OYUN BİTİŞ SESİ
+                        sesler.bitisSes.currentTime = 0; sesler.bitisSes.play().catch(e=>{});
                     }
                     metin.innerText = `Kazanan: ${data.kazanan}\nSebep: ${data.sebep}`;
                     odul.innerText = `+${data.odul.toLocaleString('tr-TR')} ÇİP`;
@@ -582,6 +608,9 @@
         });
 
         socket.on('tas_cekildi', (tas) => {
+            // ORTADAN TAŞ ÇEKME SESİ
+            sesler.tasSes.currentTime = 0; sesler.tasSes.play().catch(e=>{});
+
             for(let i=0; i<24; i++) {
                 if(document.getElementById('y'+i).children.length === 0) {
                     tasEkle(tas, 'y'+i);
@@ -611,6 +640,13 @@
         socket.on('sira_guncelle', (data) => {
             if(suAnkiMasam === data.masaAdi) {
                 kurtarmaSinyaliGonder(); 
+                
+                // SIRA BANA GEÇTİYSE BİLDİRİM SESİ ÇAL
+                if (!benimSiramMi && data.kimde === aktifKullaniciAdi) {
+                    sesler.siraSes.currentTime = 0; 
+                    sesler.siraSes.play().catch(e=>{});
+                }
+
                 benimSiramMi = (data.kimde === aktifKullaniciAdi);
                 
                 const iskarta = document.getElementById('benimIskartam');
