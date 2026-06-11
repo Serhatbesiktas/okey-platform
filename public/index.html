@@ -216,10 +216,17 @@
     <script>
         const socket = io();
         
-        // YENİ: Oyuncu adını tarayıcı hafızasına (localStorage) kaydet, böylece sayfayı yenileyince değişmez
+        // GÜNCELLEME: Oyuncu adını artık girişte soruyoruz. Böylece gizli sekme bile olsa adını yazıp dönebilir.
         let aktifKullaniciAdi = localStorage.getItem('vip_okey_isim');
         if (!aktifKullaniciAdi) {
-            aktifKullaniciAdi = "Oyuncu_" + Math.floor(Math.random() * 900 + 100);
+            let rastgeleIsim = "Oyuncu_" + Math.floor(Math.random() * 900 + 100);
+            aktifKullaniciAdi = prompt("VIP Okey'e Hoş Geldin!\nKullanıcı adını belirle (Koparsan bu isimle masana geri dönebilirsin):", rastgeleIsim);
+            
+            if (!aktifKullaniciAdi || aktifKullaniciAdi.trim() === '') {
+                aktifKullaniciAdi = rastgeleIsim;
+            } else {
+                aktifKullaniciAdi = aktifKullaniciAdi.trim();
+            }
             localStorage.setItem('vip_okey_isim', aktifKullaniciAdi);
         }
 
@@ -443,14 +450,12 @@
             }
         });
 
-        // YENİ: Bağlantı Koptuğunda Kaldığın Yerden Devam Etme Sistemi
         socket.on('kaldigin_yerden_devam', (data) => {
             suAnkiMasam = data.masaAdi;
             lobiEkrani.style.display = 'none';
             masaEkrani.style.display = 'flex';
             masaOrtasiYazi.innerText = data.masaAdi.toUpperCase();
             
-            // Masaya oturduk, sunucudan taşlarımızı ve masanın son halini istiyoruz
             socket.emit('taslarimi_ver', { masaAdi: data.masaAdi, isim: aktifKullaniciAdi });
         });
 
