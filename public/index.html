@@ -53,8 +53,6 @@
         .iskarta-alani { position: absolute; width: 44px; height: 60px; background-color: rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.1); border-radius: 6px; display: flex; align-items: center; justify-content: center; z-index: 4; }
         #iskartaUst { top: 15px; left: 25%; }
         #iskartaSag { top: 25%; right: 30px; transform: translateY(-50%); }
-        
-        /* SOL ISKARTA: Tıklanabilir yapıldı */
         #iskartaSol { bottom: 25%; left: 30px; transform: translateY(50%); cursor: pointer; }
         #iskartaSol:active { transform: translateY(50%) scale(0.9); }
         
@@ -95,7 +93,13 @@
         .sortable-ghost { opacity: 0.1; } 
         .sortable-drag { box-shadow: 5px 15px 25px rgba(0,0,0,0.8) !important; transform: scale(1.15) translateY(-20px) !important; z-index: 99999 !important; border-bottom-width: 8px !important; }
         
-        .tas-kirmizi { color: #d32f2f; } .tas-siyah { color: #212529; } .tas-mavi { color: #1976d2; } .tas-sari { color: #e65100; }
+        /* ---------------------------------------------------- */
+        /* HARİKA RENK GÜNCELLEMESİ (TURUNCU -> YEŞİL OLDU)     */
+        /* ---------------------------------------------------- */
+        .tas-kirmizi { color: #d32f2f; } 
+        .tas-siyah { color: #212529; } 
+        .tas-mavi { color: #1976d2; } 
+        .tas-sari { color: #198754; } /* Sarı/Turuncu kodu tamamen net bir yeşil renge çevrildi! */
 
         .chat-panel { background-color: #081e13; border-top: 2px solid #14422b; display: flex; flex-direction: column; height: 180px; flex-shrink: 0; z-index: 999; }
         .chat-header { font-size: 12px; padding: 5px 10px; background-color: #05140d; color: #a0a0a0; }
@@ -168,8 +172,8 @@
 
         <div class="okey-istaka-tuslar-area">
             <div class="pro-tus-takimi">
-                <button class="pro-tus" onclick="alert('Seri dizme algoritması kodlanıyor...')">SERİ DİZ</button>
-                <button class="pro-tus" onclick="alert('Çift dizme algoritması kodlanıyor...')">ÇİFT DİZ</button>
+                <button class="pro-tus" onclick="seriDiz()">SERİ DİZ</button>
+                <button class="pro-tus" onclick="ciftDiz()">ÇİFT DİZ</button>
             </div>
 
             <div class="istaka-container" id="benimIstakam">
@@ -279,7 +283,56 @@
             }
         }
 
-        // ORTADAN TAŞ ÇEKME
+        /* ---------------------------------------------------- */
+        /* YENİ: OTOMATİK DİZME ALGORİTMALARI                   */
+        /* ---------------------------------------------------- */
+        function getIstakaTaslari() {
+            let taslar = [];
+            for(let i=0; i<24; i++) {
+                let yuva = document.getElementById('y'+i);
+                if(yuva.children.length > 0) {
+                    let tas = yuva.children[0];
+                    let renkClass = Array.from(tas.classList).find(c => c.startsWith('tas-'));
+                    let renk = renkClass ? renkClass.replace('tas-', '') : '';
+                    let sayi = parseInt(tas.innerText) || 0;
+                    taslar.push({ el: tas, renk: renk, sayi: sayi });
+                }
+            }
+            return taslar;
+        }
+
+        window.seriDiz = function() {
+            let taslar = getIstakaTaslari();
+            const renkDeger = { 'kirmizi': 1, 'siyah': 2, 'mavi': 3, 'sari': 4, 'sahte': 5 };
+            
+            // Renk gruplarına ve kendi içinde sayılara göre sıralar
+            taslar.sort((a, b) => {
+                if (renkDeger[a.renk] !== renkDeger[b.renk]) {
+                    return renkDeger[a.renk] - renkDeger[b.renk];
+                }
+                return a.sayi - b.sayi;
+            });
+
+            taslar.forEach((tasObj, index) => {
+                document.getElementById('y'+index).appendChild(tasObj.el);
+            });
+        };
+
+        window.ciftDiz = function() {
+            let taslar = getIstakaTaslari();
+            
+            // Aynı sayıları yan yana, kendi içlerinde renge göre sıralar
+            taslar.sort((a, b) => {
+                if (a.sayi !== b.sayi) return a.sayi - b.sayi;
+                return a.renk.localeCompare(b.renk);
+            });
+
+            taslar.forEach((tasObj, index) => {
+                document.getElementById('y'+index).appendChild(tasObj.el);
+            });
+        };
+        /* ---------------------------------------------------- */
+
         kalanTasBilgi.addEventListener('click', () => {
             if (benimSiramMi && elimdekiTasSayisi() === 14) {
                 socket.emit('ortadan_tas_cek', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi });
@@ -290,7 +343,6 @@
             }
         });
 
-        // YANDAN (SOL ISKARTADAN) TAŞ ÇEKME
         document.getElementById('iskartaSol').addEventListener('click', function() {
             if (benimSiramMi && elimdekiTasSayisi() === 14 && this.children.length > 0) {
                 const tasEl = this.lastElementChild;
@@ -298,16 +350,14 @@
                 let renk = renkSinifi ? renkSinifi.split('-')[1] : 'siyah';
                 const tasObj = { id: tasEl.id, sayi: tasEl.innerText, renk: renk };
 
-                this.innerHTML = ''; // Taşı yerden sil
+                this.innerHTML = ''; 
 
-                // Istakaya ekle
                 for(let i=0; i<24; i++) {
                     if(document.getElementById('y'+i).children.length === 0) {
                         tasEkle(tasObj, 'y'+i);
                         break;
                     }
                 }
-                
                 socket.emit('yandan_tas_alindi', { masaAdi: suAnkiMasam, kimAldi: aktifKullaniciAdi });
             } else if(!benimSiramMi) {
                 alert("Şu an sıra sizde değil!");
@@ -316,7 +366,6 @@
             }
         });
 
-        // MASADAKİ TAŞ EFEKTLERİ (YENİ)
         socket.on('ortaya_tas_atildi', (data) => {
             if(suAnkiMasam === data.masaAdi) {
                 let target = null;
@@ -326,7 +375,7 @@
 
                 if(target) {
                     const kutu = document.getElementById(target);
-                    kutu.innerHTML = ''; // Önceki taşı temizle
+                    kutu.innerHTML = ''; 
                     const div = document.createElement('div');
                     div.className = `okey-tasi tas-${data.tas.renk}`;
                     div.innerText = data.tas.sayi;
@@ -336,9 +385,9 @@
                     div.style.left = '50%';
                     div.style.transform = 'translate(-50%, -50%)';
                     div.style.margin = '0';
-                    div.style.pointerEvents = 'none'; // Sürüklemeyi kapat
+                    div.style.pointerEvents = 'none'; 
                     
-                    if(target === 'iskartaSol') div.style.pointerEvents = 'auto'; // Sol ıskarta tıklanabilir olsun
+                    if(target === 'iskartaSol') div.style.pointerEvents = 'auto'; 
                     
                     kutu.appendChild(div);
                 }
@@ -348,7 +397,6 @@
         socket.on('yandan_alindi_guncelle', (data) => {
             if(data.masaAdi === suAnkiMasam && data.kimAldi !== aktifKullaniciAdi) {
                 let source = null;
-                // Eğer sağdaki adam taşı alırsa, benim ıskartamdan eksilir
                 if(data.kimAldi === document.getElementById('seatRight').innerText) source = 'benimIskartam';
                 else if(data.kimAldi === document.getElementById('seatTop').innerText) source = 'iskartaSag';
                 else if(data.kimAldi === document.getElementById('seatLeft').innerText) source = 'iskartaUst';
