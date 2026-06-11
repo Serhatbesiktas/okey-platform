@@ -53,7 +53,10 @@
         .iskarta-alani { position: absolute; width: 44px; height: 60px; background-color: rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.1); border-radius: 6px; display: flex; align-items: center; justify-content: center; z-index: 4; }
         #iskartaUst { top: 15px; left: 25%; }
         #iskartaSag { top: 25%; right: 30px; transform: translateY(-50%); }
-        #iskartaSol { bottom: 25%; left: 30px; transform: translateY(50%); }
+        
+        /* SOL ISKARTA: Tıklanabilir yapıldı */
+        #iskartaSol { bottom: 25%; left: 30px; transform: translateY(50%); cursor: pointer; }
+        #iskartaSol:active { transform: translateY(50%) scale(0.9); }
         
         #benimIskartam { position: absolute; bottom: 100px; right: 15px; width: 60px; height: 80px; background-color: rgba(0,0,0,0.4); border: 3px dashed #ffc107; border-radius: 8px; display: flex; align-items: center; justify-content: center; z-index: 10; transition: 0.2s;}
         #benimIskartam.sortable-drag-over { background-color: rgba(255, 193, 7, 0.3); border-color: #fff; }
@@ -63,7 +66,6 @@
 
         .iskarta-alani .okey-tasi { position: absolute !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; width: 38px !important; height: 52px !important; font-size: 18px !important; border-bottom-width: 3px !important; pointer-events: none !important; }
 
-        /* MASA ORTASI & GÖSTERGE TAŞI */
         .masa-ortasi { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 15px; background: rgba(0,0,0,0.2); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); z-index: 4; }
         .masa-isim-ortasi { color: rgba(255,255,255,0.3); font-weight: bold; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; }
         .oyun-baslat-btn { background-color: #ffc107; color: #000; border: none; padding: 10px 25px; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.4); }
@@ -157,7 +159,7 @@
 
             <div class="iskarta-alani" id="iskartaUst"></div>
             <div class="iskarta-alani" id="iskartaSag"></div>
-            <div class="iskarta-alani" id="iskartaSol"></div>
+            <div class="iskarta-alani" id="iskartaSol" title="Yerden Taş Çek"></div>
             
             <div class="iskarta-alani" id="benimIskartam">
                 <div class="iskarta-yazi" id="iskartaYazi">TAŞ AT<br>⬇</div>
@@ -190,7 +192,6 @@
         const socket = io();
         const aktifKullaniciAdi = "Oyuncu_" + Math.floor(Math.random() * 900 + 100);
         let suAnkiMasam = null; 
-        
         let benimSiramMi = false;
 
         document.getElementById('benimAdimKutusu').innerText = aktifKullaniciAdi;
@@ -232,9 +233,7 @@
         new Sortable(document.getElementById('benimIskartam'), {
             group: {
                 name: 'istaka',
-                put: function (to) {
-                    return benimSiramMi && elimdekiTasSayisi() === 15;
-                },
+                put: function (to) { return benimSiramMi && elimdekiTasSayisi() === 15; },
                 pull: false
             },
             animation: 150, forceFallback: true, fallbackOnBody: true, emptyInsertThreshold: 100, 
@@ -249,7 +248,11 @@
                 atilanTas.style.transform = 'translate(-50%, -50%)';
                 atilanTas.style.margin = '0';
                 
-                socket.emit('tas_atildi', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi, tasId: atilanTas.id });
+                let renkSinifi = Array.from(atilanTas.classList).find(c=>c.startsWith('tas-'));
+                let renk = renkSinifi ? renkSinifi.split('-')[1] : 'siyah';
+                let tasObj = { id: atilanTas.id, renk: renk, sayi: atilanTas.innerText };
+                
+                socket.emit('tas_atildi', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi, tas: tasObj });
             }
         });
 
@@ -268,10 +271,15 @@
                 const yazi = document.getElementById('iskartaYazi');
                 if(yazi) yazi.style.display = 'none';
                 
-                socket.emit('tas_atildi', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi, tasId: tasElementi.id });
+                let renkSinifi = Array.from(tasElementi.classList).find(c=>c.startsWith('tas-'));
+                let renk = renkSinifi ? renkSinifi.split('-')[1] : 'siyah';
+                let tasObj = { id: tasElementi.id, renk: renk, sayi: tasElementi.innerText };
+                
+                socket.emit('tas_atildi', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi, tas: tasObj });
             }
         }
 
+        // ORTADAN TAŞ ÇEKME
         kalanTasBilgi.addEventListener('click', () => {
             if (benimSiramMi && elimdekiTasSayisi() === 14) {
                 socket.emit('ortadan_tas_cek', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi });
@@ -279,6 +287,78 @@
                 alert("Şu an sıra sizde değil!");
             } else {
                 alert("Önce elinizdeki fazlalık taşı sağdaki oyuncuya atmalısınız!");
+            }
+        });
+
+        // YANDAN (SOL ISKARTADAN) TAŞ ÇEKME
+        document.getElementById('iskartaSol').addEventListener('click', function() {
+            if (benimSiramMi && elimdekiTasSayisi() === 14 && this.children.length > 0) {
+                const tasEl = this.lastElementChild;
+                let renkSinifi = Array.from(tasEl.classList).find(c=>c.startsWith('tas-'));
+                let renk = renkSinifi ? renkSinifi.split('-')[1] : 'siyah';
+                const tasObj = { id: tasEl.id, sayi: tasEl.innerText, renk: renk };
+
+                this.innerHTML = ''; // Taşı yerden sil
+
+                // Istakaya ekle
+                for(let i=0; i<24; i++) {
+                    if(document.getElementById('y'+i).children.length === 0) {
+                        tasEkle(tasObj, 'y'+i);
+                        break;
+                    }
+                }
+                
+                socket.emit('yandan_tas_alindi', { masaAdi: suAnkiMasam, kimAldi: aktifKullaniciAdi });
+            } else if(!benimSiramMi) {
+                alert("Şu an sıra sizde değil!");
+            } else if(elimdekiTasSayisi() === 15) {
+                alert("Elinizde zaten 15 taş var!");
+            }
+        });
+
+        // MASADAKİ TAŞ EFEKTLERİ (YENİ)
+        socket.on('ortaya_tas_atildi', (data) => {
+            if(suAnkiMasam === data.masaAdi) {
+                let target = null;
+                if(data.kimAtti === document.getElementById('seatRight').innerText) target = 'iskartaSag';
+                else if(data.kimAtti === document.getElementById('seatTop').innerText) target = 'iskartaUst';
+                else if(data.kimAtti === document.getElementById('seatLeft').innerText) target = 'iskartaSol';
+
+                if(target) {
+                    const kutu = document.getElementById(target);
+                    kutu.innerHTML = ''; // Önceki taşı temizle
+                    const div = document.createElement('div');
+                    div.className = `okey-tasi tas-${data.tas.renk}`;
+                    div.innerText = data.tas.sayi;
+                    div.id = data.tas.id;
+                    div.style.position = 'absolute';
+                    div.style.top = '50%';
+                    div.style.left = '50%';
+                    div.style.transform = 'translate(-50%, -50%)';
+                    div.style.margin = '0';
+                    div.style.pointerEvents = 'none'; // Sürüklemeyi kapat
+                    
+                    if(target === 'iskartaSol') div.style.pointerEvents = 'auto'; // Sol ıskarta tıklanabilir olsun
+                    
+                    kutu.appendChild(div);
+                }
+            }
+        });
+
+        socket.on('yandan_alindi_guncelle', (data) => {
+            if(data.masaAdi === suAnkiMasam && data.kimAldi !== aktifKullaniciAdi) {
+                let source = null;
+                // Eğer sağdaki adam taşı alırsa, benim ıskartamdan eksilir
+                if(data.kimAldi === document.getElementById('seatRight').innerText) source = 'benimIskartam';
+                else if(data.kimAldi === document.getElementById('seatTop').innerText) source = 'iskartaSag';
+                else if(data.kimAldi === document.getElementById('seatLeft').innerText) source = 'iskartaUst';
+
+                if(source) {
+                    document.getElementById(source).innerHTML = '';
+                    if(source === 'benimIskartam') {
+                        document.getElementById('benimIskartam').innerHTML = '<div class="iskarta-yazi" id="iskartaYazi">TAŞ AT<br>⬇</div>';
+                    }
+                }
             }
         });
 
@@ -404,7 +484,6 @@
         socket.on('masa_ortasi_guncelle', (data) => {
             if(suAnkiMasam === data.masaAdi) {
                 kalanTasBilgi.innerText = data.kalanTas;
-                // GÖSTERGE TAŞINI EKRANA ÇİZ
                 if(data.gosterge) {
                     const gostergeDiv = document.getElementById('gostergeTasi');
                     gostergeDiv.innerText = data.gosterge.sayi;
