@@ -28,7 +28,7 @@
         .mini-bottom { bottom: 5px; left: 50%; transform: translateX(-50%); }
         .mini-left { top: 50%; left: 5px; transform: translateY(-50%); }
         .mini-right { top: 50%; right: 5px; transform: translateY(-50%); }
-        .sit-btn { background-color: #ffc107; color: #000; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; font-size: 14px; cursor: pointer; width: 100%; transition: 0.3s; }
+        .sit-btn { background-color: #ffc107; color: #000; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; font-size: 14px; cursor: width: 100%; transition: 0.3s; }
         .sit-btn.disabled { background-color: #6c757d; color: #fff; cursor: not-allowed; }
         .players-panel { background-color: #0b2417; border-top: 2px solid #14422b; padding: 10px; }
         .panel-title { font-size: 14px; margin-bottom: 10px; color: #0dcaf0; display: flex; gap: 5px; }
@@ -37,7 +37,6 @@
         .player-table td { padding: 8px 0; border-bottom: 1px solid #0d2e1d; }
         .status-dot { width: 8px; height: 8px; background-color: #20c997; border-radius: 50%; display: inline-block; margin-right: 5px; }
 
-        /* MASA EKRANI */
         #masaEkrani { display: none; flex: 1; background-color: #0a2014; position: relative; padding: 10px; flex-direction: column; }
         .okey-table-ui { background-color: #1a5c38; border: 4px solid #0d2e1d; border-radius: 20px; width: 100%; flex: 1; position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); margin-bottom: 5px; overflow: hidden; }
         
@@ -64,7 +63,6 @@
 
         .iskarta-alani .okey-tasi { position: absolute !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; width: 38px !important; height: 52px !important; font-size: 18px !important; border-bottom-width: 3px !important; pointer-events: none !important; }
 
-        /* MASA ORTASI & GÖSTERGE TAŞI */
         .masa-ortasi { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 15px; background: rgba(0,0,0,0.2); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); z-index: 4; }
         .masa-isim-ortasi { color: rgba(255,255,255,0.3); font-weight: bold; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; }
         .oyun-baslat-btn { background-color: #ffc107; color: #000; border: none; padding: 10px 25px; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.4); }
@@ -77,7 +75,6 @@
         
         .gosterge-tasi { width: 44px; height: 58px; background-color: #fcf5e3; border: 1px solid #d3c9b3; border-bottom: 5px solid #c0b396; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 18px; box-shadow: 0 4px 6px rgba(0,0,0,0.5); font-family: Arial, sans-serif; pointer-events: none; }
 
-        /* BİTİRME ALANI (SÜNME HATASI DÜZELTİLDİ) */
         #bitisAlani { position: relative; display: none; width: 48px; height: 64px; background-color: rgba(220, 53, 69, 0.2); border: 2px dashed #dc3545; border-radius: 8px; align-items: center; justify-content: center; color: #dc3545; font-weight: bold; font-size: 11px; text-align: center; }
         #bitisAlani.sortable-drag-over { background-color: rgba(220, 53, 69, 0.6); color: white; border-color: white;}
         #bitisAlani .okey-tasi { position: absolute !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; width: 38px !important; height: 52px !important; font-size: 18px !important; border-bottom-width: 3px !important; pointer-events: none !important; }
@@ -288,19 +285,28 @@
             }
         });
 
+        // ÇAKILI KALMA (DONMA) SORUNU ÇÖZÜLDÜ
         socket.on('hatali_bitis', (mesaj) => {
-            alert(mesaj);
-            if(bitisAlani.children.length > 0) {
-                const tas = bitisAlani.lastElementChild;
+            const tas = bitisAlani.querySelector('.okey-tasi');
+            if (tas) {
+                // Taşı sessizce yuvaya geri yerleştir
                 for(let i=0; i<24; i++) {
                     if(document.getElementById('y'+i).children.length === 0) {
                         document.getElementById('y'+i).appendChild(tas);
-                        tas.style.position = 'static';
-                        tas.style.transform = 'none';
+                        // Kutu içindeki tüm zorlama stilleri sil, orijinal haline dönsün
+                        tas.style.position = '';
+                        tas.style.top = '';
+                        tas.style.left = '';
+                        tas.style.transform = '';
+                        tas.style.margin = '';
                         break;
                     }
                 }
             }
+            // Taş yerine oturduktan sonra animasyonun bitmesi için minik bir bekleme ve uyarı
+            setTimeout(() => {
+                alert(mesaj);
+            }, 100);
         });
 
         function otomatikTasAt(tasElementi) {
