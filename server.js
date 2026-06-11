@@ -8,10 +8,8 @@ const io = require('socket.io')(http, {
 
 app.use(express.static('public'));
 
-// OYUNCU BANKASI
 const oyuncuCipleri = {};
 
-// MASALAR (Bahis miktarları ve Kasa eklendi)
 const masalar = {
     'Acemiler (20K Bahis)': { bahis: 20000, kasa: 0, koltuklar: [null, null, null, null], deste: [], gosterge: null, oyunBasladi: false, siradakiOyuncu: null, eller: {} },
     'Usta Masası (50K Bahis)': { bahis: 50000, kasa: 0, koltuklar: [null, null, null, null], deste: [], gosterge: null, oyunBasladi: false, siradakiOyuncu: null, eller: {} },
@@ -36,7 +34,8 @@ function desteYaratVeKaristir() {
     return yeniDeste;
 }
 
-function oyunuSifirla(masaAdi) {
+// BİLDİRİM DESTEKLİ SIFIRLAMA
+function oyunuSifirla(masaAdi, kazanan = null, odul = 0, sebep = "") {
     const masa = masalar[masaAdi];
     if(masa) {
         masa.oyunBasladi = false;
@@ -44,12 +43,11 @@ function oyunuSifirla(masaAdi) {
         masa.gosterge = null;
         masa.siradakiOyuncu = null;
         masa.eller = {};
-        masa.kasa = 0; // Kasa sıfırlanır
-        io.emit('oyun_bitti', { masaAdi: masaAdi });
+        masa.kasa = 0; 
+        io.emit('oyun_bitti', { masaAdi: masaAdi, kazanan: kazanan, odul: odul, sebep: sebep });
     }
 }
 
-// HAKEM ALGORİTMASI
 function eliKontrolEt(gruplar, gosterge) {
     if (!gosterge) return false;
     let okeySayi = gosterge.sayi === 13 ? 1 : parseInt(gosterge.sayi) + 1;
@@ -126,8 +124,8 @@ function botHamlesiYap(masaAdi) {
             if(!masa.oyunBasladi) return;
             
             if(masa.deste.length === 0) {
-                io.emit('sistem_mesaji', `⚠️ ${masaAdi} masasında TAŞ BİTTİ! Oyun berabere sonuçlandı. Çipler masada kaldı!`);
-                oyunuSifirla(masaAdi);
+                io.emit('sistem_mesaji', `⚠️ ${masaAdi} masasında TAŞ BİTTİ! Oyun berabere sonuçlandı.`);
+                oyunuSifirla(masaAdi, null, 0, "Ortadaki taşlar bitti, oyun berabere!");
                 return;
             }
 
@@ -166,10 +164,9 @@ io.on('connection', (socket) => {
   for(let m in masalar) lobiVerisi[m] = masalar[m].koltuklar;
   socket.emit('masalari_guncelle', lobiVerisi);
 
-  // GİRİŞ VE BANKA KAYDI
   socket.on('kullanici_girisi', (isim) => {
       socket.kullaniciAdi = isim;
-      if(!oyuncuCipleri[isim]) oyuncuCipleri[isim] = 250000; // İlk giriş hediyesi
+      if(!oyuncuCipleri[isim]) oyuncuCipleri[isim] = 250000; 
       socket.emit('cip_guncelle', oyuncuCipleri[isim]);
   });
 
@@ -195,7 +192,7 @@ io.on('connection', (socket) => {
     const masa = masalar[masaAdi];
     if (masa && !masa.oyunBasladi) {
         masa.oyunBasladi = true;
-        masa.kasa = 0; // Kasa hazırlığı
+        masa.kasa = 0; 
         
         for(let i=0; i<4; i++) {
             if(masa.koltuklar[i] === null) { masa.koltuklar[i] = "Bot_" + Math.floor(Math.random() * 900 + 100); }
@@ -205,11 +202,10 @@ io.on('connection', (socket) => {
         for(let m in masalar) guncelLobi[m] = masalar[m].koltuklar;
         io.emit('masalari_guncelle', guncelLobi);
 
-        // KASAYI DOLDUR VE HESAPLARDAN DÜŞ
         masa.koltuklar.forEach(isim => {
-            masa.kasa += masa.bahis; // Herkes kasaya para koyar
+            masa.kasa += masa.bahis; 
             if(!isim.startsWith('Bot_')) {
-                oyuncuCipleri[isim] -= masa.bahis; // İnsanların hesabından para kesilir
+                oyuncuCipleri[isim] -= masa.bahis; 
                 io.emit('cip_guncelle_ozel', { isim: isim, cip: oyuncuCipleri[isim] });
             }
         });
@@ -270,8 +266,9 @@ io.on('connection', (socket) => {
       const masa = masalar[data.masaAdi];
       if(masa && masa.siradakiOyuncu === data.isim) {
           if(masa.deste.length === 0) {
-              io.emit('sistem_mesaji', `⚠️ ${data.masaAdi} masasında TAŞ BİTTİ! Çipler kasada kaldı.`);
-              oyunuSifirla(data.masaAdi); return;
+              io.emit('sistem_mesaji', `⚠️ ${data.masaAdi} masasında TAŞ BİTTİ!`);
+              oyunuSifirla(data.masaAdi, null, 0, "Ortadaki taşlar bitti, el berabere!"); 
+              return;
           }
           const cekilenTas = masa.deste.shift(); 
           if(masa.eller[data.isim]) masa.eller[data.isim].push(cekilenTas);
@@ -291,11 +288,12 @@ io.on('connection', (socket) => {
       if(masa && masa.siradakiOyuncu === data.isim) {
           const elGecerliMi = eliKontrolEt(data.gruplar, masa.gosterge);
           if(elGecerliMi) {
-              // BÜYÜK VURGUN! KASADAKİ PARAYI OYUNCUYA AKTAR
-              oyuncuCipleri[data.isim] += masa.kasa;
+              const kazanilanPara = masa.kasa;
+              oyuncuCipleri[data.isim] += kazanilanPara;
               io.emit('cip_guncelle_ozel', { isim: data.isim, cip: oyuncuCipleri[data.isim] });
-              io.emit('sistem_mesaji', `🎉 BÜYÜK VURGUN! ${data.isim} elini tamamladı ve masadaki ${masa.kasa.toLocaleString()} ÇİPİ KAZANDI! 🎉`);
-              oyunuSifirla(data.masaAdi);
+              io.emit('sistem_mesaji', `🎉 BÜYÜK VURGUN! ${data.isim} elini tamamladı ve masadaki ${kazanilanPara.toLocaleString()} ÇİPİ KAZANDI! 🎉`);
+              
+              oyunuSifirla(data.masaAdi, data.isim, kazanilanPara, "Mükemmel bir dizilimle elini tamamladı!");
           } else {
               socket.emit('hatali_bitis', "Dizilim hatalı veya perler arasında boşluk bırakmadınız! Lütfen elinizi kontrol edin.");
           }
@@ -323,7 +321,7 @@ io.on('connection', (socket) => {
               } else { masalar[m].koltuklar[index] = null; }
 
               if(masalar[m].koltuklar.every(k => k === null || k.startsWith('Bot_'))) {
-                  oyunuSifirla(m);
+                  oyunuSifirla(m, null, 0, "Masada kimse kalmadı.");
                   masalar[m].koltuklar = [null, null, null, null]; 
               }
               const guncelLobi = {};
