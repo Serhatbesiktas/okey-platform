@@ -53,6 +53,7 @@ function oyunuSifirla(masaAdi, kazanan = null, odul = 0, sebep = "") {
     }
 }
 
+// 12-13-1 KURALI DÜZELTİLMİŞ GÜNCEL EL KONTROLÜ
 function eliKontrolEt(gruplar, gosterge) {
     if (!gosterge) return false;
     let okeySayi = gosterge.sayi === 13 ? 1 : parseInt(gosterge.sayi) + 1;
@@ -103,13 +104,19 @@ function eliKontrolEt(gruplar, gosterge) {
             let cRenk = getEffectiveTile(grup[firstNormalIdx]).renk;
             let expectedForward = cSayi;
             for (let i = firstNormalIdx + 1; i < grup.length; i++) {
+                // YENİ KURAL: 1'den sonra 2 gelemez!
+                if (expectedForward === 1) { isSeri = false; break; }
                 expectedForward = expectedForward === 13 ? 1 : expectedForward + 1;
+                
                 let eff = getEffectiveTile(grup[i]);
                 if (!eff.isOkey) { if (eff.renk !== cRenk || eff.sayi !== expectedForward) { isSeri = false; break; } }
             }
             let expectedBackward = cSayi;
             for (let i = firstNormalIdx - 1; i >= 0; i--) {
+                // YENİ KURAL: Geriye doğru giderken 1'in arkasına 13 bağlanamaz
+                if (expectedBackward === 1) { isSeri = false; break; }
                 expectedBackward = expectedBackward === 1 ? 13 : expectedBackward - 1;
+                
                 let eff = getEffectiveTile(grup[i]);
                 if (!eff.isOkey) { if (eff.renk !== cRenk || eff.sayi !== expectedBackward) { isSeri = false; break; } }
             }
@@ -205,7 +212,6 @@ io.on('connection', (socket) => {
 
       let masadaBulundu = false;
 
-      // 1. Durum: Safari sekmeyi uyutmuş, sunucu senin koptuğunu henüz anlamamış.
       for(let m in masalar) {
           if (masalar[m].koltuklar.includes(isim)) {
               masadaBulundu = true;
@@ -214,7 +220,6 @@ io.on('connection', (socket) => {
           }
       }
 
-      // 2. Durum: Sunucu koptuğunu anlamış, yerine bot atamış. O botu kaldırıp seni oturtuyoruz.
       if (!masadaBulundu && kopanOyuncular[isim]) {
           const data = kopanOyuncular[isim];
           const masa = masalar[data.masaAdi];
@@ -396,7 +401,6 @@ io.on('connection', (socket) => {
                   }
               } else { masalar[m].koltuklar[index] = null; }
 
-              // YENİ: Masada insan kalmasa bile oyunu hemen bitirme, oyuncunun geri gelmesine süre tanı!
               if(!masalar[m].oyunBasladi && masalar[m].koltuklar.every(k => k === null || k.startsWith('Bot_'))) {
                   masalar[m].koltuklar = [null, null, null, null]; 
               }
