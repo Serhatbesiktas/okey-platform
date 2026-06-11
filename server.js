@@ -9,7 +9,7 @@ const io = require('socket.io')(http, {
 app.use(express.static('public'));
 
 const oyuncuCipleri = {};
-const kopanOyuncular = {}; // YENİ: Kopan oyuncuların yerine geçen botları takip eder
+const kopanOyuncular = {}; 
 
 const masalar = {
     'Acemiler (20K Bahis)': { bahis: 20000, kasa: 0, koltuklar: [null, null, null, null], deste: [], gosterge: null, oyunBasladi: false, siradakiOyuncu: null, eller: {} },
@@ -45,7 +45,6 @@ function oyunuSifirla(masaAdi, kazanan = null, odul = 0, sebep = "") {
         masa.eller = {};
         masa.kasa = 0; 
         
-        // Masa sıfırlandığında o masaya ait kopma kayıtlarını da temizle
         for(let k in kopanOyuncular) {
             if(kopanOyuncular[k].masaAdi === masaAdi) delete kopanOyuncular[k];
         }
@@ -204,24 +203,34 @@ io.on('connection', (socket) => {
       if(!oyuncuCipleri[isim]) oyuncuCipleri[isim] = 250000; 
       socket.emit('cip_guncelle', oyuncuCipleri[isim]);
 
-      // YENİ: Kopan oyuncu geri mi bağlandı?
-      if (kopanOyuncular[isim]) {
+      let masadaBulundu = false;
+
+      // 1. Durum: Safari sekmeyi uyutmuş, sunucu senin koptuğunu henüz anlamamış.
+      for(let m in masalar) {
+          if (masalar[m].koltuklar.includes(isim)) {
+              masadaBulundu = true;
+              socket.emit('kaldigin_yerden_devam', { masaAdi: m });
+              break;
+          }
+      }
+
+      // 2. Durum: Sunucu koptuğunu anlamış, yerine bot atamış. O botu kaldırıp seni oturtuyoruz.
+      if (!masadaBulundu && kopanOyuncular[isim]) {
           const data = kopanOyuncular[isim];
           const masa = masalar[data.masaAdi];
           
           if (masa && masa.oyunBasladi) {
               let botIndex = masa.koltuklar.indexOf(data.botIsmi);
               if (botIndex !== -1) {
-                  // Oyuncuyu botun yerine oturt ve eli geri ver
                   masa.koltuklar[botIndex] = isim;
                   masa.eller[isim] = masa.eller[data.botIsmi];
                   delete masa.eller[data.botIsmi];
                   
                   if (masa.siradakiOyuncu === data.botIsmi) masa.siradakiOyuncu = isim;
-                  delete kopanOyuncular[isim]; // Kaydı temizle
+                  delete kopanOyuncular[isim]; 
                   
                   socket.emit('kaldigin_yerden_devam', { masaAdi: data.masaAdi });
-                  io.emit('sistem_mesaji', `✅ ${isim} bağlantısını kurtardı ve ${data.botIsmi} yerine oyuna geri döndü!`);
+                  io.emit('sistem_mesaji', `✅ ${isim} bağlantısını kurtardı ve oyuna geri döndü!`);
                   
                   const guncelLobi = {};
                   for(let m in masalar) guncelLobi[m] = masalar[m].koltuklar;
@@ -229,7 +238,6 @@ io.on('connection', (socket) => {
                   io.emit('sira_guncelle', { masaAdi: data.masaAdi, kimde: masa.siradakiOyuncu });
               }
           } else {
-              // Oyun zaten bitmişse kaydı temizle
               delete kopanOyuncular[isim];
           }
       }
@@ -378,7 +386,6 @@ io.on('connection', (socket) => {
                   masalar[m].eller[yeniBot] = masalar[m].eller[isim]; 
                   delete masalar[m].eller[isim];
                   
-                  // Eğer kullanıcı bilerek Lobiye Dön demediyse (bağlantısı koptuysa) geri dönme hakkı tanı
                   if (koptuMu) { kopanOyuncular[isim] = { masaAdi: m, botIsmi: yeniBot }; }
 
                   io.emit('sistem_mesaji', `⚠️ ${isim} oyundan ayrıldı, yerine ${yeniBot} geçti!`);
@@ -389,12 +396,12 @@ io.on('connection', (socket) => {
                   }
               } else { masalar[m].koltuklar[index] = null; }
 
-              if(masalar[m].koltuklar.every(k => k === null || k.startsWith('Bot_'))) {
-                  oyunuSifirla(m, null, 0, "Masada kimse kalmadı.");
+              // YENİ: Masada insan kalmasa bile oyunu hemen bitirme, oyuncunun geri gelmesine süre tanı!
+              if(!masalar[m].oyunBasladi && masalar[m].koltuklar.every(k => k === null || k.startsWith('Bot_'))) {
                   masalar[m].koltuklar = [null, null, null, null]; 
               }
               const guncelLobi = {};
-              for(let m in masalar) guncelLobi[m] = masalar[m].koltuklar;
+              for(let ms in masalar) guncelLobi[ms] = masalar[ms].koltuklar;
               io.emit('masalari_guncelle', guncelLobi);
               break;
           }
