@@ -9,6 +9,7 @@ const io = require('socket.io')(http, {
 app.use(express.static('public'));
 
 const oyuncuCipleri = {};
+const kopanOyuncular = {}; // YENİ: Kopan oyuncuların yerine geçen botları takip eder
 
 const masalar = {
     'Acemiler (20K Bahis)': { bahis: 20000, kasa: 0, koltuklar: [null, null, null, null], deste: [], gosterge: null, oyunBasladi: false, siradakiOyuncu: null, eller: {} },
@@ -34,7 +35,6 @@ function desteYaratVeKaristir() {
     return yeniDeste;
 }
 
-// BİLDİRİM DESTEKLİ SIFIRLAMA
 function oyunuSifirla(masaAdi, kazanan = null, odul = 0, sebep = "") {
     const masa = masalar[masaAdi];
     if(masa) {
@@ -44,6 +44,12 @@ function oyunuSifirla(masaAdi, kazanan = null, odul = 0, sebep = "") {
         masa.siradakiOyuncu = null;
         masa.eller = {};
         masa.kasa = 0; 
+        
+        // Masa sıfırlandığında o masaya ait kopma kayıtlarını da temizle
+        for(let k in kopanOyuncular) {
+            if(kopanOyuncular[k].masaAdi === masaAdi) delete kopanOyuncular[k];
+        }
+
         io.emit('oyun_bitti', { masaAdi: masaAdi, kazanan: kazanan, odul: odul, sebep: sebep });
     }
 }
@@ -114,44 +120,32 @@ function eliKontrolEt(gruplar, gosterge) {
     return true;
 }
 
-// YENİ EKLENEN BOT ZEKASI: En gereksiz (çöp) taşı bulur
 function enCopTasiBul(el, gosterge) {
     if (!el || el.length === 0) return 0;
     
     let okeySayi = gosterge ? (gosterge.sayi === 13 ? 1 : parseInt(gosterge.sayi) + 1) : -1;
     let okeyRenk = gosterge ? gosterge.renk : '';
 
-    // Her taşa bir işlevsellik skoru veriyoruz
     let skorlar = el.map((tas, index) => {
         let skor = 0;
-        
-        // 1. KURAL: Okey taşı mı? Kesinlikle atma!
         let isOkey = (tas.renk === okeyRenk && parseInt(tas.sayi) === okeySayi);
         if (isOkey) return { index: index, skor: 9999 }; 
-        
-        // 2. KURAL: Sahte okeyi zorda kalmadıkça atma
         if (tas.renk === 'sahte') return { index: index, skor: 900 }; 
 
-        // 3. KURAL: Farklı renklerde aynı sayılar var mı? (Örn: Kırmızı 7, Siyah 7) -> 10 Puan
         let ayniSayiBaskaRenk = el.filter(t => t.sayi === tas.sayi && t.renk !== tas.renk).length;
         skor += (ayniSayiBaskaRenk * 10);
 
-        // 4. KURAL: Aynı renkten ardışık/yakın sayılar var mı? (Örn: Kırmızı 5, Kırmızı 6) -> 15 Puan
         let tasSayi = parseInt(tas.sayi);
         let ardisik = el.filter(t => t.renk === tas.renk && Math.abs(parseInt(t.sayi) - tasSayi) <= 2 && t.id !== tas.id).length;
         skor += (ardisik * 15);
 
-        // 5. KURAL: Çifte gitme ihtimaline karşı aynı taştan var mı? -> 5 Puan
         let ayniTas = el.filter(t => t.renk === tas.renk && t.sayi === tas.sayi && t.id !== tas.id).length;
         skor += (ayniTas * 5);
 
         return { index: index, skor: skor };
     });
 
-    // Skorları en düşükten en yükseğe sırala
     skorlar.sort((a, b) => a.skor - b.skor);
-    
-    // En düşük skoru alan çöp taşın indexini döndür
     return skorlar[0].index; 
 }
 
@@ -178,7 +172,7 @@ function botHamlesiYap(masaAdi) {
                 if(!masa.oyunBasladi) return;
                 
                 const botunEli = masa.eller[siradaki];
-                const atilacakIndex = enCopTasiBul(botunEli, masa.gosterge); // Zeka eklendi
+                const atilacakIndex = enCopTasiBul(botunEli, masa.gosterge);
                 const atilanTas = botunEli.splice(atilacakIndex, 1)[0]; 
 
                 io.emit('ortaya_tas_atildi', { masaAdi: masaAdi, kimAtti: siradaki, tas: atilanTas });
@@ -209,6 +203,36 @@ io.on('connection', (socket) => {
       socket.kullaniciAdi = isim;
       if(!oyuncuCipleri[isim]) oyuncuCipleri[isim] = 250000; 
       socket.emit('cip_guncelle', oyuncuCipleri[isim]);
+
+      // YENİ: Kopan oyuncu geri mi bağlandı?
+      if (kopanOyuncular[isim]) {
+          const data = kopanOyuncular[isim];
+          const masa = masalar[data.masaAdi];
+          
+          if (masa && masa.oyunBasladi) {
+              let botIndex = masa.koltuklar.indexOf(data.botIsmi);
+              if (botIndex !== -1) {
+                  // Oyuncuyu botun yerine oturt ve eli geri ver
+                  masa.koltuklar[botIndex] = isim;
+                  masa.eller[isim] = masa.eller[data.botIsmi];
+                  delete masa.eller[data.botIsmi];
+                  
+                  if (masa.siradakiOyuncu === data.botIsmi) masa.siradakiOyuncu = isim;
+                  delete kopanOyuncular[isim]; // Kaydı temizle
+                  
+                  socket.emit('kaldigin_yerden_devam', { masaAdi: data.masaAdi });
+                  io.emit('sistem_mesaji', `✅ ${isim} bağlantısını kurtardı ve ${data.botIsmi} yerine oyuna geri döndü!`);
+                  
+                  const guncelLobi = {};
+                  for(let m in masalar) guncelLobi[m] = masalar[m].koltuklar;
+                  io.emit('masalari_guncelle', guncelLobi);
+                  io.emit('sira_guncelle', { masaAdi: data.masaAdi, kimde: masa.siradakiOyuncu });
+              }
+          } else {
+              // Oyun zaten bitmişse kaydı temizle
+              delete kopanOyuncular[isim];
+          }
+      }
   });
 
   socket.on('masaya_otur', (data) => {
@@ -341,10 +365,10 @@ io.on('connection', (socket) => {
       }
   });
 
-  socket.on('masadan_kalk', (data) => { kullaniciyiMasadanKaldir(data.isim); });
-  socket.on('disconnect', () => { if(socket.kullaniciAdi) kullaniciyiMasadanKaldir(socket.kullaniciAdi); });
+  socket.on('masadan_kalk', (data) => { kullaniciyiMasadanKaldir(data.isim, false); });
+  socket.on('disconnect', () => { if(socket.kullaniciAdi) kullaniciyiMasadanKaldir(socket.kullaniciAdi, true); });
 
-  function kullaniciyiMasadanKaldir(isim) {
+  function kullaniciyiMasadanKaldir(isim, koptuMu) {
       for(let m in masalar) {
           let index = masalar[m].koltuklar.indexOf(isim);
           if(index !== -1) {
@@ -353,7 +377,11 @@ io.on('connection', (socket) => {
                   masalar[m].koltuklar[index] = yeniBot;
                   masalar[m].eller[yeniBot] = masalar[m].eller[isim]; 
                   delete masalar[m].eller[isim];
-                  io.emit('sistem_mesaji', `⚠️ ${isim} oyundan koptu, yerine ${yeniBot} geçti!`);
+                  
+                  // Eğer kullanıcı bilerek Lobiye Dön demediyse (bağlantısı koptuysa) geri dönme hakkı tanı
+                  if (koptuMu) { kopanOyuncular[isim] = { masaAdi: m, botIsmi: yeniBot }; }
+
+                  io.emit('sistem_mesaji', `⚠️ ${isim} oyundan ayrıldı, yerine ${yeniBot} geçti!`);
                   if (masalar[m].siradakiOyuncu === isim) {
                       masalar[m].siradakiOyuncu = yeniBot;
                       io.emit('sira_guncelle', { masaAdi: m, kimde: yeniBot });
