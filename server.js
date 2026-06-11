@@ -107,6 +107,7 @@ function eliKontrolEt(gruplar, gosterge) {
             for (let i = firstNormalIdx + 1; i < grup.length; i++) {
                 if (expectedForward === 1) { isSeri = false; break; }
                 expectedForward = expectedForward === 13 ? 1 : expectedForward + 1;
+                
                 let eff = getEffectiveTile(grup[i]);
                 if (!eff.isOkey) { if (eff.renk !== cRenk || eff.sayi !== expectedForward) { isSeri = false; break; } }
             }
@@ -114,6 +115,7 @@ function eliKontrolEt(gruplar, gosterge) {
             for (let i = firstNormalIdx - 1; i >= 0; i--) {
                 if (expectedBackward === 1) { isSeri = false; break; }
                 expectedBackward = expectedBackward === 1 ? 13 : expectedBackward - 1;
+                
                 let eff = getEffectiveTile(grup[i]);
                 if (!eff.isOkey) { if (eff.renk !== cRenk || eff.sayi !== expectedBackward) { isSeri = false; break; } }
             }
@@ -166,7 +168,7 @@ function botHamlesiYap(masaAdi) {
                 return;
             }
 
-            masa.gostergeYapilabilir = false; // Bot hamle yaptı, gösterge süresi doldu
+            masa.gostergeYapilabilir = false; 
             const cekilenTas = masa.deste.shift(); 
             masa.eller[siradaki].push(cekilenTas); 
             io.emit('masa_ortasi_guncelle', { masaAdi: masaAdi, kalanTas: masa.deste.length, gosterge: masa.gosterge });
@@ -211,7 +213,7 @@ io.on('connection', (socket) => {
       for(let m in masalar) {
           if (masalar[m].koltuklar.includes(isim)) {
               masadaBulundu = true;
-              socket.emit('kaldigin_yerden_devam', { masaAdi: m });
+              socket.emit('kaldigin_yerden_devam', { masaAdi: m, koltuklar: masalar[m].koltuklar });
               break;
           }
       }
@@ -230,7 +232,7 @@ io.on('connection', (socket) => {
                   if (masa.siradakiOyuncu === data.botIsmi) masa.siradakiOyuncu = isim;
                   delete kopanOyuncular[isim]; 
                   
-                  socket.emit('kaldigin_yerden_devam', { masaAdi: data.masaAdi });
+                  socket.emit('kaldigin_yerden_devam', { masaAdi: data.masaAdi, koltuklar: masa.koltuklar });
                   io.emit('sistem_mesaji', `✅ ${isim} bağlantısını kurtardı ve oyuna geri döndü!`);
                   
                   const guncelLobi = {};
@@ -264,7 +266,7 @@ io.on('connection', (socket) => {
     const masa = masalar[masaAdi];
     if (masa && !masa.oyunBasladi) {
         masa.oyunBasladi = true;
-        masa.gostergeYapilabilir = true; // YENİ: Gösterge yapma süresi başladı
+        masa.gostergeYapilabilir = true; 
         masa.gostergeYapanlar = [];
         masa.kasa = 0; 
         
@@ -311,16 +313,14 @@ io.on('connection', (socket) => {
     }
   });
 
-  // YENİ: GÖSTERGE YAPMA SİNYALİ
   socket.on('gosterge_yap', (data) => {
       const masa = masalar[data.masaAdi];
       if (masa && masa.gostergeYapilabilir && !masa.gostergeYapanlar.includes(data.isim)) {
-          // Oyuncunun elinde göstergenin eşi var mı?
           const varMi = masa.eller[data.isim].some(t => t.renk === masa.gosterge.renk && t.sayi === masa.gosterge.sayi && t.id !== masa.gosterge.id);
           
           if (varMi) {
               masa.gostergeYapanlar.push(data.isim);
-              let kesilecekCip = masa.bahis / 2; // Rakiplerden bahsin yarısı kadar kes
+              let kesilecekCip = masa.bahis / 2; 
               let toplamKazanilan = 0;
 
               masa.koltuklar.forEach(k => {
@@ -353,7 +353,7 @@ io.on('connection', (socket) => {
   socket.on('tas_atildi', (data) => {
       const masa = masalar[data.masaAdi];
       if(masa && masa.siradakiOyuncu === data.isim) {
-          masa.gostergeYapilabilir = false; // Birisi taş attıysa gösterge süresi biter
+          masa.gostergeYapilabilir = false; 
           if(masa.eller[data.isim]) {
               const tasIndex = masa.eller[data.isim].findIndex(t => t.id === data.tas.id);
               if(tasIndex !== -1) masa.eller[data.isim].splice(tasIndex, 1);
@@ -371,7 +371,7 @@ io.on('connection', (socket) => {
   socket.on('ortadan_tas_cek', (data) => {
       const masa = masalar[data.masaAdi];
       if(masa && masa.siradakiOyuncu === data.isim) {
-          masa.gostergeYapilabilir = false; // Taş çekildi, gösterge iptal
+          masa.gostergeYapilabilir = false; 
           if(masa.deste.length === 0) {
               io.emit('sistem_mesaji', `⚠️ ${data.masaAdi} masasında TAŞ BİTTİ!`);
               oyunuSifirla(data.masaAdi, null, 0, "Ortadaki taşlar bitti, el berabere!"); 
@@ -387,7 +387,7 @@ io.on('connection', (socket) => {
   socket.on('yandan_tas_alindi', (data) => {
       const masa = masalar[data.masaAdi];
       if(masa && masa.eller[data.kimAldi]) { 
-          masa.gostergeYapilabilir = false; // Taş alındı, gösterge iptal
+          masa.gostergeYapilabilir = false; 
           masa.eller[data.kimAldi].push(data.tas); 
       }
       io.emit('yandan_alindi_guncelle', data);
