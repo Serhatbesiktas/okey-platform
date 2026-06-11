@@ -5,69 +5,148 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>VIP Okey Sunucusu</title>
     <style>
-        /* ... (CSS kısmını önceki kusursuz halinden aynen kullanmaya devam ediyoruz, buraya mevcut CSS'ini koyabilirsin) ... */
+        /* OYUN MASASI VE TASARIM KODLARI */
+        body {
+            background-color: #1b5e20; /* Okey masası yeşili */
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        #ust-bilgi {
+            padding: 10px;
+            background: rgba(0,0,0,0.6);
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        #oyunuBaslatBtn {
+            margin: 20px auto;
+            padding: 15px 30px;
+            font-size: 18px;
+            background: #f39c12;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        #oyunAlanObjeleri {
+            flex-grow: 1;
+            position: relative;
+            display: none; /* Oyun başlayana kadar gizli */
+        }
+        /* ISTAKA TASARIMI */
+        #istaka {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #5d4037; /* Ahşap rengi */
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.8);
+            display: grid;
+            grid-template-columns: repeat(12, 1fr); /* İki sıra 12'li yuva */
+            gap: 5px;
+            width: 95%;
+            max-width: 800px;
+        }
+        .slot {
+            width: 100%;
+            aspect-ratio: 2/3; /* Okey taşı oranı */
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+            border: 1px inset rgba(255,255,255,0.2);
+        }
+        /* TAŞ ATMA YERİ (SAĞ TARAF) */
+        #benimIskartam {
+            position: absolute;
+            right: 15px;
+            top: 40%;
+            width: 60px;
+            height: 90px;
+            background: rgba(0,0,0,0.4);
+            border: 2px dashed #aaa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            border-radius: 8px;
+        }
+        .iskarta-yazi {
+            font-size: 12px;
+            color: #ddd;
+        }
     </style>
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 </head>
 <body>
 
-    <div id="arayuz">
-        <button id="oyunuBaslatBtn" style="display:none; padding: 15px; background: green; color: white; border: none; border-radius: 5px; font-size: 16px; margin-bottom: 20px;" onclick="oyunuBaslat()">Oyunu Başlat (Botları Ekle)</button>
-        <div id="oyunAlanObjeleri" style="display:none;">Oyun Alanı (Taşlar Burada Olacak)</div>
-        <div id="benimIskartam" style="display:none;"><div class="iskarta-yazi" id="iskartaYazi">TAŞ AT<br>⬇</div></div>
+    <div id="ust-bilgi">Bağlanılıyor...</div>
+    
+    <button id="oyunuBaslatBtn" style="display:none;" onclick="oyunuBaslat()">Oyunu Başlat (Botları Ekle)</button>
+    
+    <div id="oyunAlanObjeleri">
+        <div id="benimIskartam">
+            <div class="iskarta-yazi" id="iskartaYazi">TAŞ AT<br>⬇</div>
+        </div>
+
+        <div id="istaka">
+            </div>
     </div>
 
     <script>
+        // HTML içindeki slotları otomatik oluştur (y0'dan y23'e kadar)
+        const istaka = document.getElementById('istaka');
+        for(let i=0; i<24; i++) {
+            istaka.innerHTML += `<div id="y${i}" class="slot"></div>`;
+        }
+
         const socket = io();
         let suAnkiMasam = null;
-        let benimSiramMi = false;
-        let hamleYapildi = false;
-        let kullaniciAdim = "Oyuncu_" + Math.floor(Math.random() * 1000); // Test için rastgele isim
+        let kullaniciAdim = "Oyuncu_" + Math.floor(Math.random() * 1000); 
 
-        // Masaya oturma simülasyonu (Bunu kendi arayüzündeki butona bağlayabilirsin)
-        // Şimdilik sayfa açılınca otomatik "Acemiler" masasına otursun test için
+        // Sayfa açılınca otomatik "Acemiler" masasına otur (Test için)
         setTimeout(() => {
             suAnkiMasam = 'Acemiler';
+            document.getElementById('ust-bilgi').innerText = `${suAnkiMasam} Masasına Oturuldu. Bekleniyor...`;
             socket.emit('masaya_otur', { masaAdi: suAnkiMasam, isim: kullaniciAdim });
             document.getElementById('oyunuBaslatBtn').style.display = 'block';
         }, 500);
 
-        // EKRANI SIFIRLAMA (Takılmaları önlemek için)
-        function masayiSifirla() {
-            hamleYapildi = false;
-            document.getElementById('oyunAlanObjeleri').style.display = 'none';
-            document.getElementById('oyunuBaslatBtn').style.display = 'block';
-            for(let i=0; i<24; i++) {
-                let slot = document.getElementById('y'+i);
-                if(slot) slot.innerHTML = '';
-            }
-            let iskarta = document.getElementById('benimIskartam');
-            if(iskarta) iskarta.innerHTML = '<div class="iskarta-yazi" id="iskartaYazi">TAŞ AT<br>⬇</div>';
-        }
-
-        // OYUNU BAŞLAT BUTONUNA TIKLANINCA ÇALIŞACAK FONKSİYON
+        // OYUNU BAŞLAT BUTONU
         function oyunuBaslat() {
             if (suAnkiMasam) {
                 socket.emit('oyunu_baslat', { masaAdi: suAnkiMasam });
                 document.getElementById('oyunuBaslatBtn').style.display = 'none';
+                document.getElementById('ust-bilgi').innerText = "Oyun Başlatıldı!";
             }
         }
 
         // SUNUCUDAN GELEN OYUN BAŞLADI SİNYALİ
         socket.on('oyun_basladi', (data) => {
             if (data.masaAdi === suAnkiMasam) {
-                alert("Oyun Başladı! Botlar masaya eklendi.");
+                // Oyun alanını (masayı ve ıstakayı) görünür yap
                 document.getElementById('oyunAlanObjeleri').style.display = 'block';
-                document.getElementById('benimIskartam').style.display = 'block';
-                // İlerleyen adımlarda buraya tasDagit() fonksiyonunu bağlayacağız
+                document.getElementById('ust-bilgi').innerText = "Oyun Başladı! Botlar masada.";
             }
         });
 
-        // MASALAR GÜNCELLENDİĞİNDE BİLGİ ALMA (Test için konsola yazdırıyoruz)
-        socket.on('masalari_guncelle', (masalarData) => {
-            console.log("Güncel Masalar:", masalarData);
-        });
+        // EKRAN SIFIRLAMA FONKSİYONU
+        function masayiSifirla() {
+            document.getElementById('oyunAlanObjeleri').style.display = 'none';
+            document.getElementById('oyunuBaslatBtn').style.display = 'block';
+            for(let i=0; i<24; i++) {
+                let slot = document.getElementById('y'+i);
+                if(slot) slot.innerHTML = '';
+            }
+            document.getElementById('benimIskartam').innerHTML = '<div class="iskarta-yazi" id="iskartaYazi">TAŞ AT<br>⬇</div>';
+        }
 
     </script>
 </body>
