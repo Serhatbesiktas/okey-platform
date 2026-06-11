@@ -37,7 +37,6 @@
         .player-table td { padding: 8px 0; border-bottom: 1px solid #0d2e1d; }
         .status-dot { width: 8px; height: 8px; background-color: #20c997; border-radius: 50%; display: inline-block; margin-right: 5px; }
 
-        /* MASA EKRANI */
         #masaEkrani { display: none; flex: 1; background-color: #0a2014; position: relative; padding: 10px; flex-direction: column; }
         .okey-table-ui { background-color: #1a5c38; border: 4px solid #0d2e1d; border-radius: 20px; width: 100%; flex: 1; position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); margin-bottom: 5px; overflow: hidden; }
         
@@ -224,6 +223,32 @@
             return sayi;
         }
 
+        // HAKEM İÇİN BOŞLUKLARI OKUYAN SENSÖR
+        function getIstakaGruplari() {
+            let gruplar = [];
+            let currentGrup = [];
+            for(let i=0; i<24; i++) {
+                if(i === 12 && currentGrup.length > 0) {
+                    gruplar.push(currentGrup);
+                    currentGrup = [];
+                }
+                let yuva = document.getElementById('y'+i);
+                if(yuva.children.length > 0) {
+                    let tas = yuva.children[0];
+                    let renkClass = Array.from(tas.classList).find(c => c.startsWith('tas-'));
+                    let renk = renkClass ? renkClass.replace('tas-', '') : '';
+                    currentGrup.push({ id: tas.id, renk: renk, sayi: tas.innerText });
+                } else {
+                    if(currentGrup.length > 0) {
+                        gruplar.push(currentGrup);
+                        currentGrup = [];
+                    }
+                }
+            }
+            if(currentGrup.length > 0) gruplar.push(currentGrup);
+            return gruplar;
+        }
+
         const sortableOptions = {
             group: { name: 'istaka', put: (to) => to.el.children.length === 0 },
             animation: 100, delay: 0, forceFallback: true, fallbackOnBody: true, fallbackTolerance: 3, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag', easing: "cubic-bezier(0.25, 1, 0.5, 1)"
@@ -248,13 +273,32 @@
             }
         });
 
+        // BİTİRME KUTUSU (HAKEM KONTROLÜNE GÖNDERİR)
         new Sortable(bitisAlani, {
             group: { name: 'istaka', put: function (to) { return benimSiramMi && elimdekiTasSayisi() === 15; }, pull: false },
             animation: 150, forceFallback: true, fallbackOnBody: true, emptyInsertThreshold: 100, 
             onAdd: function (evt) {
                 const atilanTas = evt.item;
                 atilanTas.style.position = 'absolute'; atilanTas.style.top = '50%'; atilanTas.style.left = '50%'; atilanTas.style.transform = 'translate(-50%, -50%)'; atilanTas.style.margin = '0';
-                socket.emit('oyunu_bitir', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi });
+                
+                let gruplar = getIstakaGruplari(); 
+                socket.emit('oyunu_bitir', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi, gruplar: gruplar });
+            }
+        });
+
+        // HAKEM HATALI BULURSA TAŞI GERİ VER
+        socket.on('hatali_bitis', (mesaj) => {
+            alert(mesaj);
+            if(bitisAlani.children.length > 0) {
+                const tas = bitisAlani.lastElementChild;
+                for(let i=0; i<24; i++) {
+                    if(document.getElementById('y'+i).children.length === 0) {
+                        document.getElementById('y'+i).appendChild(tas);
+                        tas.style.position = 'static';
+                        tas.style.transform = 'none';
+                        break;
+                    }
+                }
             }
         });
 
@@ -272,7 +316,7 @@
             }
         }
 
-        function getIstakaTaslari() {
+        window.seriDiz = function() {
             let taslar = [];
             for(let i=0; i<24; i++) {
                 let yuva = document.getElementById('y'+i);
@@ -283,23 +327,26 @@
                     taslar.push({ el: tas, renk: renk, sayi: parseInt(tas.innerText) || 0 });
                 }
             }
-            return taslar;
-        }
-
-        window.seriDiz = function() {
-            let taslar = getIstakaTaslari();
             const renkDeger = { 'kirmizi': 1, 'siyah': 2, 'mavi': 3, 'sari': 4, 'sahte': 5 };
             taslar.sort((a, b) => { if (renkDeger[a.renk] !== renkDeger[b.renk]) return renkDeger[a.renk] - renkDeger[b.renk]; return a.sayi - b.sayi; });
             taslar.forEach((tasObj, index) => { document.getElementById('y'+index).appendChild(tasObj.el); });
         };
 
         window.ciftDiz = function() {
-            let taslar = getIstakaTaslari();
+            let taslar = [];
+            for(let i=0; i<24; i++) {
+                let yuva = document.getElementById('y'+i);
+                if(yuva.children.length > 0) {
+                    let tas = yuva.children[0];
+                    let renkClass = Array.from(tas.classList).find(c => c.startsWith('tas-'));
+                    let renk = renkClass ? renkClass.replace('tas-', '') : '';
+                    taslar.push({ el: tas, renk: renk, sayi: parseInt(tas.innerText) || 0 });
+                }
+            }
             taslar.sort((a, b) => { if (a.sayi !== b.sayi) return a.sayi - b.sayi; return a.renk.localeCompare(b.renk); });
             taslar.forEach((tasObj, index) => { document.getElementById('y'+index).appendChild(tasObj.el); });
         };
 
-        // UYKU MODU KURTARMA RADARI
         function kurtarmaSinyaliGonder() {
             if (document.getElementById('oyunuBaslatBtn').style.display !== 'none' && suAnkiMasam) {
                 socket.emit('taslarimi_ver', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi });
@@ -432,7 +479,6 @@
 
         oyunuBaslatBtn.addEventListener('click', () => { socket.emit('oyunu_baslat', suAnkiMasam); });
 
-        // ARAYÜZÜ AÇ
         socket.on('masa_oyun_basladi', (data) => {
             if(suAnkiMasam === data.masaAdi) {
                 oyunuBaslatBtn.style.display = 'none';
@@ -447,7 +493,6 @@
             }
         });
 
-        // TAŞLARI YERLEŞTİR
         socket.on('taslari_al', (data) => {
             if (data.kime === aktifKullaniciAdi) {
                 for(let i=0; i<24; i++) document.getElementById('y'+i).innerHTML = '';
@@ -484,7 +529,7 @@
 
         socket.on('sira_guncelle', (data) => {
             if(suAnkiMasam === data.masaAdi) {
-                kurtarmaSinyaliGonder(); // Radar devreye girdi
+                kurtarmaSinyaliGonder(); 
                 benimSiramMi = (data.kimde === aktifKullaniciAdi);
                 
                 const iskarta = document.getElementById('benimIskartam');
@@ -508,7 +553,7 @@
 
         socket.on('masa_ortasi_guncelle', (data) => {
             if(suAnkiMasam === data.masaAdi) {
-                kurtarmaSinyaliGonder(); // Radar devreye girdi
+                kurtarmaSinyaliGonder(); 
                 kalanTasBilgi.innerText = data.kalanTas;
                 if(data.gosterge) {
                     const gostergeDiv = document.getElementById('gostergeTasi');
