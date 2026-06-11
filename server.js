@@ -32,7 +32,6 @@ function desteYaratVeKaristir() {
     return yeniDeste;
 }
 
-// OYUNU SIFIRLAMA FONKSİYONU
 function oyunuSifirla(masaAdi) {
     const masa = masalar[masaAdi];
     if(masa) {
@@ -54,7 +53,6 @@ function botHamlesiYap(masaAdi) {
         setTimeout(() => {
             if(!masa.oyunBasladi) return;
             
-            // 1. KURAL KONTROLÜ: TAŞ BİTTİ Mİ?
             if(masa.deste.length === 0) {
                 io.emit('sistem_mesaji', `⚠️ ${masaAdi} masasında TAŞ BİTTİ! Oyun berabere sonuçlandı.`);
                 oyunuSifirla(masaAdi);
@@ -130,6 +128,8 @@ io.on('connection', (socket) => {
         masa.siradakiOyuncu = baslayacakOyuncu;
         masa.eller = {}; 
         
+        // EKRANLARI GÜNCELLE (Taş dağıtmadan önce arayüzü hazırlar)
+        io.emit('masa_oyun_basladi', { masaAdi: masaAdi, gosterge: masa.gosterge, kalanTas: masa.deste.length });
         io.emit('sistem_mesaji', `${masaAdi} masasında oyun başladı! Gösterge açıklandı. (İlk oynayacak: ${baslayacakOyuncu})`);
 
         masa.koltuklar.forEach(oyuncuIsmi => {
@@ -148,9 +148,24 @@ io.on('connection', (socket) => {
     }
   });
 
+  // UYUYAN SEKMELER İÇİN KURTARMA SİNYALİ
+  socket.on('taslarimi_ver', (data) => {
+      const masa = masalar[data.masaAdi];
+      if(masa && masa.oyunBasladi && masa.eller[data.isim]) {
+          socket.emit('masa_oyun_basladi', { masaAdi: data.masaAdi, gosterge: masa.gosterge, kalanTas: masa.deste.length });
+          socket.emit('taslari_al', { kime: data.isim, taslar: masa.eller[data.isim] });
+      }
+  });
+
   socket.on('tas_atildi', (data) => {
       const masa = masalar[data.masaAdi];
       if(masa && masa.siradakiOyuncu === data.isim) {
+          // Atılan taşı elinden sil (Kurtarma radarı için)
+          if(masa.eller[data.isim]) {
+              const tasIndex = masa.eller[data.isim].findIndex(t => t.id === data.tas.id);
+              if(tasIndex !== -1) masa.eller[data.isim].splice(tasIndex, 1);
+          }
+
           io.emit('ortaya_tas_atildi', { masaAdi: data.masaAdi, kimAtti: data.isim, tas: data.tas });
 
           let currentIndex = masa.koltuklar.indexOf(data.isim);
@@ -167,8 +182,6 @@ io.on('connection', (socket) => {
   socket.on('ortadan_tas_cek', (data) => {
       const masa = masalar[data.masaAdi];
       if(masa && masa.siradakiOyuncu === data.isim) {
-          
-          // 2. KURAL KONTROLÜ: İNSAN TAŞ ÇEKERKEN BİTERSE
           if(masa.deste.length === 0) {
               io.emit('sistem_mesaji', `⚠️ ${data.masaAdi} masasında TAŞ BİTTİ! Oyun berabere sonuçlandı.`);
               oyunuSifirla(data.masaAdi);
@@ -176,22 +189,27 @@ io.on('connection', (socket) => {
           }
 
           const cekilenTas = masa.deste.shift(); 
+          if(masa.eller[data.isim]) masa.eller[data.isim].push(cekilenTas);
+          
           socket.emit('tas_cekildi', cekilenTas); 
           io.emit('masa_ortasi_guncelle', { masaAdi: data.masaAdi, kalanTas: masa.deste.length, gosterge: masa.gosterge });
       }
   });
 
-  // OYUNCU TAŞI MERKEZE BIRAKIP BİTİRİRSE
+  socket.on('yandan_tas_alindi', (data) => {
+      const masa = masalar[data.masaAdi];
+      if(masa && masa.eller[data.kimAldi]) {
+          masa.eller[data.kimAldi].push(data.tas); // Alınan taşı eline kaydet
+      }
+      io.emit('yandan_alindi_guncelle', data);
+  });
+
   socket.on('oyunu_bitir', (data) => {
       const masa = masalar[data.masaAdi];
       if(masa && masa.siradakiOyuncu === data.isim) {
           io.emit('sistem_mesaji', `🎉 TEBRİKLER! ${data.isim} elini tamamladı ve taşı ortaya koyarak OYUNU BİTİRDİ! 🎉`);
           oyunuSifirla(data.masaAdi);
       }
-  });
-
-  socket.on('yandan_tas_alindi', (data) => {
-      io.emit('yandan_alindi_guncelle', data);
   });
 
   socket.on('masadan_kalk', (data) => { kullaniciyiMasadanKaldir(data.isim); });
