@@ -37,6 +37,7 @@
         .player-table td { padding: 8px 0; border-bottom: 1px solid #0d2e1d; }
         .status-dot { width: 8px; height: 8px; background-color: #20c997; border-radius: 50%; display: inline-block; margin-right: 5px; }
 
+        /* MASA EKRANI */
         #masaEkrani { display: none; flex: 1; background-color: #0a2014; position: relative; padding: 10px; flex-direction: column; }
         .okey-table-ui { background-color: #1a5c38; border: 4px solid #0d2e1d; border-radius: 20px; width: 100%; flex: 1; position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); margin-bottom: 5px; overflow: hidden; }
         
@@ -63,6 +64,7 @@
 
         .iskarta-alani .okey-tasi { position: absolute !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; width: 38px !important; height: 52px !important; font-size: 18px !important; border-bottom-width: 3px !important; pointer-events: none !important; }
 
+        /* MASA ORTASI & GÖSTERGE TAŞI */
         .masa-ortasi { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 15px; background: rgba(0,0,0,0.2); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); z-index: 4; }
         .masa-isim-ortasi { color: rgba(255,255,255,0.3); font-weight: bold; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; }
         .oyun-baslat-btn { background-color: #ffc107; color: #000; border: none; padding: 10px 25px; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.4); }
@@ -75,8 +77,10 @@
         
         .gosterge-tasi { width: 44px; height: 58px; background-color: #fcf5e3; border: 1px solid #d3c9b3; border-bottom: 5px solid #c0b396; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 18px; box-shadow: 0 4px 6px rgba(0,0,0,0.5); font-family: Arial, sans-serif; pointer-events: none; }
 
-        #bitisAlani { display: none; width: 48px; height: 64px; background-color: rgba(220, 53, 69, 0.2); border: 2px dashed #dc3545; border-radius: 8px; align-items: center; justify-content: center; color: #dc3545; font-weight: bold; font-size: 11px; text-align: center; }
+        /* BİTİRME ALANI (SÜNME HATASI DÜZELTİLDİ) */
+        #bitisAlani { position: relative; display: none; width: 48px; height: 64px; background-color: rgba(220, 53, 69, 0.2); border: 2px dashed #dc3545; border-radius: 8px; align-items: center; justify-content: center; color: #dc3545; font-weight: bold; font-size: 11px; text-align: center; }
         #bitisAlani.sortable-drag-over { background-color: rgba(220, 53, 69, 0.6); color: white; border-color: white;}
+        #bitisAlani .okey-tasi { position: absolute !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; width: 38px !important; height: 52px !important; font-size: 18px !important; border-bottom-width: 3px !important; pointer-events: none !important; }
 
         .pro-tus-takimi { width: 100%; display: flex; justify-content: flex-start; align-items: center; padding: 2px 10px; margin-bottom: 4px; z-index: 10; gap: 10px; }
         .pro-tus { padding: 0 15px; height: 35px; background-color: #14422b; border: 1px solid #198754; color: #ffc107; border-radius: 6px; font-weight: bold; font-size: 12px; text-transform: uppercase; cursor: pointer; box-shadow: 0 3px 5px rgba(0,0,0,0.5); }
@@ -223,7 +227,6 @@
             return sayi;
         }
 
-        // HAKEM İÇİN BOŞLUKLARI OKUYAN SENSÖR
         function getIstakaGruplari() {
             let gruplar = [];
             let currentGrup = [];
@@ -273,7 +276,6 @@
             }
         });
 
-        // BİTİRME KUTUSU (HAKEM KONTROLÜNE GÖNDERİR)
         new Sortable(bitisAlani, {
             group: { name: 'istaka', put: function (to) { return benimSiramMi && elimdekiTasSayisi() === 15; }, pull: false },
             animation: 150, forceFallback: true, fallbackOnBody: true, emptyInsertThreshold: 100, 
@@ -286,7 +288,6 @@
             }
         });
 
-        // HAKEM HATALI BULURSA TAŞI GERİ VER
         socket.on('hatali_bitis', (mesaj) => {
             alert(mesaj);
             if(bitisAlani.children.length > 0) {
