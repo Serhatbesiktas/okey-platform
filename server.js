@@ -53,7 +53,6 @@ function oyunuSifirla(masaAdi, kazanan = null, odul = 0, sebep = "") {
     }
 }
 
-// 12-13-1 KURALI DÜZELTİLMİŞ GÜNCEL EL KONTROLÜ
 function eliKontrolEt(gruplar, gosterge) {
     if (!gosterge) return false;
     let okeySayi = gosterge.sayi === 13 ? 1 : parseInt(gosterge.sayi) + 1;
@@ -104,7 +103,6 @@ function eliKontrolEt(gruplar, gosterge) {
             let cRenk = getEffectiveTile(grup[firstNormalIdx]).renk;
             let expectedForward = cSayi;
             for (let i = firstNormalIdx + 1; i < grup.length; i++) {
-                // YENİ KURAL: 1'den sonra 2 gelemez!
                 if (expectedForward === 1) { isSeri = false; break; }
                 expectedForward = expectedForward === 13 ? 1 : expectedForward + 1;
                 
@@ -113,7 +111,6 @@ function eliKontrolEt(gruplar, gosterge) {
             }
             let expectedBackward = cSayi;
             for (let i = firstNormalIdx - 1; i >= 0; i--) {
-                // YENİ KURAL: Geriye doğru giderken 1'in arkasına 13 bağlanamaz
                 if (expectedBackward === 1) { isSeri = false; break; }
                 expectedBackward = expectedBackward === 1 ? 13 : expectedBackward - 1;
                 
@@ -128,7 +125,6 @@ function eliKontrolEt(gruplar, gosterge) {
 
 function enCopTasiBul(el, gosterge) {
     if (!el || el.length === 0) return 0;
-    
     let okeySayi = gosterge ? (gosterge.sayi === 13 ? 1 : parseInt(gosterge.sayi) + 1) : -1;
     let okeyRenk = gosterge ? gosterge.renk : '';
 
@@ -361,17 +357,41 @@ io.on('connection', (socket) => {
       io.emit('yandan_alindi_guncelle', data);
   });
 
+  // GÜNCELLEME: OKEY ATARAK BİTME KONTROLÜ
   socket.on('oyunu_bitir', (data) => {
       const masa = masalar[data.masaAdi];
       if(masa && masa.siradakiOyuncu === data.isim) {
           const elGecerliMi = eliKontrolEt(data.gruplar, masa.gosterge);
           if(elGecerliMi) {
-              const kazanilanPara = masa.kasa;
+              let okeySayi = masa.gosterge.sayi === 13 ? 1 : parseInt(masa.gosterge.sayi) + 1;
+              let okeyRenk = masa.gosterge.renk;
+              let bitisTasi = data.bitisTasi;
+              let okeyAttiMi = false;
+
+              // Eğer atılan taş okeyse
+              if (bitisTasi && bitisTasi.renk === okeyRenk && parseInt(bitisTasi.sayi) === okeySayi) {
+                  okeyAttiMi = true;
+              }
+
+              let kazanilanPara = masa.kasa;
+              let sebep = "Mükemmel bir dizilimle elini tamamladı!";
+
+              // Okey atıldıysa kazanç katlanır
+              if (okeyAttiMi) {
+                  kazanilanPara = masa.kasa * 2;
+                  sebep = "🔥 OKEY ATARAK BİTİRDİ! Ödül İkiye Katlandı! 🔥";
+              }
+
               oyuncuCipleri[data.isim] += kazanilanPara;
               io.emit('cip_guncelle_ozel', { isim: data.isim, cip: oyuncuCipleri[data.isim] });
-              io.emit('sistem_mesaji', `🎉 BÜYÜK VURGUN! ${data.isim} elini tamamladı ve masadaki ${kazanilanPara.toLocaleString()} ÇİPİ KAZANDI! 🎉`);
               
-              oyunuSifirla(data.masaAdi, data.isim, kazanilanPara, "Mükemmel bir dizilimle elini tamamladı!");
+              if (okeyAttiMi) {
+                  io.emit('sistem_mesaji', `🚨 İNANILMAZ! ${data.isim} OKEY ATARAK BİTİRDİ VE ${kazanilanPara.toLocaleString()} ÇİP KAZANDI! 🚨`);
+              } else {
+                  io.emit('sistem_mesaji', `🎉 BÜYÜK VURGUN! ${data.isim} elini tamamladı ve masadaki ${kazanilanPara.toLocaleString()} ÇİPİ KAZANDI! 🎉`);
+              }
+              
+              oyunuSifirla(data.masaAdi, data.isim, kazanilanPara, sebep);
           } else {
               socket.emit('hatali_bitis', "Dizilim hatalı veya perler arasında boşluk bırakmadınız! Lütfen elinizi kontrol edin.");
           }
@@ -413,6 +433,11 @@ io.on('connection', (socket) => {
   }
 
   socket.on('lobi_mesaji_gonder', (data) => { io.emit('lobi_mesaji_geldi', { isim: data.isim, mesaj: data.mesaj }); });
+  
+  // GÜNCELLEME: Sadece masaya özel mesaj rotası
+  socket.on('masa_mesaji_gonder', (data) => { 
+      io.emit('masa_mesaji_geldi', { masaAdi: data.masaAdi, isim: data.isim, mesaj: data.mesaj, emojiMi: data.emojiMi }); 
+  });
 });
 
 const PORT = process.env.PORT || 3000;
