@@ -44,6 +44,99 @@ function oyunuSifirla(masaAdi) {
     }
 }
 
+// ----------------------------------------------------
+// YAPAY ZEKA HAKEM ALGORİTMASI
+// ----------------------------------------------------
+function eliKontrolEt(gruplar, gosterge) {
+    if (!gosterge) return false;
+    
+    let okeySayi = gosterge.sayi === 13 ? 1 : parseInt(gosterge.sayi) + 1;
+    let okeyRenk = gosterge.renk;
+
+    let totalTiles = 0;
+    let isCift = true;
+    let ciftCount = 0;
+
+    for (let grup of gruplar) {
+        totalTiles += grup.length;
+        if (grup.length !== 2) isCift = false;
+        else ciftCount++;
+    }
+
+    if (totalTiles !== 14) return false;
+
+    function getEffectiveTile(t) {
+        if (t.renk === okeyRenk && parseInt(t.sayi) === okeySayi) return { isOkey: true };
+        if (t.renk === 'sahte') return { renk: okeyRenk, sayi: okeySayi, isOkey: false };
+        return { renk: t.renk, sayi: parseInt(t.sayi), isOkey: false };
+    }
+
+    // ÇİFTE GİTME KONTROLÜ
+    if (isCift && ciftCount === 7) {
+        for (let grup of gruplar) {
+            let t1 = getEffectiveTile(grup[0]);
+            let t2 = getEffectiveTile(grup[1]);
+            if (t1.isOkey || t2.isOkey) continue; 
+            if (t1.renk !== t2.renk || t1.sayi !== t2.sayi) return false;
+        }
+        return true;
+    }
+
+    // NORMAL (SERİ/GRUP) KONTROLÜ
+    for (let grup of gruplar) {
+        if (grup.length < 3) return false;
+
+        let normalTiles = [];
+        for (let t of grup) {
+            let eff = getEffectiveTile(t);
+            if (!eff.isOkey) normalTiles.push(eff);
+        }
+
+        if (normalTiles.length === 0) continue; 
+
+        let isAyniSayi = true; 
+        let isSeri = true;     
+
+        let baseSayi = normalTiles[0].sayi;
+        let colors = new Set();
+        for (let t of normalTiles) {
+            if (t.sayi !== baseSayi) isAyniSayi = false;
+            colors.add(t.renk);
+        }
+        if (colors.size !== normalTiles.length) isAyniSayi = false; 
+
+        let firstNormalIdx = grup.findIndex(t => !getEffectiveTile(t).isOkey);
+        if (firstNormalIdx !== -1) {
+            let cSayi = getEffectiveTile(grup[firstNormalIdx]).sayi;
+            let cRenk = getEffectiveTile(grup[firstNormalIdx]).renk;
+            
+            let expectedForward = cSayi;
+            for (let i = firstNormalIdx + 1; i < grup.length; i++) {
+                expectedForward = expectedForward === 13 ? 1 : expectedForward + 1;
+                let eff = getEffectiveTile(grup[i]);
+                if (!eff.isOkey) {
+                    if (eff.renk !== cRenk || eff.sayi !== expectedForward) { isSeri = false; break; }
+                }
+            }
+            
+            let expectedBackward = cSayi;
+            for (let i = firstNormalIdx - 1; i >= 0; i--) {
+                expectedBackward = expectedBackward === 1 ? 13 : expectedBackward - 1;
+                let eff = getEffectiveTile(grup[i]);
+                if (!eff.isOkey) {
+                    if (eff.renk !== cRenk || eff.sayi !== expectedBackward) { isSeri = false; break; }
+                }
+            }
+        } else {
+            isSeri = false;
+        }
+
+        if (!isAyniSayi && !isSeri) return false;
+    }
+
+    return true;
+}
+
 function botHamlesiYap(masaAdi) {
     const masa = masalar[masaAdi];
     if(!masa || !masa.oyunBasladi) return;
@@ -128,9 +221,8 @@ io.on('connection', (socket) => {
         masa.siradakiOyuncu = baslayacakOyuncu;
         masa.eller = {}; 
         
-        // EKRANLARI GÜNCELLE (Taş dağıtmadan önce arayüzü hazırlar)
         io.emit('masa_oyun_basladi', { masaAdi: masaAdi, gosterge: masa.gosterge, kalanTas: masa.deste.length });
-        io.emit('sistem_mesaji', `${masaAdi} masasında oyun başladı! Gösterge açıklandı. (İlk oynayacak: ${baslayacakOyuncu})`);
+        io.emit('sistem_mesaji', `${masaAdi} masasında oyun başladı! (İlk oynayacak: ${baslayacakOyuncu})`);
 
         masa.koltuklar.forEach(oyuncuIsmi => {
             const kacTasAlacak = (oyuncuIsmi === baslayacakOyuncu) ? 15 : 14;
@@ -148,7 +240,6 @@ io.on('connection', (socket) => {
     }
   });
 
-  // UYUYAN SEKMELER İÇİN KURTARMA SİNYALİ
   socket.on('taslarimi_ver', (data) => {
       const masa = masalar[data.masaAdi];
       if(masa && masa.oyunBasladi && masa.eller[data.isim]) {
@@ -160,7 +251,6 @@ io.on('connection', (socket) => {
   socket.on('tas_atildi', (data) => {
       const masa = masalar[data.masaAdi];
       if(masa && masa.siradakiOyuncu === data.isim) {
-          // Atılan taşı elinden sil (Kurtarma radarı için)
           if(masa.eller[data.isim]) {
               const tasIndex = masa.eller[data.isim].findIndex(t => t.id === data.tas.id);
               if(tasIndex !== -1) masa.eller[data.isim].splice(tasIndex, 1);
@@ -199,16 +289,23 @@ io.on('connection', (socket) => {
   socket.on('yandan_tas_alindi', (data) => {
       const masa = masalar[data.masaAdi];
       if(masa && masa.eller[data.kimAldi]) {
-          masa.eller[data.kimAldi].push(data.tas); // Alınan taşı eline kaydet
+          masa.eller[data.kimAldi].push(data.tas); 
       }
       io.emit('yandan_alindi_guncelle', data);
   });
 
+  // HAKEM BURADA DEVREYE GİRİYOR
   socket.on('oyunu_bitir', (data) => {
       const masa = masalar[data.masaAdi];
       if(masa && masa.siradakiOyuncu === data.isim) {
-          io.emit('sistem_mesaji', `🎉 TEBRİKLER! ${data.isim} elini tamamladı ve taşı ortaya koyarak OYUNU BİTİRDİ! 🎉`);
-          oyunuSifirla(data.masaAdi);
+          const elGecerliMi = eliKontrolEt(data.gruplar, masa.gosterge);
+          
+          if(elGecerliMi) {
+              io.emit('sistem_mesaji', `🎉 TEBRİKLER! ${data.isim} OYUNU BİTİRDİ! 🎉`);
+              oyunuSifirla(data.masaAdi);
+          } else {
+              socket.emit('hatali_bitis', "Dizilim hatalı veya perler arasında boşluk bırakmadınız! Lütfen elinizi kontrol edin.");
+          }
       }
   });
 
@@ -219,7 +316,19 @@ io.on('connection', (socket) => {
       for(let m in masalar) {
           let index = masalar[m].koltuklar.indexOf(isim);
           if(index !== -1) {
-              masalar[m].koltuklar[index] = null;
+              if (masalar[m].oyunBasladi) {
+                  const yeniBot = "Bot_" + Math.floor(Math.random() * 900 + 100);
+                  masalar[m].koltuklar[index] = yeniBot;
+                  masalar[m].eller[yeniBot] = masalar[m].eller[isim]; 
+                  delete masalar[m].eller[isim];
+                  io.emit('sistem_mesaji', `⚠️ ${isim} oyundan koptu, yerine ${yeniBot} geçti!`);
+                  if (masalar[m].siradakiOyuncu === isim) {
+                      masalar[m].siradakiOyuncu = yeniBot;
+                      io.emit('sira_guncelle', { masaAdi: m, kimde: yeniBot });
+                      botHamlesiYap(m);
+                  }
+              } else { masalar[m].koltuklar[index] = null; }
+
               if(masalar[m].koltuklar.every(k => k === null || k.startsWith('Bot_'))) {
                   oyunuSifirla(m);
                   masalar[m].koltuklar = [null, null, null, null]; 
