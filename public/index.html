@@ -5,23 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>VIP Okey Sunucusu</title>
     <style>
-        /* OYUN MASASI VE TASARIM KODLARI */
+        /* OYUN MASASI VE TASARIM KODLARI (Mobilde Bozulmayan Sürüm) */
         body {
-            background-color: #1b5e20; /* Okey masası yeşili */
+            background-color: #0b4515; /* Koyu okey masası yeşili */
             margin: 0;
             font-family: Arial, sans-serif;
             color: white;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
         }
         #ust-bilgi {
-            padding: 10px;
-            background: rgba(0,0,0,0.6);
+            background: #111;
+            color: #fff;
             text-align: center;
-            font-size: 16px;
+            padding: 12px;
+            font-size: 15px;
             font-weight: bold;
+            z-index: 10;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
         }
         #oyunuBaslatBtn {
             margin: 20px auto;
@@ -35,51 +39,61 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
         #oyunAlanObjeleri {
-            flex-grow: 1;
+            flex: 1;
             position: relative;
             display: none; /* Oyun başlayana kadar gizli */
+            width: 100%;
+            height: 100%;
         }
         /* ISTAKA TASARIMI */
         #istaka {
             position: absolute;
-            bottom: 10px;
+            bottom: 5%; /* Telefondan taşmaması için % ile ayarladık */
             left: 50%;
             transform: translateX(-50%);
-            background: #5d4037; /* Ahşap rengi */
-            padding: 10px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.8);
-            display: grid;
-            grid-template-columns: repeat(12, 1fr); /* İki sıra 12'li yuva */
-            gap: 5px;
-            width: 95%;
+            width: 96%;
             max-width: 800px;
+            background: linear-gradient(to bottom, #8d6e63, #4e342e); /* Ahşap doku hissi */
+            padding: 8px;
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.6);
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            grid-template-rows: repeat(2, 1fr); /* 2 satır */
+            gap: 4px;
         }
         .slot {
-            width: 100%;
-            aspect-ratio: 2/3; /* Okey taşı oranı */
-            background: rgba(255,255,255,0.1);
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px inset rgba(255,255,255,0.1);
             border-radius: 5px;
-            border: 1px inset rgba(255,255,255,0.2);
+            height: 50px; /* MOBİLDE KAYBOLMAMASI İÇİN SABİT YÜKSEKLİK */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        @media (max-width: 400px) {
+            .slot { height: 40px; } /* Çok küçük ekranlar için ufak ayar */
         }
         /* TAŞ ATMA YERİ (SAĞ TARAF) */
         #benimIskartam {
             position: absolute;
             right: 15px;
-            top: 40%;
-            width: 60px;
-            height: 90px;
-            background: rgba(0,0,0,0.4);
-            border: 2px dashed #aaa;
+            top: 25%;
+            width: 65px;
+            height: 85px;
+            background: rgba(0,0,0,0.5);
+            border: 2px dashed #f39c12;
             display: flex;
             justify-content: center;
             align-items: center;
             text-align: center;
             border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
         }
         .iskarta-yazi {
-            font-size: 12px;
-            color: #ddd;
+            font-size: 11px;
+            color: #f39c12;
+            font-weight: bold;
         }
     </style>
     <script src="/socket.io/socket.io.js"></script>
@@ -87,7 +101,7 @@
 </head>
 <body>
 
-    <div id="ust-bilgi">Bağlanılıyor...</div>
+    <div id="ust-bilgi">Sunucuya Bağlanılıyor...</div>
     
     <button id="oyunuBaslatBtn" style="display:none;" onclick="oyunuBaslat()">Oyunu Başlat (Botları Ekle)</button>
     
