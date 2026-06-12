@@ -141,7 +141,7 @@
         .modal-action-btn { background: #ffc107; color: black; border: none; padding: 10px 15px; border-radius: 6px; font-weight: bold; cursor: pointer; width: 45%; font-size: 13px; margin-left: 5%; }
         .modal-action-btn.disabled { background: #6c757d; color: white; cursor: not-allowed; }
 
-        /* REKLAM SATIŞ POPUP (PAYWALL) */
+        /* REKLAM SATIŞ PAYWALL MODAL */
         .paywall-kart { background: linear-gradient(135deg, #0d2e1d, #14422b); border: 4px solid #ffc107; border-radius: 20px; padding: 35px 20px; text-align: center; color: white; max-width: 350px; width: 100%; box-shadow: 0 0 35px #ffc107; animation: pulseGlow 1.5s infinite alternate; }
         @keyframes pulseGlow { from { box-shadow: 0 0 20px #ffc107; } to { box-shadow: 0 0 40px #ffc107; } }
         .paywall-baslik { font-size: 26px; color: #ffc107; font-weight: 900; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
@@ -157,6 +157,21 @@
         .fp-input-alan { display: flex; padding: 5px; gap: 5px; background: #0b2417; border-top: 1px solid #14422b; }
         .fp-input-alan input { flex: 1; background: #0d2e1d; border: 1px solid #198754; color: white; padding: 6px; border-radius: 4px; outline: none; font-size: 13px; }
         .fp-input-alan button { background: #ffc107; color: black; border: none; padding: 0 10px; border-radius: 4px; font-weight: bold; font-size: 11px; cursor: pointer; }
+
+        /* YENİ: LİDERLİK TABLOSU STİLLERİ */
+        .leaderboard-btn { background: linear-gradient(to right, #ffc107, #ff9800); color: black; font-weight: 900; border: none; padding: 12px; border-radius: 10px; cursor: pointer; width: 100%; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(255, 193, 7, 0.4); text-transform: uppercase; font-size: 15px; animation: pulseGlow 2s infinite alternate; }
+        .lb-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 100000; justify-content: center; align-items: center; padding: 20px; }
+        .lb-kart { background: #14422b; border: 3px solid #ffc107; width: 100%; max-width: 350px; border-radius: 15px; padding: 20px; color: white; box-shadow: 0 0 25px rgba(255,193,7,0.4); }
+        .lb-header { text-align: center; color: #ffc107; font-size: 20px; font-weight: 900; margin-bottom: 15px; border-bottom: 2px solid #198754; padding-bottom: 10px; }
+        .lb-list { display: flex; flex-direction: column; gap: 8px; max-height: 300px; overflow-y: auto; margin-bottom: 15px; }
+        .lb-item { display: flex; justify-content: space-between; align-items: center; background: #0b2417; padding: 10px; border-radius: 8px; border-left: 4px solid #20c997; font-size: 14px; }
+        .lb-item.top-1 { border-left-color: #ffc107; background: rgba(255, 193, 7, 0.15); font-weight: bold; font-size: 16px; }
+        .lb-item.top-2 { border-left-color: #e0e0e0; background: rgba(224, 224, 224, 0.1); }
+        .lb-item.top-3 { border-left-color: #cd7f32; background: rgba(205, 127, 50, 0.1); }
+        .lb-rank { font-weight: bold; width: 30px; color: #a0a0a0; }
+        .lb-name { flex: 1; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+        .lb-name:hover { text-decoration: underline; color: #0dcaf0; }
+        .lb-cip { font-weight: bold; color: #20c997; }
     </style>
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
@@ -170,7 +185,10 @@
     </div>
 
     <div id="lobiEkrani">
-        <div class="tables-panel" id="masalarAlani"></div>
+        <div class="tables-panel">
+            <button class="leaderboard-btn" onclick="liderlikTablosuAc()">🏆 TOP 10 ZENGİNLER LİSTESİ 🏆</button>
+            <div id="masalarAlani" style="display: flex; flex-direction: column; gap: 15px;"></div>
+        </div>
         <div class="players-panel">
             <div class="panel-title">👥 Lobideki Oyuncular</div>
             <table class="player-table">
@@ -276,6 +294,14 @@
         </div>
     </div>
 
+    <div class="lb-modal" id="lbModal">
+        <div class="lb-kart">
+            <div class="lb-header">👑 EN ZENGİN 10 OYUNCU 👑</div>
+            <div class="lb-list" id="lbListArea">Yükleniyor...</div>
+            <button class="modal-kapat-btn" style="width:100%; background:#dc3545;" onclick="modalKapat('lbModal')">KAPAT</button>
+        </div>
+    </div>
+
     <div id="fisiltiPenceresi">
         <div class="fp-header">
             <span id="fpHedefYazi">Fısıltı: Oyuncu</span>
@@ -332,6 +358,46 @@
         const ustRaf = document.getElementById('ustRaf');
         const altRaf = document.getElementById('altRaf');
 
+        // YENİ: LİDERLİK TABLOSUNU AÇMA
+        window.liderlikTablosuAc = function() {
+            document.getElementById('lbListArea').innerHTML = '<div style="text-align:center;">Veriler çekiliyor... ⏳</div>';
+            document.getElementById('lbModal').style.display = 'flex';
+            socket.emit('liderlik_tablosu_iste');
+        };
+
+        // YENİ: LİDERLİK VERİSİ GELDİĞİNDE LİSTEYİ DOLDUR
+        socket.on('liderlik_tablosu_geldi', (liste) => {
+            const listArea = document.getElementById('lbListArea');
+            listArea.innerHTML = '';
+            
+            if(liste.length === 0) {
+                listArea.innerHTML = '<div style="text-align:center;">Henüz hiç oyuncu yok.</div>';
+                return;
+            }
+
+            liste.forEach((oyuncu, index) => {
+                const sira = index + 1;
+                let ekstraClass = "";
+                let taç = "";
+                
+                if(sira === 1) { ekstraClass = "top-1"; taç = "👑 "; }
+                else if(sira === 2) { ekstraClass = "top-2"; taç = "🥈 "; }
+                else if(sira === 3) { ekstraClass = "top-3"; taç = "🥉 "; }
+                else { taç = "👤 "; }
+
+                let vipTag = oyuncu.vip ? '<span style="color:#ffc107; font-size:10px; margin-left:4px;">[VIP]</span>' : '';
+
+                const div = document.createElement('div');
+                div.className = `lb-item ${ekstraClass}`;
+                div.innerHTML = `
+                    <div class="lb-rank">#${sira}</div>
+                    <div class="lb-name" onclick="profilAc('${oyuncu.isim}'); modalKapat('lbModal');">${taç}${oyuncu.isim}${vipTag}</div>
+                    <div class="lb-cip">${oyuncu.cip.toLocaleString('tr-TR')} ÇİP</div>
+                `;
+                listArea.appendChild(div);
+            });
+        });
+
         window.profilAc = function(isim) {
             socket.emit('profil_talebi', isim);
         };
@@ -366,7 +432,6 @@
                     cheatBtn.style.background = data.vip ? "#dc3545" : "#20c997";
                     cheatBtn.style.color = "#fff";
                     cheatBtn.onclick = function() {
-                        // İŞTE ÇÖZÜM BURADA: Tarayıcıya VIP olduğunu hemen öğretiyoruz!
                         benVipMiyim = !data.vip; 
                         socket.emit('vip_durumunu_degistir', { isim: aktifKullaniciAdi, yeniDurum: benVipMiyim });
                         modalKapat('profilModal');
