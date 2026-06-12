@@ -8,7 +8,10 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background-color: #0d2e1d; color: #fff; font-family: sans-serif; display: flex; flex-direction: column; height: 100dvh; overflow: hidden; position: relative; }
         .header { display: flex; justify-content: space-between; align-items: center; padding: 10px; background-color: #081e13; border-bottom: 2px solid #14422b; flex-shrink: 0; }
-        .logo { color: #ffc107; font-weight: bold; font-size: 14px; }
+        
+        /* LOGO TIKLANABİLİR YAPILDI (Gizli Patron Kapısı) */
+        .logo { color: #ffc107; font-weight: bold; font-size: 14px; cursor: pointer; }
+        
         .stats-box { background-color: #14422b; padding: 5px 10px; border-radius: 5px; border: 1px solid #198754; font-size: 11px; text-align: center; }
         .stats-box span { color: #20c997; display: block; font-weight: bold; font-size: 14px;}
         .user-box { background-color: #ffc107; color: #000; padding: 5px 10px; border-radius: 20px; font-weight: bold; font-size: 12px; cursor: pointer; }
@@ -148,17 +151,7 @@
         .paywall-metin { font-size: 15px; line-height: 1.5; margin-bottom: 25px; color: #e0e0e0; }
         .paywall-btn { background: linear-gradient(to right, #ffc107, #ff9800); color: black; font-size: 16px; font-weight: 900; border: none; padding: 12px 30px; border-radius: 30px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.4); width: 100%; margin-bottom: 15px; }
 
-        /* FİSILTI FLOATING WINDOW */
-        #fisiltiPenceresi { display: none; position: fixed; bottom: calc(190px + env(safe-area-inset-bottom, 10px)); right: 10px; width: 280px; height: 260px; background: #081e13; border: 2px solid #ffc107; border-radius: 10px; z-index: 99999; flex-direction: column; box-shadow: 0 5px 20px rgba(0,0,0,0.6); overflow: hidden; }
-        .fp-header { background: #14422b; padding: 8px; font-size: 12px; font-weight: bold; color: #ffc107; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #198754; }
-        .fp-kapat { background: none; border: none; color: #dc3545; font-size: 16px; font-weight: bold; cursor: pointer; }
-        .fp-mesajlar { flex: 1; padding: 8px; overflow-y: auto; font-size: 12px; display: flex; flex-direction: column; gap: 5px; background: #040e08; }
-        .fp-satir { line-height: 1.3; }
-        .fp-input-alan { display: flex; padding: 5px; gap: 5px; background: #0b2417; border-top: 1px solid #14422b; }
-        .fp-input-alan input { flex: 1; background: #0d2e1d; border: 1px solid #198754; color: white; padding: 6px; border-radius: 4px; outline: none; font-size: 13px; }
-        .fp-input-alan button { background: #ffc107; color: black; border: none; padding: 0 10px; border-radius: 4px; font-weight: bold; font-size: 11px; cursor: pointer; }
-
-        /* YENİ: LİDERLİK TABLOSU STİLLERİ */
+        /* LİDERLİK TABLOSU MODAL */
         .leaderboard-btn { background: linear-gradient(to right, #ffc107, #ff9800); color: black; font-weight: 900; border: none; padding: 12px; border-radius: 10px; cursor: pointer; width: 100%; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(255, 193, 7, 0.4); text-transform: uppercase; font-size: 15px; animation: pulseGlow 2s infinite alternate; }
         .lb-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 100000; justify-content: center; align-items: center; padding: 20px; }
         .lb-kart { background: #14422b; border: 3px solid #ffc107; width: 100%; max-width: 350px; border-radius: 15px; padding: 20px; color: white; box-shadow: 0 0 25px rgba(255,193,7,0.4); }
@@ -172,6 +165,20 @@
         .lb-name { flex: 1; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
         .lb-name:hover { text-decoration: underline; color: #0dcaf0; }
         .lb-cip { font-weight: bold; color: #20c997; }
+
+        /* YENİ: PATRON (ADMIN) PANELİ STİLLERİ */
+        .admin-input { width: 100%; padding: 12px; margin-bottom: 10px; background: #0d2e1d; color: white; border: 1px solid #198754; border-radius: 5px; outline: none; font-size: 14px; }
+        .admin-btn { background: #dc3545; color: white; border: none; padding: 12px; border-radius: 5px; font-weight: bold; font-size: 14px; cursor: pointer; width: 100%; margin-bottom: 10px; }
+
+        /* FİSILTI FLOATING WINDOW */
+        #fisiltiPenceresi { display: none; position: fixed; bottom: calc(190px + env(safe-area-inset-bottom, 10px)); right: 10px; width: 280px; height: 260px; background: #081e13; border: 2px solid #ffc107; border-radius: 10px; z-index: 99999; flex-direction: column; box-shadow: 0 5px 20px rgba(0,0,0,0.6); overflow: hidden; }
+        .fp-header { background: #14422b; padding: 8px; font-size: 12px; font-weight: bold; color: #ffc107; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #198754; }
+        .fp-kapat { background: none; border: none; color: #dc3545; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .fp-mesajlar { flex: 1; padding: 8px; overflow-y: auto; font-size: 12px; display: flex; flex-direction: column; gap: 5px; background: #040e08; }
+        .fp-satir { line-height: 1.3; }
+        .fp-input-alan { display: flex; padding: 5px; gap: 5px; background: #0b2417; border-top: 1px solid #14422b; }
+        .fp-input-alan input { flex: 1; background: #0d2e1d; border: 1px solid #198754; color: white; padding: 6px; border-radius: 4px; outline: none; font-size: 13px; }
+        .fp-input-alan button { background: #ffc107; color: black; border: none; padding: 0 10px; border-radius: 4px; font-weight: bold; font-size: 11px; cursor: pointer; }
     </style>
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
@@ -179,7 +186,7 @@
 <body>
 
     <div class="header">
-        <div class="logo">🏆 VIP OKEY<br>SUNUCUSU</div>
+        <div class="logo" onclick="adminGirisTetikleyici()">🏆 VIP OKEY<br>SUNUCUSU</div>
         <div class="stats-box"><span id="benimCipim">Bağlanıyor...</span> ÇİP</div>
         <div class="user-box" id="benimAdimKutusu" onclick="profilAc(aktifKullaniciAdi)">Bağlanıyor...</div>
     </div>
@@ -277,7 +284,6 @@
             </div>
             <button class="modal-kapat-btn" onclick="modalKapat('profilModal')">KAPAT</button>
             <button class="modal-action-btn" id="pmActionBtn">FİSILTI</button>
-            
             <button class="sit-btn" id="cheatVipBtn" style="margin-top:15px; font-size:11px; padding:5px; display:none;"></button>
         </div>
     </div>
@@ -289,7 +295,7 @@
                 Özel (Fısıltı) mesajlaşma sistemi sadece VIP kulübümüze özeldir!<br><br>
                 Hemen VIP üye ol, masalarda farkını ortaya koy ve rakiplerinle özelden atışmaya başla!
             </div>
-            <button class="paywall-btn" onclick="alert('Simüle Satış Başarılı! Kendi isminize tıklayıp Hile butonuyla VIP modunu açabilirsiniz.')">👑 VIP SATIN AL (29.99 TL)</button>
+            <button class="paywall-btn" onclick="alert('Gerçek hayatta bu butona tıklanınca ödeme sayfasına gidilecek.')">👑 VIP SATIN AL (29.99 TL)</button>
             <button class="modal-kapat-btn" style="width:100%" onclick="modalKapat('paywallModal')">VAZGEÇ</button>
         </div>
     </div>
@@ -299,6 +305,30 @@
             <div class="lb-header">👑 EN ZENGİN 10 OYUNCU 👑</div>
             <div class="lb-list" id="lbListArea">Yükleniyor...</div>
             <button class="modal-kapat-btn" style="width:100%; background:#dc3545;" onclick="modalKapat('lbModal')">KAPAT</button>
+        </div>
+    </div>
+
+    <div class="lb-modal" id="adminModal" style="z-index: 1000000;">
+        <div class="lb-kart" style="border-color:#dc3545; box-shadow: 0 0 35px rgba(220, 53, 69, 0.6);">
+            <div class="lb-header" style="color:#dc3545; border-bottom-color:#dc3545;">🕵️‍♂️ YÖNETİCİ PANELİ</div>
+            
+            <div style="font-size:12px; margin-bottom:5px; color:#a0a0a0;">Oyuncu İsmi:</div>
+            <input type="text" class="admin-input" id="adminHedefIsim" placeholder="Örn: Oyuncu_602">
+            
+            <div style="font-size:12px; margin-bottom:5px; color:#a0a0a0;">Eklenecek/Silinecek Çip:</div>
+            <input type="number" class="admin-input" id="adminCipMiktar" placeholder="Örn: 500000 (Silmek için - koy)">
+            <button class="admin-btn" style="background:#20c997;" onclick="adminIslemYap('cip')">💰 ÇİPİ GÖNDER / GÜNCELLE</button>
+            
+            <div style="display:flex; gap:10px; margin-bottom:15px;">
+                <button class="admin-btn" style="background:#ffc107; color:black; margin:0;" onclick="adminIslemYap('vip_yap')">👑 VIP YAP</button>
+                <button class="admin-btn" style="background:#6c757d; margin:0;" onclick="adminIslemYap('vip_sil')">❌ VIP İPTAL</button>
+            </div>
+
+            <div style="font-size:12px; margin-bottom:5px; color:#a0a0a0;">Global Duyuru Gönder:</div>
+            <input type="text" class="admin-input" id="adminDuyuruMetin" placeholder="Sistem mesajı yazın...">
+            <button class="admin-btn" style="background:#0dcaf0; color:black;" onclick="adminIslemYap('duyuru')">📢 TÜM SUNUCUYA DUYUR</button>
+
+            <button class="modal-kapat-btn" style="width:100%; margin-top:10px;" onclick="modalKapat('adminModal')">PANELİ KAPAT</button>
         </div>
     </div>
 
@@ -323,6 +353,7 @@
         let guncelGosterge = null; 
         let benVipMiyim = false; 
         let suAnkiFisiltiHedef = null; 
+        let adminSifresiBellek = null; // Patron şifresi hafızası
 
         document.getElementById('benimAdimKutusu').innerText = aktifKullaniciAdi;
         document.getElementById('lobiBenimAdim').innerText = "👑 " + aktifKullaniciAdi;
@@ -358,14 +389,51 @@
         const ustRaf = document.getElementById('ustRaf');
         const altRaf = document.getElementById('altRaf');
 
-        // YENİ: LİDERLİK TABLOSUNU AÇMA
+        // ---------- YENİ: PATRON PANELİ FONKSİYONLARI ----------
+        window.adminGirisTetikleyici = function() {
+            const sifre = prompt("🔒 Yetkili (Patron) Girişi:\nLütfen şifrenizi girin.");
+            if(sifre) {
+                socket.emit('admin_giris_yap', sifre);
+                adminSifresiBellek = sifre; 
+            }
+        };
+
+        socket.on('admin_onaylandi', () => {
+            document.getElementById('adminModal').style.display = 'flex';
+        });
+
+        window.adminIslemYap = function(islemTuru) {
+            const isim = document.getElementById('adminHedefIsim').value.trim();
+            const cipMiktar = document.getElementById('adminCipMiktar').value;
+            const duyuruMetni = document.getElementById('adminDuyuruMetin').value.trim();
+
+            if (islemTuru === 'cip') {
+                if(!isim || !cipMiktar) return alert("Lütfen oyuncu ismini ve çip miktarını girin!");
+                socket.emit('admin_cip_islemi', { sifre: adminSifresiBellek, hedefIsim: isim, miktar: parseInt(cipMiktar) });
+                document.getElementById('adminCipMiktar').value = '';
+            } 
+            else if (islemTuru === 'vip_yap') {
+                if(!isim) return alert("Lütfen oyuncu ismini girin!");
+                socket.emit('admin_vip_islemi', { sifre: adminSifresiBellek, hedefIsim: isim, vipDurumu: true });
+            } 
+            else if (islemTuru === 'vip_sil') {
+                if(!isim) return alert("Lütfen oyuncu ismini girin!");
+                socket.emit('admin_vip_islemi', { sifre: adminSifresiBellek, hedefIsim: isim, vipDurumu: false });
+            } 
+            else if (islemTuru === 'duyuru') {
+                if(!duyuruMetni) return alert("Lütfen bir duyuru metni yazın!");
+                socket.emit('admin_duyuru_yap', { sifre: adminSifresiBellek, mesaj: duyuruMetni });
+                document.getElementById('adminDuyuruMetin').value = '';
+            }
+        };
+        // --------------------------------------------------------
+
         window.liderlikTablosuAc = function() {
             document.getElementById('lbListArea').innerHTML = '<div style="text-align:center;">Veriler çekiliyor... ⏳</div>';
             document.getElementById('lbModal').style.display = 'flex';
             socket.emit('liderlik_tablosu_iste');
         };
 
-        // YENİ: LİDERLİK VERİSİ GELDİĞİNDE LİSTEYİ DOLDUR
         socket.on('liderlik_tablosu_geldi', (liste) => {
             const listArea = document.getElementById('lbListArea');
             listArea.innerHTML = '';
@@ -427,15 +495,6 @@
                     actionBtn.className = "modal-action-btn disabled";
                     actionBtn.onclick = null;
 
-                    cheatBtn.style.display = 'block';
-                    cheatBtn.innerText = data.vip ? "Simüle VIP'yi Kapat" : "Simüle VIP Ol (Hile)";
-                    cheatBtn.style.background = data.vip ? "#dc3545" : "#20c997";
-                    cheatBtn.style.color = "#fff";
-                    cheatBtn.onclick = function() {
-                        benVipMiyim = !data.vip; 
-                        socket.emit('vip_durumunu_degistir', { isim: aktifKullaniciAdi, yeniDurum: benVipMiyim });
-                        modalKapat('profilModal');
-                    };
                 } else {
                     durumEl.innerText = data.vip ? "👑 VIP ÜYE" : "Normal Üye";
                     durumEl.style.color = data.vip ? "#ffc107" : "#fff";
