@@ -9,14 +9,12 @@ const io = require('socket.io')(http, {
 
 app.use(express.static('public'));
 
-// VERİTABANI BAĞLANTISI (Senin gönderdiğin link)
 const dbURI = "mongodb+srv://admin:Okey1234@cluster0.e9ntzng.mongodb.net/okeydb?retryWrites=true&w=majority&appName=Cluster0";
 
 mongoose.connect(dbURI)
   .then(() => console.log('✅ MongoDB Veritabanına Başarıyla Bağlanıldı!'))
   .catch((err) => console.log('❌ MongoDB Bağlantı Hatası: ', err));
 
-// VERİTABANI ŞEMASI (Kalıcı hafıza şablonu)
 const oyuncuSchema = new mongoose.Schema({
     isim: { type: String, unique: true },
     cip: { type: Number, default: 250000 },
@@ -24,12 +22,10 @@ const oyuncuSchema = new mongoose.Schema({
 });
 const Oyuncu = mongoose.model('Oyuncu', oyuncuSchema);
 
-// GEÇİCİ HAFIZA (Hız için)
 const oyuncuCipleri = {};
 const oyuncuVipDurumu = {}; 
 const kopanOyuncular = {}; 
 
-// VERİTABANINA KAYDETME FONKSİYONU
 async function veritabaninaKaydet(isim) {
     if(!isim.startsWith('Bot_')) {
         try {
@@ -232,7 +228,16 @@ io.on('connection', (socket) => {
   for(let m in masalar) lobiVerisi[m] = masalar[m].koltuklar;
   socket.emit('masalari_guncelle', lobiVerisi);
 
-  // YENİ: KULLANICI GİRİŞİ (Veritabanından Çekme İşlemi)
+  // YENİ: Liderlik Tablosu Verisini MongoDB'den Çek
+  socket.on('liderlik_tablosu_iste', async () => {
+      try {
+          const top10 = await Oyuncu.find().sort({ cip: -1 }).limit(10);
+          socket.emit('liderlik_tablosu_geldi', top10);
+      } catch (e) {
+          console.log("Liderlik tablosu çekilemedi:", e);
+      }
+  });
+
   socket.on('kullanici_girisi', async (isim) => {
       socket.kullaniciAdi = isim;
 
@@ -241,19 +246,16 @@ io.on('connection', (socket) => {
               let dbKullanici = await Oyuncu.findOne({ isim: isim });
               
               if (!dbKullanici) {
-                  // Kullanıcı ilk defa giriyorsa DB'ye ekle
                   dbKullanici = await Oyuncu.create({ isim: isim, cip: 250000, vip: false });
               }
-              // DB'den gelen verileri hafızaya al
               oyuncuCipleri[isim] = dbKullanici.cip;
               oyuncuVipDurumu[isim] = dbKullanici.vip;
           } catch (e) {
-              console.log("DB Okuma Hatası, Varsayılan değerler kullanılıyor...", e);
+              console.log("DB Okuma Hatası:", e);
               if(!oyuncuCipleri[isim]) oyuncuCipleri[isim] = 250000;
               if(!oyuncuVipDurumu[isim]) oyuncuVipDurumu[isim] = false;
           }
       } else {
-          // Botlar DB'ye kaydedilmez
           if(!oyuncuCipleri[isim]) oyuncuCipleri[isim] = 250000;
           if(!oyuncuVipDurumu[isim]) oyuncuVipDurumu[isim] = false;
       }
@@ -310,7 +312,7 @@ io.on('connection', (socket) => {
 
   socket.on('vip_durumunu_degistir', (data) => {
       oyuncuVipDurumu[data.isim] = data.yeniDurum;
-      veritabaninaKaydet(data.isim); // DB GÜNCELLE
+      veritabaninaKaydet(data.isim); 
       socket.emit('sistem_mesaji', `👑 VIP Durumunuz Güncellendi: ${data.yeniDurum ? 'VIP ÜYE' : 'Normal Üye'}`);
   });
 
@@ -366,7 +368,7 @@ io.on('connection', (socket) => {
             masa.kasa += masa.bahis; 
             if(!isim.startsWith('Bot_')) {
                 oyuncuCipleri[isim] -= masa.bahis; 
-                veritabaninaKaydet(isim); // DB GÜNCELLE
+                veritabaninaKaydet(isim); 
                 io.emit('cip_guncelle_ozel', { isim: isim, cip: oyuncuCipleri[isim] });
             }
         });
@@ -416,7 +418,7 @@ io.on('connection', (socket) => {
                   if (k !== data.isim) {
                       if (!k.startsWith('Bot_')) {
                           oyuncuCipleri[k] -= kesilecekCip;
-                          veritabaninaKaydet(k); // DB GÜNCELLE
+                          veritabaninaKaydet(k); 
                           io.emit('cip_guncelle_ozel', { isim: k, cip: oyuncuCipleri[k] });
                       }
                       toplamKazanilan += kesilecekCip;
@@ -424,7 +426,7 @@ io.on('connection', (socket) => {
               });
 
               oyuncuCipleri[data.isim] += toplamKazanilan;
-              veritabaninaKaydet(data.isim); // DB GÜNCELLE
+              veritabaninaKaydet(data.isim); 
               io.emit('cip_guncelle_ozel', { isim: data.isim, cip: oyuncuCipleri[data.isim] });
 
               io.emit('gosterge_basarili', { masaAdi: data.masaAdi, kimYapti: data.isim });
@@ -507,7 +509,7 @@ io.on('connection', (socket) => {
               }
 
               oyuncuCipleri[data.isim] += kazanilanPara;
-              veritabaninaKaydet(data.isim); // DB GÜNCELLE
+              veritabaninaKaydet(data.isim); 
               io.emit('cip_guncelle_ozel', { isim: data.isim, cip: oyuncuCipleri[data.isim] });
               
               if (okeyAttiMi) {
