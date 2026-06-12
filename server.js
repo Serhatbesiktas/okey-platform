@@ -9,7 +9,8 @@ const io = require('socket.io')(http, {
 
 app.use(express.static('public'));
 
-const dbURI = "mongodb+srv://admin:Okey1234@cluster0.e9ntzng.mongodb.net/okeydb?retryWrites=true&w=majority&appName=Cluster0";
+// ŞİFRE DÜZELTİLDİ (Okey123456 yapıldı)
+const dbURI = "mongodb+srv://admin:Okey123456@cluster0.e9ntzng.mongodb.net/okeydb?retryWrites=true&w=majority&appName=Cluster0";
 
 mongoose.connect(dbURI)
   .then(() => console.log('✅ MongoDB Veritabanına Başarıyla Bağlanıldı!'))
@@ -228,7 +229,6 @@ io.on('connection', (socket) => {
   for(let m in masalar) lobiVerisi[m] = masalar[m].koltuklar;
   socket.emit('masalari_guncelle', lobiVerisi);
 
-  // YENİ: Liderlik Tablosu Verisini MongoDB'den Çek
   socket.on('liderlik_tablosu_iste', async () => {
       try {
           const top10 = await Oyuncu.find().sort({ cip: -1 }).limit(10);
