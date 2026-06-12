@@ -5,15 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>VIP Okey Premium</title>
     <style>
-        /* TEMEL AYARLAR (Lobi Aynı Kalıyor) */
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: #040b07; color: #fff; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
 
-        /* LOBİ STİLLERİ (Öncekiyle Aynı - Bozulmaması için) */
-        .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; background: #07170f; border-bottom: 1px solid #0f2b1c; z-index: 10; }
+        /* LOBİ STİLLERİ (Öncekiyle Aynı) */
+        .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: linear-gradient(180deg, #0a1f13, #07170f); border-bottom: 1px solid #143322; z-index: 10; }
         .profil-sol { display: flex; align-items: center; gap: 12px; }
         .avatar-kutu { position: relative; }
-        .avatar-img { width: 45px; height: 45px; border-radius: 50%; border: 2px solid #ffc107; background: linear-gradient(145deg, #1a3c28, #0a1b12); display: flex; justify-content: center; align-items: center; font-size: 20px; }
+        .avatar-img { width: 45px; height: 45px; border-radius: 50%; border: 2px solid #ffc107; background: #1a3c28; display: flex; justify-content: center; align-items: center; font-size: 20px; }
         .seviye-rozet { position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%); background: #111; color: #ffc107; font-size: 9px; padding: 2px 6px; border-radius: 12px; border: 1px solid #ffc107; font-weight: bold; }
         .profil-bilgi { display: flex; flex-direction: column; justify-content: center; }
         .isim-kutu { display: flex; align-items: center; gap: 5px; }
@@ -23,6 +22,7 @@
         .cip-kutu { background: linear-gradient(180deg, #143322, #0d2217); border: 1px solid #1f4a32; border-radius: 25px; padding: 5px 12px 5px 5px; display: flex; align-items: center; gap: 8px; }
         .cip-ikon { width: 22px; height: 22px; background: radial-gradient(circle, #ffdf00, #ffb300); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: #000; font-weight: 900; font-size: 11px; }
         .cip-miktar { font-size: 14px; font-weight: 800; color: #fff; }
+        
         .aktivite-banti { background: #050d08; border-bottom: 1px solid rgba(32, 201, 151, 0.1); padding: 6px 0; overflow: hidden; white-space: nowrap; }
         .kayan-yazi { display: inline-block; padding-left: 100%; animation: kaymaEfekti 25s linear infinite; font-size: 12px; color: #88a896; font-weight: 600; }
         .kayan-yazi span { margin-right: 50px; display: inline-flex; align-items: center; gap: 6px; }
@@ -54,75 +54,55 @@
         .hemen-oyna-kutu { background: linear-gradient(180deg, #ffdf00, #ffb300); color: #000; padding: 12px 26px; border-radius: 16px; display: flex; flex-direction: column; align-items: center; transform: translateY(-20px); border: 2px solid #111; cursor: pointer; }
         .hemen-oyna-kutu span { font-weight: 900; font-size: 14px; display: flex; align-items: center; gap: 5px; }
 
-        /* ====================================================
-           YENİ VE GERÇEKÇİ MASA (OYUN) EKRANI TASARIMI
-           (Attığın son resimdeki yerleşime göre baştan yazıldı)
-           ==================================================== */
+        /* YENİ MASA (OYUN) EKRANI STİLLERİ */
         #masaEkrani { display: none; flex-direction: column; height: 100%; width: 100%; background-color: #020603; position: relative; }
-        
-        /* Üst Menü: Daha karanlık ve şık */
         .masa-ust-bar { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(180deg, rgba(0,0,0,0.8), transparent); z-index: 5; }
         .ust-sol { display: flex; align-items: center; gap: 10px; }
         .hamburger-btn { background: rgba(255,255,255,0.1); border: none; color: #fff; font-size: 20px; padding: 5px 10px; border-radius: 6px; cursor: pointer; }
         .masa-isim-tabela { font-size: 14px; font-weight: bold; color: #88a896; display: flex; flex-direction: column; }
         .masa-isim-tabela span { color: #fff; font-size: 12px; font-weight: normal; opacity: 0.7; }
-        
         .ust-sag { display: flex; align-items: center; gap: 10px; }
-        .cikis-btn { background: rgba(220, 53, 69, 0.2); color: #ff4d4d; border: 1px solid rgba(220, 53, 69, 0.5); padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        .cikis-btn { background: rgba(220, 53, 69, 0.2); color: #ff4d4d; border: 1px solid rgba(220, 53, 69, 0.5); padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
 
-        /* Gerçekçi Oyun Alanı (Yeşil Çuha ve Ahşap Kenarlık) */
         .oyun-alani { flex: 1; margin: 5px 15px; position: relative; background: radial-gradient(circle at center, #1e7040 0%, #0d381e 100%); border-radius: 30px; box-shadow: inset 0 0 50px rgba(0,0,0,0.8), 0 10px 20px rgba(0,0,0,0.5); border: 12px solid #2b1708; border-top-color: #3d2314; border-bottom-color: #1a0f06; display: flex; justify-content: center; align-items: center; }
         
-        /* Masadaki Oyuncular (Avatarlar) - Kenarlara oturtuldu */
         .masadaki-oyuncu { position: absolute; display: flex; flex-direction: column; align-items: center; gap: 5px; z-index: 10; }
-        .o-ust { top: -20px; } /* Masanın üst kenarına bindi */
-        .o-sol { left: -10px; } /* Sol kenara bindi */
-        .o-sag { right: -10px; } /* Sağ kenara bindi */
+        .o-ust { top: -20px; } .o-sol { left: -10px; } .o-sag { right: -10px; }
+        .oyuncu-cerceve { width: 55px; height: 55px; border-radius: 50%; background: #111; border: 3px solid #2b1708; display: flex; justify-content: center; align-items: center; font-size: 26px; box-shadow: 0 5px 15px rgba(0,0,0,0.8); }
+        .oyuncu-isim-kutu { background: rgba(0,0,0,0.8); padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: bold; color: #e8dfc8; border: 1px solid rgba(255,255,255,0.1); text-align: center; }
         
-        .oyuncu-cerceve { width: 55px; height: 55px; border-radius: 50%; background: #111; border: 3px solid #2b1708; display: flex; justify-content: center; align-items: center; font-size: 26px; box-shadow: 0 5px 15px rgba(0,0,0,0.8); position: relative; }
-        .oyuncu-isim-kutu { background: rgba(0,0,0,0.8); padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: bold; color: #e8dfc8; border: 1px solid rgba(255,255,255,0.1); text-align: center; white-space: nowrap; }
-        
-        /* Okey Taşı Tasarımı (3D efektli) */
         .okey-tasi { min-width: 40px; height: 60px; background: linear-gradient(180deg, #f5f0e1, #d4c9b3); border-radius: 6px; box-shadow: 2px 4px 8px rgba(0,0,0,0.6), inset 0 2px 2px rgba(255,255,255,0.8); display: flex; flex-direction: column; justify-content: center; align-items: center; font-weight: 900; font-size: 24px; border-bottom: 4px solid #a69c87; position: relative; }
         .t-kirmizi { color: #c62828; } .t-siyah { color: #212121; } .t-mavi { color: #1565c0; } .t-sari { color: #f9a825; }
 
-        /* Gösterge ve Ortadaki Taşlar */
         .orta-saha { display: flex; gap: 30px; align-items: center; opacity: 0.9; }
         .gosterge-alani { display: flex; flex-direction: column; align-items: center; gap: 5px; }
         .gosterge-text { font-size: 10px; color: rgba(255,255,255,0.5); font-weight: bold; letter-spacing: 2px; }
 
-        /* Alt Alan: Istaka ve Paneller (Senin attığın resimdeki yerleşim) */
         .alt-konteyner { padding: 10px; display: flex; flex-direction: column; gap: 15px; background: linear-gradient(0deg, rgba(0,0,0,0.9), transparent); z-index: 10; }
-        
-        /* Istaka ve Kendi Avatarımız */
         .istaka-katmani { display: flex; flex-direction: column; align-items: center; position: relative; margin-top: -40px; }
         .benim-avatarim { z-index: 15; transform: translateY(25px); display: flex; flex-direction: column; align-items: center; }
         .benim-avatarim .oyuncu-cerceve { border-color: #ffc107; width: 65px; height: 65px; font-size: 32px; }
         
-        /* 3D Ahşap Istaka */
         .istaka { width: 95%; max-width: 700px; height: 100px; background: linear-gradient(180deg, #5c3417, #2b1708); border-radius: 12px; box-shadow: 0 15px 30px rgba(0,0,0,0.9), inset 0 8px 15px rgba(255,255,255,0.1); border-bottom: 10px solid #140a03; border-top: 2px solid #82502b; display: flex; align-items: center; padding: 0 15px; gap: 4px; overflow-x: auto; position: relative; z-index: 10; }
         
-        /* Aksiyon Butonları (Taş Çek, Diz, Okey vb.) */
         .aksiyon-butonlari { display: flex; justify-content: center; gap: 10px; width: 100%; margin-top: 10px; }
-        .btn-karanlik { background: #1a221d; color: #88a896; border: 1px solid #2a3d33; padding: 8px 15px; border-radius: 8px; font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 5px; flex: 1; justify-content: center; }
-        .btn-yesil { background: #1a4831; color: #20c997; border: 1px solid #20c997; padding: 8px 15px; border-radius: 8px; font-size: 12px; font-weight: bold; flex: 1; text-align: center; }
-        .btn-sari { background: linear-gradient(180deg, #ffc107, #f57f17); color: #000; border: none; padding: 8px 15px; border-radius: 8px; font-size: 12px; font-weight: 900; flex: 1; text-align: center; box-shadow: 0 4px 10px rgba(255, 193, 7, 0.3); }
+        .btn-karanlik { background: #1a221d; color: #88a896; border: 1px solid #2a3d33; padding: 8px 15px; border-radius: 8px; font-size: 12px; font-weight: bold; flex: 1; }
+        .btn-yesil { background: #1a4831; color: #20c997; border: 1px solid #20c997; padding: 8px 15px; border-radius: 8px; font-size: 12px; font-weight: bold; flex: 1; }
+        .btn-sari { background: linear-gradient(180deg, #ffc107, #f57f17); color: #000; border: none; padding: 8px 15px; border-radius: 8px; font-size: 12px; font-weight: 900; flex: 1; box-shadow: 0 4px 10px rgba(255, 193, 7, 0.3); }
 
-        /* Sohbet ve Emoji Panelleri (Resimdeki gibi 2 sütun) */
         .sosyal-paneller { display: flex; gap: 10px; width: 100%; }
-        
-        .sohbet-kutusu { flex: 2; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 10px; }
+        .sohbet-kutusu { flex: 2; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 10px; height: 120px; }
         .sohbet-baslik { font-size: 11px; color: #20c997; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 5px; }
-        .sohbet-mesajlar { font-size: 11px; color: #a8c4b5; display: flex; flex-direction: column; gap: 5px; line-height: 1.4; }
+        .sohbet-mesajlar { flex: 1; overflow-y: auto; font-size: 11px; color: #a8c4b5; display: flex; flex-direction: column; gap: 5px; line-height: 1.4; scrollbar-width: none; }
         .sohbet-mesajlar b { color: #fff; }
-        .sohbet-girdi { display: flex; gap: 5px; margin-top: auto; }
-        .sohbet-girdi input { flex: 1; background: rgba(255,255,255,0.05); border: none; border-radius: 6px; padding: 6px 10px; color: #fff; font-size: 11px; }
-        .sohbet-girdi button { background: #1a4831; color: #20c997; border: none; border-radius: 6px; padding: 0 10px; font-size: 11px; font-weight: bold; }
+        .sohbet-girdi { display: flex; gap: 5px; }
+        .sohbet-girdi input { flex: 1; background: rgba(255,255,255,0.05); border: none; border-radius: 6px; padding: 6px 10px; color: #fff; font-size: 11px; outline: none;}
+        .sohbet-girdi button { background: #1a4831; color: #20c997; border: none; border-radius: 6px; padding: 0 10px; font-size: 11px; font-weight: bold; cursor: pointer;}
 
         .sag-paneller { flex: 1; display: flex; flex-direction: column; gap: 10px; }
         .panel-kutu { background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 10px; }
         .panel-baslik { font-size: 10px; color: #88a896; margin-bottom: 8px; font-weight: bold; }
-        .emojiler { display: flex; justify-content: space-between; font-size: 20px; }
+        .emojiler { display: flex; justify-content: space-between; font-size: 20px; cursor: pointer; }
         .oda-bilgi-satir { display: flex; justify-content: space-between; font-size: 10px; color: #a8c4b5; margin-bottom: 4px; }
         .oda-bilgi-satir span:last-child { color: #fff; font-weight: bold; }
     </style>
@@ -141,7 +121,6 @@
             </div>
             <div class="profil-sag">
                 <div class="cip-kutu"><div class="cip-ikon">C</div><span class="cip-miktar" id="benimCipim">0</span></div>
-                <div class="ust-ikonlar"><div class="ust-ikon"><i>⚙️</i></div></div>
             </div>
         </div>
 
@@ -167,31 +146,28 @@
     </div>
 
     <div id="masaEkrani">
-        
         <div class="masa-ust-bar">
             <div class="ust-sol">
                 <button class="hamburger-btn">≡</button>
-                <div class="masa-isim-tabela" id="aktifMasaIsmi">Acemiler (20K Bahis)<span>Oda ID: 1432 🟢 32ms</span></div>
+                <div class="masa-isim-tabela" id="aktifMasaIsmi">Masa Adı<span>Oda ID: 1432 🟢 32ms</span></div>
             </div>
             <div class="ust-sag">
-                <div class="cip-kutu" style="background: rgba(0,0,0,0.5);"><div class="cip-ikon">C</div><span class="cip-miktar">250.000</span></div>
-                <button class="cikis-btn" onclick="lobiyeDon()">⬅ Çıkış</button>
+                <button class="cikis-btn" onclick="masadanKalk()">⬅ Kalk</button>
             </div>
         </div>
 
         <div class="oyun-alani">
-            
             <div class="masadaki-oyuncu o-ust">
-                <div class="oyuncu-cerceve">👩🏽</div>
-                <div class="oyuncu-isim-kutu">Merve_21<br><span style="color:#ffc107; font-size:9px;">C 320.000</span></div>
+                <div class="oyuncu-cerceve">👤</div>
+                <div class="oyuncu-isim-kutu" id="koltuk_1">Bekleniyor...</div>
             </div>
             <div class="masadaki-oyuncu o-sol">
-                <div class="oyuncu-cerceve">👨🏻</div>
-                <div class="oyuncu-isim-kutu">Kaan_07<br><span style="color:#ffc107; font-size:9px;">C 185.000</span></div>
+                <div class="oyuncu-cerceve">👤</div>
+                <div class="oyuncu-isim-kutu" id="koltuk_0">Bekleniyor...</div>
             </div>
             <div class="masadaki-oyuncu o-sag">
-                <div class="oyuncu-cerceve">🧔🏻</div>
-                <div class="oyuncu-isim-kutu">Ahmet_34<br><span style="color:#ffc107; font-size:9px;">C 410.000</span></div>
+                <div class="oyuncu-cerceve">👤</div>
+                <div class="oyuncu-isim-kutu" id="koltuk_2">Bekleniyor...</div>
             </div>
 
             <div class="orta-saha">
@@ -204,35 +180,24 @@
                     <div style="display:flex;">
                         <div class="okey-tasi t-kirmizi" style="transform: rotate(-10deg);">13</div>
                         <div class="okey-tasi t-siyah" style="margin-left:-15px;">13</div>
-                        <div class="okey-tasi t-sari" style="transform: rotate(10deg); margin-left:-15px;">13</div>
                     </div>
                 </div>
             </div>
-
         </div>
 
         <div class="alt-konteyner">
-            
             <div class="istaka-katmani">
                 <div class="benim-avatarim">
                     <div class="oyuncu-cerceve">😎</div>
-                    <div class="oyuncu-isim-kutu" style="color: #ffc107;">Sen <span style="font-size:9px;">C 250.000</span></div>
+                    <div class="oyuncu-isim-kutu" style="color: #ffc107;" id="koltuk_ben">Sen</div>
                 </div>
-                
                 <div class="istaka">
                     <div class="okey-tasi t-kirmizi">2</div>
                     <div class="okey-tasi t-kirmizi">3</div>
                     <div class="okey-tasi t-kirmizi">4</div>
                     <div style="width: 15px;"></div>
-                    <div class="okey-tasi t-siyah">5</div>
-                    <div class="okey-tasi t-siyah">5</div>
-                    <div class="okey-tasi t-mavi">5</div>
-                    <div style="width: 15px;"></div>
-                    <div class="okey-tasi t-siyah">8</div>
-                    <div class="okey-tasi t-mavi">9</div>
                     <div class="okey-tasi t-siyah">10</div>
                 </div>
-
                 <div class="aksiyon-butonlari">
                     <button class="btn-karanlik">📄 Taş Çek</button>
                     <button class="btn-karanlik">📤 Taş Aç</button>
@@ -244,91 +209,133 @@
             <div class="sosyal-paneller">
                 <div class="sohbet-kutusu">
                     <div class="sohbet-baslik">Sohbet 🟢</div>
-                    <div class="sohbet-mesajlar">
-                        <div><b>Merve_21:</b> İyi oyunlar! 😊</div>
-                        <div><b>Kaan_07:</b> Bol şans!</div>
-                        <div><b>Sen:</b> Teşekkürler, sana da!</div>
+                    <div class="sohbet-mesajlar" id="sohbetMesajlari">
+                        <div><b>Sistem:</b> Masaya hoş geldin!</div>
                     </div>
                     <div class="sohbet-girdi">
-                        <input type="text" placeholder="Mesajını yaz...">
-                        <button>Gönder</button>
+                        <input type="text" id="mesajKutusu" placeholder="Mesajını yaz..." onkeypress="if(event.key === 'Enter') sohbetGonder()">
+                        <button onclick="sohbetGonder()">Gönder</button>
                     </div>
                 </div>
-
                 <div class="sag-paneller">
                     <div class="panel-kutu">
                         <div class="panel-baslik">Hızlı Tepkiler</div>
-                        <div class="emojiler">☕ 😡 👏 🎯 😂</div>
-                    </div>
-                    <div class="panel-kutu">
-                        <div class="panel-baslik">Oda Bilgileri</div>
-                        <div class="oda-bilgi-satir"><span>Tur</span><span>1 / -</span></div>
-                        <div class="oda-bilgi-satir"><span>Süre</span><span>07:35</span></div>
-                        <div class="oda-bilgi-satir"><span>Bahis</span><span>20K</span></div>
+                        <div class="emojiler">
+                            <span onclick="hizliMesaj('☕')">☕</span>
+                            <span onclick="hizliMesaj('😡')">😡</span>
+                            <span onclick="hizliMesaj('👏')">👏</span>
+                            <span onclick="hizliMesaj('🎯')">🎯</span>
+                        </div>
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 
     <script>
         const socket = io();
         let aktifKullaniciAdi = localStorage.getItem('vip_okey_isim') || "Oyuncu_" + Math.floor(Math.random() * 900 + 100);
+        let mevcutMasa = "";
+        
         document.getElementById('benimAdim').innerText = aktifKullaniciAdi;
-
         socket.on('connect', () => { socket.emit('kullanici_girisi', aktifKullaniciAdi); });
         socket.on('cip_guncelle', (cip) => { document.getElementById('benimCipim').innerText = cip.toLocaleString('tr-TR'); });
 
-        socket.on('masalari_guncelle', (lobidekiMasalar) => {
+        socket.on('masalari_guncelle', (masalar) => {
             const masalarAlani = document.getElementById('masalarAlani');
-            masalarAlani.innerHTML = ''; 
+            if(document.getElementById('lobiEkrani').style.display !== 'none') {
+                masalarAlani.innerHTML = ''; 
+                for (const [masaAdi, masaBilgi] of Object.entries(masalar)) {
+                    const koltuklar = masaBilgi.koltuklar;
+                    const doluSayisi = koltuklar.filter(k => k !== null).length;
+                    let glowClass = masaAdi.includes('Acemi') ? 'acemi-glow' : (masaAdi.includes('Orta') ? 'orta-glow' : 'vip-glow');
 
-            for (const [masaAdi, koltuklar] of Object.entries(lobidekiMasalar)) {
-                const doluSayisi = koltuklar.filter(k => k !== null).length;
-                let bahis = masaAdi.includes('Acemi') ? '20K' : (masaAdi.includes('Orta') ? '50K' : '100K');
-                let glowClass = masaAdi.includes('Acemi') ? 'acemi-glow' : (masaAdi.includes('Orta') ? 'orta-glow' : 'vip-glow');
+                    let avatarHtml = '';
+                    for(let i=0; i<4; i++) {
+                        if(i < doluSayisi) avatarHtml += `<div class="mini-avatar">👤</div>`;
+                        else avatarHtml += `<div class="mini-avatar bos"></div>`;
+                    }
 
-                let avatarHtml = '';
-                for(let i=0; i<4; i++) {
-                    if(i < doluSayisi) avatarHtml += `<div class="mini-avatar">👤</div>`;
-                    else avatarHtml += `<div class="mini-avatar bos"></div>`;
+                    const btnClass = doluSayisi >= 4 ? 'oyna-btn dolu' : 'oyna-btn';
+                    const btnText = doluSayisi >= 4 ? 'DOLU' : 'OYNA';
+
+                    const html = `
+                        <div class="masa-kart ${glowClass}">
+                            <div class="masa-sol">
+                                <div class="zar-kutu">🎲</div>
+                                <div>
+                                    <div class="masa-isim">${masaAdi}</div>
+                                </div>
+                            </div>
+                            <div class="masa-sag">
+                                <div class="doluluk-durum">
+                                    <div class="mini-avatarlar">${avatarHtml}</div>
+                                    <span class="kisi-sayisi">${doluSayisi}/4</span>
+                                </div>
+                                <button class="${btnClass}" onclick="masayaGir('${masaAdi}')" ${doluSayisi >= 4 ? 'disabled' : ''}>${btnText}</button>
+                            </div>
+                        </div>`;
+                    masalarAlani.innerHTML += html;
                 }
+            }
+        });
 
-                const btnClass = doluSayisi >= 4 ? 'oyna-btn dolu' : 'oyna-btn';
-                const btnText = doluSayisi >= 4 ? 'DOLU' : 'OYNA';
+        // 1. GERÇEK MASAYA OTURMA VE İSİMLERİ GÖRME
+        socket.on('masa_oyuncu_durumu', (data) => {
+            if(mevcutMasa === data.masaAdi) {
+                const benimIndexim = data.koltuklar.indexOf(aktifKullaniciAdi);
+                
+                // Diğer oyuncuların yerlerini hesapla (Kendimizi her zaman alta alıyoruz)
+                let solIndex = (benimIndexim + 1) % 4;
+                let ustIndex = (benimIndexim + 2) % 4;
+                let sagIndex = (benimIndexim + 3) % 4;
 
-                const html = `
-                    <div class="masa-kart ${glowClass}">
-                        <div class="masa-sol">
-                            <div class="zar-kutu">🎲</div>
-                            <div>
-                                <div class="masa-isim">${masaAdi}</div>
-                                <div class="masa-bahis">💰 ${bahis} Bahis</div>
-                            </div>
-                        </div>
-                        <div class="masa-sag">
-                            <div class="doluluk-durum">
-                                <div class="mini-avatarlar">${avatarHtml}</div>
-                                <span class="kisi-sayisi">${doluSayisi}/4</span>
-                            </div>
-                            <button class="${btnClass}" onclick="masayaGir('${masaAdi}')" ${doluSayisi >= 4 ? 'disabled' : ''}>${btnText}</button>
-                        </div>
-                    </div>`;
-                masalarAlani.innerHTML += html;
+                document.getElementById('koltuk_0').innerText = data.koltuklar[solIndex] || "Bekleniyor...";
+                document.getElementById('koltuk_1').innerText = data.koltuklar[ustIndex] || "Bekleniyor...";
+                document.getElementById('koltuk_2').innerText = data.koltuklar[sagIndex] || "Bekleniyor...";
+                document.getElementById('koltuk_ben').innerText = aktifKullaniciAdi;
             }
         });
 
         window.masayaGir = function(masaIsmi) {
+            mevcutMasa = masaIsmi;
             socket.emit('masaya_otur', { isim: aktifKullaniciAdi, masaAdi: masaIsmi });
             document.getElementById('lobiEkrani').style.display = 'none';
             document.getElementById('masaEkrani').style.display = 'flex';
+            document.getElementById('aktifMasaIsmi').innerHTML = `${masaIsmi}<span>Oda Bağlantısı: Aktif 🟢</span>`;
+            document.getElementById('sohbetMesajlari').innerHTML = '<div><b>Sistem:</b> Masaya katıldınız.</div>';
         };
 
-        window.lobiyeDon = function() {
+        window.masadanKalk = function() {
+            socket.emit('masadan_kalk', { masaAdi: mevcutMasa });
+            mevcutMasa = "";
             document.getElementById('masaEkrani').style.display = 'none';
             document.getElementById('lobiEkrani').style.display = 'flex';
         };
+
+        // 2. CANLI SOHBET SİSTEMİ
+        window.sohbetGonder = function() {
+            const input = document.getElementById('mesajKutusu');
+            const mesaj = input.value.trim();
+            if(mesaj !== "" && mevcutMasa !== "") {
+                socket.emit('sohbet_mesaj_gonder', { mesaj: mesaj, masaAdi: mevcutMasa });
+                input.value = '';
+            }
+        };
+
+        window.hizliMesaj = function(emoji) {
+            if(mevcutMasa !== "") {
+                socket.emit('sohbet_mesaj_gonder', { mesaj: emoji, masaAdi: mevcutMasa });
+            }
+        };
+
+        socket.on('sohbet_mesaj_ilet', (data) => {
+            if(data.masaAdi === mevcutMasa) {
+                const kutu = document.getElementById('sohbetMesajlari');
+                kutu.innerHTML += `<div><b>${data.isim}:</b> ${data.mesaj}</div>`;
+                kutu.scrollTop = kutu.scrollHeight; // Otomatik aşağı kaydır
+            }
+        });
     </script>
 </body>
 </html>
