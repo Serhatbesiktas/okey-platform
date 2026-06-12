@@ -10,7 +10,7 @@ const io = require('socket.io')(http, {
 app.use(express.static('public'));
 
 const dbURI = "mongodb+srv://admin:Okey123456@cluster0.e9ntzng.mongodb.net/okeydb?retryWrites=true&w=majority&appName=Cluster0";
-const ADMIN_SIFRE = "Patron2026"; // Patron Giriş Şifresi
+const ADMIN_SIFRE = "Patron2026"; 
 
 mongoose.connect(dbURI)
   .then(() => console.log('✅ MongoDB Veritabanına Başarıyla Bağlanıldı!'))
@@ -242,15 +242,19 @@ io.on('connection', (socket) => {
           if(dbKullanici) {
               let yeniCip = dbKullanici.cip + parseInt(data.miktar);
               await Oyuncu.updateOne({ isim: data.hedefIsim }, { cip: yeniCip });
-              if (oyuncuCipleri[data.hedefIsim] !== undefined) {
-                  oyuncuCipleri[data.hedefIsim] = yeniCip;
-                  io.emit('cip_guncelle_ozel', { isim: data.hedefIsim, cip: yeniCip });
-              }
-              socket.emit('sistem_mesaji', `👑 YÖNETİCİ: ${data.hedefIsim} oyuncusunun çipi güncellendi. Eklendi/Silindi: ${data.miktar}`);
+              
+              // Hafızayı anında zorla güncelle
+              oyuncuCipleri[data.hedefIsim] = yeniCip;
+              io.emit('cip_guncelle_ozel', { isim: data.hedefIsim, cip: yeniCip });
+              
+              socket.emit('admin_islem_sonucu', { basarili: true, mesaj: `✅ BAŞARILI!\n${data.hedefIsim} adlı oyuncuya çip eklendi.\nYeni Bakiye: ${yeniCip.toLocaleString('tr-TR')} ÇİP` });
           } else {
-              socket.emit('hata_mesaji', "Veritabanında böyle bir oyuncu bulunamadı!");
+              socket.emit('admin_islem_sonucu', { basarili: false, mesaj: `❌ HATA!\n"${data.hedefIsim}" adında bir oyuncu bulunamadı. İsmi doğru yazdığınızdan emin olun.` });
           }
-      } catch(e) { console.log(e); }
+      } catch(e) { 
+          console.log(e); 
+          socket.emit('admin_islem_sonucu', { basarili: false, mesaj: "❌ Sistemsel bir hata oluştu!" });
+      }
   });
 
   socket.on('admin_vip_islemi', async (data) => {
@@ -259,19 +263,20 @@ io.on('connection', (socket) => {
           let dbKullanici = await Oyuncu.findOne({ isim: data.hedefIsim });
           if(dbKullanici) {
               await Oyuncu.updateOne({ isim: data.hedefIsim }, { vip: data.vipDurumu });
-              if (oyuncuVipDurumu[data.hedefIsim] !== undefined) {
-                  oyuncuVipDurumu[data.hedefIsim] = data.vipDurumu;
-              }
-              io.emit('sistem_mesaji', `👑 YÖNETİCİ: ${data.hedefIsim} adlı oyuncunun VIP durumu ${data.vipDurumu ? 'AKTİF' : 'İPTAL'} edildi.`);
+              oyuncuVipDurumu[data.hedefIsim] = data.vipDurumu;
+              
+              io.emit('vip_guncelle_ozel', { isim: data.hedefIsim, vip: data.vipDurumu });
+              socket.emit('admin_islem_sonucu', { basarili: true, mesaj: `✅ BAŞARILI!\n${data.hedefIsim} oyuncusunun VIP durumu ${data.vipDurumu ? 'AKTİF' : 'İPTAL'} edildi.` });
           } else {
-              socket.emit('hata_mesaji', "Veritabanında böyle bir oyuncu bulunamadı!");
+              socket.emit('admin_islem_sonucu', { basarili: false, mesaj: `❌ HATA!\n"${data.hedefIsim}" adında bir oyuncu bulunamadı.` });
           }
       } catch(e) { console.log(e); }
   });
 
   socket.on('admin_duyuru_yap', (data) => {
       if(data.sifre !== ADMIN_SIFRE) return;
-      io.emit('sistem_mesaji', `📢 DUYURU: ${data.mesaj} 📢`);
+      io.emit('sistem_mesaji', `📢 YÖNETİCİ DUYURUSU: ${data.mesaj} 📢`);
+      socket.emit('admin_islem_sonucu', { basarili: true, mesaj: "✅ Duyuru tüm sunucuya başarıyla gönderildi!" });
   });
   // ---------------------------------------------
 
