@@ -9,7 +9,7 @@
         body { background-color: #040b07; color: #fff; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
 
         /* =========================================
-           1. LOBİ EKRANI (LÜKS TASARIM AYNEN KALDI)
+           LOBİ EKRANI (LÜKS VE ÇALIŞAN TASARIM)
            ========================================= */
         .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: linear-gradient(180deg, #0a1f13, #07170f); border-bottom: 1px solid #143322; z-index: 10; }
         .profil-sol { display: flex; align-items: center; gap: 12px; }
@@ -57,7 +57,7 @@
         .hemen-oyna-kutu span { font-weight: 900; font-size: 14px; display: flex; align-items: center; gap: 5px; }
 
         /* =========================================
-           2. OYUN MASASI (HATALAR GİDERİLDİ, DÜZGÜN YERLEŞİM)
+           MASA EKRANI (SENİN ORİJİNAL ÇALIŞAN TASARIMIN)
            ========================================= */
         #masaEkrani { display: none; flex-direction: column; height: 100%; width: 100%; background-color: #06180e; }
         
@@ -68,49 +68,47 @@
         .ortadaki-cip span { color: #fff; font-size: 10px; font-weight: normal; }
         .sag-oyuncu-kutu { background: #ffc107; color: #000; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 12px; }
 
-        /* YEŞİL MASA ALANI (FLEX İLE DÜZELTİLDİ - TAŞMA YAPMAZ) */
         .gercek-oyun-alani { flex: 1; margin: 5px 15px; background: #145a32; border-radius: 20px; position: relative; border: 2px solid #0a2616; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         
-        .kirmizi-cikis { position: absolute; top: 10px; left: 10px; background: #dc3545; color: #fff; border: none; padding: 6px 10px; border-radius: 6px; font-size: 10px; font-weight: bold; cursor: pointer; z-index: 10;}
-        .mavi-bot-btn { position: absolute; top: 10px; right: 10px; background: #00bcd4; color: #000; border: none; padding: 6px 10px; border-radius: 6px; font-size: 10px; font-weight: bold; cursor: pointer; z-index: 10;}
-        
-        /* Bekleniyor Kutuları - Düzgün Yerleşim */
+        /* Çıkış ve Bot Ekle Butonları */
+        .kirmizi-cikis-btn { position: absolute; top: 10px; left: 10px; background: #dc3545; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-size: 10px; font-weight: bold; cursor: pointer; z-index: 10; }
+        .mavi-bot-btn { position: absolute; top: 10px; right: 10px; background: #00bcd4; color: #000; border: none; padding: 6px 12px; border-radius: 6px; font-size: 10px; font-weight: bold; cursor: pointer; z-index: 10; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(0, 188, 212, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(0, 188, 212, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 188, 212, 0); } }
+
+        /* Bekleniyor Kutuları */
         .bekleniyor-kutu { background: #000; border: 2px solid #00bcd4; color: #00bcd4; font-size: 10px; font-weight: bold; padding: 4px 12px; border-radius: 12px; position: absolute; }
         .b-ust { top: 15px; }
-        .b-sol { left: 10px; top: 50%; transform: translateY(-50%); } /* Döndürme iptal edildi, okunabilir yapıldı */
+        .b-sol { left: 10px; top: 50%; transform: translateY(-50%); } 
         .b-sag { right: 10px; top: 50%; transform: translateY(-50%); }
 
-        /* MASA ORTASI (KASA VE TAŞLAR YANYANA BOZULMADAN) */
-        .masa-orta-konteyner { display: flex; flex-direction: column; align-items: center; gap: 15px; z-index: 5; }
+        /* MASA ORTASI VE TAŞLAR */
+        .masa-orta-icerik { display: flex; flex-direction: column; align-items: center; gap: 15px; }
         .masa-acemiler-yazi { color: rgba(255,255,255,0.4); font-weight: 900; font-size: 14px; text-align: center; }
         .kasa-yazisi { border: 2px dashed #20c997; padding: 4px 15px; border-radius: 20px; color: #20c997; font-weight: bold; font-size: 12px; background: rgba(0,0,0,0.3); }
         
-        /* TAŞLAR VE TAŞ AT ALANI (ÜST ÜSTE BİNME ENGELLENDİ) */
-        .orta-etkilesim-alani { display: flex; gap: 15px; align-items: center; justify-content: center; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 15px; }
+        .ortadaki-taslar-gorsel { display: flex; gap: 20px; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); padding: 10px 20px; border-radius: 15px; }
         
         .tas-kutu-mini { display: flex; flex-direction: column; align-items: center; gap: 4px; }
         .tas-kutu-mini span { font-size: 9px; color: #fff; font-weight: bold; opacity: 0.8; }
         
-        .tas-at-alani { width: 55px; height: 75px; border: 2px dashed #ffc107; display: flex; flex-direction: column; justify-content: center; align-items: center; border-radius: 8px; font-size: 10px; font-weight: bold; color: #ffc107; background: rgba(0,0,0,0.4); cursor: pointer; transition: 0.2s; }
-        .tas-at-alani:active { background: rgba(255,193,7,0.3); }
+        .bitir-btn { border: 2px dashed #dc3545; color: #dc3545; background: rgba(0,0,0,0.3); padding: 5px 10px; border-radius: 8px; font-size: 10px; font-weight: bold; display: flex; flex-direction: column; align-items: center; }
+        
+        /* Okey Taşı - Mobil Ekrana Uyumlu Net Boyut */
+        .okey-tasi { min-width: 38px; height: 55px; background: linear-gradient(180deg, #fffcf2, #e8dfc8); border-radius: 5px; box-shadow: 1px 3px 5px rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; font-weight: 900; font-size: 20px; border-bottom: 3px solid #ccc1a8; cursor: pointer; transition: 0.1s; }
+        .okey-tasi.secili { transform: translateY(-10px); border: 2px solid #00bcd4; box-shadow: 0 10px 15px rgba(0,0,0,0.5); }
+        .t-kirmizi { color: #d32f2f; } .t-siyah { color: #212121; } .t-mavi { color: #1976d2; } .t-sari { color: #fbc02d; }
 
-        /* =========================================
-           3. ISTAKA VE BUTONLAR (MÜKEMMEL DİZİLİŞ)
-           ========================================= */
+        /* ISTAKA VE BUTONLAR (MÜKEMMEL DİZİLİŞ) */
         .istaka-konteyner { padding: 5px 15px 15px; display: flex; flex-direction: column; gap: 8px; }
         
-        .diz-butonlari { display: flex; gap: 10px; justify-content: flex-start; }
+        .diz-butonlari { display: flex; gap: 10px; justify-content: space-between; }
         .d-btn { background: #0a2616; border: 1px solid #ffc107; color: #ffc107; font-weight: bold; padding: 8px 16px; border-radius: 8px; font-size: 12px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
         .d-btn:active { transform: translateY(2px); }
+        .at-btn { background: #dc3545; color: #fff; border: none; padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; }
 
         /* 3D Ahşap Istaka - Taşma Yapmaz, Wrap Yapar */
         .eski-3d-istaka { width: 100%; min-height: 125px; background: #5c3417; border: 4px solid #3e200b; border-bottom: 8px solid #2b1708; border-radius: 10px; padding: 8px; display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; align-content: flex-start; box-shadow: inset 0 15px 25px rgba(0,0,0,0.6); position: relative; }
         
-        /* Okey Taşı - Mobil Ekrana Uyumlu Net Boyut */
-        .okey-tasi { width: 38px; height: 55px; background: linear-gradient(180deg, #fffcf2, #e8dfc8); border-radius: 5px; box-shadow: 1px 3px 5px rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; font-weight: 900; font-size: 20px; border-bottom: 3px solid #ccc1a8; cursor: pointer; transition: 0.1s; }
-        .okey-tasi.secili { transform: translateY(-8px); border: 2px solid #00bcd4; box-shadow: 0 10px 15px rgba(0,bcd,0.5); }
-        .t-kirmizi { color: #d32f2f; } .t-siyah { color: #212121; } .t-mavi { color: #1976d2; } .t-sari { color: #fbc02d; }
-
         /* Alt Sohbet ve Emojiler */
         .emoji-bar { display: flex; justify-content: center; gap: 20px; font-size: 22px; padding: 5px 0; background: #000;}
         .sohbet-alani { background: #000; padding: 8px 15px 15px; display: flex; flex-direction: column; gap: 5px; height: 110px; }
@@ -159,29 +157,27 @@
         </div>
 
         <div class="gercek-oyun-alani">
-            <button class="kirmizi-cikis" onclick="masadanKalk()">⬅ Çıkış</button>
+            <button class="kirmizi-cikis-btn" onclick="masadanKalk()">⬅ Çıkış</button>
             <button class="mavi-bot-btn" onclick="testBaslat()" id="testBtn">🤖 Bot Ekle</button>
             
             <div class="bekleniyor-kutu b-ust" id="koltuk_1">Bekleniyor...</div>
             <div class="bekleniyor-kutu b-sol" id="koltuk_0">Bekleniyor...</div>
             <div class="bekleniyor-kutu b-sag" id="koltuk_2">Bekleniyor...</div>
 
-            <div class="masa-orta-konteyner">
-                <div class="masa-acemiler-yazi" id="masaBasligi">ACEMİLER MASASI</div>
+            <div class="masa-orta-icerik">
+                <div class="masa-acemiler-yazi" id="masaBasligi">ACEMİLER (20K BAHİS)</div>
                 <div class="kasa-yazisi">KASA: 80.000 ÇİP</div>
                 
-                <div class="orta-etkilesim-alani" id="ortadakiTaslar" style="display:none;">
+                <div class="ortadaki-taslar-gorsel" id="ortadakiTaslar" style="display:none;">
                     <div class="tas-kutu-mini">
                         <span>GÖSTERGE</span>
-                        <div class="okey-tasi t-mavi" id="gostergeKutusu" style="margin:0;">8</div>
+                        <div class="okey-tasi t-mavi" id="gostergeKutusu" style="transform:scale(0.9); margin:0;">8</div>
                     </div>
                     <div class="tas-kutu-mini">
                         <span>ATILAN TAŞ</span>
-                        <div class="okey-tasi t-siyah" id="atilanSonTas" style="margin:0;">13</div>
+                        <div class="okey-tasi t-siyah" id="atilanSonTas" style="transform:scale(0.9); margin:0;">13</div>
                     </div>
-                    <div class="tas-at-alani" onclick="tasAt()">
-                        BURAYA<br>AT ⬇
-                    </div>
+                    <div class="bitir-btn">BİTİR<br>🏆</div>
                 </div>
             </div>
         </div>
@@ -190,7 +186,7 @@
             <div class="diz-butonlari">
                 <button class="d-btn" onclick="diz('seri')">SERİ DİZ</button>
                 <button class="d-btn" onclick="diz('cift')">ÇİFT DİZ</button>
-                <span style="margin-left:auto; color:#88a896; font-size:10px; align-self:center;">Çift Tıkla = Taş At</span>
+                <button class="at-btn" onclick="tasAc()" style="margin-left:auto;">📤 Seçiliyi At</button>
             </div>
             
             <div class="eski-3d-istaka" id="benimIstakam">
@@ -224,6 +220,9 @@
         let mevcutMasa = "";
         let elimdekiTaslar = [];
         let seciliTasId = null;
+        
+        // KİLİT MEKANİZMASI: Peş peşe taş atmayı engellemek için
+        let tasAttiMi = false; 
         
         document.getElementById('benimAdim').innerText = aktifKullaniciAdi;
         document.querySelector('.sag-oyuncu-kutu').innerText = "Ben: " + aktifKullaniciAdi;
@@ -276,14 +275,20 @@
             document.getElementById('ortadakiTaslar').style.display = 'flex';
             document.getElementById('gostergeKutusu').className = `okey-tasi t-${data.gosterge.renk}`;
             document.getElementById('gostergeKutusu').innerText = data.gosterge.sayi;
-            document.getElementById('atilanSonTas').className = `okey-tasi t-siyah`; // Boş başlangıç taşı
+            
+            // Başlangıçta atılan son taşı temizle
+            document.getElementById('atilanSonTas').className = `okey-tasi t-siyah`;
             document.getElementById('atilanSonTas').innerText = "-"; 
+            
+            tasAttiMi = false; // Yeni elde kilit açık
             elimiCiz();
         });
 
         function elimiCiz() {
             const istaka = document.getElementById('benimIstakam');
             istaka.innerHTML = '';
+            
+            // Sıralama motorunu devre dışı bırak, serverdan geldiği gibi diz (Manuel dizmeye izin vermek için)
             elimdekiTaslar.forEach(tas => {
                 let div = document.createElement('div');
                 div.className = `okey-tasi t-${tas.renk}`;
@@ -303,23 +308,27 @@
             elimiCiz();
         }
 
+        // KİLİT MEKANİZMASI ENTEGRE EDİLDİ
         function tasAt() {
-            if(seciliTasId) {
-                const atilanTas = elimdekiTaslar.find(t => t.id === seciliTasId);
-                elimdekiTaslar = elimdekiTaslar.filter(t => t.id !== seciliTasId);
-                seciliTasId = null;
-                elimiCiz();
-                
-                // Ortadaki "Atılan Taş" kısmını güncelle
-                const sonTasGorsel = document.getElementById('atilanSonTas');
-                sonTasGorsel.className = `okey-tasi t-${atilanTas.renk}`;
-                sonTasGorsel.innerText = atilanTas.sayi;
-                
-                socket.emit('sohbet_mesaj_gonder', { mesaj: "Ortaya taş attı.", masaAdi: mevcutMasa });
-            } else { alert("Önce ıstakadan bir taş seçin veya taşa çift tıklayın!"); }
+            if(!seciliTasId) { alert("Önce ıstakadan bir taş seçin!"); return; }
+            if(tasAttiMi) { alert("Zaten taş attınız, sıra bekleyin!"); return; }
+
+            const atilanTas = elimdekiTaslar.find(t => t.id === seciliTasId);
+            elimdekiTaslar = elimdekiTaslar.filter(t => t.id !== seciliTasId);
+            seciliTasId = null;
+            tasAttiMi = true; // ISTAKAYI KİLİTLE!
+            elimiCiz();
+            
+            // Ortadaki "Atılan Son Taş" kısmını güncelle
+            const sonTasGorsel = document.getElementById('atilanSonTas');
+            sonTasGorsel.className = `okey-tasi t-${atilanTas.renk}`;
+            sonTasGorsel.innerText = atilanTas.sayi;
+            
+            socket.emit('sohbet_mesaj_gonder', { mesaj: "Ortaya taş attı.", masaAdi: mevcutMasa });
         }
 
         function diz(tip) {
+            // Şimdilik sadece basit bir dizme yapalım, detaylı per kontrolü serverda olacak
             elimdekiTaslar.sort((a, b) => {
                 if(a.renk === b.renk) return (a.sayi === 'S' ? 14 : a.sayi) - (b.sayi === 'S' ? 14 : b.sayi);
                 return a.renk.localeCompare(b.renk);
@@ -335,7 +344,7 @@
             document.getElementById('masaEkrani').style.display = 'flex';
             document.getElementById('masaBasligi').innerText = masaIsmi.toUpperCase();
             document.getElementById('sohbetBasligi').innerText = masaIsmi;
-            document.getElementById('benimIstakam').innerHTML = '<div style="width:100%; text-align:center; color:rgba(255,255,255,0.3); font-size:12px; margin-top:40px;">Bot Ekle butonuna basıp oyunu başlatın...</div>';
+            document.getElementById('benimIstakam').innerHTML = '<div style="width:100%; text-align:center; color:rgba(255,255,255,0.3); font-size:12px; margin-top:40px;">Bot Ekle butonuna basıp oyuna başlatın...</div>';
             document.getElementById('ortadakiTaslar').style.display = 'none';
             document.getElementById('testBtn').style.display = 'block';
         };
