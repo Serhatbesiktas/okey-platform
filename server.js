@@ -9,8 +9,8 @@ const io = require('socket.io')(http, {
 
 app.use(express.static('public'));
 
-// ŞİFRE DÜZELTİLDİ (Okey123456 yapıldı)
 const dbURI = "mongodb+srv://admin:Okey123456@cluster0.e9ntzng.mongodb.net/okeydb?retryWrites=true&w=majority&appName=Cluster0";
+const ADMIN_SIFRE = "Patron2026"; // Patron Giriş Şifresi
 
 mongoose.connect(dbURI)
   .then(() => console.log('✅ MongoDB Veritabanına Başarıyla Bağlanıldı!'))
@@ -228,6 +228,52 @@ io.on('connection', (socket) => {
   const lobiVerisi = {};
   for(let m in masalar) lobiVerisi[m] = masalar[m].koltuklar;
   socket.emit('masalari_guncelle', lobiVerisi);
+
+  // ---------- PATRON (ADMIN) SİSTEMİ ----------
+  socket.on('admin_giris_yap', (sifre) => {
+      if(sifre === ADMIN_SIFRE) socket.emit('admin_onaylandi');
+      else socket.emit('hata_mesaji', "Hatalı Patron Şifresi! Erişim Reddedildi.");
+  });
+
+  socket.on('admin_cip_islemi', async (data) => {
+      if(data.sifre !== ADMIN_SIFRE) return;
+      try {
+          let dbKullanici = await Oyuncu.findOne({ isim: data.hedefIsim });
+          if(dbKullanici) {
+              let yeniCip = dbKullanici.cip + parseInt(data.miktar);
+              await Oyuncu.updateOne({ isim: data.hedefIsim }, { cip: yeniCip });
+              if (oyuncuCipleri[data.hedefIsim] !== undefined) {
+                  oyuncuCipleri[data.hedefIsim] = yeniCip;
+                  io.emit('cip_guncelle_ozel', { isim: data.hedefIsim, cip: yeniCip });
+              }
+              socket.emit('sistem_mesaji', `👑 YÖNETİCİ: ${data.hedefIsim} oyuncusunun çipi güncellendi. Eklendi/Silindi: ${data.miktar}`);
+          } else {
+              socket.emit('hata_mesaji', "Veritabanında böyle bir oyuncu bulunamadı!");
+          }
+      } catch(e) { console.log(e); }
+  });
+
+  socket.on('admin_vip_islemi', async (data) => {
+      if(data.sifre !== ADMIN_SIFRE) return;
+      try {
+          let dbKullanici = await Oyuncu.findOne({ isim: data.hedefIsim });
+          if(dbKullanici) {
+              await Oyuncu.updateOne({ isim: data.hedefIsim }, { vip: data.vipDurumu });
+              if (oyuncuVipDurumu[data.hedefIsim] !== undefined) {
+                  oyuncuVipDurumu[data.hedefIsim] = data.vipDurumu;
+              }
+              io.emit('sistem_mesaji', `👑 YÖNETİCİ: ${data.hedefIsim} adlı oyuncunun VIP durumu ${data.vipDurumu ? 'AKTİF' : 'İPTAL'} edildi.`);
+          } else {
+              socket.emit('hata_mesaji', "Veritabanında böyle bir oyuncu bulunamadı!");
+          }
+      } catch(e) { console.log(e); }
+  });
+
+  socket.on('admin_duyuru_yap', (data) => {
+      if(data.sifre !== ADMIN_SIFRE) return;
+      io.emit('sistem_mesaji', `📢 DUYURU: ${data.mesaj} 📢`);
+  });
+  // ---------------------------------------------
 
   socket.on('liderlik_tablosu_iste', async () => {
       try {
