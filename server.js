@@ -9,21 +9,12 @@ const io = require('socket.io')(http, {
 
 app.use(express.static('public'));
 
-// Gizli kasadan linki oku, yoksa eski linki yedek olarak kullan
 const dbURI = process.env.MONGODB_URI || "mongodb+srv://admin:Okey123456@cluster0.e9ntzng.mongodb.net/okeydb?retryWrites=true&w=majority&appName=Cluster0";
-const ADMIN_SIFRE = "Patron2026"; 
-
 let dbAktif = false;
 
 mongoose.connect(dbURI, { serverSelectionTimeoutMS: 4000 })
-  .then(() => {
-      console.log('✅ Veritabanı başarıyla bağlandı.');
-      dbAktif = true;
-  })
-  .catch((err) => {
-      console.log('⚠️ Local hafıza modu aktif.');
-      dbAktif = false;
-  });
+  .then(() => { console.log('✅ Veritabanı bağlandı.'); dbAktif = true; })
+  .catch((err) => { console.log('⚠️ Local hafıza modu aktif.'); dbAktif = false; });
 
 const oyuncuSchema = new mongoose.Schema({
     isim: { type: String, unique: true },
@@ -36,9 +27,9 @@ const oyuncuCipleri = {};
 const oyuncuVipDurumu = {}; 
 
 const masalar = {
-    'Acemiler Masası': { bahis: 20000, koltuklar: [null, null, null, null] },
-    'Orta Seviye Masası': { bahis: 50000, koltuklar: [null, null, null, null] },
-    'Ustalar VIP Masası': { bahis: 100000, koltuklar: [null, null, null, null] }
+    'Acemiler (20K Bahis)': { bahis: 20000, koltuklar: [null, null, null, null] },
+    'Orta Seviye (50K Bahis)': { bahis: 50000, koltuklar: [null, null, null, null] },
+    'Ustalar VIP (100K Bahis)': { bahis: 100000, koltuklar: [null, null, null, null] }
 };
 
 io.on('connection', (socket) => {
@@ -53,20 +44,14 @@ io.on('connection', (socket) => {
                   if (!dbKullanici) dbKullanici = await Oyuncu.create({ isim: isim, cip: 250000, vip: false });
                   oyuncuCipleri[isim] = dbKullanici.cip;
                   oyuncuVipDurumu[isim] = dbKullanici.vip;
-              } catch(e) {
-                  if(!oyuncuCipleri[isim]) oyuncuCipleri[isim] = 250000;
-              }
+              } catch(e) { if(!oyuncuCipleri[isim]) oyuncuCipleri[isim] = 250000; }
           } else {
               if(!oyuncuCipleri[isim]) oyuncuCipleri[isim] = 250000;
               if(!oyuncuVipDurumu[isim]) oyuncuVipDurumu[isim] = false;
           }
       }
       socket.emit('cip_guncelle', oyuncuCipleri[isim]);
-      socket.emit('vip_guncelle', oyuncuVipDurumu[isim]);
-      
-      const lobiVerisi = {};
-      for(let m in masalar) lobiVerisi[m] = masalar[m].koltuklar;
-      socket.emit('masalari_guncelle', lobiVerisi);
+      io.emit('masalari_guncelle', masalar);
   });
 
   socket.on('masaya_otur', (data) => {
@@ -75,9 +60,30 @@ io.on('connection', (socket) => {
           let bosKoltuk = masa.koltuklar.indexOf(null);
           if(bosKoltuk !== -1) {
               masa.koltuklar[bosKoltuk] = data.isim;
-              const lobiVerisi = {};
-              for(let m in masalar) lobiVerisi[m] = masalar[m].koltuklar;
-              io.emit('masalari_guncelle', lobiVerisi);
+              io.emit('masalari_guncelle', masalar);
+              // Masadaki herkese oyuncuların güncel halini gönder
+              io.emit('masa_oyuncu_durumu', { masaAdi: data.masaAdi, koltuklar: masa.koltuklar });
+          }
+      }
+  });
+
+  // YENİ: SOHBET SİSTEMİ
+  socket.on('sohbet_mesaj_gonder', (data) => {
+      io.emit('sohbet_mesaj_ilet', {
+          isim: socket.kullaniciAdi,
+          mesaj: data.mesaj,
+          masaAdi: data.masaAdi
+      });
+  });
+
+  socket.on('masadan_kalk', (data) => {
+      const masa = masalar[data.masaAdi];
+      if(masa) {
+          let index = masa.koltuklar.indexOf(socket.kullaniciAdi);
+          if(index !== -1) {
+              masa.koltuklar[index] = null;
+              io.emit('masalari_guncelle', masalar);
+              io.emit('masa_oyuncu_durumu', { masaAdi: data.masaAdi, koltuklar: masa.koltuklar });
           }
       }
   });
@@ -88,9 +94,8 @@ io.on('connection', (socket) => {
               let index = masalar[m].koltuklar.indexOf(socket.kullaniciAdi);
               if(index !== -1) {
                   masalar[m].koltuklar[index] = null;
-                  const lobiVerisi = {};
-                  for(let ms in masalar) lobiVerisi[ms] = masalar[ms].koltuklar;
-                  io.emit('masalari_guncelle', lobiVerisi);
+                  io.emit('masalari_guncelle', masalar);
+                  io.emit('masa_oyuncu_durumu', { masaAdi: m, koltuklar: masalar[m].koltuklar });
               }
           }
       }
