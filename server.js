@@ -9,19 +9,19 @@ const io = require('socket.io')(http, {
 
 app.use(express.static('public'));
 
-const dbURI = "mongodb+srv://admin:Okey123456@cluster0.e9ntzng.mongodb.net/okeydb?retryWrites=true&w=majority&appName=Cluster0";
+// Gizli kasadan linki oku, yoksa eski linki yedek olarak kullan
+const dbURI = process.env.MONGODB_URI || "mongodb+srv://admin:Okey123456@cluster0.e9ntzng.mongodb.net/okeydb?retryWrites=true&w=majority&appName=Cluster0";
 const ADMIN_SIFRE = "Patron2026"; 
 
-let dbAktif = false; // Veritabanı durumunu takip eden sistem
+let dbAktif = false;
 
-// YENİ: 5 saniyede bağlanamazsa çökmek yerine yerel hafızaya geçer
-mongoose.connect(dbURI, { serverSelectionTimeoutMS: 5000 })
+mongoose.connect(dbURI, { serverSelectionTimeoutMS: 4000 })
   .then(() => {
-      console.log('✅ MongoDB Veritabanı Aktif! Her şey kalıcı.');
+      console.log('✅ Veritabanı başarıyla bağlandı.');
       dbAktif = true;
   })
   .catch((err) => {
-      console.log('⚠️ MongoDB Bağlanamadı! Geçici (Local) Hafıza ile devam ediliyor.');
+      console.log('⚠️ Local hafıza modu aktif.');
       dbAktif = false;
   });
 
@@ -35,17 +35,10 @@ const Oyuncu = mongoose.model('Oyuncu', oyuncuSchema);
 const oyuncuCipleri = {};
 const oyuncuVipDurumu = {}; 
 
-async function veritabaninaKaydet(isim) {
-    if(!isim.startsWith('Bot_') && dbAktif) {
-        try { await Oyuncu.updateOne({ isim: isim }, { cip: oyuncuCipleri[isim], vip: oyuncuVipDurumu[isim] }); } 
-        catch(e) {}
-    }
-}
-
 const masalar = {
     'Acemiler Masası': { bahis: 20000, koltuklar: [null, null, null, null] },
-    'Orta Seviye': { bahis: 50000, koltuklar: [null, null, null, null] },
-    'Ustalar (VIP)': { bahis: 100000, koltuklar: [null, null, null, null] }
+    'Orta Seviye Masası': { bahis: 50000, koltuklar: [null, null, null, null] },
+    'Ustalar VIP Masası': { bahis: 100000, koltuklar: [null, null, null, null] }
 };
 
 io.on('connection', (socket) => {
@@ -64,7 +57,6 @@ io.on('connection', (socket) => {
                   if(!oyuncuCipleri[isim]) oyuncuCipleri[isim] = 250000;
               }
           } else {
-              // DB yoksa geçici çip ver
               if(!oyuncuCipleri[isim]) oyuncuCipleri[isim] = 250000;
               if(!oyuncuVipDurumu[isim]) oyuncuVipDurumu[isim] = false;
           }
@@ -106,4 +98,4 @@ io.on('connection', (socket) => {
 });
 
 const PORT = process.env.PORT || 3000;
-http.listen(PORT, () => { console.log('Sunucu başlatıldı...'); });
+http.listen(PORT, () => { console.log('Sunucu dinlemede...'); });
