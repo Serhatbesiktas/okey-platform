@@ -256,17 +256,18 @@ io.on('connection', (socket) => {
     }
   });
 
-  // YENİ GÖSTERGE SİSTEMİ
   socket.on('gosterge_goster', (data) => {
       const masa = masalar[data.masaAdi];
       if(masa && masa.oyunBasladi && !masa.gostergeGosterildi) {
           const hasTile = masa.eller[data.isim].some(t => t.renk === masa.gosterge.renk && t.sayi === masa.gosterge.sayi);
           if(hasTile) {
               masa.gostergeGosterildi = true;
-              const odul = masa.bahis; // Masa bahsi kadar ekstra ödül kasadan bağımsız sisteme ekleniyor.
+              const odul = masa.bahis;
               oyuncuCipleri[data.isim] += odul;
               io.emit('cip_guncelle_ozel', { isim: data.isim, cip: oyuncuCipleri[data.isim] });
               io.emit('sistem_mesaji', `🌟 VIP ŞOV! ${data.isim} GÖSTERGE yaptı ve anında ${odul.toLocaleString()} ÇİP kazandı!`);
+              // Oyunculara butonu kalıcı kapatma sinyali gönderiliyor
+              io.emit('gosterge_basarili', { masaAdi: data.masaAdi });
           }
       }
   });
