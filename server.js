@@ -1,7 +1,6 @@
 const express = require('express');
 const app = express();
 const http = require('http').createServer(app);
-
 const io = require('socket.io')(http, {
   cors: { origin: "*", methods: ["GET", "POST"] }
 });
@@ -9,7 +8,6 @@ const io = require('socket.io')(http, {
 app.use(express.static('public'));
 
 const oyuncuCipleri = {};
-
 const masalar = {
     'Acemiler (20K Bahis)': { bahis: 20000, kasa: 0, koltuklar: [null, null, null, null], deste: [], gosterge: null, oyunBasladi: false, siradakiOyuncu: null, eller: {} },
     'Usta Masası (50K Bahis)': { bahis: 50000, kasa: 0, koltuklar: [null, null, null, null], deste: [], gosterge: null, oyunBasladi: false, siradakiOyuncu: null, eller: {} },
@@ -34,8 +32,7 @@ function desteYaratVeKaristir() {
     return yeniDeste;
 }
 
-// BİLDİRİM DESTEKLİ SIFIRLAMA
-function oyunuSifirla(masaAdi, kazanan = null, odul = 0, sebep = "") {
+function oyunuSifirla(masaAdi, kazanan = null, odul = 0, sebep = "", okeyleBittiMi = false) {
     const masa = masalar[masaAdi];
     if(masa) {
         masa.oyunBasladi = false;
@@ -44,7 +41,7 @@ function oyunuSifirla(masaAdi, kazanan = null, odul = 0, sebep = "") {
         masa.siradakiOyuncu = null;
         masa.eller = {};
         masa.kasa = 0; 
-        io.emit('oyun_bitti', { masaAdi: masaAdi, kazanan: kazanan, odul: odul, sebep: sebep });
+        io.emit('oyun_bitti', { masaAdi: masaAdi, kazanan: kazanan, odul: odul, sebep: sebep, okeyleBittiMi: okeyleBittiMi });
     }
 }
 
@@ -137,8 +134,25 @@ function botHamlesiYap(masaAdi) {
                 if(!masa.oyunBasladi) return;
                 
                 const botunEli = masa.eller[siradaki];
-                const atilacakIndex = Math.floor(Math.random() * botunEli.length);
-                const atilanTas = botunEli.splice(atilacakIndex, 1)[0]; 
+                
+                // AKILLI BOT ALGORİTMASI: Okey veya Sahte Okey atmaması için kontrol
+                let okeySayi = masa.gosterge.sayi === 13 ? 1 : parseInt(masa.gosterge.sayi) + 1;
+                let okeyRenk = masa.gosterge.renk;
+                
+                let guvenliTaslar = botunEli.filter(t => {
+                    let isOkey = (t.renk === okeyRenk && parseInt(t.sayi) === okeySayi);
+                    return !isOkey && t.renk !== 'sahte';
+                });
+
+                // Eğer elinde sadece okey kaldıysa (çok nadir) yapacak bir şey yok
+                if(guvenliTaslar.length === 0) guvenliTaslar = botunEli; 
+
+                const atilacakIndex = Math.floor(Math.random() * guvenliTaslar.length);
+                const atilanTas = guvenliTaslar[atilacakIndex];
+                
+                // Gerçek elinden taşı sil
+                const gercekIndex = botunEli.findIndex(t => t.id === atilanTas.id);
+                botunEli.splice(gercekIndex, 1); 
 
                 io.emit('ortaya_tas_atildi', { masaAdi: masaAdi, kimAtti: siradaki, tas: atilanTas });
 
@@ -177,7 +191,6 @@ io.on('connection', (socket) => {
             socket.emit('hata_mesaji', `Yeterli çipiniz yok! Bu masanın bahsi: ${masa.bahis.toLocaleString()} ÇİP.`);
             return;
         }
-
         const bosKoltukIndex = masa.koltuklar.indexOf(null);
         if (bosKoltukIndex !== -1) {
             masa.koltuklar[bosKoltukIndex] = data.isim;
@@ -213,13 +226,21 @@ io.on('connection', (socket) => {
         io.emit('masa_kasa_guncelle', { masaAdi: masaAdi, kasa: masa.kasa });
 
         masa.deste = desteYaratVeKaristir(); 
-        masa.gosterge = masa.deste.pop();
+        
+        // GÖSTERGE DÜZELTMESİ: Sahte Okey Gösterge Olamaz!
+        let secilenGosterge = masa.deste.pop();
+        while (secilenGosterge.renk === 'sahte') {
+            masa.deste.unshift(secilenGosterge); 
+            secilenGosterge = masa.deste.pop(); 
+        }
+        masa.gosterge = secilenGosterge;
+
         const baslayacakOyuncu = masa.koltuklar[Math.floor(Math.random() * 4)];
         masa.siradakiOyuncu = baslayacakOyuncu;
         masa.eller = {}; 
         
         io.emit('masa_oyun_basladi', { masaAdi: masaAdi, gosterge: masa.gosterge, kalanTas: masa.deste.length, kasa: masa.kasa });
-        io.emit('sistem_mesaji', `🎰 Bahisler alındı! Toplam Kasa: ${masa.kasa.toLocaleString()} ÇİP. Oyun başladı!`);
+        io.emit('sistem_mesaji', `🎰 Bahisler alındı! Oyun başladı. Göstergesi olan gösterebilir!`);
 
         masa.koltuklar.forEach(oyuncuIsmi => {
             const kacTasAlacak = (oyuncuIsmi === baslayacakOyuncu) ? 15 : 14;
@@ -235,6 +256,13 @@ io.on('connection', (socket) => {
 
         if(masa.siradakiOyuncu.startsWith('Bot_')) { botHamlesiYap(masaAdi); }
     }
+  });
+
+  socket.on('gosterge_goster', (data) => {
+      const masa = masalar[data.masaAdi];
+      if(masa && masa.oyunBasladi) {
+          io.emit('sistem_mesaji', `⭐ ${data.isim} GÖSTERGE gösterdi!`);
+      }
   });
 
   socket.on('taslarimi_ver', (data) => {
@@ -288,12 +316,32 @@ io.on('connection', (socket) => {
       if(masa && masa.siradakiOyuncu === data.isim) {
           const elGecerliMi = eliKontrolEt(data.gruplar, masa.gosterge);
           if(elGecerliMi) {
-              const kazanilanPara = masa.kasa;
+              
+              // OKEYLE BİTME KONTROLÜ
+              let okeyleBittiMi = false;
+              let kazanilanPara = masa.kasa;
+              let sebepMesaji = "Mükemmel bir dizilimle elini tamamladı!";
+
+              if (data.bitisTasi) {
+                  let okeySayi = masa.gosterge.sayi === 13 ? 1 : parseInt(masa.gosterge.sayi) + 1;
+                  let okeyRenk = masa.gosterge.renk;
+                  if (data.bitisTasi.renk === okeyRenk && parseInt(data.bitisTasi.sayi) === okeySayi) {
+                      okeyleBittiMi = true;
+                      kazanilanPara = masa.kasa * 2; // Okey atarsa 2 katı!
+                      sebepMesaji = "🔥 İNANILMAZ! Yere Okey Atarak Bitirdi! Çifte Kazanç! 🔥";
+                  }
+              }
+
               oyuncuCipleri[data.isim] += kazanilanPara;
               io.emit('cip_guncelle_ozel', { isim: data.isim, cip: oyuncuCipleri[data.isim] });
-              io.emit('sistem_mesaji', `🎉 BÜYÜK VURGUN! ${data.isim} elini tamamladı ve masadaki ${kazanilanPara.toLocaleString()} ÇİPİ KAZANDI! 🎉`);
               
-              oyunuSifirla(data.masaAdi, data.isim, kazanilanPara, "Mükemmel bir dizilimle elini tamamladı!");
+              if(okeyleBittiMi) {
+                  io.emit('sistem_mesaji', `🚨 BÜYÜK VURGUN! ${data.isim} OKEY ATARAK BİTİRDİ! Tam ${kazanilanPara.toLocaleString()} ÇİP KAZANDI! 🚨`);
+              } else {
+                  io.emit('sistem_mesaji', `🎉 ${data.isim} elini tamamladı ve masadaki ${kazanilanPara.toLocaleString()} ÇİPİ KAZANDI!`);
+              }
+              
+              oyunuSifirla(data.masaAdi, data.isim, kazanilanPara, sebepMesaji, okeyleBittiMi);
           } else {
               socket.emit('hatali_bitis', "Dizilim hatalı veya perler arasında boşluk bırakmadınız! Lütfen elinizi kontrol edin.");
           }
