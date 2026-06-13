@@ -38,7 +38,41 @@ gostergeBtn.onclick = () => {
 };
 document.getElementById('oyunAlanObjeleri').firstElementChild.appendChild(gostergeBtn);
 
-// YENİ: Masada biri gösterge yaptığında ekranın ortasında PANKART aç
+// YENİ: Masayı Tamamen Sıfırlama ve Temizleme Fonksiyonu
+function masayiTemizle() {
+    const flash = document.getElementById('flashBildirim');
+    if (flash) flash.classList.remove('goster'); // Asılı kalan gösterge afişini sil
+    
+    document.getElementById('sonucEkrani').style.display = 'none';
+    oyunAlanObjeleri.style.display = 'none';
+    gostergeBtn.style.display = 'none';
+    gostergeHakki = false; 
+    
+    oyunuBaslatBtn.innerText = "🎲 OYUNU BAŞLAT";
+    oyunuBaslatBtn.style.display = 'block';
+    
+    bitisAlani.style.display = 'none';
+    masaKasaBilgisi.style.display = 'none'; 
+    bitisAlani.innerHTML = 'BİTİR<br>🏆'; 
+    
+    for(let i=0; i<24; i++) document.getElementById('y'+i).innerHTML = '';
+    document.getElementById('benimIskartam').innerHTML = '<div class="iskarta-yazi" id="iskartaYazi">TAŞ AT<br>⬇</div>';
+    document.getElementById('iskartaSag').innerHTML = '';
+    document.getElementById('iskartaSol').innerHTML = '';
+    document.getElementById('iskartaUst').innerHTML = '';
+    
+    document.getElementById('seatTop').innerText = "Bekleniyor...";
+    document.getElementById('seatLeft').innerText = "Bekleniyor...";
+    document.getElementById('seatRight').innerText = "Bekleniyor...";
+    
+    document.getElementById('benimAdimKutusu').classList.remove('aktif-sira');
+    document.getElementById('seatRight').classList.remove('aktif-sira');
+    document.getElementById('seatTop').classList.remove('aktif-sira');
+    document.getElementById('seatLeft').classList.remove('aktif-sira');
+
+    benimSiramMi = false;
+}
+
 socket.on('gosterge_basarili', (data) => {
     if(suAnkiMasam === data.masaAdi) {
         if (data.isim === aktifKullaniciAdi) {
@@ -316,6 +350,9 @@ socket.on('oyun_bitti', (data) => {
         
         sonucEkrani.style.display = 'flex'; 
         
+        const flash = document.getElementById('flashBildirim');
+        if (flash) flash.classList.remove('goster');
+
         oyunAlanObjeleri.style.display = 'none';
         gostergeBtn.style.display = 'none';
         gostergeHakki = false; 
@@ -380,9 +417,11 @@ window.masayaOtur = function(masaAdi) {
     masaOrtasiYazi.innerText = masaAdi.toUpperCase();
 };
 
+// YENİ: Masadan kalkarken her şeyi temizliyoruz
 lobiyeDonBtn.addEventListener('click', () => {
     if(suAnkiMasam) socket.emit('masadan_kalk', { isim: aktifKullaniciAdi, masaAdi: suAnkiMasam });
     suAnkiMasam = null;
+    masayiTemizle();
     masaEkrani.style.display = 'none';
     lobiEkrani.style.display = 'flex';
 });
@@ -417,6 +456,7 @@ socket.on('masa_kasa_guncelle', (data) => {
 
 socket.on('masa_oyun_basladi', (data) => {
     if(suAnkiMasam === data.masaAdi) {
+        masayiTemizle(); // Önce eski kalıntıları temizle
         oyunuBaslatBtn.style.display = 'none';
         oyunAlanObjeleri.style.display = 'flex';
         bitisAlani.style.display = 'flex';
