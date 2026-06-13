@@ -528,14 +528,8 @@ socket.on('sira_guncelle', (data) => {
         
         koltuklar.forEach(k => {
             const el = document.getElementById(k.id);
-            el.classList.remove('aktif-sira');
-            
-            // Animasyonu her tur sıfırlamak için tetikleyici (Reflow)
-            void el.offsetWidth;
-            
-            if(k.isim === data.kimde || k.gercekIsim === data.kimde) {
-                el.classList.add('aktif-sira');
-            }
+            if(k.isim === data.kimde || k.gercekIsim === data.kimde) el.classList.add('aktif-sira');
+            else el.classList.remove('aktif-sira');
         });
         
         checkGosterge(); 
