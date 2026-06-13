@@ -1,11 +1,6 @@
-/* ==========================================
-   VIP CASINO TEMA 2026 - GENEL AYARLAR
-   ========================================== */
 * { box-sizing: border-box; margin: 0; padding: 0; }
-
 body { background-color: #050d08; color: #ffffff; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; display: flex; flex-direction: column; height: 100dvh; overflow: hidden; }
 
-/* --- ÜST BAR (VIP HEADER) --- */
 .vip-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: linear-gradient(180deg, #0b1c11 0%, #050d08 100%); flex-shrink: 0; border-bottom: 1px solid rgba(39, 174, 96, 0.15); transition: all 0.3s; }
 .profil-bilgi { display: flex; align-items: center; gap: 12px; }
 .profil-avatar { width: 48px; height: 48px; background: radial-gradient(circle, #1e3f28 0%, #0d1f14 100%); border-radius: 50%; border: 2px solid #f2c94c; display: flex; justify-content: center; align-items: center; font-size: 22px; box-shadow: 0 0 10px rgba(242, 201, 76, 0.2); transition: all 0.3s; }
@@ -13,7 +8,6 @@ body { background-color: #050d08; color: #ffffff; font-family: 'Segoe UI', Robot
 .profil-isim { font-size: 15px; font-weight: bold; color: #ffffff; text-shadow: 0 2px 4px rgba(0,0,0,0.5); transition: color 0.3s;}
 .vip-badge { background: linear-gradient(180deg, #f2d94c 0%, #d4af37 100%); color: #000000; font-size: 9px; font-weight: 900; padding: 2px 6px; border-radius: 4px; margin-top: 3px; letter-spacing: 0.5px; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
 
-/* Sıra Bende İken Üst Barın Parlaması ve Süre Barı */
 .vip-header:has(.aktif-sira) { border-bottom: 1px solid #2ecc71; box-shadow: 0 5px 20px rgba(46, 204, 113, 0.15); }
 .vip-header:has(.aktif-sira) .profil-avatar { border-color: #2ecc71; box-shadow: 0 0 15px #2ecc71; }
 .benim-surem { display: none; width: 100px; margin-top: 5px; }
@@ -26,9 +20,6 @@ body { background-color: #050d08; color: #ffffff; font-family: 'Segoe UI', Robot
 .sistem-mesaji { padding: 10px 20px; font-size: 12px; color: #a3c4bc; display: flex; align-items: center; gap: 10px; background-color: rgba(11, 28, 17, 0.5); flex-shrink: 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
 .sistem-mesaji::before { content: ''; display: inline-block; width: 8px; height: 8px; background-color: #2ecc71; border-radius: 50%; box-shadow: 0 0 8px #2ecc71; }
 
-/* ==========================================
-   LOBİ TASARIMI
-   ========================================== */
 .main-container { display: flex; flex-direction: column; flex: 1; overflow-y: auto; }
 #lobiEkrani { display: flex; flex-direction: column; flex: 1; position: relative; padding-bottom: 140px; }
 .masa-sec-baslik { padding: 18px 20px 8px 20px; font-size: 12px; font-weight: 800; color: #52796f; letter-spacing: 2px; text-transform: uppercase; }
@@ -62,9 +53,6 @@ body { background-color: #050d08; color: #ffffff; font-family: 'Segoe UI', Robot
 
 .players-panel { display: none; } 
 
-/* ==========================================
-   OKEY MASASI TASARIMI
-   ========================================== */
 #masaEkrani { display: none; flex: 1; background-color: #040a05; position: relative; padding: 10px; flex-direction: column; }
 .okey-table-ui { background: radial-gradient(circle at 50% 45%, #1f5934 0%, #11361c 55%, #07190b 100%); border: 5px solid #0a170e; border-radius: 24px; width: 100%; flex: 1; position: relative; box-shadow: inset 0 0 40px rgba(0,0,0,0.85), 0 8px 25px rgba(0,0,0,0.6); margin-bottom: 8px; overflow: hidden; }
 
@@ -86,51 +74,15 @@ body { background-color: #050d08; color: #ffffff; font-family: 'Segoe UI', Robot
     z-index: 5;
     box-shadow: 0 6px 15px rgba(0,0,0,0.5);
     transition: all 0.3s ease;
+    width: 130px;
 }
-.avatar-cember {
-    width: 34px;
-    height: 34px;
-    background: radial-gradient(circle, #2c3e50, #1a252f);
-    border: 1.5px solid #7f8c8d;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 20px;
-    transition: all 0.3s ease;
-}
-.oyuncu-detay {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    width: 75px;
-}
-.oyuncu-isim {
-    color: #bdc3c7;
-    font-size: 11px;
-    font-weight: bold;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    transition: color 0.3s ease;
-}
+.avatar-cember { width: 34px; height: 34px; background: radial-gradient(circle, #2c3e50, #1a252f); border: 1.5px solid #7f8c8d; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 20px; transition: all 0.3s ease; flex-shrink: 0;}
+.oyuncu-detay { display: flex; flex-direction: column; gap: 5px; flex: 1; overflow: hidden; }
+.oyuncu-isim { color: #bdc3c7; font-size: 11px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color 0.3s ease; }
 
-/* SÜRE BARI TASARIMI */
-.sure-bari {
-    width: 100%;
-    height: 4px;
-    background: rgba(255,255,255,0.15);
-    border-radius: 2px;
-    overflow: hidden;
-}
-.sure-dolum {
-    width: 0%; 
-    height: 100%;
-    background: #2ecc71;
-    border-radius: 2px;
-}
+.sure-bari { width: 100%; height: 4px; background: rgba(255,255,255,0.15); border-radius: 2px; overflow: hidden; }
+.sure-dolum { width: 0%; height: 100%; background: #2ecc71; border-radius: 2px; }
 
-/* SIRA GELDİĞİNDE TETİKLENEN ANİMASYONLAR (Mekanik Bozulmadan) */
 .oyuncu-isim.aktif-sira { color: #f2c94c !important; text-shadow: 0 0 5px rgba(242, 201, 76, 0.5); }
 .oyuncu-kapsul:has(.aktif-sira) { border-color: #2ecc71; box-shadow: 0 0 15px rgba(46, 204, 113, 0.3); background: rgba(11, 40, 20, 0.85); }
 .oyuncu-kapsul:has(.aktif-sira) .avatar-cember { border-color: #2ecc71; box-shadow: 0 0 10px #2ecc71; }
@@ -143,17 +95,16 @@ body { background-color: #050d08; color: #ffffff; font-family: 'Segoe UI', Robot
     100% { width: 0%; background: #e74c3c; box-shadow: 0 0 5px #e74c3c;}
 }
 
-/* KOLTUK POZİSYONLARI (Hepsi Düz, Yatay, Okunabilir) */
+/* YENİ: YAN DURAN KOLTUK POZİSYONLARI (ORİJİNAL TARAFA GERİ DÖNDÜ) */
 .koltuk-ust { top: 12px; left: 50%; transform: translateX(-50%); }
-.koltuk-sol { top: 40%; left: 8px; transform: translateY(-50%); }
-.koltuk-sag { top: 40%; right: 8px; transform: translateY(-50%); }
+.koltuk-sag { top: 35%; right: -40px; transform: translateY(-50%) rotate(-90deg); }
+.koltuk-sol { bottom: 35%; left: -40px; transform: translateY(-50%) rotate(90deg); }
 
-/* Iskartalar */
 .iskarta-alani { position: absolute; width: 46px; height: 62px; background-color: rgba(0, 0, 0, 0.35); border: 1.5px solid rgba(255, 255, 255, 0.12); border-radius: 8px; display: flex; align-items: center; justify-content: center; z-index: 4; box-shadow: inset 0 2px 6px rgba(0,0,0,0.5); }
 #iskartaUst { top: 22px; left: 25%; }
-#iskartaSag { top: 20%; right: 35px; }
-#iskartaSol { bottom: 20%; left: 35px; cursor: pointer; }
-#iskartaSol:active { transform: scale(0.92); }
+#iskartaSag { top: 25%; right: 40px; transform: translateY(-50%); }
+#iskartaSol { bottom: 25%; left: 40px; transform: translateY(50%); cursor: pointer; }
+#iskartaSol:active { transform: translateY(50%) scale(0.92); }
 
 #benimIskartam { position: absolute; bottom: 105px; right: 20px; width: 62px; height: 82px; background-color: rgba(0, 0, 0, 0.45); border: 2px dashed #f2c94c; border-radius: 10px; display: flex; align-items: center; justify-content: center; z-index: 10; transition: all 0.2s ease;}
 #benimIskartam.sortable-drag-over { background-color: rgba(242, 201, 76, 0.25); border-color: #ffffff; box-shadow: 0 0 15px #f2c94c; }
@@ -162,7 +113,6 @@ body { background-color: #050d08; color: #ffffff; font-family: 'Segoe UI', Robot
 
 .iskarta-alani .okey-tasi { position: absolute !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; width: 40px !important; height: 54px !important; font-size: 19px !important; border-bottom-width: 3px !important; pointer-events: none !important; }
 
-/* --- MASA ORTASI --- */
 .masa-ortasi { position: absolute; top: 48%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 12px; background: rgba(8, 20, 13, 0.45); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 22px 25px; border-radius: 18px; border: 1px solid rgba(242, 201, 76, 0.25); z-index: 4; box-shadow: 0 12px 35px rgba(0, 0, 0, 0.55), inset 0 1px 1px rgba(255,255,255,0.1); }
 .masa-isim-ortasi { color: rgba(255,255,255,0.35); font-weight: 800; font-size: 13px; text-transform: uppercase; letter-spacing: 2.5px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
 .masa-kasa-bilgisi { display: none; color: #2ecc71; font-weight: bold; font-size: 14px; text-shadow: 0 0 8px rgba(46, 204, 113, 0.6); border: 1px dashed #2ecc71; padding: 5px 14px; border-radius: 12px; background-color: rgba(0,0,0,0.6); letter-spacing: 0.3px; }
@@ -181,7 +131,6 @@ body { background-color: #050d08; color: #ffffff; font-family: 'Segoe UI', Robot
 #bitisAlani.sortable-drag-over { background-color: rgba(220, 53, 69, 0.5); color: white; border-color: #ffffff; box-shadow: 0 0 15px #dc3545; }
 #bitisAlani .okey-tasi { position: absolute !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; width: 40px !important; height: 54px !important; font-size: 19px !important; border-bottom-width: 3px !important; pointer-events: none !important; }
 
-/* ISTAKA VE TAŞLAR */
 .okey-istaka-tuslar-area { width: 100%; display: flex; flex-direction: column; gap: 4px; }
 .pro-tus-takimi { width: 100%; display: flex; justify-content: flex-start; align-items: center; padding: 2px 5px; gap: 8px; z-index: 10; }
 .pro-tus { padding: 0 16px; height: 36px; background-color: #112618; border: 1px solid #1e3f28; color: #f2c94c; border-radius: 8px; font-weight: bold; font-size: 12px; text-transform: uppercase; cursor: pointer; box-shadow: 0 3px 6px rgba(0,0,0,0.4); transition: all 0.1s ease;}
@@ -206,7 +155,8 @@ body { background-color: #050d08; color: #ffffff; font-family: 'Segoe UI', Robot
 .tas-sari { color: #27ae60; text-shadow: 0 0.5px 1px rgba(0,0,0,0.1); } 
 .tas-sahte { color: #9b59b6; font-weight: 900; text-shadow: 0 0.5px 1px rgba(0,0,0,0.1); } 
 
-/* BİLDİRİMLER */
+.chat-panel { display: none; } 
+
 .gosterge-btn { background: linear-gradient(180deg, #9b59b6 0%, #8e44ad 100%); color: #fff; border: none; padding: 6px 14px; border-radius: 8px; font-weight: bold; font-size: 11px; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.5); animation: pulse-glow 1.3s infinite alternate; margin-left: 10px; display: none; }
 .gosterge-btn:active { transform: scale(0.95); }
 
@@ -221,8 +171,6 @@ body { background-color: #050d08; color: #ffffff; font-family: 'Segoe UI', Robot
 #sonucOdul { font-size: 26px; font-weight: bold; color: #2ecc71; margin-bottom: 25px; text-shadow: 0 0 15px rgba(46, 204, 113, 0.5); }
 .sonuc-btn { background: linear-gradient(180deg, #ffe066 0%, #db9d13 100%); color: #050d08; border: none; padding: 14px 35px; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.4); transition: transform 0.15s ease; }
 .sonuc-btn:active { transform: scale(0.95); }
-
-.chat-panel { display: none; } 
 
 @media (min-width: 768px) {
     #lobiEkrani { flex-direction: row; padding-bottom: 0; }
