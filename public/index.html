@@ -73,7 +73,17 @@
         .seat-right { top: 25%; right: -25px; transform: translateY(-50%) rotate(-90deg); border-color: #0dcaf0; color: #0dcaf0; }
         .seat-left { bottom: 25%; left: -25px; transform: translateY(-50%) rotate(90deg); border-color: #0dcaf0; color: #0dcaf0; }
         
-        .aktif-sira { box-shadow: 0 0 15px 5px #2ecc71; border-color: #2ecc71 !important; color: #fff !important; }
+        /* 2026 MODEL AKTİF SIRA ANİMASYONU */
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 8px #2ecc71, inset 0 0 5px #2ecc71; border-color: #2ecc71; background-color: rgba(0,0,0,0.75); }
+            50% { box-shadow: 0 0 25px #2ecc71, inset 0 0 15px #2ecc71; border-color: #ffffff; background-color: rgba(46, 204, 113, 0.4); }
+            100% { box-shadow: 0 0 8px #2ecc71, inset 0 0 5px #2ecc71; border-color: #2ecc71; background-color: rgba(0,0,0,0.75); }
+        }
+        .aktif-sira {
+            animation: pulse-glow 1.2s infinite alternate !important;
+            color: #fff !important;
+            z-index: 10;
+        }
 
         .iskarta-alani { position: absolute; width: 44px; height: 60px; background-color: rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.1); border-radius: 6px; display: flex; align-items: center; justify-content: center; z-index: 4; }
         #iskartaUst { top: 15px; left: 25%; }
@@ -133,7 +143,12 @@
         .sortable-ghost { opacity: 0.1; } 
         .sortable-drag { box-shadow: 5px 15px 25px rgba(0,0,0,0.8) !important; transform: scale(1.15) translateY(-20px) !important; z-index: 99999 !important; border-bottom-width: 8px !important; }
         
-        .tas-kirmizi { color: #d32f2f; } .tas-siyah { color: #212529; } .tas-mavi { color: #1976d2; } .tas-sari { color: #198754; } 
+        /* SAHTE OKEY İÇİN ÖZEL RENK EKLENDİ */
+        .tas-kirmizi { color: #d32f2f; } 
+        .tas-siyah { color: #212529; } 
+        .tas-mavi { color: #1976d2; } 
+        .tas-sari { color: #198754; } 
+        .tas-sahte { color: #8e44ad; font-weight: 900; } 
 
         .chat-panel { display: none; } 
 
@@ -358,7 +373,6 @@
                 atilanTas.style.position = 'absolute'; atilanTas.style.top = '50%'; atilanTas.style.left = '50%'; atilanTas.style.transform = 'translate(-50%, -50%)'; atilanTas.style.margin = '0';
                 let gruplar = getIstakaGruplari(); 
                 
-                // Okey ile bitiş için atılan taşı alıp server'a yolluyoruz
                 let renkSinifi = Array.from(atilanTas.classList).find(c=>c.startsWith('tas-'));
                 let renk = renkSinifi ? renkSinifi.split('-')[1] : 'siyah';
                 const bitisTasi = { id: atilanTas.id, renk: renk, sayi: atilanTas.innerText };
@@ -517,7 +531,6 @@
                 
                 oyunAlanObjeleri.style.display = 'none';
                 
-                // YENİDEN BAŞLAT BUTONU
                 oyunuBaslatBtn.innerText = "🔄 AYNI MASADA TEKRAR OYNA";
                 oyunuBaslatBtn.style.display = 'block';
                 
