@@ -40,7 +40,6 @@ body { background-color: #0b1c11; color: #fff; font-family: 'Segoe UI', Tahoma, 
 .btn-otur.disabled { background: #2a3a30; color: #5c7565; box-shadow: none; cursor: not-allowed; }
 
 .alt-menu-container { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; background-color: #0b1c11; border-top: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-around; align-items: center; padding: 0 10px; z-index: 10; }
-
 .alt-menu-item { display: flex; flex-direction: column; align-items: center; gap: 5px; color: #6c8a75; font-size: 10px; font-weight: bold; cursor: pointer; }
 .alt-menu-item.active { color: #f2c94c; }
 .alt-menu-ikon { font-size: 20px; }
@@ -56,7 +55,6 @@ body { background-color: #0b1c11; color: #fff; font-family: 'Segoe UI', Tahoma, 
 
 .return-lobby-btn { position: absolute; top: 5px; right: 5px; background-color: #dc3545; color: white; border: none; padding: 6px 10px; border-radius: 5px; font-size: 11px; font-weight: bold; z-index: 10; cursor: pointer; }
 
-/* Orijinal Siyah Kutular (Hatasız Pozisyonlar) */
 .player-seat { position: absolute; background-color: rgba(0,0,0,0.75); padding: 6px 12px; border-radius: 8px; color: #f2c94c; font-size: 12px; font-weight: bold; border: 2px solid #f2c94c; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; z-index: 5; text-align: center; transition: 0.3s; }
 .seat-top { top: 10px; left: 50%; transform: translateX(-50%); border-color: #0dcaf0; color: #0dcaf0; }
 .seat-right { top: 25%; right: -25px; transform: translateY(-50%) rotate(-90deg); border-color: #0dcaf0; color: #0dcaf0; }
@@ -135,17 +133,17 @@ body { background-color: #0b1c11; color: #fff; font-family: 'Segoe UI', Tahoma, 
 
 .chat-panel { display: none; } 
 
-.gosterge-btn { background: linear-gradient(180deg, #9b59b6 0%, #8e44ad 100%); color: #fff; border: none; padding: 6px 12px; border-radius: 8px; font-weight: bold; font-size: 11px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.4); animation: pulse-glow 1.5s infinite alternate; margin-left: 10px; display: none; }
+.gosterge-btn { background: linear-gradient(180deg, #9b59b6 0%, #8e44ad 100%); color: #fff; border: none; padding: 6px 14px; border-radius: 8px; font-weight: bold; font-size: 11px; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.5); animation: pulse-glow 1.3s infinite alternate; margin-left: 10px; display: none; }
 .gosterge-btn:active { transform: scale(0.95); }
 
-.flash-bildirim { position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%); background: linear-gradient(135deg, #f9d854, #d4a017); color: #111; padding: 15px 30px; border-radius: 50px; font-weight: 900; font-size: 16px; text-transform: uppercase; box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 20px rgba(249, 216, 84, 0.5); z-index: 9999; text-align: center; border: 3px solid #fff; pointer-events: none; opacity: 0; display: none; }
+.flash-bildirim { position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%); background: linear-gradient(135deg, #ffe266, #d49a00); color: #050d08; padding: 16px 32px; border-radius: 50px; font-weight: 900; font-size: 16px; text-transform: uppercase; box-shadow: 0 15px 40px rgba(0,0,0,0.85), 0 0 25px rgba(255, 226, 102, 0.6); z-index: 9999; text-align: center; border: 3px solid #ffffff; pointer-events: none; opacity: 0; display: none; }
 .flash-bildirim.goster { display: block; animation: flashAnim 3.5s forwards; }
 @keyframes flashAnim { 
     0% { opacity: 0; transform: translate(-50%, -20%) scale(0.5); } 
-    15% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); } 
-    30% { transform: translate(-50%, -50%) scale(1); } 
-    80% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 
-    100% { opacity: 0; transform: translate(-50%, -80%) scale(0.8); } 
+    12% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); } 
+    25% { transform: translate(-50%, -50%) scale(1); } 
+    82% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 
+    100% { opacity: 0; transform: translate(-50%, -85%) scale(0.8); } 
 }
 
 @media (min-width: 768px) {
