@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VIP Okey Sunucusu</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+</head>
+<body>
+
+    <div class="vip-header">
+        <div class="profil-bilgi">
+            <div class="profil-avatar">😎</div>
+            <div class="profil-isim-kutu">
+                <p class="profil-isim" id="benimAdimKutusu">Bağlanıyor... <span style="color:#2ecc71;">✔</span></p>
+                <span class="vip-badge">VIP GOLD</span>
+            </div>
+        </div>
+        <div class="cip-kutu">
+            <div class="cip-ikon">C</div> <span id="benimCipim">Bağlanıyor...</span>
+        </div>
+    </div>
+
+    <div id="lobiEkrani">
+        <div class="sistem-mesaji">Sistem: VIP Oyuna Hoş Geldiniz!</div>
+        <div class="masa-sec-baslik">MASA SEÇ</div>
+        <div class="tables-panel" id="masalarAlani"></div>
+
+        <div class="players-panel">
+            <div class="panel-title" style="color:#f2c94c; font-size:14px; margin-bottom:10px;">👥 Lobideki Oyuncular</div>
+            <table style="width:100%; font-size:13px; text-align:left; border-collapse:collapse;">
+                <thead><tr><th style="color:#6c8a75; padding-bottom:8px; border-bottom:1px solid #1e3f28;">TAKMA AD</th></tr></thead>
+                <tbody>
+                    <tr><td style="padding:10px 0; border-bottom:1px solid #112618; color:#f2c94c; font-weight:bold;" id="lobiBenimAdim">👑 Yükleniyor...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <button class="btn-hemen-oyna">
+            ⚡ Hemen Oyna
+            <span>Rastgele Masa</span>
+        </button>
+
+        <div class="alt-menu-container">
+            <div class="alt-menu-item active"><div class="alt-menu-ikon">🏠</div><span>Lobi</span></div>
+            <div class="alt-menu-item"><div class="alt-menu-ikon">👥</div><span>Arkadaşlar</span></div>
+            <div class="alt-menu-item"><div class="alt-menu-ikon">🏆</div><span>Turnuvalar</span></div>
+            <div class="alt-menu-item"><div class="alt-menu-ikon">🛒</div><span>Mağaza</span></div>
+        </div>
+    </div>
+
+    <div id="masaEkrani">
+        <div id="sonucEkrani">
+            <div class="sonuc-kutu">
+                <h1 id="sonucBaslik">Oyun Bitti!</h1>
+                <p id="sonucMetin">Kazanan: ...</p>
+                <p id="sonucOdul"></p>
+                <button class="sonuc-btn" onclick="document.getElementById('sonucEkrani').style.display='none'">MASAYA DÖN</button>
+            </div>
+        </div>
+
+        <div class="okey-table-ui">
+            <button class="return-lobby-btn" id="lobiyeDonBtn">⬅ Lobiye Dön</button>
+            
+            <div class="player-seat seat-top" id="seatTop">Bekleniyor...</div>
+            <div class="player-seat seat-left" id="seatLeft">Bekleniyor...</div>
+            <div class="player-seat seat-right" id="seatRight">Bekleniyor...</div>
+            
+            <div class="masa-ortasi">
+                <div class="masa-isim-ortasi" id="masaOrtasiYazi">MASA</div>
+                <div class="masa-kasa-bilgisi" id="masaKasaBilgisi">KASA: 0 ÇİP</div>
+                <button class="oyun-baslat-btn" id="oyunuBaslatBtn">🎲 OYUNU BAŞLAT</button>
+                <div class="kalan-tas-bilgi-container" id="oyunAlanObjeleri">
+                    <div style="display: flex; gap: 15px; align-items: center;">
+                        <div class="gosterge-tasi" id="gostergeTasi" title="Gösterge"></div>
+                        <div class="kapali-deste" id="kalanTasBilgi" title="Taş Çekmek İçin Tıkla">91</div>
+                        <div id="bitisAlani">BİTİR<br>🏆</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="iskarta-alani" id="iskartaUst"></div>
+            <div class="iskarta-alani" id="iskartaSag"></div>
+            <div class="iskarta-alani" id="iskartaSol" title="Yerden Taş Çek"></div>
+            <div class="iskarta-alani" id="benimIskartam"><div class="iskarta-yazi" id="iskartaYazi">TAŞ AT<br>⬇</div></div>
+        </div>
+
+        <div class="okey-istaka-tuslar-area">
+            <div class="pro-tus-takimi">
+                <button class="pro-tus" onclick="seriDiz()">SERİ DİZ</button>
+                <button class="pro-tus" onclick="ciftDiz()">ÇİFT DİZ</button>
+            </div>
+
+            <div class="istaka-container" id="benimIstakam">
+                <div class="istaka-raf raf-ust" id="ustRaf"></div>
+                <div class="istaka-raf raf-alt" id="altRaf"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
