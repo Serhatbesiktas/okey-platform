@@ -4,6 +4,9 @@ let suAnkiMasam = null;
 let benimSiramMi = false;
 let guncelMasalar = {}; 
 
+// YENİ: Gösterge hakkının olup olmadığını tutan sistem
+let gostergeHakki = false; 
+
 document.getElementById('benimAdimKutusu').innerHTML = aktifKullaniciAdi + ' <span style="color:#2ecc71;">✔</span>';
 document.getElementById('lobiBenimAdim').innerText = "👑 " + aktifKullaniciAdi;
 
@@ -26,7 +29,6 @@ const bitisAlani = document.getElementById('bitisAlani');
 const ustRaf = document.getElementById('ustRaf');
 const altRaf = document.getElementById('altRaf');
 
-// GÖSTERGE BUTONU OLUŞTURMA
 let gostergeBtn = document.createElement('button');
 gostergeBtn.id = 'gostergeBtn';
 gostergeBtn.innerText = '⭐ GÖSTERGE YAP';
@@ -37,10 +39,20 @@ gostergeBtn.onclick = () => {
 };
 document.getElementById('oyunAlanObjeleri').firstElementChild.appendChild(gostergeBtn);
 
+// GÖSTERGE BAŞARILI SİNYALİ GELDİĞİNDE BUTONU TEMELLİ KAPAT
+socket.on('gosterge_basarili', (data) => {
+    if(suAnkiMasam === data.masaAdi) {
+        gostergeHakki = false;
+        gostergeBtn.style.display = 'none';
+    }
+});
+
 function checkGosterge() {
     gostergeBtn.style.display = 'none';
+    if(!gostergeHakki || !benimSiramMi) return; // Hak yoksa veya sıra bende değilse kontrol etme!
+    
     let gostergeDiv = document.getElementById('gostergeTasi');
-    if(gostergeDiv.innerText && benimSiramMi) {
+    if(gostergeDiv.innerText) {
         let gSayi = gostergeDiv.innerText;
         let renkClass = Array.from(gostergeDiv.classList).find(c => c.startsWith('tas-'));
         if(!renkClass) return;
@@ -109,7 +121,8 @@ new Sortable(document.getElementById('benimIskartam'), {
     group: { name: 'istaka', put: function (to) { return benimSiramMi && elimdekiTasSayisi() === 15; }, pull: false },
     animation: 150, forceFallback: true, fallbackOnBody: true, emptyInsertThreshold: 100, 
     onAdd: function (evt) {
-        gostergeBtn.style.display = 'none'; // Taş atınca gösterge hakkı biter
+        gostergeHakki = false; // Taş attığı an hak biter
+        gostergeBtn.style.display = 'none'; 
         document.getElementById('iskartaYazi').style.display = 'none';
         const atilanTas = evt.item;
         atilanTas.style.position = 'absolute'; atilanTas.style.top = '50%'; atilanTas.style.left = '50%'; atilanTas.style.transform = 'translate(-50%, -50%)'; atilanTas.style.margin = '0';
@@ -124,6 +137,7 @@ new Sortable(bitisAlani, {
     group: { name: 'istaka', put: function (to) { return benimSiramMi && elimdekiTasSayisi() === 15; }, pull: false },
     animation: 150, forceFallback: true, fallbackOnBody: true, emptyInsertThreshold: 100, 
     onAdd: function (evt) {
+        gostergeHakki = false; 
         gostergeBtn.style.display = 'none';
         const atilanTas = evt.item;
         atilanTas.style.position = 'absolute'; atilanTas.style.top = '50%'; atilanTas.style.left = '50%'; atilanTas.style.transform = 'translate(-50%, -50%)'; atilanTas.style.margin = '0';
@@ -153,7 +167,8 @@ socket.on('hatali_bitis', (mesaj) => {
 
 function otomatikTasAt(tasElementi) {
     if (!benimSiramMi || elimdekiTasSayisi() !== 15) return; 
-    gostergeBtn.style.display = 'none'; // Taş atınca hak biter
+    gostergeHakki = false; // Taş attığı an hak biter
+    gostergeBtn.style.display = 'none'; 
     const iskartaKutusu = document.getElementById('benimIskartam');
     if (iskartaKutusu) {
         iskartaKutusu.appendChild(tasElementi);
@@ -204,7 +219,8 @@ function kurtarmaSinyaliGonder() {
 
 kalanTasBilgi.addEventListener('click', () => {
     if (benimSiramMi && elimdekiTasSayisi() === 14) {
-        gostergeBtn.style.display = 'none'; // Taş çekince hak biter
+        gostergeHakki = false; // Taş çektiği an hak biter
+        gostergeBtn.style.display = 'none'; 
         socket.emit('ortadan_tas_cek', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi });
     }
     else if(!benimSiramMi) alert("Şu an sıra sizde değil!");
@@ -213,7 +229,8 @@ kalanTasBilgi.addEventListener('click', () => {
 
 document.getElementById('iskartaSol').addEventListener('click', function() {
     if (benimSiramMi && elimdekiTasSayisi() === 14 && this.children.length > 0) {
-        gostergeBtn.style.display = 'none'; // Yerden taş alınca hak biter
+        gostergeHakki = false; // Yerden taş aldığı an hak biter
+        gostergeBtn.style.display = 'none'; 
         const tasEl = this.lastElementChild;
         let renkSinifi = Array.from(tasEl.classList).find(c=>c.startsWith('tas-'));
         let renk = renkSinifi ? renkSinifi.split('-')[1] : 'siyah';
@@ -292,6 +309,7 @@ socket.on('oyun_bitti', (data) => {
         
         oyunAlanObjeleri.style.display = 'none';
         gostergeBtn.style.display = 'none';
+        gostergeHakki = false; 
         
         oyunuBaslatBtn.innerText = "🔄 AYNI MASADA TEKRAR OYNA";
         oyunuBaslatBtn.style.display = 'block';
@@ -393,6 +411,9 @@ socket.on('masa_oyun_basladi', (data) => {
         oyunuBaslatBtn.style.display = 'none';
         oyunAlanObjeleri.style.display = 'flex';
         bitisAlani.style.display = 'flex';
+        
+        gostergeHakki = true; // YENİ OYUN BAŞLADIĞINDA HAKKI VER
+        
         kalanTasBilgi.innerText = data.kalanTas;
         if(data.gosterge) {
             const gostergeDiv = document.getElementById('gostergeTasi');
@@ -411,7 +432,6 @@ socket.on('taslari_al', (data) => {
         for(let i=0; i<24; i++) document.getElementById('y'+i).innerHTML = '';
         data.taslar.forEach((tas, index) => { tasEkle(tas, 'y'+index); });
         
-        // Dağıtımdan sonra kontrol et
         setTimeout(checkGosterge, 500);
     }
 });
@@ -465,7 +485,7 @@ socket.on('sira_guncelle', (data) => {
             else el.classList.remove('aktif-sira');
         });
         
-        checkGosterge(); // Sıra her değiştiğinde kontrol et
+        checkGosterge(); 
     }
 });
 
