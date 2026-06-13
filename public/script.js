@@ -60,10 +60,6 @@ function masayiTemizle() {
     document.getElementById('iskartaSol').innerHTML = '';
     document.getElementById('iskartaUst').innerHTML = '';
     
-    document.getElementById('seatTop').innerText = "Bekleniyor...";
-    document.getElementById('seatLeft').innerText = "Bekleniyor...";
-    document.getElementById('seatRight').innerText = "Bekleniyor...";
-    
     document.getElementById('benimAdimKutusu').classList.remove('aktif-sira');
     document.getElementById('seatRight').classList.remove('aktif-sira');
     document.getElementById('seatTop').classList.remove('aktif-sira');
@@ -420,6 +416,12 @@ lobiyeDonBtn.addEventListener('click', () => {
     if(suAnkiMasam) socket.emit('masadan_kalk', { isim: aktifKullaniciAdi, masaAdi: suAnkiMasam });
     suAnkiMasam = null;
     masayiTemizle();
+    
+    // YENİ: Masadan kalkarken isimleri temizliyoruz ki motorda eski botlar kalmasın
+    document.getElementById('seatTop').innerText = "Bekleniyor...";
+    document.getElementById('seatLeft').innerText = "Bekleniyor...";
+    document.getElementById('seatRight').innerText = "Bekleniyor...";
+    
     masaEkrani.style.display = 'none';
     lobiEkrani.style.display = 'flex';
 });
@@ -470,6 +472,11 @@ socket.on('masa_oyun_basladi', (data) => {
         if(data.kasa) {
             masaKasaBilgisi.style.display = 'block';
             masaKasaBilgisi.innerText = 'KASA: ' + data.kasa.toLocaleString('tr-TR') + ' ÇİP';
+        }
+        
+        // YENİ: Masayı temizledikten sonra güncel bot isimlerini hemen geri yüklüyoruz.
+        if (guncelMasalar[data.masaAdi]) {
+            gelişmişKoltukHizala(guncelMasalar[data.masaAdi]);
         }
     }
 });
