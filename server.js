@@ -265,9 +265,9 @@ io.on('connection', (socket) => {
               const odul = masa.bahis;
               oyuncuCipleri[data.isim] += odul;
               io.emit('cip_guncelle_ozel', { isim: data.isim, cip: oyuncuCipleri[data.isim] });
-              io.emit('sistem_mesaji', `🌟 VIP ŞOV! ${data.isim} GÖSTERGE yaptı ve anında ${odul.toLocaleString()} ÇİP kazandı!`);
-              // Oyunculara butonu kalıcı kapatma sinyali gönderiliyor
-              io.emit('gosterge_basarili', { masaAdi: data.masaAdi });
+              
+              // YENİ: Masadaki herkese kimin ne kadar kazandığını gösterge_basarili ile iletiyoruz
+              io.emit('gosterge_basarili', { masaAdi: data.masaAdi, isim: data.isim, odul: odul });
           }
       }
   });
@@ -339,12 +339,6 @@ io.on('connection', (socket) => {
 
               oyuncuCipleri[data.isim] += kazanilanPara;
               io.emit('cip_guncelle_ozel', { isim: data.isim, cip: oyuncuCipleri[data.isim] });
-              
-              if(okeyleBittiMi) {
-                  io.emit('sistem_mesaji', `🚨 BÜYÜK VURGUN! ${data.isim} OKEY ATARAK BİTİRDİ! Tam ${kazanilanPara.toLocaleString()} ÇİP KAZANDI! 🚨`);
-              } else {
-                  io.emit('sistem_mesaji', `🎉 ${data.isim} elini tamamladı ve masadaki ${kazanilanPara.toLocaleString()} ÇİPİ KAZANDI!`);
-              }
               
               oyunuSifirla(data.masaAdi, data.isim, kazanilanPara, sebepMesaji, okeyleBittiMi);
           } else {
