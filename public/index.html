@@ -26,7 +26,6 @@
         .sistem-mesaji::before { content: ''; display: inline-block; width: 10px; height: 10px; background-color: #2ecc71; border-radius: 50%; box-shadow: 0 0 5px #2ecc71; }
 
         .main-container { display: flex; flex-direction: column; flex: 1; overflow-y: auto; }
-        /* Padding bottom artırıldı ki son masalar yüzen butonun arkasında kalmasın */
         #lobiEkrani { display: flex; flex-direction: column; flex: 1; position: relative; padding-bottom: 140px; }
         
         .masa-sec-baslik { padding: 15px 20px 5px 20px; font-size: 12px; font-weight: 800; color: #6c8a75; letter-spacing: 2px; text-transform: uppercase; }
@@ -56,7 +55,7 @@
         .alt-menu-item.active { color: #f2c94c; }
         .alt-menu-ikon { font-size: 20px; }
 
-        /* --- HEMEN OYNA BUTONU TAMAMEN YUKARI ALINDI --- */
+        /* --- HEMEN OYNA BUTONU --- */
         .btn-hemen-oyna { position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%); background: linear-gradient(180deg, #f9d854 0%, #d4a017 100%); color: #111; border: none; padding: 12px 30px; border-radius: 12px; font-weight: 900; font-size: 14px; cursor: pointer; box-shadow: 0 8px 15px rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center; gap: 2px; width: 180px; z-index: 15; }
         .btn-hemen-oyna:active { transform: translateX(-50%) scale(0.95); }
         .btn-hemen-oyna span { font-size: 10px; font-weight: normal; color: rgba(0,0,0,0.7); }
@@ -144,7 +143,7 @@
             .players-panel { display: block; width: 350px; border-left: 1px solid rgba(255,255,255,0.05); overflow-y: auto; background-color: #0b1c11; padding: 15px; }
             .istaka-container { height: 160px; max-width: 800px; margin: 0 auto; }
             .alt-menu-container { display: none; } 
-            .btn-hemen-oyna { display: none; } /* Desktop'ta bu butonu da gizliyoruz */
+            .btn-hemen-oyna { display: none; } 
         }
     </style>
     <script src="/socket.io/socket.io.js"></script>
@@ -358,7 +357,13 @@
                 const atilanTas = evt.item;
                 atilanTas.style.position = 'absolute'; atilanTas.style.top = '50%'; atilanTas.style.left = '50%'; atilanTas.style.transform = 'translate(-50%, -50%)'; atilanTas.style.margin = '0';
                 let gruplar = getIstakaGruplari(); 
-                socket.emit('oyunu_bitir', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi, gruplar: gruplar });
+                
+                // Okey ile bitiş için atılan taşı alıp server'a yolluyoruz
+                let renkSinifi = Array.from(atilanTas.classList).find(c=>c.startsWith('tas-'));
+                let renk = renkSinifi ? renkSinifi.split('-')[1] : 'siyah';
+                const bitisTasi = { id: atilanTas.id, renk: renk, sayi: atilanTas.innerText };
+
+                socket.emit('oyunu_bitir', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi, gruplar: gruplar, bitisTasi: bitisTasi });
             }
         });
 
@@ -493,14 +498,17 @@
                 
                 if (data.kazanan) {
                     if (data.kazanan === aktifKullaniciAdi) {
-                        baslik.innerText = "🏆 TEBRİKLER, KAZANDIN! 🏆";
+                        baslik.innerText = data.okeyleBittiMi ? "🔥 OKEYLE BİTİRDİN! 🔥" : "🏆 TEBRİKLER, KAZANDIN! 🏆";
+                        baslik.style.color = data.okeyleBittiMi ? "#ff3333" : "#f2c94c";
                     } else {
-                        baslik.innerText = "🎉 OYUN BİTTİ 🎉";
+                        baslik.innerText = data.okeyleBittiMi ? "🚨 RAKİP OKEY ATTI! 🚨" : "🎉 OYUN BİTTİ 🎉";
+                        baslik.style.color = data.okeyleBittiMi ? "#ff3333" : "#f2c94c";
                     }
                     metin.innerText = `Kazanan: ${data.kazanan}\nSebep: ${data.sebep}`;
                     odul.innerText = `+${data.odul.toLocaleString('tr-TR')} ÇİP`;
                 } else {
                     baslik.innerText = "🛑 OYUN BİTTİ 🛑";
+                    baslik.style.color = "#dc3545";
                     metin.innerText = data.sebep || "Masadaki herkes ayrıldı.";
                     odul.innerText = "";
                 }
@@ -508,7 +516,11 @@
                 sonucEkrani.style.display = 'flex'; 
                 
                 oyunAlanObjeleri.style.display = 'none';
+                
+                // YENİDEN BAŞLAT BUTONU
+                oyunuBaslatBtn.innerText = "🔄 AYNI MASADA TEKRAR OYNA";
                 oyunuBaslatBtn.style.display = 'block';
+                
                 bitisAlani.style.display = 'none';
                 masaKasaBilgisi.style.display = 'none'; 
                 bitisAlani.innerHTML = 'BİTİR<br>🏆'; 
