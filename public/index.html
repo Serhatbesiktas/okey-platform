@@ -7,7 +7,7 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
-        /* --- GENEL TEMA (İLK RESME BİREBİR UYGUN) --- */
+        /* --- GENEL TEMA --- */
         body { background-color: #0b1c11; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; height: 100dvh; overflow: hidden; }
         
         /* --- ÜST BİLGİ (HEADER) --- */
@@ -18,27 +18,20 @@
         .profil-isim { font-size: 15px; font-weight: bold; margin: 0; color: #fff; display: flex; align-items: center; gap: 5px;}
         .vip-badge { background-color: #f2c94c; color: #000; font-size: 9px; font-weight: 900; padding: 2px 6px; border-radius: 4px; margin-top: 2px; }
         
-        /* Neon Çip Kutusu (İlk resimdeki gibi) */
         .cip-kutu { background-color: #0d2b1a; border: 1px solid #2ecc71; box-shadow: 0 0 10px rgba(46, 204, 113, 0.5); padding: 8px 15px; border-radius: 12px; display: flex; align-items: center; gap: 8px; font-weight: bold; color: #fff; font-size: 16px; position: relative;}
         .cip-kutu::before { content: ''; position: absolute; top: 2px; left: 2px; right: 2px; bottom: 2px; border: 1px solid rgba(46, 204, 113, 0.3); border-radius: 10px; pointer-events: none;}
         .cip-ikon { background: #f2c94c; color: #000; width: 20px; height: 20px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 12px; font-weight: 900; }
         
-        /* Sistem Mesajı */
         .sistem-mesaji { padding: 10px 20px; font-size: 12px; color: #8ba895; display: flex; align-items: center; gap: 8px; background-color: #0b1c11; flex-shrink: 0;}
         .sistem-mesaji::before { content: ''; display: inline-block; width: 10px; height: 10px; background-color: #2ecc71; border-radius: 50%; box-shadow: 0 0 5px #2ecc71; }
 
-        /* Lobi Ana Konteyner */
         .main-container { display: flex; flex-direction: column; flex: 1; overflow-y: auto; }
-        #lobiEkrani { display: flex; flex-direction: column; flex: 1; position: relative; padding-bottom: 100px; /* Alt menü için yer */ }
+        #lobiEkrani { display: flex; flex-direction: column; flex: 1; position: relative; padding-bottom: 100px; }
         
         .masa-sec-baslik { padding: 15px 20px 5px 20px; font-size: 12px; font-weight: 800; color: #6c8a75; letter-spacing: 2px; text-transform: uppercase; }
-
         .tables-panel { padding: 10px 20px; display: flex; flex-direction: column; gap: 15px; flex: 1; overflow-y: auto; }
         
-        /* --- YENİ MASA KARTLARI (İLK RESME BİREBİR) --- */
         .masa-kart { background-color: #112618; border: 1px solid #1e3f28; border-radius: 15px; padding: 15px; display: flex; justify-content: space-between; align-items: center; position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        
-        /* Masa Watermark Efekti */
         .masa-watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 140px; height: 65px; border: 2px solid rgba(255,255,255,0.06); border-radius: 40px; pointer-events: none; }
         .masa-watermark::before, .masa-watermark::after { content: ''; position: absolute; width: 20px; height: 10px; border: 2px solid rgba(255,255,255,0.06); border-radius: 5px; left: 50%; transform: translateX(-50%); }
         .masa-watermark::before { top: -10px; }
@@ -55,21 +48,21 @@
         .btn-otur:active { transform: scale(0.95); }
         .btn-otur.disabled { background: #2a3a30; color: #5c7565; box-shadow: none; cursor: not-allowed; }
 
-        /* --- ALT MENÜ VE HEMEN OYNA BUTONU (İLK RESİM) --- */
+        /* --- ALT MENÜ VE HEMEN OYNA BUTONU --- */
         .alt-menu-container { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; background-color: #0b1c11; border-top: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; z-index: 10; }
         
         .alt-menu-item { display: flex; flex-direction: column; align-items: center; gap: 5px; color: #6c8a75; font-size: 10px; font-weight: bold; cursor: pointer; }
         .alt-menu-item.active { color: #f2c94c; }
         .alt-menu-ikon { font-size: 20px; }
 
-        .btn-hemen-oyna { position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%); background: linear-gradient(180deg, #f9d854 0%, #d4a017 100%); color: #111; border: none; padding: 12px 30px; border-radius: 12px; font-weight: 900; font-size: 14px; cursor: pointer; box-shadow: 0 8px 15px rgba(0,0,0,0.4); display: flex; flex-direction: column; align-items: center; gap: 2px; width: 180px; }
+        /* BUTON YUKARI ALINDI: bottom: 35px yapıldı */
+        .btn-hemen-oyna { position: absolute; bottom: 35px; left: 50%; transform: translateX(-50%); background: linear-gradient(180deg, #f9d854 0%, #d4a017 100%); color: #111; border: none; padding: 12px 30px; border-radius: 12px; font-weight: 900; font-size: 14px; cursor: pointer; box-shadow: 0 8px 15px rgba(0,0,0,0.4); display: flex; flex-direction: column; align-items: center; gap: 2px; width: 180px; }
         .btn-hemen-oyna:active { transform: translateX(-50%) scale(0.95); }
         .btn-hemen-oyna span { font-size: 10px; font-weight: normal; color: rgba(0,0,0,0.7); }
 
-        /* Lobi Oyuncular Paneli (Mobil İçin Gizli, Desktop için Korundu) */
         .players-panel { display: none; } 
 
-        /* --- OYUN MASASI EKRANI (MEKANİK %100 KORUNDU) --- */
+        /* --- OYUN MASASI EKRANI --- */
         #masaEkrani { display: none; flex: 1; background-color: #0a2014; position: relative; padding: 10px; flex-direction: column; }
         .okey-table-ui { background-color: #1a5c38; border: 4px solid #0d2e1d; border-radius: 20px; width: 100%; flex: 1; position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); margin-bottom: 5px; overflow: hidden; }
         
@@ -115,7 +108,6 @@
         #bitisAlani.sortable-drag-over { background-color: rgba(220, 53, 69, 0.6); color: white; border-color: white;}
         #bitisAlani .okey-tasi { position: absolute !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; width: 38px !important; height: 52px !important; font-size: 18px !important; border-bottom-width: 3px !important; pointer-events: none !important; }
 
-        /* ZAFER / BİTİŞ EKRANI */
         #sonucEkrani { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
         .sonuc-kutu { background: #112618; border: 4px solid #f2c94c; padding: 30px; border-radius: 20px; text-align: center; color: white; width: 100%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
         #sonucBaslik { color: #f2c94c; font-size: 28px; margin-bottom: 15px; font-weight: 900; text-transform: uppercase; }
@@ -143,14 +135,14 @@
         
         .tas-kirmizi { color: #d32f2f; } .tas-siyah { color: #212529; } .tas-mavi { color: #1976d2; } .tas-sari { color: #198754; } 
 
-        .chat-panel { display: none; } /* Mobil lobi için chat'i gizledik, dilersek açarız */
+        .chat-panel { display: none; } 
 
         @media (min-width: 768px) {
             #lobiEkrani { flex-direction: row; padding-bottom: 0; }
             .tables-panel { flex: 1; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; align-content: start; }
             .players-panel { display: block; width: 350px; border-left: 1px solid rgba(255,255,255,0.05); overflow-y: auto; background-color: #0b1c11; padding: 15px; }
             .istaka-container { height: 160px; max-width: 800px; margin: 0 auto; }
-            .alt-menu-container { display: none; } /* Masaüstünde alt menüyü gizle */
+            .alt-menu-container { display: none; } 
         }
     </style>
     <script src="/socket.io/socket.io.js"></script>
@@ -179,7 +171,7 @@
         <div class="masa-sec-baslik">MASA SEÇ</div>
 
         <div class="tables-panel" id="masalarAlani">
-            </div>
+        </div>
 
         <div class="players-panel">
             <div class="panel-title" style="color:#f2c94c; font-size:14px; margin-bottom:10px;">👥 Lobideki Oyuncular</div>
@@ -206,7 +198,8 @@
                 <span>Rastgele Masa</span>
             </button>
 
-            <div class="alt-menu-item" style="margin-left: 60px;"> <div class="alt-menu-ikon">🏆</div>
+            <div class="alt-menu-item" style="margin-left: 60px;">
+                <div class="alt-menu-ikon">🏆</div>
                 <span>Turnuvalar</span>
             </div>
             <div class="alt-menu-item">
@@ -273,6 +266,9 @@
         const aktifKullaniciAdi = "Oyuncu_" + Math.floor(Math.random() * 900 + 100);
         let suAnkiMasam = null; 
         let benimSiramMi = false;
+        
+        // Yeni: Masaların güncel durumunu global değişkende tutuyoruz
+        let guncelMasalar = {}; 
 
         document.getElementById('benimAdimKutusu').innerHTML = aktifKullaniciAdi + ' <span style="color:#2ecc71;">✔</span>';
         document.getElementById('lobiBenimAdim').innerText = "👑 " + aktifKullaniciAdi;
@@ -525,8 +521,9 @@
             }
         });
 
-        // --- İLK RESME ÖZEL DİNAMİK KART OLUŞTURUCU (MEKANİK KORUNDU) ---
         socket.on('masalari_guncelle', (lobidekiMasalar) => {
+            guncelMasalar = lobidekiMasalar; // Yeni: Veriyi global değişkene kopyala
+            
             masalarAlani.innerHTML = ''; 
             for (const [masaAdi, koltuklar] of Object.entries(lobidekiMasalar)) {
                 const doluKoltukSayisi = koltuklar.filter(k => k !== null).length;
@@ -577,6 +574,27 @@
         });
 
         oyunuBaslatBtn.addEventListener('click', () => { socket.emit('oyunu_baslat', suAnkiMasam); });
+
+        // YENİ: Hemen Oyna Butonu Fonksiyonu
+        document.querySelector('.btn-hemen-oyna').addEventListener('click', () => {
+            if (suAnkiMasam) return; // Zaten bir masadaysa işlem yapma
+            
+            let musaitMasa = null;
+            // Tüm masaları gez ve ilk boş yeri olanı bul
+            for (const [masaAdi, koltuklar] of Object.entries(guncelMasalar)) {
+                const doluSayisi = koltuklar.filter(k => k !== null).length;
+                if (doluSayisi < 4) {
+                    musaitMasa = masaAdi;
+                    break;
+                }
+            }
+            
+            if (musaitMasa) {
+                masayaOtur(musaitMasa);
+            } else {
+                alert("Şu an tüm masalar tam kapasite dolu, patron!");
+            }
+        });
 
         socket.on('masa_kasa_guncelle', (data) => {
             if(suAnkiMasam === data.masaAdi) {
