@@ -26,7 +26,8 @@
         .sistem-mesaji::before { content: ''; display: inline-block; width: 10px; height: 10px; background-color: #2ecc71; border-radius: 50%; box-shadow: 0 0 5px #2ecc71; }
 
         .main-container { display: flex; flex-direction: column; flex: 1; overflow-y: auto; }
-        #lobiEkrani { display: flex; flex-direction: column; flex: 1; position: relative; padding-bottom: 100px; }
+        /* Padding bottom artırıldı ki son masalar yüzen butonun arkasında kalmasın */
+        #lobiEkrani { display: flex; flex-direction: column; flex: 1; position: relative; padding-bottom: 140px; }
         
         .masa-sec-baslik { padding: 15px 20px 5px 20px; font-size: 12px; font-weight: 800; color: #6c8a75; letter-spacing: 2px; text-transform: uppercase; }
         .tables-panel { padding: 10px 20px; display: flex; flex-direction: column; gap: 15px; flex: 1; overflow-y: auto; }
@@ -48,15 +49,15 @@
         .btn-otur:active { transform: scale(0.95); }
         .btn-otur.disabled { background: #2a3a30; color: #5c7565; box-shadow: none; cursor: not-allowed; }
 
-        /* --- ALT MENÜ VE HEMEN OYNA BUTONU --- */
-        .alt-menu-container { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; background-color: #0b1c11; border-top: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; z-index: 10; }
+        /* --- ALT MENÜ --- */
+        .alt-menu-container { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; background-color: #0b1c11; border-top: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-around; align-items: center; padding: 0 10px; z-index: 10; }
         
         .alt-menu-item { display: flex; flex-direction: column; align-items: center; gap: 5px; color: #6c8a75; font-size: 10px; font-weight: bold; cursor: pointer; }
         .alt-menu-item.active { color: #f2c94c; }
         .alt-menu-ikon { font-size: 20px; }
 
-        /* BUTON YUKARI ALINDI: bottom: 35px yapıldı */
-        .btn-hemen-oyna { position: absolute; bottom: 35px; left: 50%; transform: translateX(-50%); background: linear-gradient(180deg, #f9d854 0%, #d4a017 100%); color: #111; border: none; padding: 12px 30px; border-radius: 12px; font-weight: 900; font-size: 14px; cursor: pointer; box-shadow: 0 8px 15px rgba(0,0,0,0.4); display: flex; flex-direction: column; align-items: center; gap: 2px; width: 180px; }
+        /* --- HEMEN OYNA BUTONU TAMAMEN YUKARI ALINDI --- */
+        .btn-hemen-oyna { position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%); background: linear-gradient(180deg, #f9d854 0%, #d4a017 100%); color: #111; border: none; padding: 12px 30px; border-radius: 12px; font-weight: 900; font-size: 14px; cursor: pointer; box-shadow: 0 8px 15px rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center; gap: 2px; width: 180px; z-index: 15; }
         .btn-hemen-oyna:active { transform: translateX(-50%) scale(0.95); }
         .btn-hemen-oyna span { font-size: 10px; font-weight: normal; color: rgba(0,0,0,0.7); }
 
@@ -143,6 +144,7 @@
             .players-panel { display: block; width: 350px; border-left: 1px solid rgba(255,255,255,0.05); overflow-y: auto; background-color: #0b1c11; padding: 15px; }
             .istaka-container { height: 160px; max-width: 800px; margin: 0 auto; }
             .alt-menu-container { display: none; } 
+            .btn-hemen-oyna { display: none; } /* Desktop'ta bu butonu da gizliyoruz */
         }
     </style>
     <script src="/socket.io/socket.io.js"></script>
@@ -183,6 +185,11 @@
             </table>
         </div>
 
+        <button class="btn-hemen-oyna">
+            ⚡ Hemen Oyna
+            <span>Rastgele Masa</span>
+        </button>
+
         <div class="alt-menu-container">
             <div class="alt-menu-item active">
                 <div class="alt-menu-ikon">🏠</div>
@@ -192,13 +199,7 @@
                 <div class="alt-menu-ikon">👥</div>
                 <span>Arkadaşlar</span>
             </div>
-            
-            <button class="btn-hemen-oyna">
-                ⚡ Hemen Oyna
-                <span>Rastgele Masa</span>
-            </button>
-
-            <div class="alt-menu-item" style="margin-left: 60px;">
+            <div class="alt-menu-item">
                 <div class="alt-menu-ikon">🏆</div>
                 <span>Turnuvalar</span>
             </div>
@@ -267,7 +268,6 @@
         let suAnkiMasam = null; 
         let benimSiramMi = false;
         
-        // Yeni: Masaların güncel durumunu global değişkende tutuyoruz
         let guncelMasalar = {}; 
 
         document.getElementById('benimAdimKutusu').innerHTML = aktifKullaniciAdi + ' <span style="color:#2ecc71;">✔</span>';
@@ -522,7 +522,7 @@
         });
 
         socket.on('masalari_guncelle', (lobidekiMasalar) => {
-            guncelMasalar = lobidekiMasalar; // Yeni: Veriyi global değişkene kopyala
+            guncelMasalar = lobidekiMasalar; 
             
             masalarAlani.innerHTML = ''; 
             for (const [masaAdi, koltuklar] of Object.entries(lobidekiMasalar)) {
@@ -575,12 +575,10 @@
 
         oyunuBaslatBtn.addEventListener('click', () => { socket.emit('oyunu_baslat', suAnkiMasam); });
 
-        // YENİ: Hemen Oyna Butonu Fonksiyonu
         document.querySelector('.btn-hemen-oyna').addEventListener('click', () => {
-            if (suAnkiMasam) return; // Zaten bir masadaysa işlem yapma
+            if (suAnkiMasam) return; 
             
             let musaitMasa = null;
-            // Tüm masaları gez ve ilk boş yeri olanı bul
             for (const [masaAdi, koltuklar] of Object.entries(guncelMasalar)) {
                 const doluSayisi = koltuklar.filter(k => k !== null).length;
                 if (doluSayisi < 4) {
