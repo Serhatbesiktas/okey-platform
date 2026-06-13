@@ -7,53 +7,69 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
-        /* --- YENİ VIP TEMA TEMEL AYARLARI --- */
-        body { background-color: #0b140e; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; height: 100dvh; overflow: hidden; }
+        /* --- GENEL TEMA (İLK RESME BİREBİR UYGUN) --- */
+        body { background-color: #0b1c11; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; height: 100dvh; overflow: hidden; }
         
-        /* --- ÜST BİLGİ (HEADER) VIP TASARIMI --- */
-        .vip-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background-color: #111e15; border-bottom: 1px solid #1f3625; flex-shrink: 0; }
+        /* --- ÜST BİLGİ (HEADER) --- */
+        .vip-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background-color: #0b1c11; flex-shrink: 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .profil-bilgi { display: flex; align-items: center; gap: 10px; }
-        .profil-avatar { width: 50px; height: 50px; background-color: #1a2e20; border-radius: 50%; border: 2px solid #f2c94c; display: flex; justify-content: center; align-items: center; font-size: 24px; }
-        .profil-isim { font-size: 16px; font-weight: bold; margin: 0; color: #fff;}
-        .vip-badge { background-color: #f2c94c; color: #000; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-top: 3px; }
-        .cip-kutu { background-color: #0f2416; border: 1px solid #27ae60; box-shadow: 0 0 10px rgba(39, 174, 96, 0.4); padding: 8px 15px; border-radius: 8px; display: flex; align-items: center; gap: 5px; font-weight: bold; color: #2ecc71; font-size: 16px;}
+        .profil-avatar { width: 45px; height: 45px; background-color: #1a2e20; border-radius: 50%; border: 2px solid #f2c94c; display: flex; justify-content: center; align-items: center; font-size: 20px; }
+        .profil-isim-kutu { display: flex; flex-direction: column; align-items: flex-start; }
+        .profil-isim { font-size: 15px; font-weight: bold; margin: 0; color: #fff; display: flex; align-items: center; gap: 5px;}
+        .vip-badge { background-color: #f2c94c; color: #000; font-size: 9px; font-weight: 900; padding: 2px 6px; border-radius: 4px; margin-top: 2px; }
         
-        /* --- LOBİ VIP EKRANI --- */
-        .main-container { display: flex; flex-direction: column; flex: 1; overflow-y: auto; }
-        #lobiEkrani { display: flex; flex-direction: column; flex: 1; }
+        /* Neon Çip Kutusu (İlk resimdeki gibi) */
+        .cip-kutu { background-color: #0d2b1a; border: 1px solid #2ecc71; box-shadow: 0 0 10px rgba(46, 204, 113, 0.5); padding: 8px 15px; border-radius: 12px; display: flex; align-items: center; gap: 8px; font-weight: bold; color: #fff; font-size: 16px; position: relative;}
+        .cip-kutu::before { content: ''; position: absolute; top: 2px; left: 2px; right: 2px; bottom: 2px; border: 1px solid rgba(46, 204, 113, 0.3); border-radius: 10px; pointer-events: none;}
+        .cip-ikon { background: #f2c94c; color: #000; width: 20px; height: 20px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 12px; font-weight: 900; }
         
-        .sistem-mesaji { padding: 10px 20px; font-size: 13px; color: #a3b8a8; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #1f3625; background-color: #0d1810; flex-shrink: 0;}
+        /* Sistem Mesajı */
+        .sistem-mesaji { padding: 10px 20px; font-size: 12px; color: #8ba895; display: flex; align-items: center; gap: 8px; background-color: #0b1c11; flex-shrink: 0;}
         .sistem-mesaji::before { content: ''; display: inline-block; width: 10px; height: 10px; background-color: #2ecc71; border-radius: 50%; box-shadow: 0 0 5px #2ecc71; }
 
-        .tables-panel { padding: 20px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; flex: 1; }
+        /* Lobi Ana Konteyner */
+        .main-container { display: flex; flex-direction: column; flex: 1; overflow-y: auto; }
+        #lobiEkrani { display: flex; flex-direction: column; flex: 1; position: relative; padding-bottom: 100px; /* Alt menü için yer */ }
         
-        /* Yeni Masa Kartları Tasarımı */
-        .masa-kart { background-color: #142419; border: 1px solid #1f3625; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; gap: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .masa-kart-baslik { font-size: 16px; font-weight: bold; color: #f2c94c; text-align: center; }
-        .masa-gorseli { background-color: #1a2e20; border-radius: 40px; height: 100px; position: relative; border: 2px solid #243f2c; display: flex; justify-content: center; align-items: center; margin: 0 auto; width: 100%; max-width: 280px; }
-        .masa-orta { width: 50px; height: 35px; background-color: #142419; border-radius: 15px; border: 1px solid #2ecc71; box-shadow: inset 0 0 10px rgba(0,0,0,0.5);}
-        .koltuk-text { position: absolute; font-size: 11px; font-style: italic; text-align: center; }
-        .koltuk-text.occupied { color: #2ecc71; font-weight: bold; font-style: normal; }
-        .koltuk-text.empty { color: #6c8a75; }
-        .koltuk-ust { top: 10px; left: 50%; transform: translateX(-50%); }
-        .koltuk-alt { bottom: 10px; left: 50%; transform: translateX(-50%); }
-        .koltuk-sol { top: 50%; left: 15px; transform: translateY(-50%); }
-        .koltuk-sag { top: 50%; right: 15px; transform: translateY(-50%); }
+        .masa-sec-baslik { padding: 15px 20px 5px 20px; font-size: 12px; font-weight: 800; color: #6c8a75; letter-spacing: 2px; text-transform: uppercase; }
+
+        .tables-panel { padding: 10px 20px; display: flex; flex-direction: column; gap: 15px; flex: 1; overflow-y: auto; }
         
-        /* Altın Buton */
-        .btn-altin { background: linear-gradient(180deg, #f2d94c 0%, #d4af37 100%); color: #111; border: none; padding: 12px; border-radius: 8px; font-weight: 800; font-size: 14px; cursor: pointer; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: transform 0.1s; width: 100%; }
-        .btn-altin:active { transform: scale(0.97); }
-        .btn-altin.disabled { background: #3d4a41; color: #8a9e90; box-shadow: none; cursor: not-allowed; }
+        /* --- YENİ MASA KARTLARI (İLK RESME BİREBİR) --- */
+        .masa-kart { background-color: #112618; border: 1px solid #1e3f28; border-radius: 15px; padding: 15px; display: flex; justify-content: space-between; align-items: center; position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        
+        /* Masa Watermark Efekti */
+        .masa-watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 140px; height: 65px; border: 2px solid rgba(255,255,255,0.06); border-radius: 40px; pointer-events: none; }
+        .masa-watermark::before, .masa-watermark::after { content: ''; position: absolute; width: 20px; height: 10px; border: 2px solid rgba(255,255,255,0.06); border-radius: 5px; left: 50%; transform: translateX(-50%); }
+        .masa-watermark::before { top: -10px; }
+        .masa-watermark::after { bottom: -10px; }
 
-        /* Lobi Oyuncular Paneli VIP Güncelleme */
-        .players-panel { background-color: #111e15; border-top: 1px solid #1f3625; padding: 15px; flex-shrink: 0; }
-        .panel-title { font-size: 14px; margin-bottom: 10px; color: #f2c94c; display: flex; gap: 5px; font-weight: bold; }
-        .player-table { width: 100%; font-size: 13px; text-align: left; border-collapse: collapse; }
-        .player-table th { color: #6c8a75; padding-bottom: 8px; border-bottom: 1px solid #1f3625; }
-        .player-table td { padding: 10px 0; border-bottom: 1px solid #0f2416; }
-        .status-dot { width: 8px; height: 8px; background-color: #2ecc71; border-radius: 50%; display: inline-block; margin-right: 5px; box-shadow: 0 0 5px #2ecc71; }
+        .kart-sol { display: flex; align-items: center; gap: 12px; z-index: 2; }
+        .zar-kutu { width: 40px; height: 40px; background-color: rgba(255,255,255,0.1); border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: 20px; }
+        .masa-kart-isim { font-size: 15px; font-weight: bold; color: #fff; }
 
-        /* --- OYUN MASASI EKRANI (MEKANİK KORUNDU) --- */
+        .kart-sag { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; z-index: 2; }
+        .masa-kisi-kutu { background-color: rgba(0,0,0,0.4); padding: 4px 10px; border-radius: 10px; font-size: 11px; font-weight: bold; color: #a0a0a0; display: flex; align-items: center; gap: 5px; }
+        
+        .btn-otur { background: linear-gradient(180deg, #f9d854 0%, #d4a017 100%); color: #111; border: none; padding: 8px 25px; border-radius: 8px; font-weight: 800; font-size: 13px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: transform 0.1s; }
+        .btn-otur:active { transform: scale(0.95); }
+        .btn-otur.disabled { background: #2a3a30; color: #5c7565; box-shadow: none; cursor: not-allowed; }
+
+        /* --- ALT MENÜ VE HEMEN OYNA BUTONU (İLK RESİM) --- */
+        .alt-menu-container { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; background-color: #0b1c11; border-top: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; z-index: 10; }
+        
+        .alt-menu-item { display: flex; flex-direction: column; align-items: center; gap: 5px; color: #6c8a75; font-size: 10px; font-weight: bold; cursor: pointer; }
+        .alt-menu-item.active { color: #f2c94c; }
+        .alt-menu-ikon { font-size: 20px; }
+
+        .btn-hemen-oyna { position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%); background: linear-gradient(180deg, #f9d854 0%, #d4a017 100%); color: #111; border: none; padding: 12px 30px; border-radius: 12px; font-weight: 900; font-size: 14px; cursor: pointer; box-shadow: 0 8px 15px rgba(0,0,0,0.4); display: flex; flex-direction: column; align-items: center; gap: 2px; width: 180px; }
+        .btn-hemen-oyna:active { transform: translateX(-50%) scale(0.95); }
+        .btn-hemen-oyna span { font-size: 10px; font-weight: normal; color: rgba(0,0,0,0.7); }
+
+        /* Lobi Oyuncular Paneli (Mobil İçin Gizli, Desktop için Korundu) */
+        .players-panel { display: none; } 
+
+        /* --- OYUN MASASI EKRANI (MEKANİK %100 KORUNDU) --- */
         #masaEkrani { display: none; flex: 1; background-color: #0a2014; position: relative; padding: 10px; flex-direction: column; }
         .okey-table-ui { background-color: #1a5c38; border: 4px solid #0d2e1d; border-radius: 20px; width: 100%; flex: 1; position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); margin-bottom: 5px; overflow: hidden; }
         
@@ -85,7 +101,7 @@
         
         .masa-kasa-bilgisi { display: none; color: #2ecc71; font-weight: bold; font-size: 14px; text-shadow: 0 0 5px rgba(46, 204, 113, 0.5); border: 1px dashed #2ecc71; padding: 4px 10px; border-radius: 10px; background-color: rgba(0,0,0,0.5); }
 
-        .oyun-baslat-btn { background: linear-gradient(180deg, #f2d94c 0%, #d4af37 100%); color: #111; border: none; padding: 10px 25px; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.4); margin-top: 5px; }
+        .oyun-baslat-btn { background: linear-gradient(180deg, #f9d854 0%, #d4a017 100%); color: #111; border: none; padding: 10px 25px; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.4); margin-top: 5px; }
         .oyun-baslat-btn:active { transform: scale(0.95); }
         
         .kalan-tas-bilgi-container { display: none; flex-direction: column; align-items: center; gap: 8px; }
@@ -101,16 +117,16 @@
 
         /* ZAFER / BİTİŞ EKRANI */
         #sonucEkrani { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
-        .sonuc-kutu { background: #142419; border: 4px solid #f2c94c; padding: 30px; border-radius: 20px; text-align: center; color: white; width: 100%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+        .sonuc-kutu { background: #112618; border: 4px solid #f2c94c; padding: 30px; border-radius: 20px; text-align: center; color: white; width: 100%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
         #sonucBaslik { color: #f2c94c; font-size: 28px; margin-bottom: 15px; font-weight: 900; text-transform: uppercase; }
         #sonucMetin { font-size: 16px; margin-bottom: 15px; color: #fff; }
         #sonucOdul { font-size: 24px; font-weight: bold; color: #2ecc71; margin-bottom: 25px; text-shadow: 0 0 10px rgba(46, 204, 113, 0.4); }
-        .sonuc-btn { background: linear-gradient(180deg, #f2d94c 0%, #d4af37 100%); color: #111; border: none; padding: 12px 30px; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.4); }
+        .sonuc-btn { background: linear-gradient(180deg, #f9d854 0%, #d4a017 100%); color: #111; border: none; padding: 12px 30px; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.4); }
         .sonuc-btn:active { transform: scale(0.95); }
 
         .pro-tus-takimi { width: 100%; display: flex; justify-content: flex-start; align-items: center; padding: 2px 10px; margin-bottom: 4px; z-index: 10; gap: 10px; }
-        .pro-tus { padding: 0 15px; height: 35px; background-color: #142419; border: 1px solid #1f3625; color: #f2c94c; border-radius: 6px; font-weight: bold; font-size: 12px; text-transform: uppercase; cursor: pointer; box-shadow: 0 3px 5px rgba(0,0,0,0.5); }
-        .pro-tus:active { transform: scale(0.95); background-color: #0b140e; }
+        .pro-tus { padding: 0 15px; height: 35px; background-color: #112618; border: 1px solid #1e3f28; color: #f2c94c; border-radius: 6px; font-weight: bold; font-size: 12px; text-transform: uppercase; cursor: pointer; box-shadow: 0 3px 5px rgba(0,0,0,0.5); }
+        .pro-tus:active { transform: scale(0.95); background-color: #0b1c11; }
 
         .istaka-container { width: 100%; height: 140px; background-color: #8b5a2b; border-radius: 10px; border: 4px solid #4a2c10; box-shadow: 0 10px 25px rgba(0,0,0,0.7); display: flex; flex-direction: column; padding: 4px; gap: 4px; position: relative; z-index: 20;}
         .istaka-raf { display: flex; flex: 1; width: 100%; gap: 2px; border-radius: 5px; padding: 3px 2px; }
@@ -127,22 +143,14 @@
         
         .tas-kirmizi { color: #d32f2f; } .tas-siyah { color: #212529; } .tas-mavi { color: #1976d2; } .tas-sari { color: #198754; } 
 
-        /* Sohbet VIP */
-        .chat-panel { background-color: #111e15; border-top: 1px solid #1f3625; display: flex; flex-direction: column; height: 180px; flex-shrink: 0; z-index: 999; }
-        .chat-header { font-size: 12px; padding: 5px 10px; background-color: #0b140e; color: #a0a0a0; border-bottom: 1px solid #1f3625; }
-        .chat-messages { flex: 1; padding: 10px; overflow-y: auto; font-size: 13px; display: flex; flex-direction: column; gap: 5px; }
-        .msg-line { line-height: 1.4; padding-bottom: 3px;}
-        .msg-author { color: #2ecc71; font-weight: bold; }
-        .msg-author.system { color: #f2c94c; }
-        .chat-input-area { display: flex; padding: 8px; gap: 8px; background-color: #0f2416; padding-bottom: calc(8px + env(safe-area-inset-bottom, 10px)); }
-        .chat-input-area input { flex: 1; background-color: #0b140e; border: 1px solid #1f3625; color: #fff; padding: 12px; border-radius: 5px; outline: none; font-size: 16px; }
-        .chat-input-area button { background-color: #f2c94c; color: #000; border: none; padding: 0 15px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 14px; }
+        .chat-panel { display: none; } /* Mobil lobi için chat'i gizledik, dilersek açarız */
 
         @media (min-width: 768px) {
-            #lobiEkrani { flex-direction: row; }
+            #lobiEkrani { flex-direction: row; padding-bottom: 0; }
             .tables-panel { flex: 1; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; align-content: start; }
-            .players-panel { width: 350px; border-top: none; border-left: 1px solid #1f3625; overflow-y: auto; }
+            .players-panel { display: block; width: 350px; border-left: 1px solid rgba(255,255,255,0.05); overflow-y: auto; background-color: #0b1c11; padding: 15px; }
             .istaka-container { height: 160px; max-width: 800px; margin: 0 auto; }
+            .alt-menu-container { display: none; } /* Masaüstünde alt menüyü gizle */
         }
     </style>
     <script src="/socket.io/socket.io.js"></script>
@@ -153,13 +161,13 @@
     <div class="vip-header">
         <div class="profil-bilgi">
             <div class="profil-avatar">😎</div>
-            <div>
-                <p class="profil-isim" id="benimAdimKutusu">Bağlanıyor...</p>
+            <div class="profil-isim-kutu">
+                <p class="profil-isim" id="benimAdimKutusu">Bağlanıyor... <span style="color:#2ecc71;">✔</span></p>
                 <span class="vip-badge">VIP GOLD</span>
             </div>
         </div>
         <div class="cip-kutu">
-            <span>🪙</span> <span id="benimCipim">Bağlanıyor...</span>
+            <div class="cip-ikon">C</div> <span id="benimCipim">Bağlanıyor...</span>
         </div>
     </div>
 
@@ -168,17 +176,43 @@
             Sistem: VIP Oyuna Hoş Geldiniz!
         </div>
         
+        <div class="masa-sec-baslik">MASA SEÇ</div>
+
         <div class="tables-panel" id="masalarAlani">
             </div>
 
         <div class="players-panel">
-            <div class="panel-title">👥 Lobideki Oyuncular</div>
-            <table class="player-table">
-                <thead><tr><th>DRM</th><th>TAKMA AD</th><th>PUAN</th></tr></thead>
+            <div class="panel-title" style="color:#f2c94c; font-size:14px; margin-bottom:10px;">👥 Lobideki Oyuncular</div>
+            <table style="width:100%; font-size:13px; text-align:left; border-collapse:collapse;">
+                <thead><tr><th style="color:#6c8a75; padding-bottom:8px; border-bottom:1px solid #1e3f28;">TAKMA AD</th></tr></thead>
                 <tbody>
-                    <tr><td><span class="status-dot"></span></td><td style="color:#f2c94c; font-weight:bold;" id="lobiBenimAdim">👑 Yükleniyor...</td><td>-</td></tr>
+                    <tr><td style="padding:10px 0; border-bottom:1px solid #112618; color:#f2c94c; font-weight:bold;" id="lobiBenimAdim">👑 Yükleniyor...</td></tr>
                 </tbody>
             </table>
+        </div>
+
+        <div class="alt-menu-container">
+            <div class="alt-menu-item active">
+                <div class="alt-menu-ikon">🏠</div>
+                <span>Lobi</span>
+            </div>
+            <div class="alt-menu-item">
+                <div class="alt-menu-ikon">👥</div>
+                <span>Arkadaşlar</span>
+            </div>
+            
+            <button class="btn-hemen-oyna">
+                ⚡ Hemen Oyna
+                <span>Rastgele Masa</span>
+            </button>
+
+            <div class="alt-menu-item" style="margin-left: 60px;"> <div class="alt-menu-ikon">🏆</div>
+                <span>Turnuvalar</span>
+            </div>
+            <div class="alt-menu-item">
+                <div class="alt-menu-ikon">🛒</div>
+                <span>Mağaza</span>
+            </div>
         </div>
     </div>
 
@@ -207,7 +241,6 @@
                     <div style="display: flex; gap: 15px; align-items: center;">
                         <div class="gosterge-tasi" id="gostergeTasi" title="Gösterge"></div>
                         <div class="kapali-deste" id="kalanTasBilgi" title="Taş Çekmek İçin Tıkla">91</div>
-                        
                         <div id="bitisAlani">BİTİR<br>🏆</div>
                     </div>
                 </div>
@@ -235,22 +268,13 @@
         </div>
     </div>
 
-    <div class="chat-panel">
-        <div class="chat-header">💬 Sunucu Genel Sohbet</div>
-        <div class="chat-messages" id="chatMessages"></div>
-        <div class="chat-input-area">
-            <input type="text" id="chatInput" placeholder="Genel lobiye yaz...">
-            <button id="sendBtn">GÖNDER</button>
-        </div>
-    </div>
-
     <script>
         const socket = io();
         const aktifKullaniciAdi = "Oyuncu_" + Math.floor(Math.random() * 900 + 100);
         let suAnkiMasam = null; 
         let benimSiramMi = false;
 
-        document.getElementById('benimAdimKutusu').innerText = aktifKullaniciAdi;
+        document.getElementById('benimAdimKutusu').innerHTML = aktifKullaniciAdi + ' <span style="color:#2ecc71;">✔</span>';
         document.getElementById('lobiBenimAdim').innerText = "👑 " + aktifKullaniciAdi;
 
         socket.emit('kullanici_girisi', aktifKullaniciAdi);
@@ -270,9 +294,6 @@
         const oyunAlanObjeleri = document.getElementById('oyunAlanObjeleri');
         const kalanTasBilgi = document.getElementById('kalanTasBilgi');
         const bitisAlani = document.getElementById('bitisAlani');
-        const chatInput = document.getElementById('chatInput');
-        const sendBtn = document.getElementById('sendBtn');
-        const chatMessages = document.getElementById('chatMessages');
 
         const ustRaf = document.getElementById('ustRaf');
         const altRaf = document.getElementById('altRaf');
@@ -467,7 +488,6 @@
             }
         });
 
-        // BİLDİRİM (POPUP) SİSTEMİ
         socket.on('oyun_bitti', (data) => {
             if(suAnkiMasam === data.masaAdi) {
                 const sonucEkrani = document.getElementById('sonucEkrani');
@@ -505,7 +525,7 @@
             }
         });
 
-        // YENİ VIP MASA DÜZENİ BURAYA DAHİL EDİLDİ (MEKANİK KORUNDU)
+        // --- İLK RESME ÖZEL DİNAMİK KART OLUŞTURUCU (MEKANİK KORUNDU) ---
         socket.on('masalari_guncelle', (lobidekiMasalar) => {
             masalarAlani.innerHTML = ''; 
             for (const [masaAdi, koltuklar] of Object.entries(lobidekiMasalar)) {
@@ -514,19 +534,19 @@
                 
                 const html = `
                     <div class="masa-kart">
-                        <div class="masa-kart-baslik">${masaAdi}</div>
-                        <div class="masa-gorseli">
-                            <div class="koltuk-text koltuk-alt ${koltuklar[0]?'occupied':'empty'}">${koltuklar[0]?`👤<br>${koltuklar[0]}`:'Boş'}</div>
-                            <div class="koltuk-text koltuk-sag ${koltuklar[1]?'occupied':'empty'}">${koltuklar[1]?`👤<br>${koltuklar[1]}`:'Boş'}</div>
-                            <div class="koltuk-text koltuk-ust ${koltuklar[2]?'occupied':'empty'}">${koltuklar[2]?`👤<br>${koltuklar[2]}`:'Boş'}</div>
-                            <div class="koltuk-text koltuk-sol ${koltuklar[3]?'occupied':'empty'}">${koltuklar[3]?`👤<br>${koltuklar[3]}`:'Boş'}</div>
-                            <div class="masa-orta"></div>
+                        <div class="masa-watermark"></div>
+                        <div class="kart-sol">
+                            <div class="zar-kutu">🎲</div>
+                            <div class="masa-kart-isim">${masaAdi}</div>
                         </div>
-                        <button class="btn-altin ${benBuMasadaMiyim || doluKoltukSayisi>=4 ? 'disabled':''}" 
-                            style="${benBuMasadaMiyim ? 'background:#2ecc71;color:#111;':''}" 
-                            onclick="masayaOtur('${masaAdi}')">
-                            ${benBuMasadaMiyim ? 'OTURDUN ✓' : (doluKoltukSayisi>=4 ? 'MASA DOLU' : `OTUR (${doluKoltukSayisi}/4)`)}
-                        </button>
+                        <div class="kart-sag">
+                            <div class="masa-kisi-kutu">🎲 ${doluKoltukSayisi}/4</div>
+                            <button class="btn-otur ${benBuMasadaMiyim || doluKoltukSayisi>=4 ? 'disabled':''}" 
+                                style="${benBuMasadaMiyim ? 'background:#2ecc71;color:#111;':''}" 
+                                onclick="masayaOtur('${masaAdi}')">
+                                ${benBuMasadaMiyim ? 'OTURDUN ✓' : (doluKoltukSayisi>=4 ? 'DOLU' : 'OTUR')}
+                            </button>
+                        </div>
                     </div>`;
                 masalarAlani.innerHTML += html;
                 if(benBuMasadaMiyim) gelişmişKoltukHizala(koltuklar);
@@ -536,7 +556,6 @@
         function gelişmişKoltukHizala(koltuklar) {
             const index = koltuklar.indexOf(aktifKullaniciAdi);
             if (index === -1) return;
-            document.getElementById('benimAdimKutusu').innerText = "Ben: " + koltuklar[index];
             document.getElementById('seatRight').innerText = koltuklar[(index + 1) % 4] || "Bekleniyor...";
             document.getElementById('seatTop').innerText = koltuklar[(index + 2) % 4] || "Bekleniyor...";
             document.getElementById('seatLeft').innerText = koltuklar[(index + 3) % 4] || "Bekleniyor...";
@@ -653,31 +672,6 @@
                 }
             }
         });
-
-        socket.on('sistem_mesaji', (mesaj) => { ekranaMesajEkle("Sistem", mesaj, true); });
-        sendBtn.addEventListener('click', mesajGonder);
-        chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') mesajGonder(); });
-
-        function mesajGonder() {
-            const metin = chatInput.value.trim();
-            if (metin !== '') {
-                socket.emit('lobi_mesaji_gonder', { isim: aktifKullaniciAdi, mesaj: metin });
-                chatInput.value = ''; chatInput.blur(); 
-            }
-        }
-
-        function ekranaMesajEkle(yazar, icerik, isSystem) {
-            const yeniSatir = document.createElement('div');
-            yeniSatir.className = "msg-line";
-            if (isSystem) {
-                yeniSatir.innerHTML = `<span class="msg-author system">[${yazar}]:</span> <i>${icerik}</i>`;
-            } else {
-                const renk = (yazar === aktifKullaniciAdi) ? "#f2c94c" : "#2ecc71";
-                yeniSatir.innerHTML = `<span class="msg-author" style="color:${renk};">${yazar}:</span> ${icerik}`;
-            }
-            chatMessages.appendChild(yeniSatir);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
     </script>
 </body>
 </html>
