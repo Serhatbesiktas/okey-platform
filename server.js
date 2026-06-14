@@ -8,7 +8,11 @@ const io = require('socket.io')(http, {
 app.use(express.static('public'));
 
 const oyuncuCipleri = {};
+const oyuncuKozmetikleri = {}; 
 const banliKullanicilar = new Set(); 
+
+// YENİ: Anlık interneti kopanlara 20 saniye mühlet tanıyacak hafıza
+const baglantiKopanlar = {}; 
 
 const masalar = {
     'Acemiler (20K Bahis)': { bahis: 20000, kasa: 0, koltuklar: [null, null, null, null], deste: [], gosterge: null, oyunBasladi: false, siradakiOyuncu: null, eller: {}, gostergeGosterildi: false },
@@ -205,19 +209,31 @@ io.on('connection', (socket) => {
   socket.on('kullanici_girisi', (data) => {
       let isim = typeof data === 'object' ? data.isim : data;
       let dbCip = typeof data === 'object' ? data.cip : 250000;
+      let dbKozmetikler = typeof data === 'object' && data.kozmetikler ? data.kozmetikler : []; 
       
       if(banliKullanicilar.has(isim)) {
           socket.emit('admin_islem_uyarisi', { isim: isim, islem: 'ban' });
           return;
       }
 
+      // YENİ: Oyuncu 20 saniye dolmadan geri bağlandıysa Atma İşlemini (Bot'a devri) İptal Et!
+      if(baglantiKopanlar[isim]) {
+          clearTimeout(baglantiKopanlar[isim]);
+          delete baglantiKopanlar[isim];
+      }
+
       socket.kullaniciAdi = isim;
-      
-      // DÜZELTİLEN SATIR BURASI: Artık her mağaza alışında veya kasa dönüşünde sunucu bu yeni çipi kabul edecek!
       oyuncuCipleri[isim] = dbCip; 
+      oyuncuKozmetikleri[isim] = dbKozmetikler; 
 
       socket.emit('cip_guncelle', oyuncuCipleri[isim]);
       io.emit('admin_guncel_veri', oyuncuCipleri);
+      io.emit('kozmetikleri_guncelle', oyuncuKozmetikleri); 
+  });
+
+  socket.on('kozmetik_guncelle', (data) => {
+      oyuncuKozmetikleri[data.isim] = data.kozmetikler;
+      io.emit('kozmetikleri_guncelle', oyuncuKozmetikleri);
   });
 
   socket.on('masaya_otur', (data) => {
@@ -307,14 +323,6 @@ io.on('connection', (socket) => {
       }
   });
 
-  socket.on('taslarimi_ver', (data) => {
-      const masa = masalar[data.masaAdi];
-      if(masa && masa.oyunBasladi && masa.eller[data.isim]) {
-          socket.emit('masa_oyun_basladi', { masaAdi: data.masaAdi, gosterge: masa.gosterge, kalanTas: masa.deste.length, kasa: masa.kasa });
-          socket.emit('taslari_al', { kime: data.isim, taslar: masa.eller[data.isim] });
-      }
-  });
-
   socket.on('tas_atildi', (data) => {
       const masa = masalar[data.masaAdi];
       if(masa && masa.siradakiOyuncu === data.isim) {
@@ -380,43 +388,51 @@ io.on('connection', (socket) => {
       }
   });
 
+  // YENİ: Otomatik Masaya Geri Dönme Fonksiyonu
+  socket.on('masaya_geri_don', (data) => {
+      const masa = masalar[data.masaAdi];
+      if (masa && masa.oyunBasladi && masa.koltuklar.includes(data.isim)) {
+          // Oyuncunun kopan ekranını oyunun güncel haliyle onarır
+          socket.emit('masa_oyun_basladi', { masaAdi: data.masaAdi, gosterge: masa.gosterge, kalanTas: masa.deste.length, kasa: masa.kasa });
+          if(masa.eller[data.isim]) {
+              socket.emit('taslari_al', { kime: data.isim, taslar: masa.eller[data.isim] });
+          }
+          socket.emit('sira_guncelle', { masaAdi: data.masaAdi, kimde: masa.siradakiOyuncu });
+      }
+  });
+
   socket.on('masadan_kalk', (data) => { kullaniciyiMasadanKaldir(data.isim); });
-  socket.on('disconnect', () => { if(socket.kullaniciAdi) kullaniciyiMasadanKaldir(socket.kullaniciAdi); });
+  
+  socket.on('disconnect', () => { 
+      const kopanIsim = socket.kullaniciAdi;
+      if(kopanIsim) { 
+          // YENİ: Anında masadan atmak yerine 20 saniye bekletiyoruz!
+          baglantiKopanlar[kopanIsim] = setTimeout(() => {
+              kullaniciyiMasadanKaldir(kopanIsim);
+              delete baglantiKopanlar[kopanIsim];
+          }, 20000); // 20 saniyelik altın tolerans
+      } 
+  });
 
   socket.on('sohbet_mesaji', (data) => { io.emit('yeni_sohbet_mesaji', data); });
   socket.on('vip_emoji', (data) => { io.emit('yeni_vip_emoji', data); });
 
   socket.on('admin_giris', (sifre) => {
-      if(sifre === "BJK1903") {
-          socket.emit('admin_onay', { basarili: true });
-          socket.emit('admin_guncel_veri', oyuncuCipleri);
-      } else { socket.emit('admin_onay', { basarili: false }); }
+      if(sifre === "BJK1903") { socket.emit('admin_onay', { basarili: true }); socket.emit('admin_guncel_veri', oyuncuCipleri); } 
+      else { socket.emit('admin_onay', { basarili: false }); }
   });
 
   socket.on('admin_veri_iste', () => { socket.emit('admin_guncel_veri', oyuncuCipleri); });
-
   socket.on('admin_cip_islem', (data) => {
       if (oyuncuCipleri[data.isim] !== undefined) {
           if (data.islem === 'ekle') { oyuncuCipleri[data.isim] += parseInt(data.miktar); } 
           else if (data.islem === 'cikar') { oyuncuCipleri[data.isim] = Math.max(0, oyuncuCipleri[data.isim] - parseInt(data.miktar)); }
-          io.emit('cip_guncelle_ozel', { isim: data.isim, cip: oyuncuCipleri[data.isim] });
-          io.emit('admin_guncel_veri', oyuncuCipleri);
+          io.emit('cip_guncelle_ozel', { isim: data.isim, cip: oyuncuCipleri[data.isim] }); io.emit('admin_guncel_veri', oyuncuCipleri);
       }
   });
-
   socket.on('admin_duyuru', (mesaj) => { io.emit('admin_flash_mesaj', mesaj); });
-
-  socket.on('admin_oyuncu_kick', (isim) => {
-      kullaniciyiMasadanKaldir(isim);
-      io.emit('admin_islem_uyarisi', { isim: isim, islem: 'kick' });
-      io.emit('sistem_mesaji', `🚨 Yönetici, ${isim} adlı oyuncuyu masadan uzaklaştırdı.`);
-  });
-
-  socket.on('admin_oyuncu_ban', (isim) => {
-      banliKullanicilar.add(isim); 
-      kullaniciyiMasadanKaldir(isim); 
-      io.emit('admin_islem_uyarisi', { isim: isim, islem: 'ban' });
-  });
+  socket.on('admin_oyuncu_kick', (isim) => { kullaniciyiMasadanKaldir(isim); io.emit('admin_islem_uyarisi', { isim: isim, islem: 'kick' }); io.emit('sistem_mesaji', `🚨 Yönetici, ${isim} adlı oyuncuyu masadan uzaklaştırdı.`); });
+  socket.on('admin_oyuncu_ban', (isim) => { banliKullanicilar.add(isim); kullaniciyiMasadanKaldir(isim); io.emit('admin_islem_uyarisi', { isim: isim, islem: 'ban' }); });
 
 });
 
