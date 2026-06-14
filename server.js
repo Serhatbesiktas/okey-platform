@@ -226,6 +226,9 @@ io.on('connection', (socket) => {
       socket.emit('cip_guncelle', oyuncuCipleri[isim]);
       io.emit('admin_guncel_veri', oyuncuCipleri);
       io.emit('kozmetikleri_guncelle', oyuncuKozmetikleri); 
+      
+      // YENİ: Sisteme giren herkesi lobidekilere bildirir
+      io.emit('online_oyuncular', Object.keys(oyuncuCipleri));
   });
 
   socket.on('kozmetik_guncelle', (data) => {
@@ -233,16 +236,19 @@ io.on('connection', (socket) => {
       io.emit('kozmetikleri_guncelle', oyuncuKozmetikleri);
   });
 
-  // YENİ: Liderlik Tablosunu İsteyen Oyuncuya Gönderme Sistemi
   socket.on('liderlik_tablosu_iste', () => {
-      // Tüm oyuncuları çip miktarına göre büyükten küçüğe sıralayıp ilk 10'u alır
       const siraliList = Object.entries(oyuncuCipleri)
           .map(entry => ({ isim: entry[0], cip: entry[1] }))
-          .filter(k => !k.isim.startsWith('MİSAFİR_')) // Misafirleri sıralamaya sokmayız
+          .filter(k => !k.isim.startsWith('MİSAFİR_')) 
           .sort((a, b) => b.cip - a.cip)
           .slice(0, 10);
-      
       socket.emit('liderlik_tablosu_guncelle', siraliList);
+  });
+
+  // YENİ: Masaya Davet Atma Köprüsü
+  socket.on('masaya_davet_et', (data) => {
+      // data = { kimden: 'SRTBSK34', kime: 'BEYZA', masaAdi: 'Usta Masası...' }
+      io.emit('davet_geldi', data);
   });
 
   socket.on('masaya_otur', (data) => {
@@ -413,6 +419,10 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => { 
       const kopanIsim = socket.kullaniciAdi;
       if(kopanIsim) { 
+          // Çıkış yapanı online listeden sil ve herkese bildir
+          delete oyuncuCipleri[kopanIsim];
+          io.emit('online_oyuncular', Object.keys(oyuncuCipleri));
+          
           baglantiKopanlar[kopanIsim] = setTimeout(() => {
               kullaniciyiMasadanKaldir(kopanIsim);
               delete baglantiKopanlar[kopanIsim];
