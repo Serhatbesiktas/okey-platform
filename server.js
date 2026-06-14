@@ -176,9 +176,16 @@ io.on('connection', (socket) => {
   for(let m in masalar) lobiVerisi[m] = masalar[m].koltuklar;
   socket.emit('masalari_guncelle', lobiVerisi);
 
-  socket.on('kullanici_girisi', (isim) => {
+  // YENİ: Firebase'den gelen çip datasını okuma köprüsü
+  socket.on('kullanici_girisi', (data) => {
+      let isim = typeof data === 'object' ? data.isim : data;
+      let dbCip = typeof data === 'object' ? data.cip : 250000;
+      
       socket.kullaniciAdi = isim;
-      if(!oyuncuCipleri[isim]) oyuncuCipleri[isim] = 250000; 
+      // Eğer sunucuda çip yoksa veya standartsa, veritabanındakini kullan
+      if(!oyuncuCipleri[isim] || oyuncuCipleri[isim] === 250000) {
+          oyuncuCipleri[isim] = dbCip; 
+      }
       socket.emit('cip_guncelle', oyuncuCipleri[isim]);
   });
 
@@ -266,7 +273,6 @@ io.on('connection', (socket) => {
               oyuncuCipleri[data.isim] += odul;
               io.emit('cip_guncelle_ozel', { isim: data.isim, cip: oyuncuCipleri[data.isim] });
               
-              // YENİ: Masadaki herkese kimin ne kadar kazandığını gösterge_basarili ile iletiyoruz
               io.emit('gosterge_basarili', { masaAdi: data.masaAdi, isim: data.isim, odul: odul });
           }
       }
@@ -378,8 +384,6 @@ io.on('connection', (socket) => {
           }
       }
   }
-
-  socket.on('lobi_mesaji_gonder', (data) => { io.emit('lobi_mesaji_geldi', { isim: data.isim, mesaj: data.mesaj }); });
 });
 
 const PORT = process.env.PORT || 3000;
