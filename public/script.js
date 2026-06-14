@@ -5,7 +5,22 @@ let benimSiramMi = false;
 let guncelMasalar = {}; 
 let gostergeHakki = false; 
 
-// --- 1. FIREBASE VERİTABANI BAĞLANTISI ---
+const sesTasCek = new Audio('sounds/tas_cek.mp3');
+const sesTasKoy = new Audio('sounds/tas_koy.mp3');
+const sesSiraSende = new Audio('sounds/sira_sende.mp3');
+
+sesTasCek.preload = 'auto';
+sesTasKoy.preload = 'auto';
+sesSiraSende.preload = 'auto';
+
+function sesCal(sesObje) {
+    try {
+        let yeniSes = sesObje.cloneNode(); 
+        yeniSes.volume = 0.5; 
+        yeniSes.play().catch(e => console.log("Ses çalınamadı:", e));
+    } catch(err) {}
+}
+
 const firebaseConfig = {
   apiKey: "AIzaSyDZ2VhlFEtpT4kpvJn0TbCwbot8QB3MJGg",
   authDomain: "okeyoyunu-41321.firebaseapp.com",
@@ -18,7 +33,6 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// DOM Elementleri
 const authEkrani = document.getElementById('authEkrani');
 const lobiEkrani = document.getElementById('lobiEkrani');
 const masaEkrani = document.getElementById('masaEkrani');
@@ -28,34 +42,21 @@ lobiEkrani.style.display = 'none';
 masaEkrani.style.display = 'none';
 vipHeader.style.display = 'none';
 
-// --- 2. KAYIT OL VE GİRİŞ YAP İŞLEMLERİ ---
 document.getElementById('btnKayit').addEventListener('click', () => {
     const email = document.getElementById('authEmail').value;
     const pass = document.getElementById('authSifre').value;
     
-    if(!email || !pass) { 
-        alert("Lütfen e-posta ve şifre girin patron!"); 
-        return; 
-    }
-    if(pass.length < 6) { 
-        alert("Şifre en az 6 haneli olmalı!"); 
-        return; 
-    }
+    if(!email || !pass) { alert("Lütfen e-posta ve şifre girin patron!"); return; }
+    if(pass.length < 6) { alert("Şifre en az 6 haneli olmalı!"); return; }
     
     auth.createUserWithEmailAndPassword(email, pass).then((userCredential) => {
         const kullaniciAdi = email.split('@')[0].toUpperCase();
         db.collection("kullanicilar").doc(userCredential.user.uid).set({
             isim: kullaniciAdi,
             cip: 250000
-        }).then(() => {
-            oyunaGirisYap(kullaniciAdi, 250000);
-        }).catch(dbError => {
-            alert("Veritabanı Kayıt Hatası: " + dbError.message);
-        });
-    }).catch(error => {
-        // ASIL HATAYI BURADA GÖRECEĞİZ
-        alert("Sistem Hatası: " + error.message);
-    });
+        }).then(() => { oyunaGirisYap(kullaniciAdi, 250000); })
+          .catch(dbError => { alert("Veritabanı Kayıt Hatası: " + dbError.message); });
+    }).catch(error => { alert("Sistem Hatası: " + error.message); });
 });
 
 document.getElementById('btnGiris').addEventListener('click', () => {
@@ -70,12 +71,8 @@ document.getElementById('btnGiris').addEventListener('click', () => {
             let mevcutCip = 250000;
             if(doc.exists) mevcutCip = doc.data().cip;
             oyunaGirisYap(kullaniciAdi, mevcutCip);
-        }).catch(dbError => {
-            alert("Veritabanı Okuma Hatası: " + dbError.message);
-        });
-    }).catch(error => {
-        alert("Giriş Hatası: " + error.message);
-    });
+        }).catch(dbError => { alert("Veritabanı Okuma Hatası: " + dbError.message); });
+    }).catch(error => { alert("Giriş Hatası: " + error.message); });
 });
 
 function oyunaGirisYap(isim, cip) {
@@ -92,7 +89,6 @@ function oyunaGirisYap(isim, cip) {
     socket.emit('kullanici_girisi', { isim: aktifKullaniciAdi, cip: cip });
 }
 
-// --- 3. ÇİP GÜNCELLEME VE OYUN MEKANİKLERİ ---
 socket.on('cip_guncelle', (cip) => { document.getElementById('benimCipim').innerText = cip.toLocaleString('tr-TR'); });
 socket.on('cip_guncelle_ozel', (data) => { 
     if(data.isim === aktifKullaniciAdi) {
@@ -162,7 +158,7 @@ socket.on('gosterge_basarili', (data) => {
             gostergeHakki = false;
             gostergeBtn.style.display = 'none';
         }
-        
+        sesCal(sesSiraSende);
         const flash = document.getElementById('flashBildirim');
         if (flash) {
             flash.innerHTML = `🌟 ${data.isim} GÖSTERGE YAPTI!<br><span style="font-size:22px; color:#c0392b;">+${data.odul.toLocaleString()} ÇİP</span>`;
@@ -235,7 +231,8 @@ function getIstakaGruplari() {
 
 const sortableOptions = {
     group: { name: 'istaka', put: (to) => to.el.children.length === 0 },
-    animation: 100, delay: 0, forceFallback: true, fallbackOnBody: true, fallbackTolerance: 3, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag', easing: "cubic-bezier(0.25, 1, 0.5, 1)"
+    animation: 100, delay: 0, forceFallback: true, fallbackOnBody: true, fallbackTolerance: 3, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag', easing: "cubic-bezier(0.25, 1, 0.5, 1)",
+    onEnd: function() { sesCal(sesTasKoy); }
 };
 
 for(let i=0; i<12; i++) {
@@ -256,6 +253,7 @@ new Sortable(document.getElementById('benimIskartam'), {
         let renkSinifi = Array.from(atilanTas.classList).find(c=>c.startsWith('tas-'));
         let renk = renkSinifi ? renkSinifi.split('-')[1] : 'siyah';
         socket.emit('tas_atildi', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi, tas: { id: atilanTas.id, renk: renk, sayi: atilanTas.innerText } });
+        sesCal(sesTasKoy);
     }
 });
 
@@ -274,6 +272,7 @@ new Sortable(bitisAlani, {
         const bitisTasi = { id: atilanTas.id, renk: renk, sayi: atilanTas.innerText };
 
         socket.emit('oyunu_bitir', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi, gruplar: gruplar, bitisTasi: bitisTasi });
+        sesCal(sesTasKoy);
     }
 });
 
@@ -303,6 +302,7 @@ function otomatikTasAt(tasElementi) {
         let renkSinifi = Array.from(tasElementi.classList).find(c=>c.startsWith('tas-'));
         let renk = renkSinifi ? renkSinifi.split('-')[1] : 'siyah';
         socket.emit('tas_atildi', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi, tas: { id: tasElementi.id, renk: renk, sayi: tasElementi.innerText } });
+        sesCal(sesTasKoy);
     }
 }
 
@@ -320,6 +320,7 @@ window.seriDiz = function() {
     const renkDeger = { 'kirmizi': 1, 'siyah': 2, 'mavi': 3, 'sari': 4, 'sahte': 5 };
     taslar.sort((a, b) => { if (renkDeger[a.renk] !== renkDeger[b.renk]) return renkDeger[a.renk] - renkDeger[b.renk]; return a.sayi - b.sayi; });
     taslar.forEach((tasObj, index) => { document.getElementById('y'+index).appendChild(tasObj.el); });
+    sesCal(sesTasCek);
 };
 
 window.ciftDiz = function() {
@@ -335,6 +336,7 @@ window.ciftDiz = function() {
     }
     taslar.sort((a, b) => { if (a.sayi !== b.sayi) return a.sayi - b.sayi; return a.renk.localeCompare(b.renk); });
     taslar.forEach((tasObj, index) => { document.getElementById('y'+index).appendChild(tasObj.el); });
+    sesCal(sesTasCek);
 };
 
 function kurtarmaSinyaliGonder() {
@@ -348,6 +350,7 @@ kalanTasBilgi.addEventListener('click', () => {
         gostergeHakki = false; 
         gostergeBtn.style.display = 'none'; 
         socket.emit('ortadan_tas_cek', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi });
+        sesCal(sesTasCek);
     }
     else if(!benimSiramMi) alert("Şu an sıra sizde değil!");
     else alert("Önce elinizdeki fazlalık taşı sağdaki oyuncuya atmalısınız!");
@@ -370,6 +373,7 @@ document.getElementById('iskartaSol').addEventListener('click', function() {
             }
         }
         socket.emit('yandan_tas_alindi', { masaAdi: suAnkiMasam, kimAldi: aktifKullaniciAdi, tas: tasObj });
+        sesCal(sesTasCek);
     } else if(!benimSiramMi) alert("Şu an sıra sizde değil!");
     else if(elimdekiTasSayisi() === 15) alert("Elinizde zaten 15 taş var!");
 });
@@ -389,6 +393,7 @@ socket.on('ortaya_tas_atildi', (data) => {
             div.style.position = 'absolute'; div.style.top = '50%'; div.style.left = '50%'; div.style.transform = 'translate(-50%, -50%)'; div.style.margin = '0'; div.style.pointerEvents = 'none'; 
             if(target === 'iskartaSol') div.style.pointerEvents = 'auto'; 
             kutu.appendChild(div);
+            sesCal(sesTasKoy);
         }
     }
 });
@@ -403,6 +408,7 @@ socket.on('yandan_alindi_guncelle', (data) => {
         if(source) {
             document.getElementById(source).innerHTML = '';
             if(source === 'benimIskartam') document.getElementById('benimIskartam').innerHTML = '<div class="iskarta-yazi" id="iskartaYazi">TAŞ AT<br>⬇</div>';
+            sesCal(sesTasCek);
         }
     }
 });
@@ -424,6 +430,7 @@ socket.on('oyun_bitti', (data) => {
             }
             metin.innerText = `Kazanan: ${data.kazanan}\nSebep: ${data.sebep}`;
             odul.innerText = `+${data.odul.toLocaleString('tr-TR')} ÇİP`;
+            sesCal(sesSiraSende); 
         } else {
             baslik.innerText = "🛑 OYUN BİTTİ 🛑";
             baslik.style.color = "#dc3545";
@@ -606,7 +613,13 @@ function tasEkle(tasData, yuvaId) {
 socket.on('sira_guncelle', (data) => {
     if(suAnkiMasam === data.masaAdi) {
         kurtarmaSinyaliGonder(); 
+        
+        const eskiSira = benimSiramMi; 
         benimSiramMi = (data.kimde === aktifKullaniciAdi);
+        
+        if(benimSiramMi && !eskiSira) {
+            sesCal(sesSiraSende);
+        }
         
         const iskarta = document.getElementById('benimIskartam');
         if(benimSiramMi) iskarta.classList.remove('kilitli-iskarta');
@@ -638,5 +651,54 @@ socket.on('masa_ortasi_guncelle', (data) => {
             gostergeDiv.innerText = data.gosterge.sayi;
             gostergeDiv.className = `gosterge-tasi tas-${data.gosterge.renk}`;
         }
+    }
+});
+
+// --- YENİ: SOHBET VE EMOJİ KONTROLLERİ (MOTOR DIŞI) ---
+const sohbetPaneli = document.getElementById('sohbetPaneli');
+const sohbetMesajlari = document.getElementById('sohbetMesajlari');
+const sohbetInput = document.getElementById('sohbetInput');
+
+document.getElementById('sohbetAcBtn')?.addEventListener('click', () => {
+    sohbetPaneli.style.display = sohbetPaneli.style.display === 'flex' ? 'none' : 'flex';
+});
+
+document.getElementById('sohbetKapatBtn')?.addEventListener('click', () => {
+    sohbetPaneli.style.display = 'none';
+});
+
+document.getElementById('sohbetGonderBtn')?.addEventListener('click', () => {
+    if(sohbetInput.value.trim() !== '' && suAnkiMasam) {
+        socket.emit('sohbet_mesaji', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi, mesaj: sohbetInput.value });
+        sohbetInput.value = '';
+    }
+});
+
+window.vipEmojiGonder = function(emoji) {
+    if(suAnkiMasam) {
+        socket.emit('vip_emoji', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi, emoji: emoji });
+        sohbetPaneli.style.display = 'none'; 
+    }
+}
+
+socket.on('yeni_sohbet_mesaji', (data) => {
+    if(data.masaAdi === suAnkiMasam) {
+        const div = document.createElement('div');
+        div.className = 'mesaj-satiri';
+        div.innerHTML = `<span class="mesaj-gonderen">${data.isim}:</span>${data.mesaj}`;
+        sohbetMesajlari.appendChild(div);
+        sohbetMesajlari.scrollTop = sohbetMesajlari.scrollHeight;
+    }
+});
+
+socket.on('yeni_vip_emoji', (data) => {
+    if(data.masaAdi === suAnkiMasam) {
+        const div = document.createElement('div');
+        div.className = 'ucan-emoji';
+        div.innerText = data.emoji;
+        document.getElementById('masaEkrani').appendChild(div);
+        
+        // Emojiyi 2.5 saniye sonra ekrandan sil (Ekranda kalabalık yapmasın)
+        setTimeout(() => { div.remove(); }, 2500);
     }
 });
