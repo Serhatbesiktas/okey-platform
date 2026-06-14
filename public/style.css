@@ -201,3 +201,12 @@ body { background-color: #050d08; color: #fff; font-family: 'Segoe UI', Tahoma, 
     0% { box-shadow: 0 0 5px #c0392b; }
     100% { box-shadow: 0 0 20px #f1c40f; }
 }
+/* YENİ: LİDERLİK TABLOSU TASARIMLARI */
+.lider-satir { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.4); border: 1px solid #1e3f28; padding: 15px; border-radius: 12px; transition: 0.2s; }
+.lider-satir:hover { background: rgba(46, 204, 113, 0.1); border-color: #2ecc71; }
+.lider-sira { font-size: 18px; font-weight: 900; color: #52796f; width: 35px; text-align: center; }
+.lider-isim { font-size: 15px; font-weight: bold; color: #fff; flex: 1; display: flex; align-items: center; gap: 8px; margin-left: 10px; }
+.lider-cip { font-size: 15px; font-weight: 900; color: #2ecc71; background: rgba(0,0,0,0.6); padding: 5px 10px; border-radius: 8px; border: 1px dashed #2ecc71; }
+.sira-1 { color: #f1c40f; text-shadow: 0 0 15px #f1c40f; font-size: 24px; }
+.sira-2 { color: #bdc3c7; text-shadow: 0 0 10px #bdc3c7; font-size: 22px; }
+.sira-3 { color: #cd7f32; text-shadow: 0 0 10px #cd7f32; font-size: 20px; }
