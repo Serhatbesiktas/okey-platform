@@ -21,7 +21,6 @@ function sesCal(sesObje) {
     } catch(err) {}
 }
 
-// --- FIREBASE SEVKİYAT AYARLARI ---
 const firebaseConfig = {
   apiKey: "AIzaSyDZ2VhlFEtpT4kpvJn0TbCwbot8QB3MJGg",
   authDomain: "okeyoyunu-41321.firebaseapp.com",
@@ -606,9 +605,6 @@ socket.on('masa_ortasi_guncelle', (data) => {
     }
 });
 
-/* --------------------------------------
-   VIP SOHBET ÇEKMECESİ TETİKLEYİCİLERİ
-   -------------------------------------- */
 const sohbetCekmecesi = document.getElementById('sohbetCekmecesi');
 
 document.getElementById('sohbetAcBtn')?.addEventListener('click', () => {
@@ -661,5 +657,27 @@ socket.on('yeni_vip_emoji', (data) => {
         div.innerText = data.emoji;
         document.getElementById('masaEkrani').appendChild(div);
         setTimeout(() => { div.remove(); }, 2500);
+    }
+});
+
+// ----------------------------------------------------
+// YENİ: PATRON DUYURU DİNLEYİCİSİ
+// ----------------------------------------------------
+socket.on('admin_flash_mesaj', (mesaj) => {
+    const flash = document.getElementById('flashBildirim');
+    if (flash) {
+        flash.innerHTML = `👑 PATRON DUYURUSU 👑<br><span style="font-size:18px; color:#fff; text-transform:none; margin-top:5px; display:block;">${mesaj}</span>`;
+        flash.style.background = "linear-gradient(135deg, #c0392b, #8e44ad)";
+        flash.style.boxShadow = "0 15px 40px rgba(0,0,0,0.85), 0 0 25px rgba(192, 57, 43, 0.8)";
+        flash.style.borderColor = "#f2c94c";
+        flash.classList.remove('goster');
+        void flash.offsetWidth; 
+        flash.classList.add('goster');
+        
+        setTimeout(() => {
+            flash.style.background = "";
+            flash.style.boxShadow = "";
+            flash.style.borderColor = "";
+        }, 3500);
     }
 });
