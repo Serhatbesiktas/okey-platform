@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIP PATRON PANELİ</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        body { background-color: #050a07; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        
+        #loginEkrani { background: #0b1a12; padding: 40px; border-radius: 15px; border: 2px solid #f2c94c; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+        #loginEkrani h1 { color: #f2c94c; margin-bottom: 20px; }
+        #adminSifre { padding: 12px; width: 100%; border-radius: 8px; border: 1px solid #2ecc71; background: #000; color: #fff; margin-bottom: 15px; text-align: center; letter-spacing: 2px;}
+        #loginBtn { background: #2ecc71; color: #000; border: none; padding: 12px 30px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; }
+
+        #dashboard { display: none; width: 100%; max-width: 900px; height: 90vh; background: #0b1a12; border-radius: 15px; border: 1px solid #f2c94c; padding: 20px; display: none; flex-direction: column; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2ecc71; padding-bottom: 15px; margin-bottom: 20px; }
+        .header h2 { color: #f2c94c; text-transform: uppercase; }
+        
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; flex: 1; overflow: hidden;}
+        
+        .kutu { background: rgba(0,0,0,0.4); border: 1px solid #1e3f28; border-radius: 10px; padding: 15px; display: flex; flex-direction: column; }
+        .kutu h3 { color: #2ecc71; margin-bottom: 15px; font-size: 16px; border-bottom: 1px dashed #1e3f28; padding-bottom: 5px;}
+        
+        .oyuncu-listesi { overflow-y: auto; flex: 1; }
+        .oyuncu-satir { display: flex; justify-content: space-between; padding: 10px; background: rgba(255,255,255,0.05); margin-bottom: 5px; border-radius: 5px; }
+        .oyuncu-isim { font-weight: bold; color: #f2c94c; cursor: pointer; }
+        
+        .form-grup { margin-bottom: 15px; }
+        .form-grup label { display: block; font-size: 12px; color: #aaa; margin-bottom: 5px; }
+        .form-grup input { width: 100%; padding: 10px; background: #000; border: 1px solid #1e3f28; color: #fff; border-radius: 5px; }
+        
+        .butonlar { display: flex; gap: 10px; }
+        .btn-ekle { flex: 1; background: #2ecc71; color: #000; padding: 10px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        .btn-cikar { flex: 1; background: #e74c3c; color: #fff; padding: 10px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        .btn-duyuru { width: 100%; background: #f2c94c; color: #000; padding: 12px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; overflow-y: auto;} }
+    </style>
+</head>
+<body>
+
+    <div id="loginEkrani">
+        <h1>👑 PATRON GİRİŞİ</h1>
+        <input type="password" id="adminSifre" placeholder="Şifreyi Girin">
+        <button id="loginBtn">GİRİŞ YAP</button>
+    </div>
+
+    <div id="dashboard">
+        <div class="header">
+            <h2>VİP KONTROL MERKEZİ</h2>
+            <div style="color:#aaa; font-size:12px;">Canlı Bağlantı: <span style="color:#2ecc71;">Aktif</span></div>
+        </div>
+        
+        <div class="grid">
+            <div class="kutu">
+                <h3>👥 Aktif Oyuncu Kasaları</h3>
+                <div class="oyuncu-listesi" id="oyuncuListesiDiv">Yükleniyor...</div>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                <div class="kutu">
+                    <h3>💰 Çip Transfer Merkezi</h3>
+                    <div class="form-grup">
+                        <label>Oyuncu Adı (Soldan kopyalamak için isme tıklayın)</label>
+                        <input type="text" id="hedefIsim" placeholder="Örn: SRTBSK34">
+                    </div>
+                    <div class="form-grup">
+                        <label>Miktar (Çip)</label>
+                        <input type="number" id="islemMiktar" placeholder="Örn: 500000">
+                    </div>
+                    <div class="butonlar">
+                        <button class="btn-ekle" onclick="cipIslem('ekle')">+ EKLE</button>
+                        <button class="btn-cikar" onclick="cipIslem('cikar')">- ÇIKAR</button>
+                    </div>
+                </div>
+
+                <div class="kutu">
+                    <h3>📢 Global Sistem Duyurusu</h3>
+                    <div class="form-grup">
+                        <label>Tüm masalarda dev ekranda görünür</label>
+                        <input type="text" id="duyuruMesaj" placeholder="Mesajınızı yazın...">
+                    </div>
+                    <button class="btn-duyuru" onclick="duyuruYap()">🚀 DUYURUYU FIRLAT</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const socket = io();
+        
+        document.getElementById('loginBtn').onclick = () => {
+            const sifre = document.getElementById('adminSifre').value;
+            socket.emit('admin_giris', sifre);
+        };
+
+        socket.on('admin_onay', (data) => {
+            if(data.basarili) {
+                document.getElementById('loginEkrani').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'flex';
+                socket.emit('admin_veri_iste');
+            } else {
+                alert("Hatalı Şifre!");
+            }
+        });
+
+        socket.on('admin_guncel_veri', (oyuncular) => {
+            const div = document.getElementById('oyuncuListesiDiv');
+            div.innerHTML = '';
+            for(let isim in oyuncular) {
+                div.innerHTML += `
+                    <div class="oyuncu-satir">
+                        <span class="oyuncu-isim" onclick="ismeTikla('${isim}')">${isim}</span>
+                        <span style="color:#2ecc71; font-weight:bold;">${oyuncular[isim].toLocaleString('tr-TR')} ÇİP</span>
+                    </div>
+                `;
+            }
+            if(Object.keys(oyuncular).length === 0) div.innerHTML = "<p style='color:#777; font-size:12px;'>Şu an aktif oyuncu yok.</p>";
+        });
+
+        function ismeTikla(isim) { document.getElementById('hedefIsim').value = isim; }
+
+        function cipIslem(tur) {
+            const isim = document.getElementById('hedefIsim').value;
+            const miktar = document.getElementById('islemMiktar').value;
+            if(!isim || !miktar) { alert("Lütfen isim ve miktar girin."); return; }
+            socket.emit('admin_cip_islem', { isim: isim, miktar: miktar, islem: tur });
+            document.getElementById('islemMiktar').value = '';
+        }
+
+        function duyuruYap() {
+            const mesaj = document.getElementById('duyuruMesaj').value;
+            if(!mesaj) return;
+            socket.emit('admin_duyuru', mesaj);
+            document.getElementById('duyuruMesaj').value = '';
+            alert("Duyuru tüm masalara gönderildi!");
+        }
+    </script>
+</body>
+</html>
