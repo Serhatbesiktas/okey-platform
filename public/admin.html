@@ -122,11 +122,17 @@
 
         function ismeTikla(isim) { document.getElementById('hedefIsim').value = isim; }
 
+        // --- YENİ EKLENEN BAŞARI MESAJI KISMI ---
         function cipIslem(tur) {
             const isim = document.getElementById('hedefIsim').value;
             const miktar = document.getElementById('islemMiktar').value;
             if(!isim || !miktar) { alert("Lütfen isim ve miktar girin."); return; }
+            
             socket.emit('admin_cip_islem', { isim: isim, miktar: miktar, islem: tur });
+            
+            const islemAdi = (tur === 'ekle') ? "eklendi" : "silindi";
+            alert(`✅ İŞLEM BAŞARILI!\n${isim} adlı oyuncunun hesabından ${Number(miktar).toLocaleString('tr-TR')} ÇİP ${islemAdi}.`);
+            
             document.getElementById('islemMiktar').value = '';
         }
 
@@ -135,7 +141,7 @@
             if(!mesaj) return;
             socket.emit('admin_duyuru', mesaj);
             document.getElementById('duyuruMesaj').value = '';
-            alert("Duyuru tüm masalara gönderildi!");
+            alert("✅ Duyuru tüm masalara başarıyla fırlatıldı!");
         }
     </script>
 </body>
