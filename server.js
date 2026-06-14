@@ -8,7 +8,7 @@ const io = require('socket.io')(http, {
 app.use(express.static('public'));
 
 const oyuncuCipleri = {};
-const banliKullanicilar = new Set(); // YENİ: Banlananların tutulduğu kara liste
+const banliKullanicilar = new Set(); 
 
 const masalar = {
     'Acemiler (20K Bahis)': { bahis: 20000, kasa: 0, koltuklar: [null, null, null, null], deste: [], gosterge: null, oyunBasladi: false, siradakiOyuncu: null, eller: {}, gostergeGosterildi: false },
@@ -206,14 +206,16 @@ io.on('connection', (socket) => {
       let isim = typeof data === 'object' ? data.isim : data;
       let dbCip = typeof data === 'object' ? data.cip : 250000;
       
-      // YENİ: Ban kontrolü
       if(banliKullanicilar.has(isim)) {
           socket.emit('admin_islem_uyarisi', { isim: isim, islem: 'ban' });
           return;
       }
 
       socket.kullaniciAdi = isim;
-      if(!oyuncuCipleri[isim] || oyuncuCipleri[isim] === 250000) { oyuncuCipleri[isim] = dbCip; }
+      
+      // DÜZELTİLEN SATIR BURASI: Artık her mağaza alışında veya kasa dönüşünde sunucu bu yeni çipi kabul edecek!
+      oyuncuCipleri[isim] = dbCip; 
+
       socket.emit('cip_guncelle', oyuncuCipleri[isim]);
       io.emit('admin_guncel_veri', oyuncuCipleri);
   });
@@ -384,9 +386,6 @@ io.on('connection', (socket) => {
   socket.on('sohbet_mesaji', (data) => { io.emit('yeni_sohbet_mesaji', data); });
   socket.on('vip_emoji', (data) => { io.emit('yeni_vip_emoji', data); });
 
-  // ----------------------------------------------------
-  // GÜNCELLENMİŞ PATRON PANELİ KÖPRÜLERİ (KICK / BAN)
-  // ----------------------------------------------------
   socket.on('admin_giris', (sifre) => {
       if(sifre === "BJK1903") {
           socket.emit('admin_onay', { basarili: true });
@@ -407,17 +406,15 @@ io.on('connection', (socket) => {
 
   socket.on('admin_duyuru', (mesaj) => { io.emit('admin_flash_mesaj', mesaj); });
 
-  // YENİ: Oyuncuyu Masadan At (Sadece masadan koparır)
   socket.on('admin_oyuncu_kick', (isim) => {
       kullaniciyiMasadanKaldir(isim);
       io.emit('admin_islem_uyarisi', { isim: isim, islem: 'kick' });
       io.emit('sistem_mesaji', `🚨 Yönetici, ${isim} adlı oyuncuyu masadan uzaklaştırdı.`);
   });
 
-  // YENİ: Oyuncuyu Banla (Sisteme bir daha giremez)
   socket.on('admin_oyuncu_ban', (isim) => {
-      banliKullanicilar.add(isim); // Kara listeye al
-      kullaniciyiMasadanKaldir(isim); // Masadaysa at
+      banliKullanicilar.add(isim); 
+      kullaniciyiMasadanKaldir(isim); 
       io.emit('admin_islem_uyarisi', { isim: isim, islem: 'ban' });
   });
 
