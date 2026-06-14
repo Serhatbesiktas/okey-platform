@@ -5,6 +5,9 @@ let benimSiramMi = false;
 let guncelMasalar = {}; 
 let gostergeHakki = false; 
 
+// YENİ: Oyuncunun sahip olduğu lüks eşyalar
+let benimEnvanterim = [];
+
 const sesTasCek = new Audio('sounds/tas_cek.mp3');
 const sesTasKoy = new Audio('sounds/tas_koy.mp3');
 const sesSiraSende = new Audio('sounds/sira_sende.mp3');
@@ -53,9 +56,13 @@ document.getElementById('btnKayit').addEventListener('click', () => {
         const kullaniciAdi = email.split('@')[0].toUpperCase();
         db.collection("kullanicilar").doc(userCredential.user.uid).set({
             isim: kullaniciAdi,
-            cip: 250000
-        }).then(() => { oyunaGirisYap(kullaniciAdi, 250000); })
-          .catch(dbError => { alert("Veritabanı kayıt hatası."); });
+            cip: 250000,
+            envanter: [] // YENİ: Başlangıçta boş envanter
+        }).then(() => { 
+            benimEnvanterim = [];
+            oyunaGirisYap(kullaniciAdi, 250000); 
+            kozmetikleriUygula(benimEnvanterim);
+        }).catch(dbError => { alert("Veritabanı kayıt hatası."); });
     }).catch(error => { alert("Sistem Hatası: " + error.message); });
 });
 
@@ -69,8 +76,12 @@ document.getElementById('btnGiris').addEventListener('click', () => {
         const kullaniciAdi = email.split('@')[0].toUpperCase();
         db.collection("kullanicilar").doc(userCredential.user.uid).get().then(doc => {
             let mevcutCip = 250000;
-            if(doc.exists) mevcutCip = doc.data().cip;
+            if(doc.exists) {
+                mevcutCip = doc.data().cip;
+                benimEnvanterim = doc.data().envanter || []; // YENİ: Veritabanından çantayı çek
+            }
             oyunaGirisYap(kullaniciAdi, mevcutCip);
+            kozmetikleriUygula(benimEnvanterim); // Eşyaları üstüne giy
         }).catch(dbError => { alert("Veritabanı okunamadı."); });
     }).catch(error => { alert("Giriş Başarısız."); });
 });
@@ -86,6 +97,61 @@ function oyunaGirisYap(isim, cip) {
     lobiEkrani.style.display = 'flex';
 
     socket.emit('kullanici_girisi', { isim: aktifKullaniciAdi, cip: cip });
+}
+
+// YENİ: MAĞAZA SATIN ALMA SİSTEMİ
+window.esyaSatinAl = function(esyaId, fiyat) {
+    if(benimEnvanterim.includes(esyaId)) {
+        alert("Buna zaten sahipsin patron!"); return;
+    }
+    
+    const guncelCip = parseInt(document.getElementById('benimCipim').innerText.replace(/\./g, ''));
+    if(guncelCip < fiyat) {
+        alert("Bunun için yeterli çipin yok!"); return;
+    }
+    
+    const yeniCip = guncelCip - fiyat;
+    benimEnvanterim.push(esyaId);
+    
+    if(auth.currentUser) {
+        db.collection("kullanicilar").doc(auth.currentUser.uid).update({ 
+            cip: yeniCip,
+            envanter: benimEnvanterim
+        }).then(() => {
+            socket.emit('kullanici_girisi', { isim: aktifKullaniciAdi, cip: yeniCip });
+            document.getElementById('benimCipim').innerText = yeniCip.toLocaleString('tr-TR');
+            kozmetikleriUygula(benimEnvanterim);
+            alert("✅ Satın alma başarılı! VIP eşyan hemen kuşanıldı.");
+        });
+    }
+}
+
+// YENİ: SATIN ALINANLARI GÖRÜNÜME YANSITMA
+function kozmetikleriUygula(envanter) {
+    const avatar = document.getElementById('vipAvatar');
+    const isimKutu = document.getElementById('benimAdimKutusu');
+    const lobiIsim = document.getElementById('lobiBenimAdim');
+
+    if(envanter.includes('altin_cerceve')) {
+        avatar.style.border = '3px solid #f2c94c';
+        avatar.style.boxShadow = '0 0 15px #f2c94c';
+    }
+    if(envanter.includes('atesli_isim')) {
+        isimKutu.style.color = '#ff4d4d';
+        isimKutu.style.textShadow = '0 0 8px #ff0000';
+        lobiIsim.style.color = '#ff4d4d';
+    }
+    if(envanter.includes('neon_tac')) {
+        if(!lobiIsim.innerText.includes('👑')) {
+            lobiIsim.innerText = '👑 ' + lobiIsim.innerText.replace('👑 ', '');
+        }
+    }
+    
+    // Mağazadaki butonları "SAHİPSİN" olarak değiştir
+    envanter.forEach(esya => {
+        const btn = document.getElementById('btn_' + esya);
+        if(btn) { btn.innerText = 'SAHİPSİN'; btn.classList.add('sahip'); }
+    });
 }
 
 socket.on('cip_guncelle', (cip) => { document.getElementById('benimCipim').innerText = cip.toLocaleString('tr-TR'); });
@@ -674,9 +740,6 @@ socket.on('admin_flash_mesaj', (mesaj) => {
     }
 });
 
-// ----------------------------------------------------
-// YENİ: PATRONUN KICK / BAN SİLAHINA YAKALANMA KODU
-// ----------------------------------------------------
 socket.on('admin_islem_uyarisi', (data) => {
     if(data.isim === aktifKullaniciAdi) {
         if(data.islem === 'kick') {
@@ -689,7 +752,7 @@ socket.on('admin_islem_uyarisi', (data) => {
             }
         } else if(data.islem === 'ban') {
             alert("🛑 HESABINIZ SİSTEMDEN SINIRSIZ BANLANDI!");
-            location.reload(); // Sayfayı yenileyip giriş ekranına (auth) fırlatır
+            location.reload(); 
         }
     }
 });
