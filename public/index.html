@@ -15,10 +15,21 @@
 </head>
 <body>
 
+    <div id="liderlikEkrani" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:99999; flex-direction:column; justify-content:center; align-items:center;">
+        <div class="magaza-kutu" style="max-height: 85vh; display: flex; flex-direction: column; width: 95%; max-width: 500px;">
+            <div class="magaza-header">
+                <h2>🏆 EN ZENGİNLER (TOP 10)</h2>
+                <button onclick="document.getElementById('liderlikEkrani').style.display='none'" style="background:none;border:none;color:#e74c3c;font-size:24px;cursor:pointer;font-weight:bold;">X</button>
+            </div>
+            <div id="liderlikListesi" style="overflow-y:auto; padding-right:5px; flex:1; display:flex; flex-direction:column; gap:10px;">
+                </div>
+        </div>
+    </div>
+
     <div id="gunlukBonusEkrani" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.92); z-index:999999; flex-direction:column; justify-content:center; align-items:center;">
         <div class="bonus-kutu">
             <h2>🎁 GÜNLÜK VIP ÖDÜLÜ</h2>
-            <p>Her day gir, kasanın şifresini kır ve çipleri topla!</p>
+            <p>Her gün gir, kasanın şifresini kır ve çipleri topla!</p>
             <div class="dijital-gosterge" id="dijitalGosterge">000.000</div>
             <button class="bonus-btn" id="btnBonusCevir" onclick="gunlukKasaCevir()">🔒 KASAYI AÇ</button>
         </div>
@@ -103,7 +114,7 @@
         <div class="alt-menu-container">
             <div class="alt-menu-item active"><div class="alt-menu-ikon">🏠</div><span>Lobi</span></div>
             <div class="alt-menu-item"><div class="alt-menu-ikon">👥</div><span>Arkadaşlar</span></div>
-            <div class="alt-menu-item"><div class="alt-menu-ikon">🏆</div><span>Turnuvalar</span></div>
+            <div class="alt-menu-item" onclick="liderlikTablosunuAc()" style="cursor:pointer;"><div class="alt-menu-ikon">🏆</div><span>En İyiler</span></div>
             <div class="alt-menu-item" onclick="document.getElementById('magazaEkrani').style.display='flex'" style="cursor:pointer;"><div class="alt-menu-ikon">🛒</div><span style="color:#f2c94c;">Mağaza</span></div>
         </div>
     </div>
@@ -145,9 +156,9 @@
         <div class="okey-table-ui">
             <button class="return-lobby-btn" id="lobiyeDonBtn">⬅ Lobiye Dön</button>
             
-            <div class="player-seat seat-top" id="seatTop">Bekleniyor...</div>
-            <div class="player-seat seat-left" id="seatLeft">Bekleniyor...</div>
-            <div class="player-seat seat-right" id="seatRight">Bekleniyor...</div>
+            <div class="player-seat seat-top" id="seatTop" data-isim="">Bekleniyor...</div>
+            <div class="player-seat seat-left" id="seatLeft" data-isim="">Bekleniyor...</div>
+            <div class="player-seat seat-right" id="seatRight" data-isim="">Bekleniyor...</div>
             
             <div class="masa-ortasi">
                 <div class="masa-isim-ortasi" id="masaOrtasiYazi">MASA</div>
