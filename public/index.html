@@ -5,16 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>VIP Okey Sunucusu</title>
     <link rel="stylesheet" href="style.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+    
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 </head>
 <body>
 
+    <div id="authEkrani">
+        <div class="auth-kutu">
+            <div class="zar-ikon">🎲</div>
+            <h2>VIP CASINO GİRİŞİ</h2>
+            <p style="color:#a3c4bc; font-size:12px; margin-bottom:20px;">Çiplerini güvende tutmak için kayıt ol veya giriş yap</p>
+            <input type="email" id="authEmail" class="auth-input" placeholder="E-Posta Adresi">
+            <input type="password" id="authSifre" class="auth-input" placeholder="Şifre (En az 6 hane)">
+            <button id="btnGiris" class="auth-btn btn-sari">GİRİŞ YAP</button>
+            <button id="btnKayit" class="auth-btn btn-yesil">YENİ KAYIT OL</button>
+        </div>
+    </div>
+
     <div class="vip-header">
         <div class="profil-bilgi">
             <div class="profil-avatar">😎</div>
             <div class="profil-isim-kutu">
-                <p class="profil-isim" id="benimAdimKutusu">Bağlanıyor... <span style="color:#2ecc71;">✔</span></p>
+                <p class="profil-isim" id="benimAdimKutusu">Bağlanıyor...</p>
                 <span class="vip-badge">VIP GOLD</span>
             </div>
         </div>
