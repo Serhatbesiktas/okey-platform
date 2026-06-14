@@ -12,6 +12,10 @@ let sonBonusTarihim = "";
 let isMisafir = false; 
 let globalKozmetikler = {}; 
 
+// YENİ: Arkadaş Sistemi Değişkenleri
+let benimArkadaslarim = []; 
+let onlineOyuncularListesi = []; 
+
 const sesTasCek = new Audio('sounds/tas_cek.mp3');
 const sesTasKoy = new Audio('sounds/tas_koy.mp3');
 const sesSiraSende = new Audio('sounds/sira_sende.mp3');
@@ -57,6 +61,7 @@ document.getElementById('btnMisafir').addEventListener('click', () => {
     benimAnlikCipim = 20000; 
     benimEnvanterim = [];
     aktifKozmetikler = [];
+    benimArkadaslarim = []; // Misafirin arkadaşı olmaz
     sonBonusTarihim = new Date().toLocaleDateString('tr-TR'); 
     
     document.getElementById('misafirUyariBanner').style.display = 'block';
@@ -82,9 +87,9 @@ document.getElementById('btnKayit').addEventListener('click', () => {
         
         const kullaniciAdi = email.split('@')[0].toUpperCase();
         db.collection("kullanicilar").doc(userCredential.user.uid).set({
-            isim: kullaniciAdi, cip: 250000, envanter: [], aktifKozmetikler: [], sonBonusTarihi: ""
+            isim: kullaniciAdi, cip: 250000, envanter: [], aktifKozmetikler: [], sonBonusTarihi: "", arkadaslar: []
         }).then(() => { 
-            benimAnlikCipim = 250000; benimEnvanterim = []; aktifKozmetikler = []; sonBonusTarihim = "";
+            benimAnlikCipim = 250000; benimEnvanterim = []; aktifKozmetikler = []; sonBonusTarihim = ""; benimArkadaslarim = [];
             oyunaGirisYap(kullaniciAdi); arayuzGuncelle(); gunlukBonusKontrol();
         }).catch(dbError => { alert("Veritabanı kayıt hatası."); });
     }).catch(error => { alert("Sistem Hatası: " + error.message); });
@@ -108,6 +113,7 @@ document.getElementById('btnGiris').addEventListener('click', () => {
                 benimEnvanterim = doc.data().envanter || [];
                 aktifKozmetikler = doc.data().aktifKozmetikler || [];
                 sonBonusTarihim = doc.data().sonBonusTarihi || "";
+                benimArkadaslarim = doc.data().arkadaslar || []; // YENİ: Firebase'den listeyi çek
             }
             oyunaGirisYap(kullaniciAdi); arayuzGuncelle(); gunlukBonusKontrol();
         }).catch(dbError => { alert("Veritabanı okunamadı."); });
@@ -129,7 +135,6 @@ window.liderlikTablosunuAc = function() {
     socket.emit('liderlik_tablosu_iste');
 }
 
-// YENİ: Liderlik Tablosu Verisi Geldiğinde Ekrana Çizme
 socket.on('liderlik_tablosu_guncelle', (siraliData) => {
     const listeDiv = document.getElementById('liderlikListesi');
     listeDiv.innerHTML = '';
@@ -140,8 +145,7 @@ socket.on('liderlik_tablosu_guncelle', (siraliData) => {
     }
 
     siraliData.forEach((oyuncu, index) => {
-        let siraClass = '';
-        let kupa = '';
+        let siraClass = ''; let kupa = '';
         if(index === 0) { siraClass = 'sira-1'; kupa = '🏆'; }
         else if(index === 1) { siraClass = 'sira-2'; kupa = '🥈'; }
         else if(index === 2) { siraClass = 'sira-3'; kupa = '🥉'; }
@@ -160,6 +164,109 @@ socket.on('liderlik_tablosu_guncelle', (siraliData) => {
         `;
     });
 });
+
+// YENİ: Lobideki Canlı Oyuncuları Listeleme
+socket.on('online_oyuncular', (liste) => {
+    onlineOyuncularListesi = liste;
+    const lobiDiv = document.getElementById('lobidekilerListesi');
+    if(!lobiDiv) return;
+    
+    lobiDiv.innerHTML = '';
+    liste.forEach(oyuncuIsmi => {
+        if(oyuncuIsmi === aktifKullaniciAdi) return; // Kendini listede gösterme
+        
+        let kozmetikler = globalKozmetikler[oyuncuIsmi] || [];
+        let isimRenk = kozmetikler.includes('atesli_isim') ? '#ff4d4d' : '#0dcaf0';
+        let tac = kozmetikler.includes('neon_tac') ? '👑 ' : '';
+        
+        let butonHtml = '';
+        if(!isMisafir && !oyuncuIsmi.startsWith('MİSAFİR_') && !benimArkadaslarim.includes(oyuncuIsmi)) {
+            butonHtml = `<button class="btn-arkadas-ekle" onclick="arkadasEkle('${oyuncuIsmi}')">+ Ekle</button>`;
+        }
+
+        lobiDiv.innerHTML += `
+            <div class="lobi-oyuncu-satir">
+                <span class="lobi-oyuncu-isim" style="color:${isimRenk};"><span class="online-nokta"></span>${tac}${oyuncuIsmi}</span>
+                ${butonHtml}
+            </div>
+        `;
+    });
+});
+
+// YENİ: Arkadaş Ekleme
+window.arkadasEkle = function(isim) {
+    if(isMisafir) return;
+    if(!benimArkadaslarim.includes(isim)) {
+        benimArkadaslarim.push(isim);
+        if(auth.currentUser) {
+            db.collection("kullanicilar").doc(auth.currentUser.uid).update({ arkadaslar: benimArkadaslarim }).then(() => {
+                alert(`✅ ${isim} arkadaş listene eklendi!`);
+                // Ekranı güncellemek için tetikliyoruz
+                socket.emit('liderlik_tablosu_iste'); 
+            });
+        }
+    }
+}
+
+// YENİ: Arkadaş Listesini (Davet Ekranını) Açma
+window.arkadaslarMenusuAc = function() {
+    if(isMisafir) { alert("⚠️ Misafir hesapların arkadaş listesi kapalıdır."); return; }
+    document.getElementById('arkadaslarEkrani').style.display = 'flex';
+    
+    const listeDiv = document.getElementById('arkadasListesiDiv');
+    listeDiv.innerHTML = '';
+    
+    if(benimArkadaslarim.length === 0) {
+        listeDiv.innerHTML = '<p style="text-align:center; color:#777; font-size:12px;">Henüz hiç arkadaşın yok. Lobiden ekleyebilirsin!</p>';
+        return;
+    }
+
+    benimArkadaslarim.forEach(arkadas => {
+        let isOnline = onlineOyuncularListesi.includes(arkadas);
+        let durumNoktasi = isOnline ? '<span class="online-nokta"></span>' : '<span class="offline-nokta"></span>';
+        
+        let kozmetikler = globalKozmetikler[arkadas] || [];
+        let isimRenk = kozmetikler.includes('atesli_isim') ? '#ff4d4d' : '#fff';
+        let tac = kozmetikler.includes('neon_tac') ? '👑 ' : '';
+        
+        let davetButonu = '';
+        // Sadece arkadaş online ise ve sen bir masadaysan Davet butonu çıkar
+        if(isOnline && suAnkiMasam) {
+            davetButonu = `<button class="btn-davet-et" onclick="masayaDavetEt('${arkadas}')">📥 Davet Et</button>`;
+        }
+
+        listeDiv.innerHTML += `
+            <div class="lider-satir">
+                <div class="lider-isim" style="color:${isimRenk};">${durumNoktasi} ${tac}${arkadas}</div>
+                ${davetButonu}
+            </div>
+        `;
+    });
+}
+
+// YENİ: Davet Gönderme
+window.masayaDavetEt = function(arkadasIsmi) {
+    if(!suAnkiMasam) return;
+    socket.emit('masaya_davet_et', { kimden: aktifKullaniciAdi, kime: arkadasIsmi, masaAdi: suAnkiMasam });
+    alert(`💌 ${arkadasIsmi} adlı oyuncuya davet gönderildi!`);
+    document.getElementById('arkadaslarEkrani').style.display = 'none';
+}
+
+// YENİ: Davet Alma ve Kabul Etme
+socket.on('davet_geldi', (data) => {
+    // data = { kimden: 'SRTBSK34', kime: 'BEYZA', masaAdi: 'Usta Masası...' }
+    if(data.kime === aktifKullaniciAdi && !suAnkiMasam) { // Sadece lobideysen davet gelir
+        document.getElementById('davetEdenIsim').innerText = data.kimden;
+        document.getElementById('davetMasaIsim').innerText = data.masaAdi;
+        document.getElementById('davetGeldiEkrani').style.display = 'flex';
+        
+        document.getElementById('btnDavetKabul').onclick = function() {
+            document.getElementById('davetGeldiEkrani').style.display = 'none';
+            masayaOtur(data.masaAdi); // Tek tuşla masaya otur!
+        };
+    }
+});
+
 
 function gunlukBonusKontrol() {
     if(isMisafir) return; 
@@ -279,7 +386,7 @@ socket.on('cip_guncelle', (cip) => { benimAnlikCipim = cip; document.getElementB
 socket.on('cip_guncelle_ozel', (data) => { 
     if(data.isim === aktifKullaniciAdi) {
         benimAnlikCipim = data.cip; document.getElementById('benimCipim').innerText = data.cip.toLocaleString('tr-TR'); 
-        if(auth.currentUser) { db.collection("kullanicilar").doc(auth.currentUser.uid).update({ cip: data.cip }); }
+        if(auth.currentUser && !isMisafir) { db.collection("kullanicilar").doc(auth.currentUser.uid).update({ cip: data.cip }); }
     }
 });
 
