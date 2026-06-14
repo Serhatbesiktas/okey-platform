@@ -24,7 +24,6 @@ const lobiEkrani = document.getElementById('lobiEkrani');
 const masaEkrani = document.getElementById('masaEkrani');
 const vipHeader = document.querySelector('.vip-header');
 
-// Başlangıçta lobi ve masayı gizle, Giriş ekranını göster
 lobiEkrani.style.display = 'none';
 masaEkrani.style.display = 'none';
 vipHeader.style.display = 'none';
@@ -33,35 +32,50 @@ vipHeader.style.display = 'none';
 document.getElementById('btnKayit').addEventListener('click', () => {
     const email = document.getElementById('authEmail').value;
     const pass = document.getElementById('authSifre').value;
-    if(!email || !pass) { alert("Lütfen e-posta ve şifre girin patron!"); return; }
-    if(pass.length < 6) { alert("Şifre en az 6 haneli olmalı!"); return; }
+    
+    if(!email || !pass) { 
+        alert("Lütfen e-posta ve şifre girin patron!"); 
+        return; 
+    }
+    if(pass.length < 6) { 
+        alert("Şifre en az 6 haneli olmalı!"); 
+        return; 
+    }
     
     auth.createUserWithEmailAndPassword(email, pass).then((userCredential) => {
         const kullaniciAdi = email.split('@')[0].toUpperCase();
-        // Yeni oyuncuya veritabanında kasa aç
         db.collection("kullanicilar").doc(userCredential.user.uid).set({
             isim: kullaniciAdi,
-            cip: 250000 // Başlangıç VIP hediyesi
+            cip: 250000
         }).then(() => {
             oyunaGirisYap(kullaniciAdi, 250000);
+        }).catch(dbError => {
+            alert("Veritabanı Kayıt Hatası: " + dbError.message);
         });
-    }).catch(error => alert("Kayıt Hatası: Bu e-posta kullanılıyor olabilir."));
+    }).catch(error => {
+        // ASIL HATAYI BURADA GÖRECEĞİZ
+        alert("Sistem Hatası: " + error.message);
+    });
 });
 
 document.getElementById('btnGiris').addEventListener('click', () => {
     const email = document.getElementById('authEmail').value;
     const pass = document.getElementById('authSifre').value;
+    
     if(!email || !pass) { alert("Lütfen e-posta ve şifre girin!"); return; }
 
     auth.signInWithEmailAndPassword(email, pass).then((userCredential) => {
         const kullaniciAdi = email.split('@')[0].toUpperCase();
-        // Kasasındaki çipi kontrol et
         db.collection("kullanicilar").doc(userCredential.user.uid).get().then(doc => {
             let mevcutCip = 250000;
             if(doc.exists) mevcutCip = doc.data().cip;
             oyunaGirisYap(kullaniciAdi, mevcutCip);
+        }).catch(dbError => {
+            alert("Veritabanı Okuma Hatası: " + dbError.message);
         });
-    }).catch(error => alert("Giriş Hatası: Şifre veya e-posta yanlış!"));
+    }).catch(error => {
+        alert("Giriş Hatası: " + error.message);
+    });
 });
 
 function oyunaGirisYap(isim, cip) {
@@ -75,16 +89,14 @@ function oyunaGirisYap(isim, cip) {
     vipHeader.style.display = 'flex';
     lobiEkrani.style.display = 'flex';
 
-    // Sunucuya ismi ve veritabanındaki güvenli çipi gönder
     socket.emit('kullanici_girisi', { isim: aktifKullaniciAdi, cip: cip });
 }
 
-// --- 3. ÇİP KAZANINCA/KAYBEDİNCE VERİTABANINI GÜNCELLEME ---
+// --- 3. ÇİP GÜNCELLEME VE OYUN MEKANİKLERİ ---
 socket.on('cip_guncelle', (cip) => { document.getElementById('benimCipim').innerText = cip.toLocaleString('tr-TR'); });
 socket.on('cip_guncelle_ozel', (data) => { 
     if(data.isim === aktifKullaniciAdi) {
         document.getElementById('benimCipim').innerText = data.cip.toLocaleString('tr-TR'); 
-        // Veritabanına yeni çipi YAZ!
         if(auth.currentUser) {
             db.collection("kullanicilar").doc(auth.currentUser.uid).update({ cip: data.cip });
         }
