@@ -17,10 +17,11 @@ function sesCal(sesObje) {
     try {
         let yeniSes = sesObje.cloneNode(); 
         yeniSes.volume = 0.5; 
-        yeniSes.play().catch(e => console.log("Ses çalınamadı:", e));
+        yeniSes.play().catch(e => console.log("Ses aktif değil:", e));
     } catch(err) {}
 }
 
+// --- FIREBASE SEVKİYAT AYARLARI ---
 const firebaseConfig = {
   apiKey: "AIzaSyDZ2VhlFEtpT4kpvJn0TbCwbot8QB3MJGg",
   authDomain: "okeyoyunu-41321.firebaseapp.com",
@@ -55,7 +56,7 @@ document.getElementById('btnKayit').addEventListener('click', () => {
             isim: kullaniciAdi,
             cip: 250000
         }).then(() => { oyunaGirisYap(kullaniciAdi, 250000); })
-          .catch(dbError => { alert("Veritabanı Kayıt Hatası: " + dbError.message); });
+          .catch(dbError => { alert("Veritabanı kayıt hatası."); });
     }).catch(error => { alert("Sistem Hatası: " + error.message); });
 });
 
@@ -71,8 +72,8 @@ document.getElementById('btnGiris').addEventListener('click', () => {
             let mevcutCip = 250000;
             if(doc.exists) mevcutCip = doc.data().cip;
             oyunaGirisYap(kullaniciAdi, mevcutCip);
-        }).catch(dbError => { alert("Veritabanı Okuma Hatası: " + dbError.message); });
-    }).catch(error => { alert("Giriş Hatası: " + error.message); });
+        }).catch(dbError => { alert("Veritabanı okunamadı."); });
+    }).catch(error => { alert("Giriş Başarısız."); });
 });
 
 function oyunaGirisYap(isim, cip) {
@@ -606,7 +607,7 @@ socket.on('masa_ortasi_guncelle', (data) => {
 });
 
 /* --------------------------------------
-   YENİ: PRO SOHBET ÇEKMECESİ KONTROLLERİ
+   VIP SOHBET ÇEKMECESİ TETİKLEYİCİLERİ
    -------------------------------------- */
 const sohbetCekmecesi = document.getElementById('sohbetCekmecesi');
 
@@ -635,7 +636,6 @@ window.vipEmojiGonder = function(emoji) {
 
 socket.on('yeni_sohbet_mesaji', (data) => {
     if(data.masaAdi === suAnkiMasam) {
-        // 1. Sağdaki çekmeceye yazdır
         const div = document.createElement('div');
         div.className = 'pro-mesaj';
         div.innerHTML = `<span class="pro-mesaj-isim">${data.isim}</span>${data.mesaj}`;
@@ -645,13 +645,11 @@ socket.on('yeni_sohbet_mesaji', (data) => {
             mesajAlani.scrollTop = mesajAlani.scrollHeight;
         }
         
-        // 2. Anlık olarak ekranda uçur (Çekmece kapalıyken görebilmek için)
         const anlikDiv = document.createElement('div');
         anlikDiv.className = 'anlik-mesaj';
         anlikDiv.innerHTML = `<strong style="color:#f2c94c">${data.isim}:</strong> ${data.mesaj}`;
         document.getElementById('anlikMesajAlani')?.appendChild(anlikDiv);
         
-        // 4 saniye sonra ekrandan sil
         setTimeout(() => { anlikDiv.remove(); }, 4000);
     }
 });
