@@ -5,10 +5,9 @@ let benimSiramMi = false;
 let guncelMasalar = {}; 
 let gostergeHakki = false; 
 
-// YENİ: Gerçek Çanta Sistemi
-let benimAnlikCipim = 0; // Çipi ekrandan okumak yerine hafızada tutuyoruz (Hata yapmaz)
-let benimEnvanterim = []; // Sahip olduğun eşyalar
-let aktifKozmetikler = []; // Üstüne giydiğin eşyalar
+let benimAnlikCipim = 0; 
+let benimEnvanterim = []; 
+let aktifKozmetikler = []; 
 
 const sesTasCek = new Audio('sounds/tas_cek.mp3');
 const sesTasKoy = new Audio('sounds/tas_koy.mp3');
@@ -93,8 +92,6 @@ document.getElementById('btnGiris').addEventListener('click', () => {
 
 function oyunaGirisYap(isim) {
     aktifKullaniciAdi = isim;
-    document.getElementById('benimAdimKutusu').innerHTML = aktifKullaniciAdi + ' <span style="color:#2ecc71;">✔</span>';
-    document.getElementById('lobiBenimAdim').innerText = "👑 " + aktifKullaniciAdi;
     document.getElementById('benimCipim').innerText = benimAnlikCipim.toLocaleString('tr-TR');
 
     authEkrani.style.display = 'none';
@@ -104,17 +101,14 @@ function oyunaGirisYap(isim) {
     socket.emit('kullanici_girisi', { isim: aktifKullaniciAdi, cip: benimAnlikCipim });
 }
 
-// YENİ: KUSURSUZ MAĞAZA VE ÇANTA SİSTEMİ
 window.magazaIslem = function(esyaId, fiyat) {
     if (!benimEnvanterim.includes(esyaId)) {
-        // --- 1. SATIN ALMA İŞLEMİ ---
         if (benimAnlikCipim < fiyat) {
             alert("Bunun için yeterli çipin yok patron!"); return;
         }
-        
-        benimAnlikCipim -= fiyat; // Çipi hafızadan düşüyoruz (Asla hata yapmaz)
-        benimEnvanterim.push(esyaId); // Çantaya at
-        aktifKozmetikler.push(esyaId); // Aldığını hemen üstüne giy
+        benimAnlikCipim -= fiyat; 
+        benimEnvanterim.push(esyaId); 
+        aktifKozmetikler.push(esyaId); 
 
         if(auth.currentUser) {
             db.collection("kullanicilar").doc(auth.currentUser.uid).update({ 
@@ -129,15 +123,11 @@ window.magazaIslem = function(esyaId, fiyat) {
             });
         }
     } else {
-        // --- 2. ÇIKAR / KULLAN İŞLEMİ (Çantadan giy/çıkar) ---
         if(aktifKozmetikler.includes(esyaId)) {
-            // Eşya üstündeyse çıkar
             aktifKozmetikler = aktifKozmetikler.filter(e => e !== esyaId);
         } else {
-            // Eşya çantadaysa kullan
             aktifKozmetikler.push(esyaId);
         }
-        
         if(auth.currentUser) {
             db.collection("kullanicilar").doc(auth.currentUser.uid).update({ 
                 aktifKozmetikler: aktifKozmetikler
@@ -148,25 +138,27 @@ window.magazaIslem = function(esyaId, fiyat) {
     }
 }
 
-// YENİ: EŞYALARI VE BUTONLARI EKRANA YANSITAN SİSTEM
+// DÜZELTİLDİ: TAÇ VE RENKLİ İSİMLER ARTIK KUSURSUZ GÖRÜNECEK
 function arayuzGuncelle() {
     const avatar = document.getElementById('vipAvatar');
     const isimKutu = document.getElementById('benimAdimKutusu');
     const lobiIsim = document.getElementById('lobiBenimAdim');
     
-    // Önce her şeyi sıfırla (Çıkarma işlemi yaptıysan eski haline dönsün)
     avatar.style.border = '2px solid #52796f';
     avatar.style.boxShadow = 'none';
     isimKutu.style.color = '#fff';
     isimKutu.style.textShadow = '0 2px 4px rgba(0,0,0,0.5)';
     lobiIsim.style.color = '#f2c94c';
+    lobiIsim.style.textShadow = 'none';
     
+    let tacEki = "";
+    if(aktifKozmetikler.includes('neon_tac')) { tacEki = "👑 "; }
+
     if(aktifKullaniciAdi) {
-        isimKutu.innerHTML = aktifKullaniciAdi + ' <span style="color:#2ecc71;">✔</span>';
-        lobiIsim.innerText = "👑 " + aktifKullaniciAdi; 
+        isimKutu.innerHTML = tacEki + aktifKullaniciAdi + ' <span style="color:#2ecc71;">✔</span>';
+        lobiIsim.innerText = tacEki + aktifKullaniciAdi; 
     }
 
-    // Aktif çantanda ne varsa üstüne giydir
     if(aktifKozmetikler.includes('altin_cerceve')) {
         avatar.style.border = '3px solid #f2c94c';
         avatar.style.boxShadow = '0 0 15px #f2c94c';
@@ -175,39 +167,25 @@ function arayuzGuncelle() {
         isimKutu.style.color = '#ff4d4d';
         isimKutu.style.textShadow = '0 0 8px #ff0000';
         lobiIsim.style.color = '#ff4d4d';
-    }
-    if(aktifKozmetikler.includes('neon_tac')) {
-        lobiIsim.innerText = '🌟 ' + aktifKullaniciAdi; // Neon taç için özel yıldız
+        lobiIsim.style.textShadow = '0 0 5px #ff0000';
     }
     
-    // Mağaza butonlarının yazılarını ve renklerini güncelle
-    const esyalar = [
-        {id: 'altin_cerceve', fiyat: '500.000'}, 
-        {id: 'neon_tac', fiyat: '1.5M'}, 
-        {id: 'atesli_isim', fiyat: '3M'}
-    ];
+    const esyalar = [ {id: 'altin_cerceve', fiyat: '500.000'}, {id: 'neon_tac', fiyat: '1.5M'}, {id: 'atesli_isim', fiyat: '3M'} ];
     
     esyalar.forEach(esya => {
         const btn = document.getElementById('btn_' + esya.id);
         if(btn) {
             if(aktifKozmetikler.includes(esya.id)) {
-                btn.innerText = 'ÇIKAR';
-                btn.style.background = '#e74c3c'; // Kırmızı (Çıkar)
-                btn.style.color = '#fff';
+                btn.innerText = 'ÇIKAR'; btn.style.background = '#e74c3c'; btn.style.color = '#fff';
             } else if(benimEnvanterim.includes(esya.id)) {
-                btn.innerText = 'KULLAN';
-                btn.style.background = '#2ecc71'; // Yeşil (Kullan)
-                btn.style.color = '#fff';
+                btn.innerText = 'KULLAN'; btn.style.background = '#2ecc71'; btn.style.color = '#fff';
             } else {
-                btn.innerText = esya.fiyat + ' ÇİP';
-                btn.style.background = ''; // Orijinal sarı renge dön
-                btn.style.color = '';
+                btn.innerText = esya.fiyat + ' ÇİP'; btn.style.background = ''; btn.style.color = '';
             }
         }
     });
 }
 
-// Çip güncellemelerini hafızadaki değişkene bağladık
 socket.on('cip_guncelle', (cip) => { 
     benimAnlikCipim = cip;
     document.getElementById('benimCipim').innerText = cip.toLocaleString('tr-TR'); 
@@ -277,17 +255,12 @@ function masayiTemizle() {
 
 socket.on('gosterge_basarili', (data) => {
     if(suAnkiMasam === data.masaAdi) {
-        if (data.isim === aktifKullaniciAdi) {
-            gostergeHakki = false;
-            gostergeBtn.style.display = 'none';
-        }
+        if (data.isim === aktifKullaniciAdi) { gostergeHakki = false; gostergeBtn.style.display = 'none'; }
         sesCal(sesSiraSende);
         const flash = document.getElementById('flashBildirim');
         if (flash) {
             flash.innerHTML = `🌟 ${data.isim} GÖSTERGE YAPTI!<br><span style="font-size:22px; color:#c0392b;">+${data.odul.toLocaleString()} ÇİP</span>`;
-            flash.classList.remove('goster');
-            void flash.offsetWidth; 
-            flash.classList.add('goster');
+            flash.classList.remove('goster'); void flash.offsetWidth; flash.classList.add('goster');
         }
     }
 });
@@ -295,7 +268,6 @@ socket.on('gosterge_basarili', (data) => {
 function checkGosterge() {
     gostergeBtn.style.display = 'none';
     if(!gostergeHakki || !benimSiramMi) return; 
-    
     let gostergeDiv = document.getElementById('gostergeTasi');
     if(gostergeDiv.innerText) {
         let gSayi = gostergeDiv.innerText;
@@ -321,15 +293,12 @@ function checkGosterge() {
 
 function elimdekiTasSayisi() {
     let sayi = 0;
-    for(let i=0; i<24; i++) {
-        if(document.getElementById('y'+i).children.length > 0) sayi++;
-    }
+    for(let i=0; i<24; i++) { if(document.getElementById('y'+i).children.length > 0) sayi++; }
     return sayi;
 }
 
 function getIstakaGruplari() {
-    let gruplar = [];
-    let currentGrup = [];
+    let gruplar = []; let currentGrup = [];
     for(let i=0; i<24; i++) {
         if(i === 12 && currentGrup.length > 0) { gruplar.push(currentGrup); currentGrup = []; }
         let yuva = document.getElementById('y'+i);
@@ -739,10 +708,16 @@ document.getElementById('sohbetKapatBtn')?.addEventListener('click', () => {
     sohbetCekmecesi.classList.remove('acik');
 });
 
+// DÜZELTİLDİ: SOHBET GÖNDERİRKEN KOZMETİKLER DE YANINDA GİDİYOR
 document.getElementById('sohbetGonderBtn')?.addEventListener('click', () => {
     const input = document.getElementById('sohbetInput');
     if(input.value.trim() !== '' && suAnkiMasam) {
-        socket.emit('sohbet_mesaji', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi, mesaj: input.value });
+        socket.emit('sohbet_mesaji', { 
+            masaAdi: suAnkiMasam, 
+            isim: aktifKullaniciAdi, 
+            mesaj: input.value,
+            kozmetikler: aktifKozmetikler // <-- Milyonluk vizyon burası!
+        });
         input.value = '';
     }
 });
@@ -754,20 +729,39 @@ window.vipEmojiGonder = function(emoji) {
     }
 }
 
+// DÜZELTİLDİ: YENİ MESAJ GELDİĞİNDE KOZMETİKLERE GÖRE BOYUYORUZ
 socket.on('yeni_sohbet_mesaji', (data) => {
     if(data.masaAdi === suAnkiMasam) {
+        
+        let isimRenk = "#f2c94c"; // Varsayılan Altın Sarısı
+        let isimGolge = "none";
+        let tacIcon = "";
+        
+        // Gönderen kişinin kozmetiklerini kontrol et
+        if (data.kozmetikler) {
+            if(data.kozmetikler.includes('atesli_isim')) {
+                isimRenk = "#ff4d4d";
+                isimGolge = "0 0 5px #ff0000";
+            }
+            if(data.kozmetikler.includes('neon_tac')) {
+                tacIcon = "👑 ";
+            }
+        }
+
+        // Çekmece İçi Mesaj Ekleme
         const div = document.createElement('div');
         div.className = 'pro-mesaj';
-        div.innerHTML = `<span class="pro-mesaj-isim">${data.isim}</span>${data.mesaj}`;
+        div.innerHTML = `<span class="pro-mesaj-isim" style="color:${isimRenk}; text-shadow:${isimGolge};">${tacIcon}${data.isim}</span>${data.mesaj}`;
         const mesajAlani = document.getElementById('sohbetMesajlari');
         if(mesajAlani) {
             mesajAlani.appendChild(div);
             mesajAlani.scrollTop = mesajAlani.scrollHeight;
         }
         
+        // Ekranda Uçan Anlık Mesaj
         const anlikDiv = document.createElement('div');
         anlikDiv.className = 'anlik-mesaj';
-        anlikDiv.innerHTML = `<strong style="color:#f2c94c">${data.isim}:</strong> ${data.mesaj}`;
+        anlikDiv.innerHTML = `<strong style="color:${isimRenk}; text-shadow:${isimGolge};">${tacIcon}${data.isim}:</strong> ${data.mesaj}`;
         document.getElementById('anlikMesajAlani')?.appendChild(anlikDiv);
         
         setTimeout(() => { anlikDiv.remove(); }, 4000);
