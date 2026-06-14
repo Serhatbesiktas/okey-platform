@@ -70,20 +70,22 @@
 
     <div id="masaEkrani">
         
-        <button id="sohbetAcBtn" class="sohbet-ac-btn">💬 SOHBET</button>
-        <div id="sohbetPaneli" class="sohbet-paneli">
-            <div class="sohbet-header">
+        <button id="sohbetAcBtn" class="pro-sohbet-tetikleyici">💬</button>
+        <div id="anlikMesajAlani" class="anlik-mesaj-alani"></div>
+
+        <div id="sohbetCekmecesi" class="sohbet-cekmecesi">
+            <div class="cekmence-header">
                 <span>VIP Sohbet</span>
                 <button id="sohbetKapatBtn">X</button>
             </div>
-            <div id="sohbetMesajlari" class="sohbet-mesajlari"></div>
-            <div class="vip-emojiler">
-                <button class="emoji-btn" onclick="vipEmojiGonder('☕')">☕ Çay</button>
-                <button class="emoji-btn" onclick="vipEmojiGonder('🌹')">🌹 Gül</button>
-                <button class="emoji-btn" onclick="vipEmojiGonder('😠')">😠 Kızdır</button>
-                <button class="emoji-btn" onclick="vipEmojiGonder('👏')">👏 Tebrik</button>
+            <div id="sohbetMesajlari" class="cekmence-mesajlar"></div>
+            <div class="cekmence-emojiler">
+                <button onclick="vipEmojiGonder('☕')">☕</button>
+                <button onclick="vipEmojiGonder('🌹')">🌹</button>
+                <button onclick="vipEmojiGonder('😠')">😠</button>
+                <button onclick="vipEmojiGonder('👏')">👏</button>
             </div>
-            <div class="sohbet-input-alani">
+            <div class="cekmence-input">
                 <input type="text" id="sohbetInput" placeholder="Mesaj yaz..." maxlength="40">
                 <button id="sohbetGonderBtn">Gönder</button>
             </div>
