@@ -69,6 +69,26 @@
     </div>
 
     <div id="masaEkrani">
+        
+        <button id="sohbetAcBtn" class="sohbet-ac-btn">💬 SOHBET</button>
+        <div id="sohbetPaneli" class="sohbet-paneli">
+            <div class="sohbet-header">
+                <span>VIP Sohbet</span>
+                <button id="sohbetKapatBtn">X</button>
+            </div>
+            <div id="sohbetMesajlari" class="sohbet-mesajlari"></div>
+            <div class="vip-emojiler">
+                <button class="emoji-btn" onclick="vipEmojiGonder('☕')">☕ Çay</button>
+                <button class="emoji-btn" onclick="vipEmojiGonder('🌹')">🌹 Gül</button>
+                <button class="emoji-btn" onclick="vipEmojiGonder('😠')">😠 Kızdır</button>
+                <button class="emoji-btn" onclick="vipEmojiGonder('👏')">👏 Tebrik</button>
+            </div>
+            <div class="sohbet-input-alani">
+                <input type="text" id="sohbetInput" placeholder="Mesaj yaz..." maxlength="40">
+                <button id="sohbetGonderBtn">Gönder</button>
+            </div>
+        </div>
+
         <div id="flashBildirim" class="flash-bildirim"></div>
 
         <div id="sonucEkrani">
