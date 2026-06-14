@@ -14,29 +14,32 @@
         #adminSifre { padding: 12px; width: 100%; border-radius: 8px; border: 1px solid #2ecc71; background: #000; color: #fff; margin-bottom: 15px; text-align: center; letter-spacing: 2px;}
         #loginBtn { background: #2ecc71; color: #000; border: none; padding: 12px 30px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; }
 
-        #dashboard { display: none; width: 100%; max-width: 900px; height: 90vh; background: #0b1a12; border-radius: 15px; border: 1px solid #f2c94c; padding: 20px; display: none; flex-direction: column; }
+        #dashboard { display: none; width: 100%; max-width: 900px; height: 95vh; background: #0b1a12; border-radius: 15px; border: 1px solid #f2c94c; padding: 20px; display: none; flex-direction: column; overflow-y: auto;}
         .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2ecc71; padding-bottom: 15px; margin-bottom: 20px; }
-        .header h2 { color: #f2c94c; text-transform: uppercase; }
+        .header h2 { color: #f2c94c; text-transform: uppercase; font-size: 20px;}
         
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; flex: 1; overflow: hidden;}
         
         .kutu { background: rgba(0,0,0,0.4); border: 1px solid #1e3f28; border-radius: 10px; padding: 15px; display: flex; flex-direction: column; }
-        .kutu h3 { color: #2ecc71; margin-bottom: 15px; font-size: 16px; border-bottom: 1px dashed #1e3f28; padding-bottom: 5px;}
+        .kutu h3 { color: #2ecc71; margin-bottom: 10px; font-size: 15px; border-bottom: 1px dashed #1e3f28; padding-bottom: 5px;}
         
-        .oyuncu-listesi { overflow-y: auto; flex: 1; }
-        .oyuncu-satir { display: flex; justify-content: space-between; padding: 10px; background: rgba(255,255,255,0.05); margin-bottom: 5px; border-radius: 5px; }
+        .arama-kutusu { width: 100%; padding: 10px; margin-bottom: 10px; background: #000; border: 1px solid #2ecc71; color: #fff; border-radius: 5px; outline: none; }
+        
+        .oyuncu-listesi { overflow-y: auto; flex: 1; max-height: 400px;}
+        .oyuncu-satir { display: flex; justify-content: space-between; padding: 10px; background: rgba(255,255,255,0.05); margin-bottom: 5px; border-radius: 5px; transition: 0.2s;}
+        .oyuncu-satir:hover { background: rgba(46, 204, 113, 0.2); }
         .oyuncu-isim { font-weight: bold; color: #f2c94c; cursor: pointer; }
         
-        .form-grup { margin-bottom: 15px; }
-        .form-grup label { display: block; font-size: 12px; color: #aaa; margin-bottom: 5px; }
-        .form-grup input { width: 100%; padding: 10px; background: #000; border: 1px solid #1e3f28; color: #fff; border-radius: 5px; }
+        .form-grup { margin-bottom: 12px; }
+        .form-grup label { display: block; font-size: 11px; color: #aaa; margin-bottom: 5px; }
+        .form-grup input { width: 100%; padding: 10px; background: #000; border: 1px solid #1e3f28; color: #fff; border-radius: 5px; outline: none;}
         
         .butonlar { display: flex; gap: 10px; }
         .btn-ekle { flex: 1; background: #2ecc71; color: #000; padding: 10px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
         .btn-cikar { flex: 1; background: #e74c3c; color: #fff; padding: 10px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
-        .btn-duyuru { width: 100%; background: #f2c94c; color: #000; padding: 12px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-duyuru { width: 100%; background: #f2c94c; color: #000; padding: 12px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 5px; }
 
-        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; overflow-y: auto;} }
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; overflow-y: visible;} }
     </style>
 </head>
 <body>
@@ -56,10 +59,11 @@
         <div class="grid">
             <div class="kutu">
                 <h3>👥 Aktif Oyuncu Kasaları</h3>
+                <input type="text" id="aramaInput" class="arama-kutusu" placeholder="🔍 Oyuncu Ara..." onkeyup="oyuncuAra()">
                 <div class="oyuncu-listesi" id="oyuncuListesiDiv">Yükleniyor...</div>
             </div>
             
-            <div style="display: flex; flex-direction: column; gap: 20px;">
+            <div style="display: flex; flex-direction: column; gap: 15px;">
                 <div class="kutu">
                     <h3>💰 Çip Transfer Merkezi</h3>
                     <div class="form-grup">
@@ -76,10 +80,21 @@
                     </div>
                 </div>
 
+                <div class="kutu" style="border-color: #e74c3c;">
+                    <h3 style="color:#e74c3c; border-bottom-color: #e74c3c;">🛑 Güvenlik Merkezi</h3>
+                    <div class="form-grup">
+                        <label>İşlem Yapılacak Oyuncu</label>
+                        <input type="text" id="cezaIsim" placeholder="Örn: SRTBSK34">
+                    </div>
+                    <div class="butonlar">
+                        <button class="btn-cikar" style="background:#f39c12;" onclick="cezaVer('kick')">MASADAN AT</button>
+                        <button class="btn-cikar" style="background:#c0392b;" onclick="cezaVer('ban')">SÜRESİZ BANLA</button>
+                    </div>
+                </div>
+
                 <div class="kutu">
                     <h3>📢 Global Sistem Duyurusu</h3>
                     <div class="form-grup">
-                        <label>Tüm masalarda dev ekranda görünür</label>
                         <input type="text" id="duyuruMesaj" placeholder="Mesajınızı yazın...">
                     </div>
                     <button class="btn-duyuru" onclick="duyuruYap()">🚀 DUYURUYU FIRLAT</button>
@@ -90,6 +105,7 @@
 
     <script>
         const socket = io();
+        let globalOyuncular = {}; // Arama yapmak için listeyi hafızada tutuyoruz
         
         document.getElementById('loginBtn').onclick = () => {
             const sifre = document.getElementById('adminSifre').value;
@@ -101,39 +117,73 @@
                 document.getElementById('loginEkrani').style.display = 'none';
                 document.getElementById('dashboard').style.display = 'flex';
                 socket.emit('admin_veri_iste');
-            } else {
-                alert("Hatalı Şifre!");
-            }
+            } else { alert("Hatalı Şifre!"); }
         });
 
         socket.on('admin_guncel_veri', (oyuncular) => {
+            globalOyuncular = oyuncular;
+            listeyiCiz(oyuncular);
+        });
+
+        function listeyiCiz(oyuncuObjesi) {
             const div = document.getElementById('oyuncuListesiDiv');
             div.innerHTML = '';
-            for(let isim in oyuncular) {
+            let sayac = 0;
+            for(let isim in oyuncuObjesi) {
+                sayac++;
                 div.innerHTML += `
                     <div class="oyuncu-satir">
                         <span class="oyuncu-isim" onclick="ismeTikla('${isim}')">${isim}</span>
-                        <span style="color:#2ecc71; font-weight:bold;">${oyuncular[isim].toLocaleString('tr-TR')} ÇİP</span>
+                        <span style="color:#2ecc71; font-weight:bold;">${oyuncuObjesi[isim].toLocaleString('tr-TR')} ÇİP</span>
                     </div>
                 `;
             }
-            if(Object.keys(oyuncular).length === 0) div.innerHTML = "<p style='color:#777; font-size:12px;'>Şu an aktif oyuncu yok.</p>";
-        });
+            if(sayac === 0) div.innerHTML = "<p style='color:#777; font-size:12px;'>Kayıt bulunamadı.</p>";
+        }
 
-        function ismeTikla(isim) { document.getElementById('hedefIsim').value = isim; }
+        // Arama Motoru Fonksiyonu
+        window.oyuncuAra = function() {
+            const aranan = document.getElementById('aramaInput').value.toLowerCase();
+            const filtrelenmis = {};
+            for(let isim in globalOyuncular) {
+                if(isim.toLowerCase().includes(aranan)) {
+                    filtrelenmis[isim] = globalOyuncular[isim];
+                }
+            }
+            listeyiCiz(filtrelenmis);
+        }
 
-        // --- YENİ EKLENEN BAŞARI MESAJI KISMI ---
+        function ismeTikla(isim) { 
+            document.getElementById('hedefIsim').value = isim; 
+            document.getElementById('cezaIsim').value = isim; 
+        }
+
         function cipIslem(tur) {
             const isim = document.getElementById('hedefIsim').value;
             const miktar = document.getElementById('islemMiktar').value;
             if(!isim || !miktar) { alert("Lütfen isim ve miktar girin."); return; }
-            
             socket.emit('admin_cip_islem', { isim: isim, miktar: miktar, islem: tur });
-            
             const islemAdi = (tur === 'ekle') ? "eklendi" : "silindi";
             alert(`✅ İŞLEM BAŞARILI!\n${isim} adlı oyuncunun hesabından ${Number(miktar).toLocaleString('tr-TR')} ÇİP ${islemAdi}.`);
-            
             document.getElementById('islemMiktar').value = '';
+        }
+
+        function cezaVer(tur) {
+            const isim = document.getElementById('cezaIsim').value;
+            if(!isim) { alert("Lütfen işlem yapılacak oyuncunun adını yazın."); return; }
+            
+            if(tur === 'kick') {
+                if(confirm(`${isim} adlı oyuncuyu masadan atmak istediğinize emin misiniz?`)) {
+                    socket.emit('admin_oyuncu_kick', isim);
+                    alert(`✅ ${isim} başarıyla masadan uzaklaştırıldı!`);
+                }
+            } else if (tur === 'ban') {
+                if(confirm(`DİKKAT! ${isim} adlı oyuncuyu sistemden süresiz olarak BANLAMAK istediğinize emin misiniz?`)) {
+                    socket.emit('admin_oyuncu_ban', isim);
+                    alert(`🛑 ${isim} başarıyla sistemden BANLANDI!`);
+                }
+            }
+            document.getElementById('cezaIsim').value = '';
         }
 
         function duyuruYap() {
