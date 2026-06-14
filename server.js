@@ -120,7 +120,6 @@ function botHamlesiYap(masaAdi) {
     if(siradaki && siradaki.startsWith('Bot_')) {
         setTimeout(() => {
             if(!masa.oyunBasladi) return;
-            
             if(masa.deste.length === 0) {
                 io.emit('sistem_mesaji', `⚠️ ${masaAdi} masasında TAŞ BİTTİ! Oyun berabere sonuçlandı.`);
                 oyunuSifirla(masaAdi, null, 0, "Ortadaki taşlar bitti, oyun berabere!");
@@ -133,9 +132,7 @@ function botHamlesiYap(masaAdi) {
             
             setTimeout(() => {
                 if(!masa.oyunBasladi) return;
-                
                 const botunEli = masa.eller[siradaki];
-                
                 let okeySayi = masa.gosterge.sayi === 13 ? 1 : parseInt(masa.gosterge.sayi) + 1;
                 let okeyRenk = masa.gosterge.renk;
                 
@@ -163,9 +160,7 @@ function botHamlesiYap(masaAdi) {
                 io.emit('sistem_mesaji', `${siradaki} hamlesini yaptı. Sıra ${masa.siradakiOyuncu}'da!`);
                 io.emit('sira_guncelle', { masaAdi: masaAdi, kimde: masa.siradakiOyuncu });
                 
-                if(masa.siradakiOyuncu && masa.siradakiOyuncu.startsWith('Bot_')) {
-                    botHamlesiYap(masaAdi);
-                }
+                if(masa.siradakiOyuncu && masa.siradakiOyuncu.startsWith('Bot_')) { botHamlesiYap(masaAdi); }
             }, 1500); 
         }, 1500); 
     }
@@ -183,6 +178,8 @@ io.on('connection', (socket) => {
       socket.kullaniciAdi = isim;
       if(!oyuncuCipleri[isim] || oyuncuCipleri[isim] === 250000) { oyuncuCipleri[isim] = dbCip; }
       socket.emit('cip_guncelle', oyuncuCipleri[isim]);
+      // Admin paneline güncel listeyi yolla
+      io.emit('admin_guncel_veri', oyuncuCipleri);
   });
 
   socket.on('masaya_otur', (data) => {
@@ -226,7 +223,6 @@ io.on('connection', (socket) => {
         });
         
         io.emit('masa_kasa_guncelle', { masaAdi: masaAdi, kasa: masa.kasa });
-
         masa.deste = desteYaratVeKaristir(); 
         
         let secilenGosterge = masa.deste.pop();
@@ -332,8 +328,7 @@ io.on('connection', (socket) => {
                   let okeySayi = masa.gosterge.sayi === 13 ? 1 : parseInt(masa.gosterge.sayi) + 1;
                   let okeyRenk = masa.gosterge.renk;
                   if (data.bitisTasi.renk === okeyRenk && parseInt(data.bitisTasi.sayi) === okeySayi) {
-                      okeyleBittiMi = true;
-                      kazanilanPara = masa.kasa * 2; 
+                      okeyleBittiMi = true; kazanilanPara = masa.kasa * 2; 
                       sebepMesaji = "🔥 İNANILMAZ! Yere Okey Atarak Bitirdi! Çifte Kazanç! 🔥";
                   }
               }
@@ -379,9 +374,36 @@ io.on('connection', (socket) => {
       }
   }
 
-  // --- YENİ: SOHBET VE EMOJİ KÖPRÜLERİ ---
   socket.on('sohbet_mesaji', (data) => { io.emit('yeni_sohbet_mesaji', data); });
   socket.on('vip_emoji', (data) => { io.emit('yeni_vip_emoji', data); });
+
+  // ----------------------------------------------------
+  // YENİ: PATRON PANELİ (ADMİN) KÖPRÜLERİ
+  // ----------------------------------------------------
+  socket.on('admin_giris', (sifre) => {
+      if(sifre === "BJK1903") {
+          socket.emit('admin_onay', { basarili: true });
+          socket.emit('admin_guncel_veri', oyuncuCipleri);
+      } else {
+          socket.emit('admin_onay', { basarili: false });
+      }
+  });
+
+  socket.on('admin_veri_iste', () => { socket.emit('admin_guncel_veri', oyuncuCipleri); });
+
+  socket.on('admin_cip_islem', (data) => {
+      if (oyuncuCipleri[data.isim] !== undefined) {
+          if (data.islem === 'ekle') { oyuncuCipleri[data.isim] += parseInt(data.miktar); } 
+          else if (data.islem === 'cikar') { oyuncuCipleri[data.isim] = Math.max(0, oyuncuCipleri[data.isim] - parseInt(data.miktar)); }
+          
+          io.emit('cip_guncelle_ozel', { isim: data.isim, cip: oyuncuCipleri[data.isim] });
+          io.emit('admin_guncel_veri', oyuncuCipleri);
+      }
+  });
+
+  socket.on('admin_duyuru', (mesaj) => {
+      io.emit('admin_flash_mesaj', mesaj);
+  });
 
 });
 
