@@ -10,8 +10,6 @@ app.use(express.static('public'));
 const oyuncuCipleri = {};
 const oyuncuKozmetikleri = {}; 
 const banliKullanicilar = new Set(); 
-
-// YENİ: Anlık interneti kopanlara 20 saniye mühlet tanıyacak hafıza
 const baglantiKopanlar = {}; 
 
 const masalar = {
@@ -216,7 +214,6 @@ io.on('connection', (socket) => {
           return;
       }
 
-      // YENİ: Oyuncu 20 saniye dolmadan geri bağlandıysa Atma İşlemini (Bot'a devri) İptal Et!
       if(baglantiKopanlar[isim]) {
           clearTimeout(baglantiKopanlar[isim]);
           delete baglantiKopanlar[isim];
@@ -234,6 +231,18 @@ io.on('connection', (socket) => {
   socket.on('kozmetik_guncelle', (data) => {
       oyuncuKozmetikleri[data.isim] = data.kozmetikler;
       io.emit('kozmetikleri_guncelle', oyuncuKozmetikleri);
+  });
+
+  // YENİ: Liderlik Tablosunu İsteyen Oyuncuya Gönderme Sistemi
+  socket.on('liderlik_tablosu_iste', () => {
+      // Tüm oyuncuları çip miktarına göre büyükten küçüğe sıralayıp ilk 10'u alır
+      const siraliList = Object.entries(oyuncuCipleri)
+          .map(entry => ({ isim: entry[0], cip: entry[1] }))
+          .filter(k => !k.isim.startsWith('MİSAFİR_')) // Misafirleri sıralamaya sokmayız
+          .sort((a, b) => b.cip - a.cip)
+          .slice(0, 10);
+      
+      socket.emit('liderlik_tablosu_guncelle', siraliList);
   });
 
   socket.on('masaya_otur', (data) => {
@@ -388,11 +397,9 @@ io.on('connection', (socket) => {
       }
   });
 
-  // YENİ: Otomatik Masaya Geri Dönme Fonksiyonu
   socket.on('masaya_geri_don', (data) => {
       const masa = masalar[data.masaAdi];
       if (masa && masa.oyunBasladi && masa.koltuklar.includes(data.isim)) {
-          // Oyuncunun kopan ekranını oyunun güncel haliyle onarır
           socket.emit('masa_oyun_basladi', { masaAdi: data.masaAdi, gosterge: masa.gosterge, kalanTas: masa.deste.length, kasa: masa.kasa });
           if(masa.eller[data.isim]) {
               socket.emit('taslari_al', { kime: data.isim, taslar: masa.eller[data.isim] });
@@ -406,11 +413,10 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => { 
       const kopanIsim = socket.kullaniciAdi;
       if(kopanIsim) { 
-          // YENİ: Anında masadan atmak yerine 20 saniye bekletiyoruz!
           baglantiKopanlar[kopanIsim] = setTimeout(() => {
               kullaniciyiMasadanKaldir(kopanIsim);
               delete baglantiKopanlar[kopanIsim];
-          }, 20000); // 20 saniyelik altın tolerans
+          }, 20000); 
       } 
   });
 
