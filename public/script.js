@@ -77,7 +77,6 @@ document.getElementById('btnGiris').addEventListener('click', () => {
 
 function oyunaGirisYap(isim, cip) {
     aktifKullaniciAdi = isim;
-    
     document.getElementById('benimAdimKutusu').innerHTML = aktifKullaniciAdi + ' <span style="color:#2ecc71;">✔</span>';
     document.getElementById('lobiBenimAdim').innerText = "👑 " + aktifKullaniciAdi;
     document.getElementById('benimCipim').innerText = cip.toLocaleString('tr-TR');
@@ -208,10 +207,7 @@ function getIstakaGruplari() {
     let gruplar = [];
     let currentGrup = [];
     for(let i=0; i<24; i++) {
-        if(i === 12 && currentGrup.length > 0) {
-            gruplar.push(currentGrup);
-            currentGrup = [];
-        }
+        if(i === 12 && currentGrup.length > 0) { gruplar.push(currentGrup); currentGrup = []; }
         let yuva = document.getElementById('y'+i);
         if(yuva.children.length > 0) {
             let tas = yuva.children[0];
@@ -219,10 +215,7 @@ function getIstakaGruplari() {
             let renk = renkClass ? renkClass.replace('tas-', '') : '';
             currentGrup.push({ id: tas.id, renk: renk, sayi: tas.innerText });
         } else {
-            if(currentGrup.length > 0) {
-                gruplar.push(currentGrup);
-                currentGrup = [];
-            }
+            if(currentGrup.length > 0) { gruplar.push(currentGrup); currentGrup = []; }
         }
     }
     if(currentGrup.length > 0) gruplar.push(currentGrup);
@@ -244,12 +237,9 @@ new Sortable(document.getElementById('benimIskartam'), {
     group: { name: 'istaka', put: function (to) { return benimSiramMi && elimdekiTasSayisi() === 15; }, pull: false },
     animation: 150, forceFallback: true, fallbackOnBody: true, emptyInsertThreshold: 100, 
     onAdd: function (evt) {
-        gostergeHakki = false; 
-        gostergeBtn.style.display = 'none'; 
-        document.getElementById('iskartaYazi').style.display = 'none';
+        gostergeHakki = false; gostergeBtn.style.display = 'none'; document.getElementById('iskartaYazi').style.display = 'none';
         const atilanTas = evt.item;
         atilanTas.style.position = 'absolute'; atilanTas.style.top = '50%'; atilanTas.style.left = '50%'; atilanTas.style.transform = 'translate(-50%, -50%)'; atilanTas.style.margin = '0';
-        
         let renkSinifi = Array.from(atilanTas.classList).find(c=>c.startsWith('tas-'));
         let renk = renkSinifi ? renkSinifi.split('-')[1] : 'siyah';
         socket.emit('tas_atildi', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi, tas: { id: atilanTas.id, renk: renk, sayi: atilanTas.innerText } });
@@ -261,16 +251,13 @@ new Sortable(bitisAlani, {
     group: { name: 'istaka', put: function (to) { return benimSiramMi && elimdekiTasSayisi() === 15; }, pull: false },
     animation: 150, forceFallback: true, fallbackOnBody: true, emptyInsertThreshold: 100, 
     onAdd: function (evt) {
-        gostergeHakki = false; 
-        gostergeBtn.style.display = 'none';
+        gostergeHakki = false; gostergeBtn.style.display = 'none';
         const atilanTas = evt.item;
         atilanTas.style.position = 'absolute'; atilanTas.style.top = '50%'; atilanTas.style.left = '50%'; atilanTas.style.transform = 'translate(-50%, -50%)'; atilanTas.style.margin = '0';
         let gruplar = getIstakaGruplari(); 
-        
         let renkSinifi = Array.from(atilanTas.classList).find(c=>c.startsWith('tas-'));
         let renk = renkSinifi ? renkSinifi.split('-')[1] : 'siyah';
         const bitisTasi = { id: atilanTas.id, renk: renk, sayi: atilanTas.innerText };
-
         socket.emit('oyunu_bitir', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi, gruplar: gruplar, bitisTasi: bitisTasi });
         sesCal(sesTasKoy);
     }
@@ -292,8 +279,7 @@ socket.on('hatali_bitis', (mesaj) => {
 
 function otomatikTasAt(tasElementi) {
     if (!benimSiramMi || elimdekiTasSayisi() !== 15) return; 
-    gostergeHakki = false; 
-    gostergeBtn.style.display = 'none'; 
+    gostergeHakki = false; gostergeBtn.style.display = 'none'; 
     const iskartaKutusu = document.getElementById('benimIskartam');
     if (iskartaKutusu) {
         iskartaKutusu.appendChild(tasElementi);
@@ -347,19 +333,16 @@ function kurtarmaSinyaliGonder() {
 
 kalanTasBilgi.addEventListener('click', () => {
     if (benimSiramMi && elimdekiTasSayisi() === 14) {
-        gostergeHakki = false; 
-        gostergeBtn.style.display = 'none'; 
+        gostergeHakki = false; gostergeBtn.style.display = 'none'; 
         socket.emit('ortadan_tas_cek', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi });
         sesCal(sesTasCek);
-    }
-    else if(!benimSiramMi) alert("Şu an sıra sizde değil!");
+    } else if(!benimSiramMi) alert("Şu an sıra sizde değil!");
     else alert("Önce elinizdeki fazlalık taşı sağdaki oyuncuya atmalısınız!");
 });
 
 document.getElementById('iskartaSol').addEventListener('click', function() {
     if (benimSiramMi && elimdekiTasSayisi() === 14 && this.children.length > 0) {
-        gostergeHakki = false; 
-        gostergeBtn.style.display = 'none'; 
+        gostergeHakki = false; gostergeBtn.style.display = 'none'; 
         const tasEl = this.lastElementChild;
         let renkSinifi = Array.from(tasEl.classList).find(c=>c.startsWith('tas-'));
         let renk = renkSinifi ? renkSinifi.split('-')[1] : 'siyah';
@@ -367,10 +350,7 @@ document.getElementById('iskartaSol').addEventListener('click', function() {
         
         this.innerHTML = ''; 
         for(let i=0; i<24; i++) {
-            if(document.getElementById('y'+i).children.length === 0) {
-                tasEkle(tasObj, 'y'+i);
-                break;
-            }
+            if(document.getElementById('y'+i).children.length === 0) { tasEkle(tasObj, 'y'+i); break; }
         }
         socket.emit('yandan_tas_alindi', { masaAdi: suAnkiMasam, kimAldi: aktifKullaniciAdi, tas: tasObj });
         sesCal(sesTasCek);
@@ -439,7 +419,6 @@ socket.on('oyun_bitti', (data) => {
         }
         
         sonucEkrani.style.display = 'flex'; 
-        
         const flash = document.getElementById('flashBildirim');
         if (flash) flash.classList.remove('goster');
 
@@ -464,19 +443,14 @@ socket.on('oyun_bitti', (data) => {
 
 socket.on('masalari_guncelle', (lobidekiMasalar) => {
     guncelMasalar = lobidekiMasalar; 
-    
     masalarAlani.innerHTML = ''; 
     for (const [masaAdi, koltuklar] of Object.entries(lobidekiMasalar)) {
         const doluKoltukSayisi = koltuklar.filter(k => k !== null).length;
         const benBuMasadaMiyim = koltuklar.includes(aktifKullaniciAdi);
-        
         const html = `
             <div class="masa-kart">
                 <div class="masa-watermark"></div>
-                <div class="kart-sol">
-                    <div class="zar-kutu">🎲</div>
-                    <div class="masa-kart-isim">${masaAdi}</div>
-                </div>
+                <div class="kart-sol"><div class="zar-kutu">🎲</div><div class="masa-kart-isim">${masaAdi}</div></div>
                 <div class="kart-sag">
                     <div class="masa-kisi-kutu">🎲 ${doluKoltukSayisi}/4</div>
                     <button class="btn-otur ${benBuMasadaMiyim || doluKoltukSayisi>=4 ? 'disabled':''}" 
@@ -524,21 +498,12 @@ oyunuBaslatBtn.addEventListener('click', () => { socket.emit('oyunu_baslat', suA
 
 document.querySelector('.btn-hemen-oyna').addEventListener('click', () => {
     if (suAnkiMasam) return; 
-    
     let musaitMasa = null;
     for (const [masaAdi, koltuklar] of Object.entries(guncelMasalar)) {
-        const doluSayisi = koltuklar.filter(k => k !== null).length;
-        if (doluSayisi < 4) {
-            musaitMasa = masaAdi;
-            break;
-        }
+        if (koltuklar.filter(k => k !== null).length < 4) { musaitMasa = masaAdi; break; }
     }
-    
-    if (musaitMasa) {
-        masayaOtur(musaitMasa);
-    } else {
-        alert("Şu an tüm masalar tam kapasite dolu, patron!");
-    }
+    if (musaitMasa) masayaOtur(musaitMasa);
+    else alert("Şu an tüm masalar tam kapasite dolu, patron!");
 });
 
 socket.on('masa_kasa_guncelle', (data) => {
@@ -554,7 +519,6 @@ socket.on('masa_oyun_basladi', (data) => {
         oyunuBaslatBtn.style.display = 'none';
         oyunAlanObjeleri.style.display = 'flex';
         bitisAlani.style.display = 'flex';
-        
         gostergeHakki = true; 
         
         kalanTasBilgi.innerText = data.kalanTas;
@@ -567,10 +531,7 @@ socket.on('masa_oyun_basladi', (data) => {
             masaKasaBilgisi.style.display = 'block';
             masaKasaBilgisi.innerText = 'KASA: ' + data.kasa.toLocaleString('tr-TR') + ' ÇİP';
         }
-        
-        if (guncelMasalar[data.masaAdi]) {
-            gelişmişKoltukHizala(guncelMasalar[data.masaAdi]);
-        }
+        if (guncelMasalar[data.masaAdi]) gelişmişKoltukHizala(guncelMasalar[data.masaAdi]);
     }
 });
 
@@ -578,24 +539,19 @@ socket.on('taslari_al', (data) => {
     if (data.kime === aktifKullaniciAdi) {
         for(let i=0; i<24; i++) document.getElementById('y'+i).innerHTML = '';
         data.taslar.forEach((tas, index) => { tasEkle(tas, 'y'+index); });
-        
         setTimeout(checkGosterge, 500);
     }
 });
 
 socket.on('tas_cekildi', (tas) => {
     for(let i=0; i<24; i++) {
-        if(document.getElementById('y'+i).children.length === 0) {
-            tasEkle(tas, 'y'+i);
-            break;
-        }
+        if(document.getElementById('y'+i).children.length === 0) { tasEkle(tas, 'y'+i); break; }
     }
 });
 
 function tasEkle(tasData, yuvaId) {
     const div = document.createElement('div');
     div.className = `okey-tasi tas-${tasData.renk}`; div.innerText = tasData.sayi; div.id = tasData.id; 
-    
     let sonDokunma = 0; let surukleniyorMu = false;
     div.addEventListener('touchstart', () => { surukleniyorMu = false; }, {passive: true});
     div.addEventListener('touchmove', () => { surukleniyorMu = true; }, {passive: true});
@@ -606,20 +562,16 @@ function tasEkle(tasData, yuvaId) {
         sonDokunma = simdi;
     });
     div.addEventListener('dblclick', function() { otomatikTasAt(this); });
-
     document.getElementById(yuvaId).appendChild(div);
 }
 
 socket.on('sira_guncelle', (data) => {
     if(suAnkiMasam === data.masaAdi) {
         kurtarmaSinyaliGonder(); 
-        
         const eskiSira = benimSiramMi; 
         benimSiramMi = (data.kimde === aktifKullaniciAdi);
         
-        if(benimSiramMi && !eskiSira) {
-            sesCal(sesSiraSende);
-        }
+        if(benimSiramMi && !eskiSira) sesCal(sesSiraSende);
         
         const iskarta = document.getElementById('benimIskartam');
         if(benimSiramMi) iskarta.classList.remove('kilitli-iskarta');
@@ -637,7 +589,6 @@ socket.on('sira_guncelle', (data) => {
             if(k.isim === data.kimde || k.gercekIsim === data.kimde) el.classList.add('aktif-sira');
             else el.classList.remove('aktif-sira');
         });
-        
         checkGosterge(); 
     }
 });
@@ -654,40 +605,54 @@ socket.on('masa_ortasi_guncelle', (data) => {
     }
 });
 
-// --- YENİ: SOHBET VE EMOJİ KONTROLLERİ (MOTOR DIŞI) ---
-const sohbetPaneli = document.getElementById('sohbetPaneli');
-const sohbetMesajlari = document.getElementById('sohbetMesajlari');
-const sohbetInput = document.getElementById('sohbetInput');
+/* --------------------------------------
+   YENİ: PRO SOHBET ÇEKMECESİ KONTROLLERİ
+   -------------------------------------- */
+const sohbetCekmecesi = document.getElementById('sohbetCekmecesi');
 
 document.getElementById('sohbetAcBtn')?.addEventListener('click', () => {
-    sohbetPaneli.style.display = sohbetPaneli.style.display === 'flex' ? 'none' : 'flex';
+    sohbetCekmecesi.classList.add('acik');
 });
 
 document.getElementById('sohbetKapatBtn')?.addEventListener('click', () => {
-    sohbetPaneli.style.display = 'none';
+    sohbetCekmecesi.classList.remove('acik');
 });
 
 document.getElementById('sohbetGonderBtn')?.addEventListener('click', () => {
-    if(sohbetInput.value.trim() !== '' && suAnkiMasam) {
-        socket.emit('sohbet_mesaji', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi, mesaj: sohbetInput.value });
-        sohbetInput.value = '';
+    const input = document.getElementById('sohbetInput');
+    if(input.value.trim() !== '' && suAnkiMasam) {
+        socket.emit('sohbet_mesaji', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi, mesaj: input.value });
+        input.value = '';
     }
 });
 
 window.vipEmojiGonder = function(emoji) {
     if(suAnkiMasam) {
         socket.emit('vip_emoji', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi, emoji: emoji });
-        sohbetPaneli.style.display = 'none'; 
+        sohbetCekmecesi.classList.remove('acik'); 
     }
 }
 
 socket.on('yeni_sohbet_mesaji', (data) => {
     if(data.masaAdi === suAnkiMasam) {
+        // 1. Sağdaki çekmeceye yazdır
         const div = document.createElement('div');
-        div.className = 'mesaj-satiri';
-        div.innerHTML = `<span class="mesaj-gonderen">${data.isim}:</span>${data.mesaj}`;
-        sohbetMesajlari.appendChild(div);
-        sohbetMesajlari.scrollTop = sohbetMesajlari.scrollHeight;
+        div.className = 'pro-mesaj';
+        div.innerHTML = `<span class="pro-mesaj-isim">${data.isim}</span>${data.mesaj}`;
+        const mesajAlani = document.getElementById('sohbetMesajlari');
+        if(mesajAlani) {
+            mesajAlani.appendChild(div);
+            mesajAlani.scrollTop = mesajAlani.scrollHeight;
+        }
+        
+        // 2. Anlık olarak ekranda uçur (Çekmece kapalıyken görebilmek için)
+        const anlikDiv = document.createElement('div');
+        anlikDiv.className = 'anlik-mesaj';
+        anlikDiv.innerHTML = `<strong style="color:#f2c94c">${data.isim}:</strong> ${data.mesaj}`;
+        document.getElementById('anlikMesajAlani')?.appendChild(anlikDiv);
+        
+        // 4 saniye sonra ekrandan sil
+        setTimeout(() => { anlikDiv.remove(); }, 4000);
     }
 });
 
@@ -697,8 +662,6 @@ socket.on('yeni_vip_emoji', (data) => {
         div.className = 'ucan-emoji';
         div.innerText = data.emoji;
         document.getElementById('masaEkrani').appendChild(div);
-        
-        // Emojiyi 2.5 saniye sonra ekrandan sil (Ekranda kalabalık yapmasın)
         setTimeout(() => { div.remove(); }, 2500);
     }
 });
