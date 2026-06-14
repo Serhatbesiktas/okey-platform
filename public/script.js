@@ -5,8 +5,10 @@ let benimSiramMi = false;
 let guncelMasalar = {}; 
 let gostergeHakki = false; 
 
-// YENİ: Oyuncunun sahip olduğu lüks eşyalar
-let benimEnvanterim = [];
+// YENİ: Gerçek Çanta Sistemi
+let benimAnlikCipim = 0; // Çipi ekrandan okumak yerine hafızada tutuyoruz (Hata yapmaz)
+let benimEnvanterim = []; // Sahip olduğun eşyalar
+let aktifKozmetikler = []; // Üstüne giydiğin eşyalar
 
 const sesTasCek = new Audio('sounds/tas_cek.mp3');
 const sesTasKoy = new Audio('sounds/tas_koy.mp3');
@@ -57,11 +59,14 @@ document.getElementById('btnKayit').addEventListener('click', () => {
         db.collection("kullanicilar").doc(userCredential.user.uid).set({
             isim: kullaniciAdi,
             cip: 250000,
-            envanter: [] // YENİ: Başlangıçta boş envanter
+            envanter: [],
+            aktifKozmetikler: []
         }).then(() => { 
+            benimAnlikCipim = 250000;
             benimEnvanterim = [];
-            oyunaGirisYap(kullaniciAdi, 250000); 
-            kozmetikleriUygula(benimEnvanterim);
+            aktifKozmetikler = [];
+            oyunaGirisYap(kullaniciAdi); 
+            arayuzGuncelle();
         }).catch(dbError => { alert("Veritabanı kayıt hatası."); });
     }).catch(error => { alert("Sistem Hatası: " + error.message); });
 });
@@ -75,88 +80,141 @@ document.getElementById('btnGiris').addEventListener('click', () => {
     auth.signInWithEmailAndPassword(email, pass).then((userCredential) => {
         const kullaniciAdi = email.split('@')[0].toUpperCase();
         db.collection("kullanicilar").doc(userCredential.user.uid).get().then(doc => {
-            let mevcutCip = 250000;
             if(doc.exists) {
-                mevcutCip = doc.data().cip;
-                benimEnvanterim = doc.data().envanter || []; // YENİ: Veritabanından çantayı çek
+                benimAnlikCipim = doc.data().cip || 250000;
+                benimEnvanterim = doc.data().envanter || [];
+                aktifKozmetikler = doc.data().aktifKozmetikler || [];
             }
-            oyunaGirisYap(kullaniciAdi, mevcutCip);
-            kozmetikleriUygula(benimEnvanterim); // Eşyaları üstüne giy
+            oyunaGirisYap(kullaniciAdi);
+            arayuzGuncelle();
         }).catch(dbError => { alert("Veritabanı okunamadı."); });
     }).catch(error => { alert("Giriş Başarısız."); });
 });
 
-function oyunaGirisYap(isim, cip) {
+function oyunaGirisYap(isim) {
     aktifKullaniciAdi = isim;
     document.getElementById('benimAdimKutusu').innerHTML = aktifKullaniciAdi + ' <span style="color:#2ecc71;">✔</span>';
     document.getElementById('lobiBenimAdim').innerText = "👑 " + aktifKullaniciAdi;
-    document.getElementById('benimCipim').innerText = cip.toLocaleString('tr-TR');
+    document.getElementById('benimCipim').innerText = benimAnlikCipim.toLocaleString('tr-TR');
 
     authEkrani.style.display = 'none';
     vipHeader.style.display = 'flex';
     lobiEkrani.style.display = 'flex';
 
-    socket.emit('kullanici_girisi', { isim: aktifKullaniciAdi, cip: cip });
+    socket.emit('kullanici_girisi', { isim: aktifKullaniciAdi, cip: benimAnlikCipim });
 }
 
-// YENİ: MAĞAZA SATIN ALMA SİSTEMİ
-window.esyaSatinAl = function(esyaId, fiyat) {
-    if(benimEnvanterim.includes(esyaId)) {
-        alert("Buna zaten sahipsin patron!"); return;
-    }
-    
-    const guncelCip = parseInt(document.getElementById('benimCipim').innerText.replace(/\./g, ''));
-    if(guncelCip < fiyat) {
-        alert("Bunun için yeterli çipin yok!"); return;
-    }
-    
-    const yeniCip = guncelCip - fiyat;
-    benimEnvanterim.push(esyaId);
-    
-    if(auth.currentUser) {
-        db.collection("kullanicilar").doc(auth.currentUser.uid).update({ 
-            cip: yeniCip,
-            envanter: benimEnvanterim
-        }).then(() => {
-            socket.emit('kullanici_girisi', { isim: aktifKullaniciAdi, cip: yeniCip });
-            document.getElementById('benimCipim').innerText = yeniCip.toLocaleString('tr-TR');
-            kozmetikleriUygula(benimEnvanterim);
-            alert("✅ Satın alma başarılı! VIP eşyan hemen kuşanıldı.");
-        });
+// YENİ: KUSURSUZ MAĞAZA VE ÇANTA SİSTEMİ
+window.magazaIslem = function(esyaId, fiyat) {
+    if (!benimEnvanterim.includes(esyaId)) {
+        // --- 1. SATIN ALMA İŞLEMİ ---
+        if (benimAnlikCipim < fiyat) {
+            alert("Bunun için yeterli çipin yok patron!"); return;
+        }
+        
+        benimAnlikCipim -= fiyat; // Çipi hafızadan düşüyoruz (Asla hata yapmaz)
+        benimEnvanterim.push(esyaId); // Çantaya at
+        aktifKozmetikler.push(esyaId); // Aldığını hemen üstüne giy
+
+        if(auth.currentUser) {
+            db.collection("kullanicilar").doc(auth.currentUser.uid).update({ 
+                cip: benimAnlikCipim,
+                envanter: benimEnvanterim,
+                aktifKozmetikler: aktifKozmetikler
+            }).then(() => {
+                socket.emit('kullanici_girisi', { isim: aktifKullaniciAdi, cip: benimAnlikCipim });
+                document.getElementById('benimCipim').innerText = benimAnlikCipim.toLocaleString('tr-TR');
+                arayuzGuncelle();
+                alert("✅ Satın alma başarılı! Eşya otomatik olarak kuşanıldı.");
+            });
+        }
+    } else {
+        // --- 2. ÇIKAR / KULLAN İŞLEMİ (Çantadan giy/çıkar) ---
+        if(aktifKozmetikler.includes(esyaId)) {
+            // Eşya üstündeyse çıkar
+            aktifKozmetikler = aktifKozmetikler.filter(e => e !== esyaId);
+        } else {
+            // Eşya çantadaysa kullan
+            aktifKozmetikler.push(esyaId);
+        }
+        
+        if(auth.currentUser) {
+            db.collection("kullanicilar").doc(auth.currentUser.uid).update({ 
+                aktifKozmetikler: aktifKozmetikler
+            }).then(() => {
+                arayuzGuncelle();
+            });
+        }
     }
 }
 
-// YENİ: SATIN ALINANLARI GÖRÜNÜME YANSITMA
-function kozmetikleriUygula(envanter) {
+// YENİ: EŞYALARI VE BUTONLARI EKRANA YANSITAN SİSTEM
+function arayuzGuncelle() {
     const avatar = document.getElementById('vipAvatar');
     const isimKutu = document.getElementById('benimAdimKutusu');
     const lobiIsim = document.getElementById('lobiBenimAdim');
+    
+    // Önce her şeyi sıfırla (Çıkarma işlemi yaptıysan eski haline dönsün)
+    avatar.style.border = '2px solid #52796f';
+    avatar.style.boxShadow = 'none';
+    isimKutu.style.color = '#fff';
+    isimKutu.style.textShadow = '0 2px 4px rgba(0,0,0,0.5)';
+    lobiIsim.style.color = '#f2c94c';
+    
+    if(aktifKullaniciAdi) {
+        isimKutu.innerHTML = aktifKullaniciAdi + ' <span style="color:#2ecc71;">✔</span>';
+        lobiIsim.innerText = "👑 " + aktifKullaniciAdi; 
+    }
 
-    if(envanter.includes('altin_cerceve')) {
+    // Aktif çantanda ne varsa üstüne giydir
+    if(aktifKozmetikler.includes('altin_cerceve')) {
         avatar.style.border = '3px solid #f2c94c';
         avatar.style.boxShadow = '0 0 15px #f2c94c';
     }
-    if(envanter.includes('atesli_isim')) {
+    if(aktifKozmetikler.includes('atesli_isim')) {
         isimKutu.style.color = '#ff4d4d';
         isimKutu.style.textShadow = '0 0 8px #ff0000';
         lobiIsim.style.color = '#ff4d4d';
     }
-    if(envanter.includes('neon_tac')) {
-        if(!lobiIsim.innerText.includes('👑')) {
-            lobiIsim.innerText = '👑 ' + lobiIsim.innerText.replace('👑 ', '');
-        }
+    if(aktifKozmetikler.includes('neon_tac')) {
+        lobiIsim.innerText = '🌟 ' + aktifKullaniciAdi; // Neon taç için özel yıldız
     }
     
-    // Mağazadaki butonları "SAHİPSİN" olarak değiştir
-    envanter.forEach(esya => {
-        const btn = document.getElementById('btn_' + esya);
-        if(btn) { btn.innerText = 'SAHİPSİN'; btn.classList.add('sahip'); }
+    // Mağaza butonlarının yazılarını ve renklerini güncelle
+    const esyalar = [
+        {id: 'altin_cerceve', fiyat: '500.000'}, 
+        {id: 'neon_tac', fiyat: '1.5M'}, 
+        {id: 'atesli_isim', fiyat: '3M'}
+    ];
+    
+    esyalar.forEach(esya => {
+        const btn = document.getElementById('btn_' + esya.id);
+        if(btn) {
+            if(aktifKozmetikler.includes(esya.id)) {
+                btn.innerText = 'ÇIKAR';
+                btn.style.background = '#e74c3c'; // Kırmızı (Çıkar)
+                btn.style.color = '#fff';
+            } else if(benimEnvanterim.includes(esya.id)) {
+                btn.innerText = 'KULLAN';
+                btn.style.background = '#2ecc71'; // Yeşil (Kullan)
+                btn.style.color = '#fff';
+            } else {
+                btn.innerText = esya.fiyat + ' ÇİP';
+                btn.style.background = ''; // Orijinal sarı renge dön
+                btn.style.color = '';
+            }
+        }
     });
 }
 
-socket.on('cip_guncelle', (cip) => { document.getElementById('benimCipim').innerText = cip.toLocaleString('tr-TR'); });
+// Çip güncellemelerini hafızadaki değişkene bağladık
+socket.on('cip_guncelle', (cip) => { 
+    benimAnlikCipim = cip;
+    document.getElementById('benimCipim').innerText = cip.toLocaleString('tr-TR'); 
+});
 socket.on('cip_guncelle_ozel', (data) => { 
     if(data.isim === aktifKullaniciAdi) {
+        benimAnlikCipim = data.cip;
         document.getElementById('benimCipim').innerText = data.cip.toLocaleString('tr-TR'); 
         if(auth.currentUser) {
             db.collection("kullanicilar").doc(auth.currentUser.uid).update({ cip: data.cip });
