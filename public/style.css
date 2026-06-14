@@ -6,7 +6,7 @@ body { background-color: #050d08; color: #fff; font-family: 'Segoe UI', Tahoma, 
 .profil-bilgi { display: flex; align-items: center; gap: 10px; }
 .profil-avatar { width: 45px; height: 45px; background: radial-gradient(circle, #1e3f28 0%, #0d1f14 100%); border-radius: 50%; border: 2px solid #52796f; display: flex; justify-content: center; align-items: center; font-size: 20px; transition: all 0.3s; }
 .profil-isim-kutu { display: flex; flex-direction: column; align-items: flex-start; }
-.profil-isim { font-size: 15px; font-weight: bold; margin: 0; color: #fff; display: flex; align-items: center; gap: 5px; transition: all 0.3s; }
+.profil-isim { font-size: 15px; font-weight: bold; margin: 0; color: #fff; display: flex; align-items: center; gap: 5px; transition: all 0.3s; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
 .vip-badge { background: linear-gradient(180deg, #f2d94c 0%, #d4af37 100%); color: #000; font-size: 9px; font-weight: 900; padding: 2px 6px; border-radius: 4px; margin-top: 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
 
 .cip-kutu { background: rgba(13, 43, 26, 0.6); border: 1px solid #2ecc71; box-shadow: 0 0 12px rgba(46, 204, 113, 0.4), inset 0 0 6px rgba(46, 204, 113, 0.2); padding: 8px 15px; border-radius: 12px; display: flex; align-items: center; gap: 8px; font-weight: bold; color: #fff; font-size: 16px; position: relative;}
@@ -133,7 +133,6 @@ body { background-color: #050d08; color: #fff; font-family: 'Segoe UI', Tahoma, 
 
 .flash-bildirim { position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%); background: linear-gradient(135deg, #ffe266, #d49a00); color: #050d08; padding: 16px 32px; border-radius: 50px; font-weight: 900; font-size: 16px; text-transform: uppercase; box-shadow: 0 15px 40px rgba(0,0,0,0.85), 0 0 25px rgba(255, 226, 102, 0.6); z-index: 9999; text-align: center; border: 3px solid #ffffff; pointer-events: none; opacity: 0; display: none; }
 .flash-bildirim.goster { display: block; animation: flashAnim 3.5s forwards; }
-@keyframes flashAnim { 0% { opacity: 0; transform: translate(-50%, -20%) scale(0.5); } 12% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); } 25% { transform: translate(-50%, -50%) scale(1); } 82% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -85%) scale(0.8); } }
 
 #authEkrani { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 45%, #1f5934 0%, #11361c 55%, #050d08 100%); z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
 .auth-kutu { background: linear-gradient(135deg, #112618 0%, #06120b 100%); border: 3px solid #f2c94c; padding: 40px 30px; border-radius: 20px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.8), 0 0 20px rgba(242, 201, 76, 0.2); }
@@ -144,7 +143,10 @@ body { background-color: #050d08; color: #fff; font-family: 'Segoe UI', Tahoma, 
 .auth-btn { width: 100%; padding: 14px; border-radius: 10px; border: none; font-weight: 900; font-size: 14px; cursor: pointer; transition: transform 0.1s, box-shadow: 0.2s; margin-bottom: 12px; text-transform: uppercase; }
 .auth-btn:active { transform: scale(0.95); }
 .btn-sari { background: linear-gradient(180deg, #ffe066 0%, #db9d13 100%); color: #111; box-shadow: 0 5px 15px rgba(0,0,0,0.4); }
-.btn-yesil { background: linear-gradient(180deg, #2ecc71 0%, #1e8449 100%); color: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.4); margin-bottom: 0; }
+.btn-yesil { background: linear-gradient(180deg, #2ecc71 0%, #1e8449 100%); color: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.4); }
+
+/* MİSAFİR GİRİŞ BUTON BOYASI */
+.btn-gri { background: linear-gradient(180deg, #7f8c8d 0%, #34495e 100%); color: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.4); margin-bottom: 0; }
 
 .pro-sohbet-tetikleyici { position: absolute; top: 15px; left: 15px; width: 42px; height: 45px; border-radius: 50%; background: rgba(11, 38, 20, 0.8); border: 2px solid #2ecc71; color: #fff; font-size: 20px; cursor: pointer; box-shadow: 0 0 15px rgba(46, 204, 113, 0.5); z-index: 99; backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; }
 .pro-sohbet-tetikleyici:active { transform: scale(0.9); }
@@ -162,6 +164,7 @@ body { background-color: #050d08; color: #fff; font-family: 'Segoe UI', Tahoma, 
 .cekmence-input input { flex: 1; background: rgba(255,255,255,0.1); border: 1px solid rgba(46, 204, 113, 0.4); border-radius: 8px; color: white; padding: 10px; outline: none; }
 .cekmence-input button { background: #2ecc71; color: #000; border: none; border-radius: 8px; padding: 0 15px; font-weight: bold; cursor: pointer; }
 .cekmence-input button:active { transform: scale(0.95); }
+
 .anlik-mesaj-alani { position: absolute; top: 70px; left: 15px; z-index: 40; pointer-events: none; display: flex; flex-direction: column; gap: 5px; }
 .anlik-mesaj { background: rgba(5, 15, 8, 0.85); border: 1px solid #2ecc71; color: #fff; padding: 8px 15px; border-radius: 20px; font-size: 12px; animation: silin 4s forwards; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
 .ucan-emoji { position: absolute; top: 50%; left: 50%; font-size: 80px; pointer-events: none; z-index: 99999; animation: ucGit 2.5s ease-out forwards; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.8)); }
@@ -174,14 +177,27 @@ body { background-color: #050d08; color: #fff; font-family: 'Segoe UI', Tahoma, 
 .urun-kart h3 { color: #fff; font-size: 14px; }
 .urun-kart p { color: #aaa; font-size: 11px; margin-bottom: 10px; line-height: 1.3;}
 .satin-al-btn { background: linear-gradient(180deg, #ffe066 0%, #db9d13 100%); color: #000; border: none; padding: 10px 5px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; width: 100%; box-shadow: 0 4px 10px rgba(0,0,0,0.5); transition: 0.2s;}
-.satin-al-btn:active { transform: scale(0.95); }
 .satin-al-btn.sahip { background: #2ecc71; color: #fff; pointer-events: none; box-shadow: none; border: 1px solid #1e8449;}
 
-/* YENİ: GÜNLÜK BONUS KASA TASARIMI */
 .bonus-kutu { background: linear-gradient(135deg, #112618 0%, #06120b 100%); border: 3px solid #2ecc71; border-radius: 20px; padding: 40px 30px; text-align: center; box-shadow: 0 0 50px rgba(46, 204, 113, 0.4); width: 90%; max-width: 400px; }
 .bonus-kutu h2 { color: #2ecc71; font-size: 26px; margin-bottom: 10px; text-shadow: 0 0 10px rgba(46,204,113,0.5); }
 .bonus-kutu p { color: #a3c4bc; font-size: 13px; margin-bottom: 25px; }
 .dijital-gosterge { background: #000; color: #f2c94c; font-family: 'Courier New', Courier, monospace; font-size: 45px; font-weight: 900; padding: 15px 20px; border-radius: 10px; border: 2px inset #f2c94c; letter-spacing: 5px; margin-bottom: 25px; box-shadow: inset 0 0 20px rgba(242, 201, 76, 0.2); }
-.bonus-btn { background: linear-gradient(180deg, #ffe066 0%, #db9d13 100%); color: #000; border: none; padding: 15px 40px; border-radius: 12px; font-weight: 900; font-size: 18px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.5); width: 100%; transition: all 0.2s; }
-.bonus-btn:active { transform: scale(0.95); }
-.bonus-btn:disabled { background: #555; color: #888; cursor: not-allowed; box-shadow: none; }
+.bonus-btn { background: linear-gradient(180deg, #ffe066 0%, #db9d13 100%); color: #000; border: none; padding: 15px 40px; border-radius: 12px; font-weight: 900; font-size: 18px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.4); width: 100%; transition: all 0.2s; }
+
+/* YENİ: MİSAFİR UYARI BANNER TASARIMI */
+.guest-warning-banner {
+    background: linear-gradient(90deg, #d35400, #c0392b);
+    color: #fff;
+    padding: 10px 15px;
+    font-size: 11px;
+    font-weight: 800;
+    text-align: center;
+    border-bottom: 2px solid #f1c40f;
+    animation: glowBanner 2s infinite alternate;
+    z-index: 99;
+}
+@keyframes glowBanner {
+    0% { box-shadow: 0 0 5px #c0392b; }
+    100% { box-shadow: 0 0 20px #f1c40f; }
+}
