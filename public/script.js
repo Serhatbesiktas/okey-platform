@@ -1,25 +1,98 @@
 const socket = io();
-const aktifKullaniciAdi = "Oyuncu_" + Math.floor(Math.random() * 900 + 100);
+let aktifKullaniciAdi = ""; 
 let suAnkiMasam = null; 
 let benimSiramMi = false;
 let guncelMasalar = {}; 
-
 let gostergeHakki = false; 
 
-document.getElementById('benimAdimKutusu').innerHTML = aktifKullaniciAdi + ' <span style="color:#2ecc71;">✔</span>';
-document.getElementById('lobiBenimAdim').innerText = "👑 " + aktifKullaniciAdi;
+// --- 1. FIREBASE VERİTABANI BAĞLANTISI ---
+const firebaseConfig = {
+  apiKey: "AIzaSyDZ2VhlFEtpT4kpvJn0TbCwbot8QB3MJGg",
+  authDomain: "okeyoyunu-41321.firebaseapp.com",
+  projectId: "okeyoyunu-41321",
+  storageBucket: "okeyoyunu-41321.firebasestorage.app",
+  messagingSenderId: "472848132493",
+  appId: "1:472848132493:web:d104317f6398b5a3adf5c4"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
 
-socket.emit('kullanici_girisi', aktifKullaniciAdi);
-
-socket.on('cip_guncelle', (cip) => { document.getElementById('benimCipim').innerText = cip.toLocaleString('tr-TR'); });
-socket.on('cip_guncelle_ozel', (data) => { if(data.isim === aktifKullaniciAdi) document.getElementById('benimCipim').innerText = data.cip.toLocaleString('tr-TR'); });
-socket.on('hata_mesaji', (mesaj) => { alert(mesaj); });
-
+// DOM Elementleri
+const authEkrani = document.getElementById('authEkrani');
 const lobiEkrani = document.getElementById('lobiEkrani');
 const masaEkrani = document.getElementById('masaEkrani');
-const masaOrtasiYazi = document.getElementById('masaOrtasiYazi');
-const masaKasaBilgisi = document.getElementById('masaKasaBilgisi');
-const masalarAlani = document.getElementById('masalarAlani');
+const vipHeader = document.querySelector('.vip-header');
+
+// Başlangıçta lobi ve masayı gizle, Giriş ekranını göster
+lobiEkrani.style.display = 'none';
+masaEkrani.style.display = 'none';
+vipHeader.style.display = 'none';
+
+// --- 2. KAYIT OL VE GİRİŞ YAP İŞLEMLERİ ---
+document.getElementById('btnKayit').addEventListener('click', () => {
+    const email = document.getElementById('authEmail').value;
+    const pass = document.getElementById('authSifre').value;
+    if(!email || !pass) { alert("Lütfen e-posta ve şifre girin patron!"); return; }
+    if(pass.length < 6) { alert("Şifre en az 6 haneli olmalı!"); return; }
+    
+    auth.createUserWithEmailAndPassword(email, pass).then((userCredential) => {
+        const kullaniciAdi = email.split('@')[0].toUpperCase();
+        // Yeni oyuncuya veritabanında kasa aç
+        db.collection("kullanicilar").doc(userCredential.user.uid).set({
+            isim: kullaniciAdi,
+            cip: 250000 // Başlangıç VIP hediyesi
+        }).then(() => {
+            oyunaGirisYap(kullaniciAdi, 250000);
+        });
+    }).catch(error => alert("Kayıt Hatası: Bu e-posta kullanılıyor olabilir."));
+});
+
+document.getElementById('btnGiris').addEventListener('click', () => {
+    const email = document.getElementById('authEmail').value;
+    const pass = document.getElementById('authSifre').value;
+    if(!email || !pass) { alert("Lütfen e-posta ve şifre girin!"); return; }
+
+    auth.signInWithEmailAndPassword(email, pass).then((userCredential) => {
+        const kullaniciAdi = email.split('@')[0].toUpperCase();
+        // Kasasındaki çipi kontrol et
+        db.collection("kullanicilar").doc(userCredential.user.uid).get().then(doc => {
+            let mevcutCip = 250000;
+            if(doc.exists) mevcutCip = doc.data().cip;
+            oyunaGirisYap(kullaniciAdi, mevcutCip);
+        });
+    }).catch(error => alert("Giriş Hatası: Şifre veya e-posta yanlış!"));
+});
+
+function oyunaGirisYap(isim, cip) {
+    aktifKullaniciAdi = isim;
+    
+    document.getElementById('benimAdimKutusu').innerHTML = aktifKullaniciAdi + ' <span style="color:#2ecc71;">✔</span>';
+    document.getElementById('lobiBenimAdim').innerText = "👑 " + aktifKullaniciAdi;
+    document.getElementById('benimCipim').innerText = cip.toLocaleString('tr-TR');
+
+    authEkrani.style.display = 'none';
+    vipHeader.style.display = 'flex';
+    lobiEkrani.style.display = 'flex';
+
+    // Sunucuya ismi ve veritabanındaki güvenli çipi gönder
+    socket.emit('kullanici_girisi', { isim: aktifKullaniciAdi, cip: cip });
+}
+
+// --- 3. ÇİP KAZANINCA/KAYBEDİNCE VERİTABANINI GÜNCELLEME ---
+socket.on('cip_guncelle', (cip) => { document.getElementById('benimCipim').innerText = cip.toLocaleString('tr-TR'); });
+socket.on('cip_guncelle_ozel', (data) => { 
+    if(data.isim === aktifKullaniciAdi) {
+        document.getElementById('benimCipim').innerText = data.cip.toLocaleString('tr-TR'); 
+        // Veritabanına yeni çipi YAZ!
+        if(auth.currentUser) {
+            db.collection("kullanicilar").doc(auth.currentUser.uid).update({ cip: data.cip });
+        }
+    }
+});
+
+socket.on('hata_mesaji', (mesaj) => { alert(mesaj); });
+
 const lobiyeDonBtn = document.getElementById('lobiyeDonBtn');
 const oyunuBaslatBtn = document.getElementById('oyunuBaslatBtn');
 const oyunAlanObjeleri = document.getElementById('oyunAlanObjeleri');
@@ -27,6 +100,9 @@ const kalanTasBilgi = document.getElementById('kalanTasBilgi');
 const bitisAlani = document.getElementById('bitisAlani');
 const ustRaf = document.getElementById('ustRaf');
 const altRaf = document.getElementById('altRaf');
+const masaOrtasiYazi = document.getElementById('masaOrtasiYazi');
+const masaKasaBilgisi = document.getElementById('masaKasaBilgisi');
+const masalarAlani = document.getElementById('masalarAlani');
 
 let gostergeBtn = document.createElement('button');
 gostergeBtn.id = 'gostergeBtn';
@@ -417,7 +493,6 @@ lobiyeDonBtn.addEventListener('click', () => {
     suAnkiMasam = null;
     masayiTemizle();
     
-    // YENİ: Masadan kalkarken isimleri temizliyoruz ki motorda eski botlar kalmasın
     document.getElementById('seatTop').innerText = "Bekleniyor...";
     document.getElementById('seatLeft').innerText = "Bekleniyor...";
     document.getElementById('seatRight').innerText = "Bekleniyor...";
@@ -474,7 +549,6 @@ socket.on('masa_oyun_basladi', (data) => {
             masaKasaBilgisi.innerText = 'KASA: ' + data.kasa.toLocaleString('tr-TR') + ' ÇİP';
         }
         
-        // YENİ: Masayı temizledikten sonra güncel bot isimlerini hemen geri yüklüyoruz.
         if (guncelMasalar[data.masaAdi]) {
             gelişmişKoltukHizala(guncelMasalar[data.masaAdi]);
         }
