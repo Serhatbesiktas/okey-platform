@@ -660,9 +660,6 @@ socket.on('yeni_vip_emoji', (data) => {
     }
 });
 
-// ----------------------------------------------------
-// YENİ: PATRON DUYURU DİNLEYİCİSİ
-// ----------------------------------------------------
 socket.on('admin_flash_mesaj', (mesaj) => {
     const flash = document.getElementById('flashBildirim');
     if (flash) {
@@ -673,11 +670,26 @@ socket.on('admin_flash_mesaj', (mesaj) => {
         flash.classList.remove('goster');
         void flash.offsetWidth; 
         flash.classList.add('goster');
-        
-        setTimeout(() => {
-            flash.style.background = "";
-            flash.style.boxShadow = "";
-            flash.style.borderColor = "";
-        }, 3500);
+        setTimeout(() => { flash.style.background = ""; flash.style.boxShadow = ""; flash.style.borderColor = ""; }, 3500);
+    }
+});
+
+// ----------------------------------------------------
+// YENİ: PATRONUN KICK / BAN SİLAHINA YAKALANMA KODU
+// ----------------------------------------------------
+socket.on('admin_islem_uyarisi', (data) => {
+    if(data.isim === aktifKullaniciAdi) {
+        if(data.islem === 'kick') {
+            alert("🚨 YÖNETİCİ TARAFINDAN MASADAN ATILDINIZ!");
+            if(suAnkiMasam) {
+                suAnkiMasam = null;
+                masayiTemizle();
+                document.getElementById('masaEkrani').style.display = 'none';
+                document.getElementById('lobiEkrani').style.display = 'flex';
+            }
+        } else if(data.islem === 'ban') {
+            alert("🛑 HESABINIZ SİSTEMDEN SINIRSIZ BANLANDI!");
+            location.reload(); // Sayfayı yenileyip giriş ekranına (auth) fırlatır
+        }
     }
 });
