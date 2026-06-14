@@ -8,6 +8,8 @@ const io = require('socket.io')(http, {
 app.use(express.static('public'));
 
 const oyuncuCipleri = {};
+const banliKullanicilar = new Set(); // YENİ: Banlananların tutulduğu kara liste
+
 const masalar = {
     'Acemiler (20K Bahis)': { bahis: 20000, kasa: 0, koltuklar: [null, null, null, null], deste: [], gosterge: null, oyunBasladi: false, siradakiOyuncu: null, eller: {}, gostergeGosterildi: false },
     'Usta Masası (50K Bahis)': { bahis: 50000, kasa: 0, koltuklar: [null, null, null, null], deste: [], gosterge: null, oyunBasladi: false, siradakiOyuncu: null, eller: {}, gostergeGosterildi: false },
@@ -166,6 +168,35 @@ function botHamlesiYap(masaAdi) {
     }
 }
 
+function kullaniciyiMasadanKaldir(isim) {
+    for(let m in masalar) {
+        let index = masalar[m].koltuklar.indexOf(isim);
+        if(index !== -1) {
+            if (masalar[m].oyunBasladi) {
+                const yeniBot = "Bot_" + Math.floor(Math.random() * 900 + 100);
+                masalar[m].koltuklar[index] = yeniBot;
+                masalar[m].eller[yeniBot] = masalar[m].eller[isim]; 
+                delete masalar[m].eller[isim];
+                io.emit('sistem_mesaji', `⚠️ ${isim} oyundan ayrıldı, yerine ${yeniBot} geçti!`);
+                if (masalar[m].siradakiOyuncu === isim) {
+                    masalar[m].siradakiOyuncu = yeniBot;
+                    io.emit('sira_guncelle', { masaAdi: m, kimde: yeniBot });
+                    botHamlesiYap(m);
+                }
+            } else { masalar[m].koltuklar[index] = null; }
+
+            if(masalar[m].koltuklar.every(k => k === null || k.startsWith('Bot_'))) {
+                oyunuSifirla(m, null, 0, "Masada kimse kalmadı.");
+                masalar[m].koltuklar = [null, null, null, null]; 
+            }
+            const guncelLobi = {};
+            for(let m in masalar) guncelLobi[m] = masalar[m].koltuklar;
+            io.emit('masalari_guncelle', guncelLobi);
+            break;
+        }
+    }
+}
+
 io.on('connection', (socket) => {
   const lobiVerisi = {};
   for(let m in masalar) lobiVerisi[m] = masalar[m].koltuklar;
@@ -175,10 +206,15 @@ io.on('connection', (socket) => {
       let isim = typeof data === 'object' ? data.isim : data;
       let dbCip = typeof data === 'object' ? data.cip : 250000;
       
+      // YENİ: Ban kontrolü
+      if(banliKullanicilar.has(isim)) {
+          socket.emit('admin_islem_uyarisi', { isim: isim, islem: 'ban' });
+          return;
+      }
+
       socket.kullaniciAdi = isim;
       if(!oyuncuCipleri[isim] || oyuncuCipleri[isim] === 250000) { oyuncuCipleri[isim] = dbCip; }
       socket.emit('cip_guncelle', oyuncuCipleri[isim]);
-      // Admin paneline güncel listeyi yolla
       io.emit('admin_guncel_veri', oyuncuCipleri);
   });
 
@@ -345,48 +381,17 @@ io.on('connection', (socket) => {
   socket.on('masadan_kalk', (data) => { kullaniciyiMasadanKaldir(data.isim); });
   socket.on('disconnect', () => { if(socket.kullaniciAdi) kullaniciyiMasadanKaldir(socket.kullaniciAdi); });
 
-  function kullaniciyiMasadanKaldir(isim) {
-      for(let m in masalar) {
-          let index = masalar[m].koltuklar.indexOf(isim);
-          if(index !== -1) {
-              if (masalar[m].oyunBasladi) {
-                  const yeniBot = "Bot_" + Math.floor(Math.random() * 900 + 100);
-                  masalar[m].koltuklar[index] = yeniBot;
-                  masalar[m].eller[yeniBot] = masalar[m].eller[isim]; 
-                  delete masalar[m].eller[isim];
-                  io.emit('sistem_mesaji', `⚠️ ${isim} oyundan koptu, yerine ${yeniBot} geçti!`);
-                  if (masalar[m].siradakiOyuncu === isim) {
-                      masalar[m].siradakiOyuncu = yeniBot;
-                      io.emit('sira_guncelle', { masaAdi: m, kimde: yeniBot });
-                      botHamlesiYap(m);
-                  }
-              } else { masalar[m].koltuklar[index] = null; }
-
-              if(masalar[m].koltuklar.every(k => k === null || k.startsWith('Bot_'))) {
-                  oyunuSifirla(m, null, 0, "Masada kimse kalmadı.");
-                  masalar[m].koltuklar = [null, null, null, null]; 
-              }
-              const guncelLobi = {};
-              for(let m in masalar) guncelLobi[m] = masalar[m].koltuklar;
-              io.emit('masalari_guncelle', guncelLobi);
-              break;
-          }
-      }
-  }
-
   socket.on('sohbet_mesaji', (data) => { io.emit('yeni_sohbet_mesaji', data); });
   socket.on('vip_emoji', (data) => { io.emit('yeni_vip_emoji', data); });
 
   // ----------------------------------------------------
-  // YENİ: PATRON PANELİ (ADMİN) KÖPRÜLERİ
+  // GÜNCELLENMİŞ PATRON PANELİ KÖPRÜLERİ (KICK / BAN)
   // ----------------------------------------------------
   socket.on('admin_giris', (sifre) => {
       if(sifre === "BJK1903") {
           socket.emit('admin_onay', { basarili: true });
           socket.emit('admin_guncel_veri', oyuncuCipleri);
-      } else {
-          socket.emit('admin_onay', { basarili: false });
-      }
+      } else { socket.emit('admin_onay', { basarili: false }); }
   });
 
   socket.on('admin_veri_iste', () => { socket.emit('admin_guncel_veri', oyuncuCipleri); });
@@ -395,14 +400,25 @@ io.on('connection', (socket) => {
       if (oyuncuCipleri[data.isim] !== undefined) {
           if (data.islem === 'ekle') { oyuncuCipleri[data.isim] += parseInt(data.miktar); } 
           else if (data.islem === 'cikar') { oyuncuCipleri[data.isim] = Math.max(0, oyuncuCipleri[data.isim] - parseInt(data.miktar)); }
-          
           io.emit('cip_guncelle_ozel', { isim: data.isim, cip: oyuncuCipleri[data.isim] });
           io.emit('admin_guncel_veri', oyuncuCipleri);
       }
   });
 
-  socket.on('admin_duyuru', (mesaj) => {
-      io.emit('admin_flash_mesaj', mesaj);
+  socket.on('admin_duyuru', (mesaj) => { io.emit('admin_flash_mesaj', mesaj); });
+
+  // YENİ: Oyuncuyu Masadan At (Sadece masadan koparır)
+  socket.on('admin_oyuncu_kick', (isim) => {
+      kullaniciyiMasadanKaldir(isim);
+      io.emit('admin_islem_uyarisi', { isim: isim, islem: 'kick' });
+      io.emit('sistem_mesaji', `🚨 Yönetici, ${isim} adlı oyuncuyu masadan uzaklaştırdı.`);
+  });
+
+  // YENİ: Oyuncuyu Banla (Sisteme bir daha giremez)
+  socket.on('admin_oyuncu_ban', (isim) => {
+      banliKullanicilar.add(isim); // Kara listeye al
+      kullaniciyiMasadanKaldir(isim); // Masadaysa at
+      io.emit('admin_islem_uyarisi', { isim: isim, islem: 'ban' });
   });
 
 });
