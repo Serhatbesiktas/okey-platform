@@ -176,16 +176,12 @@ io.on('connection', (socket) => {
   for(let m in masalar) lobiVerisi[m] = masalar[m].koltuklar;
   socket.emit('masalari_guncelle', lobiVerisi);
 
-  // YENİ: Firebase'den gelen çip datasını okuma köprüsü
   socket.on('kullanici_girisi', (data) => {
       let isim = typeof data === 'object' ? data.isim : data;
       let dbCip = typeof data === 'object' ? data.cip : 250000;
       
       socket.kullaniciAdi = isim;
-      // Eğer sunucuda çip yoksa veya standartsa, veritabanındakini kullan
-      if(!oyuncuCipleri[isim] || oyuncuCipleri[isim] === 250000) {
-          oyuncuCipleri[isim] = dbCip; 
-      }
+      if(!oyuncuCipleri[isim] || oyuncuCipleri[isim] === 250000) { oyuncuCipleri[isim] = dbCip; }
       socket.emit('cip_guncelle', oyuncuCipleri[isim]);
   });
 
@@ -272,7 +268,6 @@ io.on('connection', (socket) => {
               const odul = masa.bahis;
               oyuncuCipleri[data.isim] += odul;
               io.emit('cip_guncelle_ozel', { isim: data.isim, cip: oyuncuCipleri[data.isim] });
-              
               io.emit('gosterge_basarili', { masaAdi: data.masaAdi, isim: data.isim, odul: odul });
           }
       }
@@ -345,7 +340,6 @@ io.on('connection', (socket) => {
 
               oyuncuCipleri[data.isim] += kazanilanPara;
               io.emit('cip_guncelle_ozel', { isim: data.isim, cip: oyuncuCipleri[data.isim] });
-              
               oyunuSifirla(data.masaAdi, data.isim, kazanilanPara, sebepMesaji, okeyleBittiMi);
           } else {
               socket.emit('hatali_bitis', "Dizilim hatalı veya perler arasında boşluk bırakmadınız! Lütfen elinizi kontrol edin.");
@@ -384,6 +378,11 @@ io.on('connection', (socket) => {
           }
       }
   }
+
+  // --- YENİ: SOHBET VE EMOJİ KÖPRÜLERİ ---
+  socket.on('sohbet_mesaji', (data) => { io.emit('yeni_sohbet_mesaji', data); });
+  socket.on('vip_emoji', (data) => { io.emit('yeni_vip_emoji', data); });
+
 });
 
 const PORT = process.env.PORT || 3000;
