@@ -75,14 +75,13 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// 250K SIFIRLAMA KİLİDİ: Sadece hesap hiç yoksa sıfırdan oluşturur
 auth.onAuthStateChanged((user) => {
     if (user && !aktifKullaniciAdi) {
         db.collection("kullanicilar").doc(user.uid).get().then(doc => {
             let kayitliNick = "";
-            if(doc.exists) { // VERİTABANINDA KAYIT VARSA ASLA SIFIRLAMA!
-                kayitliNick = doc.data().isim || user.email.split('@')[0].toUpperCase();
-                benimAnlikCipim = doc.data().cip !== undefined ? doc.data().cip : 250000;
+            if(doc.exists && doc.data().isim) {
+                kayitliNick = doc.data().isim;
+                benimAnlikCipim = doc.data().cip || 250000;
                 benimEnvanterim = doc.data().envanter || [];
                 aktifKozmetikler = doc.data().aktifKozmetikler || [];
                 sonBonusTarihim = doc.data().sonBonusTarihi || "";
@@ -216,7 +215,6 @@ window.profilDavetAksiyon = function() {
     ozelUyariGoster(`💌 ${hedef} adlı oyuncuya davet gönderildi!`); document.getElementById('profilEkrani').style.display = 'none';
 };
 
-// DÜN ONAYLADIĞIN ANINDA KESİM VE GÜNCELLEME KODU (YENİDEN EKLENDİ)
 function masadanAyrilmaIslemi(cezaUygulansinMi = false) {
     if (suAnkiMasam) {
         if (cezaUygulansinMi && masaOyunBasladiMi) {
@@ -226,22 +224,6 @@ function masadanAyrilmaIslemi(cezaUygulansinMi = false) {
             else if (suAnkiMasam.includes('10K')) cezaMiktari = 10000;
 
             if (cezaMiktari > 0) {
-                benimAnlikCipim -= cezaMiktari;
-                if (benimAnlikCipim < 0) benimAnlikCipim = 0;
-
-                const cipKutu = document.getElementById('benimCipim');
-                cipKutu.innerText = benimAnlikCipim.toLocaleString('tr-TR');
-                
-                // Kırmızı Animasyon
-                cipKutu.style.color = "#e74c3c";
-                setTimeout(() => cipKutu.style.color = "", 2000);
-
-                if (auth.currentUser && !isMisafir) {
-                    db.collection("kullanicilar").doc(auth.currentUser.uid).update({ cip: benimAnlikCipim });
-                }
-                
-                socket.emit('kullanici_girisi', { isim: aktifKullaniciAdi, cip: benimAnlikCipim, kozmetikler: aktifKozmetikler });
-                
                 document.getElementById('cezaMiktarMetni').innerText = cezaMiktari.toLocaleString('tr-TR') + " ÇİP";
                 document.getElementById('cezaBildirimEkrani').style.display = 'flex';
             }
@@ -449,14 +431,15 @@ if(oyunuBaslatBtn) oyunuBaslatBtn.addEventListener('click', () => { socket.emit(
 const hemenOynaBtn = document.querySelector('.btn-hemen-oyna');
 if(hemenOynaBtn) hemenOynaBtn.addEventListener('click', () => { if (suAnkiMasam) return; let musaitMasa = null; for (const [masaAdi, koltuklar] of Object.entries(guncelMasalar)) { if (koltuklar.filter(k => k !== null).length < 4) { musaitMasa = masaAdi; break; } } if (musaitMasa) masayaOtur(musaitMasa); else ozelUyariGoster("Şu an tüm masalar tam kapasite dolu, patron!"); });
 
-// YENİ: Başkası kazandığında veya Admin gönderdiğinde çalışan güvenlik motoru
 socket.on('cip_guncelle_ozel', (data) => { 
     if(data.isim === aktifKullaniciAdi) {
         benimAnlikCipim = data.cip; 
         const cipKutu = document.getElementById('benimCipim');
-        cipKutu.innerText = data.cip.toLocaleString('tr-TR'); 
-        cipKutu.style.color = "#2ecc71";
-        setTimeout(() => cipKutu.style.color = "", 2000);
+        if(cipKutu) {
+            cipKutu.innerText = data.cip.toLocaleString('tr-TR'); 
+            cipKutu.style.color = "#2ecc71";
+            setTimeout(() => cipKutu.style.color = "", 2000);
+        }
         if(auth.currentUser && !isMisafir) { 
             db.collection("kullanicilar").doc(auth.currentUser.uid).update({ cip: data.cip }); 
         } 
@@ -592,8 +575,7 @@ window.gunlukKasaCevir = function() {
 }
 
 function oduluKaydet(odulMiktari) {
-    const bugun = new Date().toLocaleDateString('tr-TR');
-    benimAnlikCipim += odulMiktari; sonBonusTarihim = bugun;
+    const bugun = new Date().toLocaleDateString('tr-TR'); benimAnlikCipim += odulMiktari; sonBonusTarihim = bugun;
     if(auth.currentUser) {
         db.collection("kullanicilar").doc(auth.currentUser.uid).update({ cip: benimAnlikCipim, sonBonusTarihi: bugun }).then(() => {
             document.getElementById('benimCipim').innerText = benimAnlikCipim.toLocaleString('tr-TR');
