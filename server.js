@@ -170,13 +170,11 @@ function botHamlesiYap(masaAdi) {
     }
 }
 
-// İŞTE BURASI: KAÇIŞ CEZASI MANTIĞI EKLENDİ
 function kullaniciyiMasadanKaldir(isim) {
     for(let m in masalar) {
         let index = masalar[m].koltuklar.indexOf(isim);
         if(index !== -1) {
             if (masalar[m].oyunBasladi) {
-                // Eğer oyun başlamışsa ve çıkıyorsa CEZA KESİYORUZ
                 let ceza = masalar[m].bahis;
                 if(oyuncuCipleri[isim] !== undefined) {
                     oyuncuCipleri[isim] = Math.max(0, oyuncuCipleri[isim] - ceza);
@@ -188,7 +186,6 @@ function kullaniciyiMasadanKaldir(isim) {
                 masalar[m].eller[yeniBot] = masalar[m].eller[isim]; 
                 delete masalar[m].eller[isim];
                 
-                // Herkese rezil et
                 io.emit('sistem_mesaji', `🏃‍♂️💨 ${isim} masadan kaçtı ve ${ceza.toLocaleString()} ÇİP ceza yedi! Yerine ${yeniBot} geçti.`);
                 
                 if (masalar[m].siradakiOyuncu === isim) {
@@ -297,7 +294,6 @@ io.on('connection', (socket) => {
 
   socket.on('oyunu_baslat', (masaAdi) => {
     const masa = masalar[masaAdi];
-    
     if (masa && !masa.oyunBasladi && masa.koltuklar.includes(socket.kullaniciAdi)) {
         masa.oyunBasladi = true;
         masa.gostergeGosterildi = false;
@@ -468,7 +464,6 @@ io.on('connection', (socket) => {
   
   socket.on('admin_cip_islem', (data) => {
       let hedefIsim = (data.isim || "").trim().toUpperCase(); 
-      
       if (oyuncuCipleri[hedefIsim] !== undefined) {
           if (data.islem === 'ekle') { oyuncuCipleri[hedefIsim] += parseInt(data.miktar); } 
           else if (data.islem === 'cikar') { oyuncuCipleri[hedefIsim] = Math.max(0, oyuncuCipleri[hedefIsim] - parseInt(data.miktar)); }
@@ -496,7 +491,6 @@ io.on('connection', (socket) => {
       kullaniciyiMasadanKaldir(hedefIsim); 
       io.emit('admin_islem_uyarisi', { isim: hedefIsim, islem: 'ban' }); 
   });
-
 });
 
 const PORT = process.env.PORT || 3000;
