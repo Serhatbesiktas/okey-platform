@@ -50,6 +50,7 @@ function oyunuSifirla(masaAdi, kazanan = null, odul = 0, sebep = "", okeyleBitti
     }
 }
 
+// İŞTE SİSTEMİN BEYNİ: Artık 12-11-10 dizilimini de tanıyor!
 function eliKontrolEt(gruplar, gosterge) {
     if (!gosterge) return false;
     let okeySayi = gosterge.sayi === 13 ? 1 : parseInt(gosterge.sayi) + 1;
@@ -86,7 +87,7 @@ function eliKontrolEt(gruplar, gosterge) {
         }
         if (normalTiles.length === 0) continue; 
 
-        let isAyniSayi = true; let isSeri = true;     
+        let isAyniSayi = true; 
         let baseSayi = normalTiles[0].sayi; let colors = new Set();
         for (let t of normalTiles) {
             if (t.sayi !== baseSayi) isAyniSayi = false;
@@ -94,24 +95,49 @@ function eliKontrolEt(gruplar, gosterge) {
         }
         if (colors.size !== normalTiles.length) isAyniSayi = false; 
 
+        let isSeriArtan = true; // Küçükten büyüğe (10-11-12)
+        let isSeriAzalan = true; // Büyükten küçüğe (12-11-10)
         let firstNormalIdx = grup.findIndex(t => !getEffectiveTile(t).isOkey);
+
         if (firstNormalIdx !== -1) {
             let cSayi = getEffectiveTile(grup[firstNormalIdx]).sayi;
             let cRenk = getEffectiveTile(grup[firstNormalIdx]).renk;
-            let expectedForward = cSayi;
+            
+            // ARTAN (Küçükten Büyüğe) KONTROL
+            let expFwdArtan = cSayi;
             for (let i = firstNormalIdx + 1; i < grup.length; i++) {
-                expectedForward = expectedForward === 13 ? 1 : expectedForward + 1;
+                expFwdArtan = expFwdArtan === 13 ? 1 : expFwdArtan + 1;
                 let eff = getEffectiveTile(grup[i]);
-                if (!eff.isOkey) { if (eff.renk !== cRenk || eff.sayi !== expectedForward) { isSeri = false; break; } }
+                if (!eff.isOkey) { if (eff.renk !== cRenk || eff.sayi !== expFwdArtan) { isSeriArtan = false; break; } }
             }
-            let expectedBackward = cSayi;
+            let expBwdArtan = cSayi;
             for (let i = firstNormalIdx - 1; i >= 0; i--) {
-                expectedBackward = expectedBackward === 1 ? 13 : expectedBackward - 1;
+                expBwdArtan = expBwdArtan === 1 ? 13 : expBwdArtan - 1;
                 let eff = getEffectiveTile(grup[i]);
-                if (!eff.isOkey) { if (eff.renk !== cRenk || eff.sayi !== expectedBackward) { isSeri = false; break; } }
+                if (!eff.isOkey) { if (eff.renk !== cRenk || eff.sayi !== expBwdArtan) { isSeriArtan = false; break; } }
             }
-        } else { isSeri = false; }
-        if (!isAyniSayi && !isSeri) return false;
+
+            // AZALAN (Büyükten Küçüğe) KONTROL (Senin kullandığın stil!)
+            let expFwdAzalan = cSayi;
+            for (let i = firstNormalIdx + 1; i < grup.length; i++) {
+                expFwdAzalan = expFwdAzalan === 1 ? 13 : expFwdAzalan - 1;
+                let eff = getEffectiveTile(grup[i]);
+                if (!eff.isOkey) { if (eff.renk !== cRenk || eff.sayi !== expFwdAzalan) { isSeriAzalan = false; break; } }
+            }
+            let expBwdAzalan = cSayi;
+            for (let i = firstNormalIdx - 1; i >= 0; i--) {
+                expBwdAzalan = expBwdAzalan === 13 ? 1 : expBwdAzalan + 1;
+                let eff = getEffectiveTile(grup[i]);
+                if (!eff.isOkey) { if (eff.renk !== cRenk || eff.sayi !== expBwdAzalan) { isSeriAzalan = false; break; } }
+            }
+
+        } else { 
+            isSeriArtan = false; 
+            isSeriAzalan = false; 
+        }
+
+        // Ya renkleri aynı, ya küçükten büyüğe seri, ya da büyükten küçüğe seri olmak zorunda!
+        if (!isAyniSayi && !isSeriArtan && !isSeriAzalan) return false;
     }
     return true;
 }
@@ -233,7 +259,6 @@ io.on('connection', (socket) => {
       oyuncuCipleri[isim] = Number(dbCip); 
       oyuncuKozmetikleri[isim] = dbKozmetikler; 
 
-      socket.emit('cip_guncelle', oyuncuCipleri[isim]);
       io.emit('admin_guncel_veri', oyuncuCipleri);
       io.emit('kozmetikleri_guncelle', oyuncuKozmetikleri); 
       io.emit('online_oyuncular', Object.keys(oyuncuCipleri));
@@ -359,7 +384,6 @@ io.on('connection', (socket) => {
               io.emit('cip_guncelle_ozel', { isim: data.isim, cip: oyuncuCipleri[data.isim] });
               io.emit('gosterge_basarili', { masaAdi: data.masaAdi, isim: data.isim, odul: odul });
               
-              // SOHBET MESAJI EKLENDİ
               io.emit('yeni_sohbet_mesaji', { 
                   masaAdi: data.masaAdi, 
                   isim: "Sistem", 
@@ -429,7 +453,6 @@ io.on('connection', (socket) => {
               oyuncuCipleri[data.isim] = Number(oyuncuCipleri[data.isim]) + Number(kazanilanPara);
               io.emit('cip_guncelle_ozel', { isim: data.isim, cip: oyuncuCipleri[data.isim] });
               
-              // SOHBET MESAJI EKLENDİ
               io.emit('yeni_sohbet_mesaji', { 
                   masaAdi: data.masaAdi, 
                   isim: "Sistem", 
