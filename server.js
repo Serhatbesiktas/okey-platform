@@ -170,22 +170,35 @@ function botHamlesiYap(masaAdi) {
     }
 }
 
+// İŞTE BURASI: KAÇIŞ CEZASI MANTIĞI EKLENDİ
 function kullaniciyiMasadanKaldir(isim) {
     for(let m in masalar) {
         let index = masalar[m].koltuklar.indexOf(isim);
         if(index !== -1) {
             if (masalar[m].oyunBasladi) {
+                // Eğer oyun başlamışsa ve çıkıyorsa CEZA KESİYORUZ
+                let ceza = masalar[m].bahis;
+                if(oyuncuCipleri[isim] !== undefined) {
+                    oyuncuCipleri[isim] = Math.max(0, oyuncuCipleri[isim] - ceza);
+                    io.emit('cip_guncelle_ozel', { isim: isim, cip: oyuncuCipleri[isim] });
+                }
+                
                 const yeniBot = "Bot_" + Math.floor(Math.random() * 900 + 100);
                 masalar[m].koltuklar[index] = yeniBot;
                 masalar[m].eller[yeniBot] = masalar[m].eller[isim]; 
                 delete masalar[m].eller[isim];
-                io.emit('sistem_mesaji', `⚠️ ${isim} oyundan ayrıldı, yerine ${yeniBot} geçti!`);
+                
+                // Herkese rezil et
+                io.emit('sistem_mesaji', `🏃‍♂️💨 ${isim} masadan kaçtı ve ${ceza.toLocaleString()} ÇİP ceza yedi! Yerine ${yeniBot} geçti.`);
+                
                 if (masalar[m].siradakiOyuncu === isim) {
                     masalar[m].siradakiOyuncu = yeniBot;
                     io.emit('sira_guncelle', { masaAdi: m, kimde: yeniBot });
                     botHamlesiYap(m);
                 }
-            } else { masalar[m].koltuklar[index] = null; }
+            } else { 
+                masalar[m].koltuklar[index] = null; 
+            }
 
             if(masalar[m].koltuklar.every(k => k === null || k.startsWith('Bot_'))) {
                 oyunuSifirla(m, null, 0, "Masada kimse kalmadı.");
@@ -285,7 +298,6 @@ io.on('connection', (socket) => {
   socket.on('oyunu_baslat', (masaAdi) => {
     const masa = masalar[masaAdi];
     
-    // GÜVENLİK KALKANI: Oyunu başlatan kişi masanın koltuklarında oturmuyorsa işlem iptal!
     if (masa && !masa.oyunBasladi && masa.koltuklar.includes(socket.kullaniciAdi)) {
         masa.oyunBasladi = true;
         masa.gostergeGosterildi = false;
@@ -302,7 +314,6 @@ io.on('connection', (socket) => {
         masa.koltuklar.forEach(isim => {
             masa.kasa += masa.bahis; 
             if(!isim.startsWith('Bot_')) {
-                // GÜVENLİK: Çiplerin eksiye düşmemesi için limit koyuldu
                 oyuncuCipleri[isim] = Math.max(0, oyuncuCipleri[isim] - masa.bahis); 
                 io.emit('cip_guncelle_ozel', { isim: isim, cip: oyuncuCipleri[isim] });
             }
