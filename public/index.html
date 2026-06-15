@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIP Okey</title>
+    
+    <!-- TÜM TASARIM KODLARI (CSS) -->
+    <style>
+        body { font-family: sans-serif; background-color: #2c3e50; color: white; margin: 0; padding: 20px; }
+        
+        /* VIP Profil Kartı Tasarımı */
+        .profil-modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); }
+        .profil-modal-icerik { background-color: #34495e; color: #ecf0f1; margin: 30% auto; padding: 20px; border-radius: 12px; width: 85%; max-width: 320px; text-align: center; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.5); border: 2px solid #f1c40f; }
+        .profil-kapat-btn { position: absolute; right: 15px; top: 10px; color: #e74c3c; font-size: 28px; cursor: pointer; font-weight: bold; }
+        .profil-avatar { width: 80px; height: 80px; border-radius: 50%; border: 3px solid #f1c40f; background: #fff; margin-bottom: 10px; }
+        .profil-aksiyonlar { margin-top: 15px; display: flex; flex-direction: column; gap: 12px; }
+        .profil-btn { padding: 12px; font-size: 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; }
+        .btn-yesil { background-color: #27ae60; }
+        .btn-mavi { background-color: #2980b9; }
+        
+        /* Test için basit buton stili */
+        .test-btn { background-color: #e67e22; padding: 10px; border: none; border-radius: 5px; color: white; font-weight: bold; cursor: pointer; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <!-- OKEY MASASI VE OYUN ALANI BURAYA GELECEK -->
+    <div>
+        <h1>VIP Okey Masası</h1>
+        <p>Senin Socket ID: <span id="kendiId" style="color: #f1c40f;">Bağlanıyor...</span></p>
+        
+        <!-- Oyun oynarken rakibin resmine/ismine tıklandığında profilGoster() çalışmalı. 
+             Aşağıdaki buton sadece senin mobilden hızlıca test etmen için: -->
+        <button class="test-btn" onclick="testProfilAc()">Rakibin Profilini Test Et (Tıkla)</button>
+    </div>
+    <!-- OKEY MASASI BİTİŞ -->
+
+
+    <!-- VIP PROFİL KARTI (Bu kısım gizlidir, tıklanınca açılır) -->
+    <div id="profilKartiModal" class="profil-modal">
+      <div class="profil-modal-icerik">
+        <span class="profil-kapat-btn" onclick="profilKapat()">X</span>
+        
+        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" id="profilAvatar" class="profil-avatar" alt="Avatar">
+        <h2 id="profilKullaniciAdi" style="margin: 0;">Oyuncu</h2>
+        
+        <div class="profil-aksiyonlar">
+          <button class="profil-btn btn-yesil" onclick="arkadasEkle()">➕ Arkadaş Ekle</button>
+          <button class="profil-btn btn-mavi" onclick="mesajGonder()">💬 Özel Mesaj Gönder</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SOCKET.IO VE OYUN MANTIĞI (JAVASCRIPT) -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        let aktifProfilId = null; // Tıklanan kişinin ID'sini tutar
+
+        // Bağlandığında kendi ID'ni ekrana yaz
+        socket.on('connect', () => {
+            document.getElementById('kendiId').innerText = socket.id;
+        });
+
+        // 1. SUNUCUDAN GELEN İSTEK VE MESAJLARI EKRANDA GÖSTERME
+        socket.on('yeni_arkadaslik_istegi', (data) => {
+            alert("🔔 Yeni Arkadaşlık İsteği Geldi!\nGönderen Socket ID: " + data.gonderenId);
+        });
+
+        socket.on('yeni_ozel_mesaj', (data) => {
+            alert("💬 Yeni Özel Mesaj!\nKimden: " + data.gonderenId + "\nMesaj: " + data.mesajMetni);
+        });
+
+        // 2. PROFİL KARTINI AÇIP KAPATMA FONKSİYONLARI
+        function profilGoster(hedefSocketId, isim, avatarUrl) {
+            aktifProfilId = hedefSocketId;
+            document.getElementById('profilKullaniciAdi').innerText = isim || "Misafir Oyuncu";
+            
+            if(avatarUrl) {
+                document.getElementById('profilAvatar').src = avatarUrl;
+            }
+            
+            document.getElementById('profilKartiModal').style.display = 'block';
+        }
+
+        function profilKapat() {
+            document.getElementById('profilKartiModal').style.display = 'none';
+            aktifProfilId = null;
+        }
+
+        // 3. BUTON İŞLEMLERİ
+        function arkadasEkle() {
+            if(!aktifProfilId) return;
+            socket.emit('arkadaslik_istegi_gonder', { hedefOyuncuId: aktifProfilId });
+            alert("✅ Arkadaşlık isteği başarıyla gönderildi!");
+            profilKapat();
+        }
+
+        function mesajGonder() {
+            if(!aktifProfilId) return;
+            let mesaj = prompt("Göndermek istediğiniz mesajı yazın:");
+            if(mesaj && mesaj.trim() !== "") {
+                socket.emit('ozel_mesaj_gonder', { hedefOyuncuId: aktifProfilId, mesajMetni: mesaj });
+                alert("✅ Mesaj iletildi!");
+                profilKapat();
+            }
+        }
+
+        // 4. TEST FONKSİYONU (İleride silebilirsin)
+        function testProfilAc() {
+            let ornekId = prompt("Test için profilini açmak istediğin Socket ID'sini gir (veya boş bırak):");
+            profilGoster(ornekId || "test-id-123", "VIP Üye", "https://api.dicebear.com/7.x/avataaars/svg?seed=Serhat");
+        }
+    </script>
+</body>
+</html>
