@@ -77,6 +77,33 @@ auth.onAuthStateChanged((user) => {
     }
 });
 
+// YENİ: ÇIKIŞ YAP (LOGOUT) İŞLEMİ
+document.getElementById('btnCikisYap').addEventListener('click', () => {
+    const cikisOnay = confirm("Hesabınızdan çıkış yapmak istediğinize emin misiniz?");
+    if(cikisOnay) {
+        if(suAnkiMasam && masaOyunBasladiMi) {
+            socket.emit('masadan_kalk', { isim: aktifKullaniciAdi, masaAdi: suAnkiMasam });
+        } else if (suAnkiMasam) {
+            socket.emit('masadan_kalk', { isim: aktifKullaniciAdi, masaAdi: suAnkiMasam });
+        }
+        
+        auth.signOut().then(() => {
+            aktifKullaniciAdi = "";
+            suAnkiMasam = null;
+            masaOyunBasladiMi = false;
+            
+            document.getElementById('authEkrani').style.display = 'flex';
+            document.getElementById('lobiEkrani').style.display = 'none';
+            document.getElementById('masaEkrani').style.display = 'none';
+            document.querySelector('.vip-header').style.display = 'none';
+            
+            document.getElementById('authEmail').value = '';
+            document.getElementById('authSifre').value = '';
+            document.getElementById('authKullaniciAdi').value = '';
+        });
+    }
+});
+
 document.getElementById('btnGecisKayit').addEventListener('click', () => {
     document.getElementById('authBaslik').innerText = "YENİ HESAP OLUŞTUR";
     document.getElementById('authAltMetin').innerText = "Milyonların arasına katılmak için efsanevi nickini seç!";
@@ -492,6 +519,7 @@ socket.on('cip_guncelle_ozel', (data) => {
 
 socket.on('hata_mesaji', (mesaj) => { alert(mesaj); });
 
+// KUSURSUZ ÇIKIŞ YAP VE UYARI SİSTEMİ
 const lobiyeDonBtn = document.getElementById('lobiyeDonBtn');
 lobiyeDonBtn.addEventListener('click', () => {
     if (suAnkiMasam && masaOyunBasladiMi) {
@@ -664,7 +692,6 @@ function koltukStiliUygula(elementId, oyuncuIsmi) {
     if(kozmetikler.includes('atesli_isim')) { el.style.color = '#ff4d4d'; el.style.textShadow = '0 0 5px #ff0000'; } else { el.style.color = '#0dcaf0'; el.style.textShadow = 'none'; }
 }
 
-// YENİ: Masaya oturunca sadece lokal kontrol yaparız
 window.masayaOtur = function(masaAdi) { 
     let bahis = 0;
     if(masaAdi.includes('20K')) bahis = 20000;
