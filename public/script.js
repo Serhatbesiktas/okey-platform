@@ -374,29 +374,41 @@ function oduluKaydet(odulMiktari) {
     }
 }
 
+// İŞTE BURASI: Askıda kalma sorununu çözen "Anında Tepki (Optimistic Update)" sistemi!
 window.magazaIslem = function(esyaId, fiyat) {
     if(isMisafir) { alert("⚠️ MİSAFİR HESAPLAR MAĞAZADAN ALIŞVERİŞ YAPAMAZ!\nLütfen lobiye dönüp gerçek bir VIP hesap kaydedin."); return; }
     
     if (!benimEnvanterim.includes(esyaId)) {
         if (benimAnlikCipim < fiyat) { alert("Bunun için yeterli çipin yok patron!"); return; }
-        benimAnlikCipim -= fiyat; benimEnvanterim.push(esyaId); aktifKozmetikler.push(esyaId); 
+        
+        // 1. ADIM: Anında lokal düşüş ve ekran güncellemesi (Kullanıcı hiç beklemez)
+        benimAnlikCipim -= fiyat; 
+        benimEnvanterim.push(esyaId); 
+        aktifKozmetikler.push(esyaId); 
+        document.getElementById('benimCipim').innerText = benimAnlikCipim.toLocaleString('tr-TR');
+        arayuzGuncelle(); 
 
+        // 2. ADIM: Sunucunun hafızasını anında uyar (Masaya oturunca eski çipi kesmemesi için)
+        socket.emit('magaza_harcamasi', { isim: aktifKullaniciAdi, yeniCip: benimAnlikCipim });
+        socket.emit('kozmetik_guncelle', { isim: aktifKullaniciAdi, kozmetikler: aktifKozmetikler }); 
+
+        // 3. ADIM: Arka planda Firebase'e kaydet (Ekran donmaz)
         if(auth.currentUser) {
-            db.collection("kullanicilar").doc(auth.currentUser.uid).update({ cip: benimAnlikCipim, envanter: benimEnvanterim, aktifKozmetikler: aktifKozmetikler }).then(() => {
-                socket.emit('kullanici_girisi', { isim: aktifKullaniciAdi, cip: benimAnlikCipim, kozmetikler: aktifKozmetikler });
-                socket.emit('kozmetik_guncelle', { isim: aktifKullaniciAdi, kozmetikler: aktifKozmetikler }); 
-                document.getElementById('benimCipim').innerText = benimAnlikCipim.toLocaleString('tr-TR');
-                arayuzGuncelle(); alert("✅ Satın alma başarılı! Eşya otomatik olarak kuşanıldı.");
+            db.collection("kullanicilar").doc(auth.currentUser.uid).update({ 
+                cip: benimAnlikCipim, envanter: benimEnvanterim, aktifKozmetikler: aktifKozmetikler 
+            }).then(() => {
+                alert("✅ Satın alma başarılı! Eşya otomatik olarak kuşanıldı.");
             });
         }
     } else {
         if(aktifKozmetikler.includes(esyaId)) { aktifKozmetikler = aktifKozmetikler.filter(e => e !== esyaId); } 
         else { aktifKozmetikler.push(esyaId); }
+        
+        arayuzGuncelle(); 
+        socket.emit('kozmetik_guncelle', { isim: aktifKullaniciAdi, kozmetikler: aktifKozmetikler }); 
+
         if(auth.currentUser) { 
-            db.collection("kullanicilar").doc(auth.currentUser.uid).update({ aktifKozmetikler: aktifKozmetikler }).then(() => { 
-                socket.emit('kozmetik_guncelle', { isim: aktifKullaniciAdi, kozmetikler: aktifKozmetikler }); 
-                arayuzGuncelle(); 
-            }); 
+            db.collection("kullanicilar").doc(auth.currentUser.uid).update({ aktifKozmetikler: aktifKozmetikler }); 
         }
     }
 }
@@ -628,6 +640,7 @@ function koltukStiliUygula(elementId, oyuncuIsmi) {
 }
 
 window.masayaOtur = function(masaAdi) { suAnkiMasam = masaAdi; socket.emit('masaya_otur', { isim: aktifKullaniciAdi, masaAdi: masaAdi }); lobiEkrani.style.display = 'none'; masaEkrani.style.display = 'flex'; masaOrtasiYazi.innerText = masaAdi.toUpperCase(); };
+
 oyunuBaslatBtn.addEventListener('click', () => { socket.emit('oyunu_baslat', suAnkiMasam); });
 document.querySelector('.btn-hemen-oyna').addEventListener('click', () => { if (suAnkiMasam) return; let musaitMasa = null; for (const [masaAdi, koltuklar] of Object.entries(guncelMasalar)) { if (koltuklar.filter(k => k !== null).length < 4) { musaitMasa = masaAdi; break; } } if (musaitMasa) masayaOtur(musaitMasa); else alert("Şu an tüm masalar tam kapasite dolu, patron!"); });
 socket.on('masa_kasa_guncelle', (data) => { if(suAnkiMasam === data.masaAdi) { masaKasaBilgisi.style.display = 'block'; masaKasaBilgisi.innerText = 'KASA: ' + data.kasa.toLocaleString('tr-TR') + ' ÇİP'; } });
