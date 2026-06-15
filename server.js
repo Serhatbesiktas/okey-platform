@@ -177,7 +177,7 @@ function kullaniciyiMasadanKaldir(isim) {
             if (masalar[m].oyunBasladi) {
                 let ceza = masalar[m].bahis;
                 if(oyuncuCipleri[isim] !== undefined) {
-                    oyuncuCipleri[isim] = Math.max(0, Number(oyuncuCipleri[isim]) - ceza);
+                    oyuncuCipleri[isim] = Math.max(0, Number(oyuncuCipleri[isim]) - Number(ceza));
                     io.emit('cip_guncelle_ozel', { isim: isim, cip: oyuncuCipleri[isim] });
                 }
                 
@@ -233,6 +233,7 @@ io.on('connection', (socket) => {
       oyuncuCipleri[isim] = Number(dbCip); 
       oyuncuKozmetikleri[isim] = dbKozmetikler; 
 
+      socket.emit('cip_guncelle', oyuncuCipleri[isim]);
       io.emit('admin_guncel_veri', oyuncuCipleri);
       io.emit('kozmetikleri_guncelle', oyuncuKozmetikleri); 
       io.emit('online_oyuncular', Object.keys(oyuncuCipleri));
@@ -309,7 +310,7 @@ io.on('connection', (socket) => {
         masa.koltuklar.forEach(isim => {
             masa.kasa += masa.bahis; 
             if(!isim.startsWith('Bot_')) {
-                oyuncuCipleri[isim] = Math.max(0, Number(oyuncuCipleri[isim]) - masa.bahis);
+                oyuncuCipleri[isim] = Math.max(0, Number(oyuncuCipleri[isim]) - Number(masa.bahis)); 
                 io.emit('cip_guncelle_ozel', { isim: isim, cip: oyuncuCipleri[isim] });
             }
         });
@@ -354,11 +355,11 @@ io.on('connection', (socket) => {
           if(hasTile) {
               masa.gostergeGosterildi = true;
               const odul = masa.bahis;
-              oyuncuCipleri[data.isim] = Number(oyuncuCipleri[data.isim]) + odul;
+              oyuncuCipleri[data.isim] = Number(oyuncuCipleri[data.isim]) + Number(odul);
               io.emit('cip_guncelle_ozel', { isim: data.isim, cip: oyuncuCipleri[data.isim] });
               io.emit('gosterge_basarili', { masaAdi: data.masaAdi, isim: data.isim, odul: odul });
               
-              // SİSTEM MESAJI EKLENDİ
+              // SOHBET MESAJI EKLENDİ
               io.emit('yeni_sohbet_mesaji', { 
                   masaAdi: data.masaAdi, 
                   isim: "Sistem", 
@@ -425,10 +426,10 @@ io.on('connection', (socket) => {
                   }
               }
 
-              oyuncuCipleri[data.isim] = Number(oyuncuCipleri[data.isim]) + kazanilanPara;
+              oyuncuCipleri[data.isim] = Number(oyuncuCipleri[data.isim]) + Number(kazanilanPara);
               io.emit('cip_guncelle_ozel', { isim: data.isim, cip: oyuncuCipleri[data.isim] });
               
-              // SİSTEM MESAJI EKLENDİ
+              // SOHBET MESAJI EKLENDİ
               io.emit('yeni_sohbet_mesaji', { 
                   masaAdi: data.masaAdi, 
                   isim: "Sistem", 
@@ -481,8 +482,11 @@ io.on('connection', (socket) => {
   socket.on('admin_cip_islem', (data) => {
       let hedefIsim = (data.isim || "").trim().toUpperCase(); 
       if (oyuncuCipleri[hedefIsim] !== undefined) {
-          if (data.islem === 'ekle') { oyuncuCipleri[hedefIsim] += parseInt(data.miktar); } 
-          else if (data.islem === 'cikar') { oyuncuCipleri[hedefIsim] = Math.max(0, oyuncuCipleri[hedefIsim] - parseInt(data.miktar)); }
+          if (data.islem === 'ekle') { 
+              oyuncuCipleri[hedefIsim] = Number(oyuncuCipleri[hedefIsim]) + Number(data.miktar); 
+          } else if (data.islem === 'cikar') { 
+              oyuncuCipleri[hedefIsim] = Math.max(0, Number(oyuncuCipleri[hedefIsim]) - Number(data.miktar)); 
+          }
           
           io.emit('cip_guncelle_ozel', { isim: hedefIsim, cip: oyuncuCipleri[hedefIsim] }); 
           io.emit('admin_guncel_veri', oyuncuCipleri);
