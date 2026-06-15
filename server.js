@@ -227,6 +227,18 @@ io.on('connection', (socket) => {
       io.emit('admin_guncel_veri', oyuncuCipleri);
       io.emit('kozmetikleri_guncelle', oyuncuKozmetikleri); 
       io.emit('online_oyuncular', Object.keys(oyuncuCipleri));
+      
+      // YENİ: Oyuncu sayfa yenilediyse ve masadaysa, onu direkt masaya al!
+      let masaBulundu = null;
+      for(let m in masalar) {
+          if(masalar[m].koltuklar.includes(isim)) {
+              masaBulundu = m;
+              break;
+          }
+      }
+      if(masaBulundu) {
+          socket.emit('sen_masadasin', masaBulundu);
+      }
   });
 
   socket.on('kozmetik_guncelle', (data) => {
