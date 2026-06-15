@@ -88,16 +88,24 @@
     <div id="authEkrani">
         <div class="auth-kutu">
             <div class="zar-ikon">🎲</div>
-            <h2>VIP CASINO GİRİŞİ</h2>
-            <p style="color:#a3c4bc; font-size:12px; margin-bottom:20px;">Çiplerini güvende tutmak için kayıt ol veya giriş yap</p>
+            <h2 id="authBaslik">VIP CASINO GİRİŞİ</h2>
+            <p id="authAltMetin" style="color:#a3c4bc; font-size:12px; margin-bottom:20px;">Çiplerini güvende tutmak için giriş yap</p>
             
-            <input type="text" id="authKullaniciAdi" class="auth-input" placeholder="Oyuncu Nickiniz (Sadece Kayıt İçin)">
+            <input type="text" id="authKullaniciAdi" class="auth-input" placeholder="Oyuncu Nickiniz (Örn: KRAL_34)" style="display:none;">
             
             <input type="email" id="authEmail" class="auth-input" placeholder="E-Posta Adresi">
             <input type="password" id="authSifre" class="auth-input" placeholder="Şifre (En az 6 hane)">
-            <button id="btnGiris" class="auth-btn btn-sari">GİRİŞ YAP</button>
-            <button id="btnKayit" class="auth-btn btn-yesil">YENİ KAYIT OL</button>
-            <button id="btnMisafir" class="auth-btn btn-gri">MİSAFİR OLARAK OYNA</button>
+            
+            <div id="loginButonlari">
+                <button id="btnGiris" class="auth-btn btn-sari">GİRİŞ YAP</button>
+                <button id="btnGecisKayit" class="auth-btn btn-yesil">YENİ KAYIT OL</button>
+                <button id="btnMisafir" class="auth-btn btn-gri">MİSAFİR OLARAK OYNA</button>
+            </div>
+
+            <div id="kayitButonlari" style="display:none;">
+                <button id="btnKayitTamamla" class="auth-btn btn-yesil">KAYDI TAMAMLA</button>
+                <button id="btnGecisGiris" class="auth-btn btn-gri" style="margin-top:10px;">⬅ GİRİŞ EKRANINA DÖN</button>
+            </div>
         </div>
     </div>
 
