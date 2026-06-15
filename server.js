@@ -228,7 +228,6 @@ io.on('connection', (socket) => {
       io.emit('kozmetikleri_guncelle', oyuncuKozmetikleri); 
       io.emit('online_oyuncular', Object.keys(oyuncuCipleri));
       
-      // YENİ: Oyuncu sayfa yenilediyse ve masadaysa, onu direkt masaya al!
       let masaBulundu = null;
       for(let m in masalar) {
           if(masalar[m].koltuklar.includes(isim)) {
@@ -445,16 +444,39 @@ io.on('connection', (socket) => {
   });
 
   socket.on('admin_veri_iste', () => { socket.emit('admin_guncel_veri', oyuncuCipleri); });
+  
+  // YENİ: KUSURSUZ VE GÜVENLİ ADMIN ÇİP İŞLEMİ
   socket.on('admin_cip_islem', (data) => {
-      if (oyuncuCipleri[data.isim] !== undefined) {
-          if (data.islem === 'ekle') { oyuncuCipleri[data.isim] += parseInt(data.miktar); } 
-          else if (data.islem === 'cikar') { oyuncuCipleri[data.isim] = Math.max(0, oyuncuCipleri[data.isim] - parseInt(data.miktar)); }
-          io.emit('cip_guncelle_ozel', { isim: data.isim, cip: oyuncuCipleri[data.isim] }); io.emit('admin_guncel_veri', oyuncuCipleri);
+      let hedefIsim = (data.isim || "").trim().toUpperCase(); // Küçük harf girilse bile büyütür!
+      
+      if (oyuncuCipleri[hedefIsim] !== undefined) {
+          if (data.islem === 'ekle') { oyuncuCipleri[hedefIsim] += parseInt(data.miktar); } 
+          else if (data.islem === 'cikar') { oyuncuCipleri[hedefIsim] = Math.max(0, oyuncuCipleri[hedefIsim] - parseInt(data.miktar)); }
+          
+          io.emit('cip_guncelle_ozel', { isim: hedefIsim, cip: oyuncuCipleri[hedefIsim] }); 
+          io.emit('admin_guncel_veri', oyuncuCipleri);
+          socket.emit('admin_flash_mesaj', `Başarılı: ${hedefIsim} adlı oyuncunun çiplerini güncelledin!`);
+      } else {
+          // Oyuncu çevrimdışıysa admine uyarı gönder
+          socket.emit('admin_flash_mesaj', `⚠️ HATA: ${hedefIsim} şu an aktif değil! Çip gönderilemedi.`);
       }
   });
+
   socket.on('admin_duyuru', (mesaj) => { io.emit('admin_flash_mesaj', mesaj); });
-  socket.on('admin_oyuncu_kick', (isim) => { kullaniciyiMasadanKaldir(isim); io.emit('admin_islem_uyarisi', { isim: isim, islem: 'kick' }); io.emit('sistem_mesaji', `🚨 Yönetici, ${isim} adlı oyuncuyu masadan uzaklaştırdı.`); });
-  socket.on('admin_oyuncu_ban', (isim) => { banliKullanicilar.add(isim); kullaniciyiMasadanKaldir(isim); io.emit('admin_islem_uyarisi', { isim: isim, islem: 'ban' }); });
+  
+  socket.on('admin_oyuncu_kick', (isim) => { 
+      let hedefIsim = (isim || "").trim().toUpperCase();
+      kullaniciyiMasadanKaldir(hedefIsim); 
+      io.emit('admin_islem_uyarisi', { isim: hedefIsim, islem: 'kick' }); 
+      io.emit('sistem_mesaji', `🚨 Yönetici, ${hedefIsim} adlı oyuncuyu masadan uzaklaştırdı.`); 
+  });
+  
+  socket.on('admin_oyuncu_ban', (isim) => { 
+      let hedefIsim = (isim || "").trim().toUpperCase();
+      banliKullanicilar.add(hedefIsim); 
+      kullaniciyiMasadanKaldir(hedefIsim); 
+      io.emit('admin_islem_uyarisi', { isim: hedefIsim, islem: 'ban' }); 
+  });
 
 });
 
