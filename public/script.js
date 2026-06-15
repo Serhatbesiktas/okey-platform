@@ -77,7 +77,6 @@ auth.onAuthStateChanged((user) => {
     }
 });
 
-// YENİ: ÇIKIŞ YAP (LOGOUT) İŞLEMİ
 document.getElementById('btnCikisYap').addEventListener('click', () => {
     const cikisOnay = confirm("Hesabınızdan çıkış yapmak istediğinize emin misiniz?");
     if(cikisOnay) {
