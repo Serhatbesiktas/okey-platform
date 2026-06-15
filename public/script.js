@@ -115,6 +115,7 @@ document.getElementById('btnMisafir').addEventListener('click', () => {
 });
 
 document.getElementById('btnKayitTamamla').addEventListener('click', () => {
+    const btn = document.getElementById('btnKayitTamamla');
     const nick = document.getElementById('authKullaniciAdi').value.trim().toUpperCase();
     const email = document.getElementById('authEmail').value.trim();
     const pass = document.getElementById('authSifre').value;
@@ -125,9 +126,16 @@ document.getElementById('btnKayitTamamla').addEventListener('click', () => {
     if(!email || !pass) { alert("Lütfen e-posta ve şifre girin patron!"); return; }
     if(pass.length < 6) { alert("Şifre en az 6 haneli olmalı!"); return; }
     
+    // YENİ: Yükleme efekti
+    btn.disabled = true;
+    btn.innerText = "KAYDEDİLİYOR... ⏳";
+    btn.style.opacity = "0.7";
+    
     db.collection("kullanicilar").where("isim", "==", nick).get().then((querySnapshot) => {
         if(!querySnapshot.empty) {
-            alert("Bu nick zaten alınmış patron! Kendine eşsiz başka bir isim bul."); return;
+            alert("Bu nick zaten alınmış patron! Kendine eşsiz başka bir isim bul."); 
+            btn.disabled = false; btn.innerText = "KAYDI TAMAMLA"; btn.style.opacity = "1";
+            return;
         }
         
         auth.createUserWithEmailAndPassword(email, pass).then((userCredential) => {
@@ -138,16 +146,32 @@ document.getElementById('btnKayitTamamla').addEventListener('click', () => {
                     alert("✅ Kayıt Başarılı! Efsanevi nickin ayarlandı.\nŞimdi lütfen e-posta ve şifrenle GİRİŞ YAP.");
                     document.getElementById('btnGecisGiris').click(); 
                     document.getElementById('authSifre').value = ''; 
+                    btn.disabled = false; btn.innerText = "KAYDI TAMAMLA"; btn.style.opacity = "1";
                 });
-            }).catch(dbError => { console.error(dbError); alert("Veritabanı kayıt hatası."); });
-        }).catch(error => { alert("Sistem Hatası (E-posta zaten kullanımda olabilir): " + error.message); });
-    }).catch(err => { console.error(err); alert("İsim kontrolü yapılamadı."); });
+            }).catch(dbError => { 
+                console.error(dbError); alert("Veritabanı kayıt hatası."); 
+                btn.disabled = false; btn.innerText = "KAYDI TAMAMLA"; btn.style.opacity = "1";
+            });
+        }).catch(error => { 
+            alert("Sistem Hatası (E-posta zaten kullanımda olabilir): " + error.message); 
+            btn.disabled = false; btn.innerText = "KAYDI TAMAMLA"; btn.style.opacity = "1";
+        });
+    }).catch(err => { 
+        console.error(err); alert("İsim kontrolü yapılamadı."); 
+        btn.disabled = false; btn.innerText = "KAYDI TAMAMLA"; btn.style.opacity = "1";
+    });
 });
 
 document.getElementById('btnGiris').addEventListener('click', () => {
+    const btn = document.getElementById('btnGiris');
     const email = document.getElementById('authEmail').value.trim();
     const pass = document.getElementById('authSifre').value;
     if(!email || !pass) { alert("Lütfen e-posta ve şifrenizi girin!"); return; }
+
+    // YENİ: Yükleme efekti
+    btn.disabled = true;
+    btn.innerText = "GİRİŞ YAPILIYOR... ⏳";
+    btn.style.opacity = "0.7";
 
     auth.signInWithEmailAndPassword(email, pass).then((userCredential) => {
         isMisafir = false;
@@ -171,14 +195,22 @@ document.getElementById('btnGiris').addEventListener('click', () => {
                     isim: kayitliNick, cip: 250000, envanter: [], aktifKozmetikler: [], sonBonusTarihi: "", arkadaslar: []
                 });
             }
+            
+            // Butonu eski haline getir
+            btn.disabled = false; btn.innerText = "GİRİŞ YAP"; btn.style.opacity = "1";
+            
             oyunaGirisYap(kayitliNick); 
             arayuzGuncelle(); 
             gunlukBonusKontrol();
         }).catch(dbError => { 
             console.error("Hata:", dbError);
             alert("Veritabanı bağlantısında geçici bir kopukluk oldu. Lütfen sayfayı yenileyip tekrar deneyin."); 
+            btn.disabled = false; btn.innerText = "GİRİŞ YAP"; btn.style.opacity = "1";
         });
-    }).catch(error => { alert("Giriş Başarısız. E-posta veya şifre yanlış."); });
+    }).catch(error => { 
+        alert("Giriş Başarısız. E-posta veya şifre yanlış."); 
+        btn.disabled = false; btn.innerText = "GİRİŞ YAP"; btn.style.opacity = "1";
+    });
 });
 
 function oyunaGirisYap(isim) {
@@ -374,25 +406,21 @@ function oduluKaydet(odulMiktari) {
     }
 }
 
-// İŞTE BURASI: Askıda kalma sorununu çözen "Anında Tepki (Optimistic Update)" sistemi!
 window.magazaIslem = function(esyaId, fiyat) {
     if(isMisafir) { alert("⚠️ MİSAFİR HESAPLAR MAĞAZADAN ALIŞVERİŞ YAPAMAZ!\nLütfen lobiye dönüp gerçek bir VIP hesap kaydedin."); return; }
     
     if (!benimEnvanterim.includes(esyaId)) {
         if (benimAnlikCipim < fiyat) { alert("Bunun için yeterli çipin yok patron!"); return; }
         
-        // 1. ADIM: Anında lokal düşüş ve ekran güncellemesi (Kullanıcı hiç beklemez)
         benimAnlikCipim -= fiyat; 
         benimEnvanterim.push(esyaId); 
         aktifKozmetikler.push(esyaId); 
         document.getElementById('benimCipim').innerText = benimAnlikCipim.toLocaleString('tr-TR');
         arayuzGuncelle(); 
 
-        // 2. ADIM: Sunucunun hafızasını anında uyar (Masaya oturunca eski çipi kesmemesi için)
         socket.emit('magaza_harcamasi', { isim: aktifKullaniciAdi, yeniCip: benimAnlikCipim });
         socket.emit('kozmetik_guncelle', { isim: aktifKullaniciAdi, kozmetikler: aktifKozmetikler }); 
 
-        // 3. ADIM: Arka planda Firebase'e kaydet (Ekran donmaz)
         if(auth.currentUser) {
             db.collection("kullanicilar").doc(auth.currentUser.uid).update({ 
                 cip: benimAnlikCipim, envanter: benimEnvanterim, aktifKozmetikler: aktifKozmetikler 
@@ -640,7 +668,6 @@ function koltukStiliUygula(elementId, oyuncuIsmi) {
 }
 
 window.masayaOtur = function(masaAdi) { suAnkiMasam = masaAdi; socket.emit('masaya_otur', { isim: aktifKullaniciAdi, masaAdi: masaAdi }); lobiEkrani.style.display = 'none'; masaEkrani.style.display = 'flex'; masaOrtasiYazi.innerText = masaAdi.toUpperCase(); };
-
 oyunuBaslatBtn.addEventListener('click', () => { socket.emit('oyunu_baslat', suAnkiMasam); });
 document.querySelector('.btn-hemen-oyna').addEventListener('click', () => { if (suAnkiMasam) return; let musaitMasa = null; for (const [masaAdi, koltuklar] of Object.entries(guncelMasalar)) { if (koltuklar.filter(k => k !== null).length < 4) { musaitMasa = masaAdi; break; } } if (musaitMasa) masayaOtur(musaitMasa); else alert("Şu an tüm masalar tam kapasite dolu, patron!"); });
 socket.on('masa_kasa_guncelle', (data) => { if(suAnkiMasam === data.masaAdi) { masaKasaBilgisi.style.display = 'block'; masaKasaBilgisi.innerText = 'KASA: ' + data.kasa.toLocaleString('tr-TR') + ' ÇİP'; } });
