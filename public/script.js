@@ -135,40 +135,55 @@ function oyunaGirisYap(isim) {
     socket.emit('kullanici_girisi', { isim: aktifKullaniciAdi, cip: benimAnlikCipim, kozmetikler: aktifKozmetikler });
 }
 
+// YENİ: Liderlik Tablosu Artık Doğrudan Firebase'den Çekiliyor! (Çevrimdışı olsalar bile görünürler)
 window.liderlikTablosunuAc = function() {
     document.getElementById('liderlikEkrani').style.display = 'flex';
-    socket.emit('liderlik_tablosu_iste');
-}
-
-socket.on('liderlik_tablosu_guncelle', (siraliData) => {
     const listeDiv = document.getElementById('liderlikListesi');
-    listeDiv.innerHTML = '';
-    
-    if(siraliData.length === 0) {
-        listeDiv.innerHTML = '<p style="text-align:center; color:#777;">Henüz sıralama oluşmadı.</p>';
-        return;
-    }
+    listeDiv.innerHTML = '<p style="text-align:center; color:#f2c94c; font-weight:bold;">Veritabanı taranıyor...</p>';
 
-    siraliData.forEach((oyuncu, index) => {
-        let siraClass = ''; let kupa = '';
-        if(index === 0) { siraClass = 'sira-1'; kupa = '🏆'; }
-        else if(index === 1) { siraClass = 'sira-2'; kupa = '🥈'; }
-        else if(index === 2) { siraClass = 'sira-3'; kupa = '🥉'; }
-        
-        let kozmetikler = globalKozmetikler[oyuncu.isim] || [];
-        let isimRenk = kozmetikler.includes('atesli_isim') ? '#ff4d4d' : '#fff';
-        let isimGolge = kozmetikler.includes('atesli_isim') ? '0 0 5px #ff0000' : 'none';
-        let tac = kozmetikler.includes('neon_tac') ? '👑 ' : '';
+    // Firebase'den en zengin 5 kişiyi çek
+    db.collection("kullanicilar")
+      .orderBy("cip", "desc")
+      .limit(5)
+      .get()
+      .then((querySnapshot) => {
+          listeDiv.innerHTML = '';
+          if(querySnapshot.empty) {
+              listeDiv.innerHTML = '<p style="text-align:center; color:#777;">Henüz sıralama oluşmadı.</p>';
+              return;
+          }
 
-        listeDiv.innerHTML += `
-            <div class="lider-satir">
-                <div class="lider-sira ${siraClass}">${index + 1}.</div>
-                <div class="lider-isim" style="color:${isimRenk}; text-shadow:${isimGolge};">${kupa} ${tac}${oyuncu.isim}</div>
-                <div class="lider-cip">${oyuncu.cip.toLocaleString('tr-TR')} ÇİP</div>
-            </div>
-        `;
-    });
-});
+          let index = 0;
+          querySnapshot.forEach((doc) => {
+              const oyuncu = doc.data();
+              if(oyuncu.isim.startsWith('MİSAFİR_')) return; 
+
+              let siraClass = ''; let kupa = '';
+              if(index === 0) { siraClass = 'sira-1'; kupa = '🏆'; }
+              else if(index === 1) { siraClass = 'sira-2'; kupa = '🥈'; }
+              else if(index === 2) { siraClass = 'sira-3'; kupa = '🥉'; }
+              else { siraClass = ''; kupa = '🏅'; }
+              
+              let kozmetikler = oyuncu.aktifKozmetikler || [];
+              let isimRenk = kozmetikler.includes('atesli_isim') ? '#ff4d4d' : '#fff';
+              let isimGolge = kozmetikler.includes('atesli_isim') ? '0 0 5px #ff0000' : 'none';
+              let tac = kozmetikler.includes('neon_tac') ? '👑 ' : '';
+
+              listeDiv.innerHTML += `
+                  <div class="lider-satir">
+                      <div class="lider-sira ${siraClass}">${index + 1}.</div>
+                      <div class="lider-isim" style="color:${isimRenk}; text-shadow:${isimGolge};">${kupa} ${tac}${oyuncu.isim}</div>
+                      <div class="lider-cip">${oyuncu.cip.toLocaleString('tr-TR')} ÇİP</div>
+                  </div>
+              `;
+              index++;
+          });
+      })
+      .catch((error) => {
+          console.log("Liderlik tablosu hatası:", error);
+          listeDiv.innerHTML = '<p style="text-align:center; color:#e74c3c;">Bağlantı hatası, liste alınamadı.</p>';
+      });
+}
 
 socket.on('online_oyuncular', (liste) => {
     onlineOyuncularListesi = liste;
@@ -204,7 +219,6 @@ window.arkadasEkle = function(isim) {
         if(auth.currentUser) {
             db.collection("kullanicilar").doc(auth.currentUser.uid).update({ arkadaslar: benimArkadaslarim }).then(() => {
                 alert(`✅ ${isim} arkadaş listene eklendi!`);
-                socket.emit('liderlik_tablosu_iste'); 
             });
         }
     }
@@ -337,10 +351,10 @@ window.magazaIslem = function(esyaId, fiyat) {
     }
 }
 
-// İŞTE ÇÖZÜLEN KISIM BURASI: DOM HATASI TAMAMEN GİDERİLDİ!
 function arayuzGuncelle() {
     const avatar = document.getElementById('vipAvatar');
     const isimKutu = document.getElementById('benimAdimKutusu');
+    const lobiIsim = document.getElementById('lobiBenimAdim');
     
     if(avatar) { avatar.style.border = '2px solid #52796f'; avatar.style.boxShadow = 'none'; }
     if(isimKutu) { isimKutu.style.color = '#fff'; isimKutu.style.textShadow = '0 2px 4px rgba(0,0,0,0.5)'; }
