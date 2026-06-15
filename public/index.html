@@ -15,6 +15,15 @@
 </head>
 <body>
 
+    <div id="uyariModalEkrani" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999999; flex-direction:column; justify-content:center; align-items:center;">
+        <div class="magaza-kutu" style="text-align:center; border: 2px solid #f2c94c; max-width: 300px; padding: 25px;">
+            <div style="font-size:45px; margin-bottom:10px;">⚠️</div>
+            <h2 style="color:#f2c94c; margin-bottom:15px; font-size:20px;">SİSTEM MESAJI</h2>
+            <p id="uyariModalMetni" style="color:#fff; font-size:14px; margin-bottom:20px; line-height:1.5;">...</p>
+            <button onclick="document.getElementById('uyariModalEkrani').style.display='none'" class="satin-al-btn" style="background:#f2c94c; color:#000; font-size: 14px; padding: 10px 30px; font-weight:bold;">TAMAM</button>
+        </div>
+    </div>
+
     <div id="cezaBildirimEkrani" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:999999; flex-direction:column; justify-content:center; align-items:center;">
         <div class="magaza-kutu" style="text-align:center; border: 3px solid #e74c3c; box-shadow: 0 0 30px rgba(231, 76, 60, 0.4);">
             <div style="font-size:55px; margin-bottom:10px;">📉</div>
@@ -27,12 +36,9 @@
     <div id="profilEkrani" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999999; flex-direction:column; justify-content:center; align-items:center;">
         <div class="magaza-kutu" style="max-width: 320px; text-align: center; padding: 30px 20px; position:relative;">
             <button onclick="document.getElementById('profilEkrani').style.display='none'" style="position:absolute; top:15px; right:20px; background:none; border:none; color:#e74c3c; font-size:24px; cursor:pointer; font-weight:bold;">X</button>
-            
             <div id="profilAvatarAlan" style="width:80px; height:80px; margin: 0 auto 15px; background: radial-gradient(circle, #1e3f28 0%, #0d1f14 100%); border-radius:50%; border:3px solid #52796f; display:flex; justify-content:center; align-items:center; font-size:40px; transition: 0.3s;">😎</div>
-            
             <h2 id="profilIsim" style="color:#fff; margin-bottom:5px; font-size:22px; word-break: break-all;">OYUNCU</h2>
             <div style="background: linear-gradient(180deg, #f2d94c 0%, #d4af37 100%); color: #000; font-size: 11px; font-weight: 900; padding: 3px 10px; border-radius: 6px; display:inline-block; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">VIP GOLD</div>
-            
             <div style="display:flex; justify-content:space-between; background:rgba(0,0,0,0.5); padding:15px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); margin-bottom:15px;">
                 <div style="text-align:center; flex:1; border-right:1px solid rgba(255,255,255,0.1);">
                     <div style="font-size:10px; color:#a3c4bc; margin-bottom:5px; font-weight:bold;">OYNANAN</div>
@@ -47,7 +53,6 @@
                     <div id="profilKazanmaOrani" style="font-size:18px; font-weight:900; color:#f1c40f;">%0</div>
                 </div>
             </div>
-            
             <div style="background:rgba(0,0,0,0.5); padding:12px; border-radius:12px; border:1px dashed #2ecc71;">
                 <div style="font-size:11px; color:#2ecc71; margin-bottom:5px; font-weight:bold;">GÜNCEL ÇİP</div>
                 <div id="profilCip" style="font-size:20px; font-weight:900; color:#fff;">0</div>
