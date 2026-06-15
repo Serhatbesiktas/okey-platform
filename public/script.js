@@ -190,7 +190,6 @@ function oyunaGirisYap(isim) {
     socket.emit('kullanici_girisi', { isim: aktifKullaniciAdi, cip: benimAnlikCipim, kozmetikler: aktifKozmetikler });
 }
 
-// YENİ: SUNUCU SANA "SEN MASADASIN" DEDİĞİNDE TETİKLENEN KOD
 socket.on('sen_masadasin', (masaAdi) => {
     suAnkiMasam = masaAdi;
     lobiEkrani.style.display = 'none';
@@ -452,8 +451,6 @@ socket.on('cip_guncelle_ozel', (data) => {
 
 socket.on('hata_mesaji', (mesaj) => { alert(mesaj); });
 
-
-// YENİ: Masadan Ayrılma Güvenliği
 const lobiyeDonBtn = document.getElementById('lobiyeDonBtn');
 lobiyeDonBtn.addEventListener('click', () => {
     if (suAnkiMasam && masaOyunBasladiMi) {
@@ -510,11 +507,23 @@ function masayiTemizle() {
     benimSiramMi = false;
 }
 
+// İŞTE BURASI: YENİ GÖSTERGE BAŞARILI ANİMASYONU TETİKLEYİCİSİ
 socket.on('gosterge_basarili', (data) => {
     if(suAnkiMasam === data.masaAdi) {
         if (data.isim === aktifKullaniciAdi) { gostergeHakki = false; gostergeBtn.style.display = 'none'; }
-        sesCal(sesSiraSende); const flash = document.getElementById('flashBildirim');
-        if (flash) { flash.innerHTML = `🌟 ${data.isim} GÖSTERGE YAPTI!<br><span style="font-size:22px; color:#c0392b;">+${data.odul.toLocaleString()} ÇİP</span>`; flash.classList.remove('goster'); void flash.offsetWidth; flash.classList.add('goster'); }
+        sesCal(sesSiraSende); 
+        
+        // GÖSTERGE ANİMASYONU EKRANINI GÖSTER
+        document.getElementById('gostergeKutlamaMetni').innerHTML = `<strong style="color:#f2c94c;">${data.isim}</strong> gösterge yaptı!`;
+        document.getElementById('gostergeKutlamaOdul').innerText = `+${data.odul.toLocaleString('tr-TR')} ÇİP`;
+        
+        const kutlamaEkrani = document.getElementById('gostergeKutlamaEkrani');
+        kutlamaEkrani.style.display = 'flex';
+        
+        // 3.5 saniye sonra ekrandan otomatik kaybolsun
+        setTimeout(() => {
+            kutlamaEkrani.style.display = 'none';
+        }, 3500);
     }
 });
 
@@ -639,8 +648,8 @@ socket.on('admin_flash_mesaj', (mesaj) => { const flash = document.getElementByI
 socket.on('admin_islem_uyarisi', (data) => { if(data.isim === aktifKullaniciAdi) { if(data.islem === 'kick') { alert("🚨 YÖNETİCİ TARAFINDAN MASADAN ATILDINIZ!"); if(suAnkiMasam) { suAnkiMasam = null; masayiTemizle(); document.getElementById('masaEkrani').style.display = 'none'; document.getElementById('lobiEkrani').style.display = 'flex'; } } else if(data.islem === 'ban') { alert("🛑 HESABINIZ SİSTEMDEN SINIRSIZ BANLANDI!"); location.reload(); } } });
 
 socket.on('connect', () => {
-    // Sadece kayıtlı ve açık bir oturum varsa çalışır
     if (aktifKullaniciAdi) {
         socket.emit('kullanici_girisi', { isim: aktifKullaniciAdi, cip: benimAnlikCipim, kozmetikler: aktifKozmetikler });
+        if (suAnkiMasam) { socket.emit('masaya_geri_don', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi }); }
     }
 });
