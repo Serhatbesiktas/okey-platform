@@ -77,13 +77,52 @@ auth.onAuthStateChanged((user) => {
     }
 });
 
+// YENİ: TEK BİR MERKEZİ CEZA VE MASADAN KALKMA FONKSİYONU
+function masadanAyrilmaIslemi(cezaUygulansinMi = false) {
+    if (suAnkiMasam) {
+        if (cezaUygulansinMi && masaOyunBasladiMi) {
+            let cezaMiktari = 0;
+            if (suAnkiMasam.includes('20K')) cezaMiktari = 20000;
+            else if (suAnkiMasam.includes('50K')) cezaMiktari = 50000;
+            else if (suAnkiMasam.includes('10K')) cezaMiktari = 10000;
+
+            if (cezaMiktari > 0) {
+                benimAnlikCipim -= cezaMiktari;
+                if (benimAnlikCipim < 0) benimAnlikCipim = 0;
+
+                document.getElementById('benimCipim').innerText = benimAnlikCipim.toLocaleString('tr-TR');
+
+                if (auth.currentUser && !isMisafir) {
+                    db.collection("kullanicilar").doc(auth.currentUser.uid).update({ cip: benimAnlikCipim });
+                }
+                
+                socket.emit('kullanici_girisi', { isim: aktifKullaniciAdi, cip: benimAnlikCipim, kozmetikler: aktifKozmetikler });
+                alert(`🚨 Oyun ortasında masadan kaçtığınız için ${cezaMiktari.toLocaleString('tr-TR')} ÇİP ceza kesildi!`);
+            }
+        }
+        socket.emit('masadan_kalk', { isim: aktifKullaniciAdi, masaAdi: suAnkiMasam }); 
+    }
+
+    suAnkiMasam = null; 
+    masayiTemizle(); 
+    document.getElementById('seatTop').innerText = "Bekleniyor..."; 
+    document.getElementById('seatLeft').innerText = "Bekleniyor..."; 
+    document.getElementById('seatRight').innerText = "Bekleniyor..."; 
+    document.getElementById('seatTop').dataset.isim = ""; 
+    document.getElementById('seatLeft').dataset.isim = ""; 
+    document.getElementById('seatRight').dataset.isim = ""; 
+    masaEkrani.style.display = 'none'; 
+    lobiEkrani.style.display = 'flex';
+}
+
 document.getElementById('btnCikisYap').addEventListener('click', () => {
     const cikisOnay = confirm("Hesabınızdan çıkış yapmak istediğinize emin misiniz?");
     if(cikisOnay) {
+        // Çıkış yapıyorsa ve masadaysa ceza kesilsin mi diye kontrol eder
         if(suAnkiMasam && masaOyunBasladiMi) {
-            socket.emit('masadan_kalk', { isim: aktifKullaniciAdi, masaAdi: suAnkiMasam });
+            masadanAyrilmaIslemi(true); // Ceza Uygula
         } else if (suAnkiMasam) {
-            socket.emit('masadan_kalk', { isim: aktifKullaniciAdi, masaAdi: suAnkiMasam });
+            masadanAyrilmaIslemi(false); // Ceza Yok
         }
         
         auth.signOut().then(() => {
@@ -102,6 +141,21 @@ document.getElementById('btnCikisYap').addEventListener('click', () => {
         });
     }
 });
+
+const lobiyeDonBtn = document.getElementById('lobiyeDonBtn');
+lobiyeDonBtn.addEventListener('click', () => {
+    if (suAnkiMasam && masaOyunBasladiMi) {
+        document.getElementById('cikisUyariEkrani').style.display = 'flex';
+    } else {
+        masadanAyrilmaIslemi(false); // Oyun başlamadıysa cezasız dön
+    }
+});
+
+document.getElementById('btnCikisOnayla').addEventListener('click', () => {
+    document.getElementById('cikisUyariEkrani').style.display = 'none';
+    masadanAyrilmaIslemi(true); // Uyarıyı onayladı, CEZAYI KES!
+});
+
 
 document.getElementById('btnGecisKayit').addEventListener('click', () => {
     document.getElementById('authBaslik').innerText = "YENİ HESAP OLUŞTUR";
@@ -518,35 +572,6 @@ socket.on('cip_guncelle_ozel', (data) => {
 
 socket.on('hata_mesaji', (mesaj) => { alert(mesaj); });
 
-
-// İŞTE ÇAKIŞMANIN TEMİZLENDİĞİ YER
-const lobiyeDonBtn = document.getElementById('lobiyeDonBtn');
-lobiyeDonBtn.addEventListener('click', () => {
-    if (suAnkiMasam && masaOyunBasladiMi) {
-        document.getElementById('cikisUyariEkrani').style.display = 'flex';
-    } else {
-        masadanAyrilmaIslemi();
-    }
-});
-
-document.getElementById('btnCikisOnayla').addEventListener('click', () => {
-    document.getElementById('cikisUyariEkrani').style.display = 'none';
-    masadanAyrilmaIslemi();
-});
-
-function masadanAyrilmaIslemi() {
-    if(suAnkiMasam) socket.emit('masadan_kalk', { isim: aktifKullaniciAdi, masaAdi: suAnkiMasam }); 
-    suAnkiMasam = null; 
-    masayiTemizle(); 
-    document.getElementById('seatTop').innerText = "Bekleniyor..."; 
-    document.getElementById('seatLeft').innerText = "Bekleniyor..."; 
-    document.getElementById('seatRight').innerText = "Bekleniyor..."; 
-    document.getElementById('seatTop').dataset.isim = ""; 
-    document.getElementById('seatLeft').dataset.isim = ""; 
-    document.getElementById('seatRight').dataset.isim = ""; 
-    masaEkrani.style.display = 'none'; 
-    lobiEkrani.style.display = 'flex';
-}
 
 const oyunuBaslatBtn = document.getElementById('oyunuBaslatBtn');
 const oyunAlanObjeleri = document.getElementById('oyunAlanObjeleri');
