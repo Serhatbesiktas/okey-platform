@@ -126,7 +126,6 @@ document.getElementById('btnKayitTamamla').addEventListener('click', () => {
     if(!email || !pass) { alert("Lütfen e-posta ve şifre girin patron!"); return; }
     if(pass.length < 6) { alert("Şifre en az 6 haneli olmalı!"); return; }
     
-    // YENİ: Yükleme efekti
     btn.disabled = true;
     btn.innerText = "KAYDEDİLİYOR... ⏳";
     btn.style.opacity = "0.7";
@@ -168,7 +167,6 @@ document.getElementById('btnGiris').addEventListener('click', () => {
     const pass = document.getElementById('authSifre').value;
     if(!email || !pass) { alert("Lütfen e-posta ve şifrenizi girin!"); return; }
 
-    // YENİ: Yükleme efekti
     btn.disabled = true;
     btn.innerText = "GİRİŞ YAPILIYOR... ⏳";
     btn.style.opacity = "0.7";
@@ -196,7 +194,6 @@ document.getElementById('btnGiris').addEventListener('click', () => {
                 });
             }
             
-            // Butonu eski haline getir
             btn.disabled = false; btn.innerText = "GİRİŞ YAP"; btn.style.opacity = "1";
             
             oyunaGirisYap(kayitliNick); 
@@ -667,7 +664,25 @@ function koltukStiliUygula(elementId, oyuncuIsmi) {
     if(kozmetikler.includes('atesli_isim')) { el.style.color = '#ff4d4d'; el.style.textShadow = '0 0 5px #ff0000'; } else { el.style.color = '#0dcaf0'; el.style.textShadow = 'none'; }
 }
 
-window.masayaOtur = function(masaAdi) { suAnkiMasam = masaAdi; socket.emit('masaya_otur', { isim: aktifKullaniciAdi, masaAdi: masaAdi }); lobiEkrani.style.display = 'none'; masaEkrani.style.display = 'flex'; masaOrtasiYazi.innerText = masaAdi.toUpperCase(); };
+// YENİ: Masaya oturunca sadece lokal kontrol yaparız
+window.masayaOtur = function(masaAdi) { 
+    let bahis = 0;
+    if(masaAdi.includes('20K')) bahis = 20000;
+    else if(masaAdi.includes('50K')) bahis = 50000;
+    else if(masaAdi.includes('10K')) bahis = 10000;
+
+    if (benimAnlikCipim < bahis) {
+        alert("⚠️ Yetersiz Bakiye! Bu masaya oturmak için en az " + bahis.toLocaleString() + " ÇİP gerekiyor.");
+        return;
+    }
+
+    suAnkiMasam = masaAdi; 
+    socket.emit('masaya_otur', { isim: aktifKullaniciAdi, masaAdi: masaAdi }); 
+    lobiEkrani.style.display = 'none'; 
+    masaEkrani.style.display = 'flex'; 
+    masaOrtasiYazi.innerText = masaAdi.toUpperCase(); 
+};
+
 oyunuBaslatBtn.addEventListener('click', () => { socket.emit('oyunu_baslat', suAnkiMasam); });
 document.querySelector('.btn-hemen-oyna').addEventListener('click', () => { if (suAnkiMasam) return; let musaitMasa = null; for (const [masaAdi, koltuklar] of Object.entries(guncelMasalar)) { if (koltuklar.filter(k => k !== null).length < 4) { musaitMasa = masaAdi; break; } } if (musaitMasa) masayaOtur(musaitMasa); else alert("Şu an tüm masalar tam kapasite dolu, patron!"); });
 socket.on('masa_kasa_guncelle', (data) => { if(suAnkiMasam === data.masaAdi) { masaKasaBilgisi.style.display = 'block'; masaKasaBilgisi.innerText = 'KASA: ' + data.kasa.toLocaleString('tr-TR') + ' ÇİP'; } });
