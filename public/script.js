@@ -31,7 +31,6 @@ function sesCal(sesObje) {
     } catch(err) {}
 }
 
-// BİLGİ: Firebase Ayarların Aynen Bırakıldı
 const firebaseConfig = {
   apiKey: "AIzaSyDZ2VhlFEtpT4kpvJn0TbCwbot8QB3MJGg",
   authDomain: "okeyoyunu-41321.firebaseapp.com",
@@ -92,7 +91,7 @@ document.getElementById('btnKayit').addEventListener('click', () => {
             benimAnlikCipim = 250000; benimEnvanterim = []; aktifKozmetikler = []; sonBonusTarihim = ""; benimArkadaslarim = [];
             oyunaGirisYap(kullaniciAdi); arayuzGuncelle(); gunlukBonusKontrol();
         }).catch(dbError => { 
-            console.error(dbError); alert("Veritabanı kayıt hatası. Hata kodu konsolda."); 
+            console.error(dbError); alert("Veritabanı kayıt hatası."); 
         });
     }).catch(error => { alert("Sistem Hatası: " + error.message); });
 });
@@ -117,11 +116,12 @@ document.getElementById('btnGiris').addEventListener('click', () => {
                 sonBonusTarihim = doc.data().sonBonusTarihi || "";
                 benimArkadaslarim = doc.data().arkadaslar || []; 
             }
-            oyunaGirisYap(kullaniciAdi); arayuzGuncelle(); gunlukBonusKontrol();
+            oyunaGirisYap(kullaniciAdi); 
+            arayuzGuncelle(); 
+            gunlukBonusKontrol();
         }).catch(dbError => { 
-            // HATANIN GÖRÜNDÜĞÜ YER BURASIYDI. ARTIK SİSTEMİ ÇÖKERTMEZ!
-            console.error("Firebase DB Okuma Hatası:", dbError);
-            alert("Veritabanına bağlanılamadı. Geçici bağlantı sorunu olabilir: " + dbError.message); 
+            console.error("Hata:", dbError);
+            alert("Veri çekilemedi: " + dbError.message); 
         });
     }).catch(error => { alert("Giriş Başarısız. Şifre yanlış olabilir."); });
 });
@@ -337,26 +337,23 @@ window.magazaIslem = function(esyaId, fiyat) {
     }
 }
 
+// İŞTE ÇÖZÜLEN KISIM BURASI: DOM HATASI TAMAMEN GİDERİLDİ!
 function arayuzGuncelle() {
     const avatar = document.getElementById('vipAvatar');
     const isimKutu = document.getElementById('benimAdimKutusu');
-    const lobiIsim = document.getElementById('lobiBenimAdim');
     
-    avatar.style.border = '2px solid #52796f'; avatar.style.boxShadow = 'none';
-    isimKutu.style.color = '#fff'; isimKutu.style.textShadow = '0 2px 4px rgba(0,0,0,0.5)';
-    lobiIsim.style.color = '#f2c94c'; lobiIsim.style.textShadow = 'none';
+    if(avatar) { avatar.style.border = '2px solid #52796f'; avatar.style.boxShadow = 'none'; }
+    if(isimKutu) { isimKutu.style.color = '#fff'; isimKutu.style.textShadow = '0 2px 4px rgba(0,0,0,0.5)'; }
     
     let tacEki = ""; if(aktifKozmetikler.includes('neon_tac')) { tacEki = "👑 "; }
 
-    if(aktifKullaniciAdi) {
+    if(aktifKullaniciAdi && isimKutu) {
         isimKutu.innerHTML = tacEki + aktifKullaniciAdi + ' <span style="color:#2ecc71;">✔</span>';
-        lobiIsim.innerText = tacEki + aktifKullaniciAdi; 
     }
 
-    if(aktifKozmetikler.includes('altin_cerceve')) { avatar.style.border = '3px solid #f2c94c'; avatar.style.boxShadow = '0 0 15px #f2c94c'; }
-    if(aktifKozmetikler.includes('atesli_isim')) {
+    if(aktifKozmetikler.includes('altin_cerceve') && avatar) { avatar.style.border = '3px solid #f2c94c'; avatar.style.boxShadow = '0 0 15px #f2c94c'; }
+    if(aktifKozmetikler.includes('atesli_isim') && isimKutu) {
         isimKutu.style.color = '#ff4d4d'; isimKutu.style.textShadow = '0 0 8px #ff0000';
-        lobiIsim.style.color = '#ff4d4d'; lobiIsim.style.textShadow = '0 0 5px #ff0000';
     }
     
     const esyalar = [ {id: 'altin_cerceve', fiyat: '500.000'}, {id: 'neon_tac', fiyat: '1.5M'}, {id: 'atesli_isim', fiyat: '3M'} ];
