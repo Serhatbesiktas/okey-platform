@@ -18,6 +18,19 @@ const masalar = {
     'Hızlı Oyun (10K Bahis)': { bahis: 10000, kasa: 0, koltuklar: [null, null, null, null], deste: [], gosterge: null, oyunBasladi: false, siradakiOyuncu: null, eller: {}, gostergeGosterildi: false }
 };
 
+// YENİ: Çip hesaplamalarını %100 güvene alan, string çakışmalarını engelleyen motor!
+function cipGuncelle(isim, miktar, islem) {
+    if (oyuncuCipleri[isim] === undefined) oyuncuCipleri[isim] = 0;
+    oyuncuCipleri[isim] = Number(oyuncuCipleri[isim]); 
+    if (islem === 'ekle') {
+        oyuncuCipleri[isim] += Number(miktar);
+    } else if (islem === 'cikar') {
+        oyuncuCipleri[isim] = Math.max(0, oyuncuCipleri[isim] - Number(miktar));
+    }
+    io.emit('cip_guncelle_ozel', { isim: isim, cip: oyuncuCipleri[isim] });
+    return oyuncuCipleri[isim];
+}
+
 function desteYaratVeKaristir() {
     let yeniDeste = [];
     let idSayaci = 1;
@@ -176,10 +189,7 @@ function kullaniciyiMasadanKaldir(isim) {
         if(index !== -1) {
             if (masalar[m].oyunBasladi) {
                 let ceza = masalar[m].bahis;
-                if(oyuncuCipleri[isim] !== undefined) {
-                    oyuncuCipleri[isim] = Math.max(0, oyuncuCipleri[isim] - ceza);
-                    io.emit('cip_guncelle_ozel', { isim: isim, cip: oyuncuCipleri[isim] });
-                }
+                cipGuncelle(isim, ceza, 'cikar'); // GÜVENLİ ÇİP SİSTEMİ
                 
                 const yeniBot = "Bot_" + Math.floor(Math.random() * 900 + 100);
                 masalar[m].koltuklar[index] = yeniBot;
@@ -230,7 +240,7 @@ io.on('connection', (socket) => {
       }
 
       socket.kullaniciAdi = isim;
-      oyuncuCipleri[isim] = dbCip; 
+      oyuncuCipleri[isim] = Number(dbCip); // Güvenli çevrim
       oyuncuKozmetikleri[isim] = dbKozmetikler; 
 
       socket.emit('cip_guncelle', oyuncuCipleri[isim]);
@@ -252,7 +262,7 @@ io.on('connection', (socket) => {
 
   socket.on('magaza_harcamasi', (data) => {
       if (oyuncuCipleri[data.isim] !== undefined) {
-          oyuncuCipleri[data.isim] = data.yeniCip; 
+          oyuncuCipleri[data.isim] = Number(data.yeniCip); 
           io.emit('admin_guncel_veri', oyuncuCipleri); 
       }
   });
@@ -310,8 +320,7 @@ io.on('connection', (socket) => {
         masa.koltuklar.forEach(isim => {
             masa.kasa += masa.bahis; 
             if(!isim.startsWith('Bot_')) {
-                oyuncuCipleri[isim] = Math.max(0, oyuncuCipleri[isim] - masa.bahis); 
-                io.emit('cip_guncelle_ozel', { isim: isim, cip: oyuncuCipleri[isim] });
+                cipGuncelle(isim, masa.bahis, 'cikar'); // GÜVENLİ KESİM
             }
         });
         
@@ -355,9 +364,16 @@ io.on('connection', (socket) => {
           if(hasTile) {
               masa.gostergeGosterildi = true;
               const odul = masa.bahis;
-              oyuncuCipleri[data.isim] += odul;
-              io.emit('cip_guncelle_ozel', { isim: data.isim, cip: oyuncuCipleri[data.isim] });
+              cipGuncelle(data.isim, odul, 'ekle'); // GÜVENLİ EKLEME
               io.emit('gosterge_basarili', { masaAdi: data.masaAdi, isim: data.isim, odul: odul });
+              
+              // İŞTE BURASI: Gösterge yapana chat mesajı düşüyor!
+              io.emit('yeni_sohbet_mesaji', { 
+                  masaAdi: data.masaAdi, 
+                  isim: "Sistem", 
+                  mesaj: `⭐ ${data.isim} gösterge yaptı ve ${odul.toLocaleString('tr-TR')} ÇİP kazandı!`, 
+                  kozmetikler: [] 
+              });
           }
       }
   });
@@ -418,8 +434,16 @@ io.on('connection', (socket) => {
                   }
               }
 
-              oyuncuCipleri[data.isim] += kazanilanPara;
-              io.emit('cip_guncelle_ozel', { isim: data.isim, cip: oyuncuCipleri[data.isim] });
+              cipGuncelle(data.isim, kazanilanPara, 'ekle'); // GÜVENLİ EKLEME
+              
+              // İŞTE BURASI: Oyun bittiğinde herkese şık bir chat mesajı atar
+              io.emit('yeni_sohbet_mesaji', { 
+                  masaAdi: data.masaAdi, 
+                  isim: "Sistem", 
+                  mesaj: `🏆 Oyun bitti! Kazanan: ${data.isim} (+${kazanilanPara.toLocaleString('tr-TR')} ÇİP)`, 
+                  kozmetikler: [] 
+              });
+
               oyunuSifirla(data.masaAdi, data.isim, kazanilanPara, sebepMesaji, okeyleBittiMi);
           } else {
               socket.emit('hatali_bitis', "Dizilim hatalı veya perler arasında boşluk bırakmadınız! Lütfen elinizi kontrol edin.");
@@ -465,10 +489,7 @@ io.on('connection', (socket) => {
   socket.on('admin_cip_islem', (data) => {
       let hedefIsim = (data.isim || "").trim().toUpperCase(); 
       if (oyuncuCipleri[hedefIsim] !== undefined) {
-          if (data.islem === 'ekle') { oyuncuCipleri[hedefIsim] += parseInt(data.miktar); } 
-          else if (data.islem === 'cikar') { oyuncuCipleri[hedefIsim] = Math.max(0, oyuncuCipleri[hedefIsim] - parseInt(data.miktar)); }
-          
-          io.emit('cip_guncelle_ozel', { isim: hedefIsim, cip: oyuncuCipleri[hedefIsim] }); 
+          cipGuncelle(hedefIsim, parseInt(data.miktar), data.islem);
           io.emit('admin_guncel_veri', oyuncuCipleri);
           socket.emit('admin_flash_mesaj', `Başarılı: ${hedefIsim} adlı oyuncunun çiplerini güncelledin!`);
       } else {
