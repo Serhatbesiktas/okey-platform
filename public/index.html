@@ -15,6 +15,15 @@
 </head>
 <body>
 
+    <div id="gostergeKutlamaEkrani" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:9999999; flex-direction:column; justify-content:center; align-items:center; pointer-events:none;">
+        <div class="gosterge-kutlama-kutu">
+            <div class="kutlama-ikon">⭐</div>
+            <h2 style="color:#f2c94c; margin-bottom:10px; font-size: 28px; text-shadow: 0 0 15px #f2c94c; letter-spacing: 2px;">GÖSTERGE!</h2>
+            <p id="gostergeKutlamaMetni" style="color:#fff; font-size:16px; margin-bottom:10px;">... gösterge yaptı!</p>
+            <div id="gostergeKutlamaOdul" style="color:#2ecc71; font-size:26px; font-weight:900; text-shadow: 0 0 15px rgba(46, 204, 113, 0.8);">+0 ÇİP</div>
+        </div>
+    </div>
+
     <div id="cikisUyariEkrani" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:999999; flex-direction:column; justify-content:center; align-items:center;">
         <div class="magaza-kutu" style="text-align:center;">
             <div style="font-size:50px; margin-bottom:10px;">⚠️</div>
@@ -104,7 +113,6 @@
             <p id="authAltMetin" style="color:#a3c4bc; font-size:12px; margin-bottom:20px;">Çiplerini güvende tutmak için giriş yap</p>
             
             <input type="text" id="authKullaniciAdi" class="auth-input" placeholder="Oyuncu Nickiniz (Örn: KRAL_34)" style="display:none;">
-            
             <input type="email" id="authEmail" class="auth-input" placeholder="E-Posta Adresi">
             <input type="password" id="authSifre" class="auth-input" placeholder="Şifre (En az 6 hane)">
             
