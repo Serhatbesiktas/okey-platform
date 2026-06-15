@@ -518,7 +518,8 @@ socket.on('cip_guncelle_ozel', (data) => {
 
 socket.on('hata_mesaji', (mesaj) => { alert(mesaj); });
 
-// KUSURSUZ ÇIKIŞ YAP VE UYARI SİSTEMİ
+
+// İŞTE ÇAKIŞMANIN TEMİZLENDİĞİ YER
 const lobiyeDonBtn = document.getElementById('lobiyeDonBtn');
 lobiyeDonBtn.addEventListener('click', () => {
     if (suAnkiMasam && masaOyunBasladiMi) {
