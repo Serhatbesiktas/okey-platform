@@ -441,7 +441,11 @@ socket.on('kozmetikleri_guncelle', (data) => {
     if(document.getElementById('lobiEkrani').style.display !== 'none') { socket.emit('kullanici_girisi', { isim: aktifKullaniciAdi, cip: benimAnlikCipim, kozmetikler: aktifKozmetikler }); }
 });
 
-socket.on('cip_guncelle', (cip) => { benimAnlikCipim = cip; document.getElementById('benimCipim').innerText = cip.toLocaleString('tr-TR'); });
+socket.on('cip_guncelle', (cip) => { 
+    benimAnlikCipim = cip; 
+    document.getElementById('benimCipim').innerText = cip.toLocaleString('tr-TR'); 
+});
+
 socket.on('cip_guncelle_ozel', (data) => { 
     if(data.isim === aktifKullaniciAdi) {
         benimAnlikCipim = data.cip; document.getElementById('benimCipim').innerText = data.cip.toLocaleString('tr-TR'); 
@@ -507,20 +511,17 @@ function masayiTemizle() {
     benimSiramMi = false;
 }
 
-// İŞTE BURASI: YENİ GÖSTERGE BAŞARILI ANİMASYONU TETİKLEYİCİSİ
 socket.on('gosterge_basarili', (data) => {
     if(suAnkiMasam === data.masaAdi) {
         if (data.isim === aktifKullaniciAdi) { gostergeHakki = false; gostergeBtn.style.display = 'none'; }
         sesCal(sesSiraSende); 
         
-        // GÖSTERGE ANİMASYONU EKRANINI GÖSTER
         document.getElementById('gostergeKutlamaMetni').innerHTML = `<strong style="color:#f2c94c;">${data.isim}</strong> gösterge yaptı!`;
         document.getElementById('gostergeKutlamaOdul').innerText = `+${data.odul.toLocaleString('tr-TR')} ÇİP`;
         
         const kutlamaEkrani = document.getElementById('gostergeKutlamaEkrani');
         kutlamaEkrani.style.display = 'flex';
         
-        // 3.5 saniye sonra ekrandan otomatik kaybolsun
         setTimeout(() => {
             kutlamaEkrani.style.display = 'none';
         }, 3500);
