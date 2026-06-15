@@ -14,7 +14,6 @@ let globalKozmetikler = {};
 
 let benimArkadaslarim = []; 
 let onlineOyuncularListesi = []; 
-// YENİ: Oyunun aktif olup olmadığını takip et
 let masaOyunBasladiMi = false; 
 
 const sesTasCek = new Audio('sounds/tas_cek.mp3');
@@ -54,9 +53,7 @@ lobiEkrani.style.display = 'none';
 masaEkrani.style.display = 'none';
 vipHeader.style.display = 'none';
 
-// YENİ: OTOMATİK GİRİŞ SİSTEMİ (SAYFA YENİLENİNCE ŞİFRE SORMASIN)
 auth.onAuthStateChanged((user) => {
-    // Sadece henüz oyuna giriş yapmamışsak ve Firebase bizi tanıyorsa
     if (user && !aktifKullaniciAdi) {
         db.collection("kullanicilar").doc(user.uid).get().then(doc => {
             if(doc.exists && doc.data().isim) {
@@ -192,6 +189,15 @@ function oyunaGirisYap(isim) {
     lobiEkrani.style.display = 'flex';
     socket.emit('kullanici_girisi', { isim: aktifKullaniciAdi, cip: benimAnlikCipim, kozmetikler: aktifKozmetikler });
 }
+
+// YENİ: SUNUCU SANA "SEN MASADASIN" DEDİĞİNDE TETİKLENEN KOD
+socket.on('sen_masadasin', (masaAdi) => {
+    suAnkiMasam = masaAdi;
+    lobiEkrani.style.display = 'none';
+    masaEkrani.style.display = 'flex';
+    document.getElementById('masaOrtasiYazi').innerText = masaAdi.toUpperCase();
+    socket.emit('masaya_geri_don', { masaAdi: masaAdi, isim: aktifKullaniciAdi });
+});
 
 window.liderlikTablosunuAc = function() {
     document.getElementById('liderlikEkrani').style.display = 'flex';
@@ -492,7 +498,7 @@ gostergeBtn.onclick = () => { socket.emit('gosterge_goster', { masaAdi: suAnkiMa
 document.getElementById('oyunAlanObjeleri').firstElementChild.appendChild(gostergeBtn);
 
 function masayiTemizle() {
-    masaOyunBasladiMi = false; // Oyun bittiğinde veya iptal olduğunda
+    masaOyunBasladiMi = false; 
     const flash = document.getElementById('flashBildirim'); if (flash) flash.classList.remove('goster'); 
     document.getElementById('sonucEkrani').style.display = 'none'; oyunAlanObjeleri.style.display = 'none'; gostergeBtn.style.display = 'none'; gostergeHakki = false; 
     oyunuBaslatBtn.innerText = "🎲 OYUNU BAŞLAT"; oyunuBaslatBtn.style.display = 'block'; bitisAlani.style.display = 'none'; masaKasaBilgisi.style.display = 'none'; bitisAlani.innerHTML = 'BİTİR<br>🏆'; 
@@ -612,7 +618,6 @@ function koltukStiliUygula(elementId, oyuncuIsmi) {
 }
 
 window.masayaOtur = function(masaAdi) { suAnkiMasam = masaAdi; socket.emit('masaya_otur', { isim: aktifKullaniciAdi, masaAdi: masaAdi }); lobiEkrani.style.display = 'none'; masaEkrani.style.display = 'flex'; masaOrtasiYazi.innerText = masaAdi.toUpperCase(); };
-
 oyunuBaslatBtn.addEventListener('click', () => { socket.emit('oyunu_baslat', suAnkiMasam); });
 document.querySelector('.btn-hemen-oyna').addEventListener('click', () => { if (suAnkiMasam) return; let musaitMasa = null; for (const [masaAdi, koltuklar] of Object.entries(guncelMasalar)) { if (koltuklar.filter(k => k !== null).length < 4) { musaitMasa = masaAdi; break; } } if (musaitMasa) masayaOtur(musaitMasa); else alert("Şu an tüm masalar tam kapasite dolu, patron!"); });
 socket.on('masa_kasa_guncelle', (data) => { if(suAnkiMasam === data.masaAdi) { masaKasaBilgisi.style.display = 'block'; masaKasaBilgisi.innerText = 'KASA: ' + data.kasa.toLocaleString('tr-TR') + ' ÇİP'; } });
@@ -634,8 +639,8 @@ socket.on('admin_flash_mesaj', (mesaj) => { const flash = document.getElementByI
 socket.on('admin_islem_uyarisi', (data) => { if(data.isim === aktifKullaniciAdi) { if(data.islem === 'kick') { alert("🚨 YÖNETİCİ TARAFINDAN MASADAN ATILDINIZ!"); if(suAnkiMasam) { suAnkiMasam = null; masayiTemizle(); document.getElementById('masaEkrani').style.display = 'none'; document.getElementById('lobiEkrani').style.display = 'flex'; } } else if(data.islem === 'ban') { alert("🛑 HESABINIZ SİSTEMDEN SINIRSIZ BANLANDI!"); location.reload(); } } });
 
 socket.on('connect', () => {
+    // Sadece kayıtlı ve açık bir oturum varsa çalışır
     if (aktifKullaniciAdi) {
         socket.emit('kullanici_girisi', { isim: aktifKullaniciAdi, cip: benimAnlikCipim, kozmetikler: aktifKozmetikler });
-        if (suAnkiMasam) { socket.emit('masaya_geri_don', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi }); }
     }
 });
