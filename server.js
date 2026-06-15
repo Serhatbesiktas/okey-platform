@@ -18,17 +18,14 @@ const masalar = {
     'Hızlı Oyun (10K Bahis)': { bahis: 10000, kasa: 0, koltuklar: [null, null, null, null], deste: [], gosterge: null, oyunBasladi: false, siradakiOyuncu: null, eller: {}, gostergeGosterildi: false }
 };
 
-// YENİ: Çip hesaplamalarını %100 güvene alan, string çakışmalarını engelleyen motor!
-function cipGuncelle(isim, miktar, islem) {
-    if (oyuncuCipleri[isim] === undefined) oyuncuCipleri[isim] = 0;
-    oyuncuCipleri[isim] = Number(oyuncuCipleri[isim]); 
-    if (islem === 'ekle') {
-        oyuncuCipleri[isim] += Number(miktar);
-    } else if (islem === 'cikar') {
-        oyuncuCipleri[isim] = Math.max(0, oyuncuCipleri[isim] - Number(miktar));
+// YENİ: Çip hesaplamasını sıfırlama riskine karşı istemciye (telefona) devreden güvenli motor!
+function cipDegistir(isim, miktar, islemAciklama) {
+    if (oyuncuCipleri[isim] !== undefined) {
+        oyuncuCipleri[isim] += miktar;
+        if (oyuncuCipleri[isim] < 0) oyuncuCipleri[isim] = 0;
     }
-    io.emit('cip_guncelle_ozel', { isim: isim, cip: oyuncuCipleri[isim] });
-    return oyuncuCipleri[isim];
+    // Sunucu diretmiyor, sadece telefona "şu kadar ekle/çıkar" emri veriyor!
+    io.emit('cip_degisimi_uygula', { isim: isim, degisim: miktar, islem: islemAciklama });
 }
 
 function desteYaratVeKaristir() {
@@ -189,7 +186,7 @@ function kullaniciyiMasadanKaldir(isim) {
         if(index !== -1) {
             if (masalar[m].oyunBasladi) {
                 let ceza = masalar[m].bahis;
-                cipGuncelle(isim, ceza, 'cikar'); // GÜVENLİ ÇİP SİSTEMİ
+                cipDegistir(isim, -ceza, 'ceza'); // GÜVENLİ CEZA KESİMİ
                 
                 const yeniBot = "Bot_" + Math.floor(Math.random() * 900 + 100);
                 masalar[m].koltuklar[index] = yeniBot;
@@ -240,10 +237,9 @@ io.on('connection', (socket) => {
       }
 
       socket.kullaniciAdi = isim;
-      oyuncuCipleri[isim] = Number(dbCip); // Güvenli çevrim
+      oyuncuCipleri[isim] = Number(dbCip); // Taze ve temiz veri yazılıyor
       oyuncuKozmetikleri[isim] = dbKozmetikler; 
 
-      socket.emit('cip_guncelle', oyuncuCipleri[isim]);
       io.emit('admin_guncel_veri', oyuncuCipleri);
       io.emit('kozmetikleri_guncelle', oyuncuKozmetikleri); 
       io.emit('online_oyuncular', Object.keys(oyuncuCipleri));
@@ -320,7 +316,7 @@ io.on('connection', (socket) => {
         masa.koltuklar.forEach(isim => {
             masa.kasa += masa.bahis; 
             if(!isim.startsWith('Bot_')) {
-                cipGuncelle(isim, masa.bahis, 'cikar'); // GÜVENLİ KESİM
+                cipDegistir(isim, -masa.bahis, 'bahis_odeme'); // GÜVENLİ KESİM
             }
         });
         
@@ -364,10 +360,10 @@ io.on('connection', (socket) => {
           if(hasTile) {
               masa.gostergeGosterildi = true;
               const odul = masa.bahis;
-              cipGuncelle(data.isim, odul, 'ekle'); // GÜVENLİ EKLEME
+              cipDegistir(data.isim, odul, 'gosterge'); // GÜVENLİ EKLEME
               io.emit('gosterge_basarili', { masaAdi: data.masaAdi, isim: data.isim, odul: odul });
               
-              // İŞTE BURASI: Gösterge yapana chat mesajı düşüyor!
+              // SOHBETE SİSTEM MESAJI DÜŞÜYOR!
               io.emit('yeni_sohbet_mesaji', { 
                   masaAdi: data.masaAdi, 
                   isim: "Sistem", 
@@ -434,9 +430,9 @@ io.on('connection', (socket) => {
                   }
               }
 
-              cipGuncelle(data.isim, kazanilanPara, 'ekle'); // GÜVENLİ EKLEME
+              cipDegistir(data.isim, kazanilanPara, 'oyun_kazanci'); // GÜVENLİ EKLEME
               
-              // İŞTE BURASI: Oyun bittiğinde herkese şık bir chat mesajı atar
+              // SOHBETE OYUN BİTİŞ MESAJI!
               io.emit('yeni_sohbet_mesaji', { 
                   masaAdi: data.masaAdi, 
                   isim: "Sistem", 
@@ -489,7 +485,8 @@ io.on('connection', (socket) => {
   socket.on('admin_cip_islem', (data) => {
       let hedefIsim = (data.isim || "").trim().toUpperCase(); 
       if (oyuncuCipleri[hedefIsim] !== undefined) {
-          cipGuncelle(hedefIsim, parseInt(data.miktar), data.islem);
+          let miktar = data.islem === 'ekle' ? parseInt(data.miktar) : -parseInt(data.miktar);
+          cipDegistir(hedefIsim, miktar, 'admin');
           io.emit('admin_guncel_veri', oyuncuCipleri);
           socket.emit('admin_flash_mesaj', `Başarılı: ${hedefIsim} adlı oyuncunun çiplerini güncelledin!`);
       } else {
