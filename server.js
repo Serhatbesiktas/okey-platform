@@ -240,11 +240,10 @@ io.on('connection', (socket) => {
       }
   });
 
-  // YENİ: Mağazadan alışveriş yapıldığında anında sunucu hafızasını senkronize eden köprü
   socket.on('magaza_harcamasi', (data) => {
       if (oyuncuCipleri[data.isim] !== undefined) {
-          oyuncuCipleri[data.isim] = data.yeniCip; // Eski parayı unut, yeni parayı kaydet!
-          io.emit('admin_guncel_veri', oyuncuCipleri); // Admin panelindeki sayıyı da anında günceller
+          oyuncuCipleri[data.isim] = data.yeniCip; 
+          io.emit('admin_guncel_veri', oyuncuCipleri); 
       }
   });
 
@@ -285,7 +284,9 @@ io.on('connection', (socket) => {
 
   socket.on('oyunu_baslat', (masaAdi) => {
     const masa = masalar[masaAdi];
-    if (masa && !masa.oyunBasladi) {
+    
+    // GÜVENLİK KALKANI: Oyunu başlatan kişi masanın koltuklarında oturmuyorsa işlem iptal!
+    if (masa && !masa.oyunBasladi && masa.koltuklar.includes(socket.kullaniciAdi)) {
         masa.oyunBasladi = true;
         masa.gostergeGosterildi = false;
         masa.kasa = 0; 
@@ -301,7 +302,8 @@ io.on('connection', (socket) => {
         masa.koltuklar.forEach(isim => {
             masa.kasa += masa.bahis; 
             if(!isim.startsWith('Bot_')) {
-                oyuncuCipleri[isim] -= masa.bahis; 
+                // GÜVENLİK: Çiplerin eksiye düşmemesi için limit koyuldu
+                oyuncuCipleri[isim] = Math.max(0, oyuncuCipleri[isim] - masa.bahis); 
                 io.emit('cip_guncelle_ozel', { isim: isim, cip: oyuncuCipleri[isim] });
             }
         });
