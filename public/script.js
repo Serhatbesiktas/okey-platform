@@ -75,26 +75,19 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
+// 250K SIFIRLAMA KİLİDİ: Sadece hesap hiç yoksa sıfırdan oluşturur
 auth.onAuthStateChanged((user) => {
     if (user && !aktifKullaniciAdi) {
         db.collection("kullanicilar").doc(user.uid).get().then(doc => {
             let kayitliNick = "";
-            if(doc.exists && doc.data().isim) {
-                kayitliNick = doc.data().isim;
-                benimAnlikCipim = doc.data().cip || 250000;
+            if(doc.exists) { // VERİTABANINDA KAYIT VARSA ASLA SIFIRLAMA!
+                kayitliNick = doc.data().isim || user.email.split('@')[0].toUpperCase();
+                benimAnlikCipim = doc.data().cip !== undefined ? doc.data().cip : 250000;
                 benimEnvanterim = doc.data().envanter || [];
                 aktifKozmetikler = doc.data().aktifKozmetikler || [];
                 sonBonusTarihim = doc.data().sonBonusTarihi || "";
                 benimArkadaslarim = doc.data().arkadaslar || []; 
                 benimKazanilanOyun = doc.data().kazanilanOyun || 0; 
-                
-                // PATRON TELAFİ SİSTEMİ (Kaybettiğin serveti sana geri veriyoruz)
-                if (kayitliNick === 'SRTBSK34' && benimAnlikCipim < 2000000) {
-                    benimAnlikCipim = 5000000;
-                    db.collection("kullanicilar").doc(user.uid).update({ cip: benimAnlikCipim });
-                    setTimeout(() => ozelUyariGoster("Sistem Hatası Telafisi: Hesabınıza 5.000.000 ÇİP geri yüklendi patron! Zynga bile böyle kıyak geçmez, kusura bakma!"), 1500);
-                }
-
             } else {
                 kayitliNick = user.email ? user.email.split('@')[0].toUpperCase() : "OYUNCU"; 
                 benimAnlikCipim = 250000; benimKazanilanOyun = 0;
@@ -223,44 +216,49 @@ window.profilDavetAksiyon = function() {
     ozelUyariGoster(`💌 ${hedef} adlı oyuncuya davet gönderildi!`); document.getElementById('profilEkrani').style.display = 'none';
 };
 
-// YENİ VE EFSANEVİ ÇİP GÜVENLİK MOTORU
-socket.on('cip_degisimi_uygula', (data) => {
-    if (data.isim === aktifKullaniciAdi) {
-        benimAnlikCipim += data.degisim;
-        if (benimAnlikCipim < 0) benimAnlikCipim = 0;
-        
-        const cipKutu = document.getElementById('benimCipim');
-        cipKutu.innerText = benimAnlikCipim.toLocaleString('tr-TR');
-        
-        if (data.degisim > 0) cipKutu.style.color = "#2ecc71"; // Kazanana Yeşil
-        else if (data.degisim < 0) cipKutu.style.color = "#e74c3c"; // Kaybedene Kırmızı
-        
-        setTimeout(() => cipKutu.style.color = "", 2000); 
-
-        // Sadece ceza ise uyarı çıkart
-        if (data.islem === 'ceza') {
-            document.getElementById('cezaMiktarMetni').innerText = Math.abs(data.degisim).toLocaleString('tr-TR') + " ÇİP";
-            document.getElementById('cezaBildirimEkrani').style.display = 'flex';
-        }
-
-        // Değişikliği anında Firebase'e çivile
-        if (auth.currentUser && !isMisafir) {
-            db.collection("kullanicilar").doc(auth.currentUser.uid).update({ cip: benimAnlikCipim });
-        }
-        // Sunucuya güncel halimi ilet
-        socket.emit('kullanici_girisi', { isim: aktifKullaniciAdi, cip: benimAnlikCipim, kozmetikler: aktifKozmetikler });
-    }
-});
-
+// DÜN ONAYLADIĞIN ANINDA KESİM VE GÜNCELLEME KODU (YENİDEN EKLENDİ)
 function masadanAyrilmaIslemi(cezaUygulansinMi = false) {
     if (suAnkiMasam) {
-        // Çıkış kararını sunucuya at. Sunucu ceza kesecekse 'cip_degisimi_uygula' yollayacak. Artık telefondan 2 kez düşmüyor!
+        if (cezaUygulansinMi && masaOyunBasladiMi) {
+            let cezaMiktari = 0;
+            if (suAnkiMasam.includes('20K')) cezaMiktari = 20000;
+            else if (suAnkiMasam.includes('50K')) cezaMiktari = 50000;
+            else if (suAnkiMasam.includes('10K')) cezaMiktari = 10000;
+
+            if (cezaMiktari > 0) {
+                benimAnlikCipim -= cezaMiktari;
+                if (benimAnlikCipim < 0) benimAnlikCipim = 0;
+
+                const cipKutu = document.getElementById('benimCipim');
+                cipKutu.innerText = benimAnlikCipim.toLocaleString('tr-TR');
+                
+                // Kırmızı Animasyon
+                cipKutu.style.color = "#e74c3c";
+                setTimeout(() => cipKutu.style.color = "", 2000);
+
+                if (auth.currentUser && !isMisafir) {
+                    db.collection("kullanicilar").doc(auth.currentUser.uid).update({ cip: benimAnlikCipim });
+                }
+                
+                socket.emit('kullanici_girisi', { isim: aktifKullaniciAdi, cip: benimAnlikCipim, kozmetikler: aktifKozmetikler });
+                
+                document.getElementById('cezaMiktarMetni').innerText = cezaMiktari.toLocaleString('tr-TR') + " ÇİP";
+                document.getElementById('cezaBildirimEkrani').style.display = 'flex';
+            }
+        }
         socket.emit('masadan_kalk', { isim: aktifKullaniciAdi, masaAdi: suAnkiMasam }); 
     }
-    suAnkiMasam = null; masayiTemizle(); 
-    document.getElementById('seatTop').innerText = "Bekleniyor..."; document.getElementById('seatLeft').innerText = "Bekleniyor..."; document.getElementById('seatRight').innerText = "Bekleniyor..."; 
-    document.getElementById('seatTop').dataset.isim = ""; document.getElementById('seatLeft').dataset.isim = ""; document.getElementById('seatRight').dataset.isim = ""; 
-    masaEkrani.style.display = 'none'; lobiEkrani.style.display = 'flex';
+
+    suAnkiMasam = null; 
+    masayiTemizle(); 
+    document.getElementById('seatTop').innerText = "Bekleniyor..."; 
+    document.getElementById('seatLeft').innerText = "Bekleniyor..."; 
+    document.getElementById('seatRight').innerText = "Bekleniyor..."; 
+    document.getElementById('seatTop').dataset.isim = ""; 
+    document.getElementById('seatLeft').dataset.isim = ""; 
+    document.getElementById('seatRight').dataset.isim = ""; 
+    masaEkrani.style.display = 'none'; 
+    lobiEkrani.style.display = 'flex';
 }
 
 window.cezaAnladimKapat = function() {
@@ -291,8 +289,11 @@ document.getElementById('btnCikisYap').addEventListener('click', (e) => {
 
 const lobiyeDonBtn = document.getElementById('lobiyeDonBtn');
 lobiyeDonBtn.addEventListener('click', () => {
-    if (suAnkiMasam && masaOyunBasladiMi) { document.getElementById('cikisUyariEkrani').style.display = 'flex'; } 
-    else { masadanAyrilmaIslemi(false); } 
+    if (suAnkiMasam && masaOyunBasladiMi) {
+        document.getElementById('cikisUyariEkrani').style.display = 'flex';
+    } else {
+        masadanAyrilmaIslemi(false); 
+    }
 });
 
 document.getElementById('btnCikisOnayla').addEventListener('click', () => {
@@ -304,7 +305,9 @@ document.getElementById('btnGecisKayit').addEventListener('click', () => { docum
 document.getElementById('btnGecisGiris').addEventListener('click', () => { document.getElementById('authBaslik').innerText = "VIP CASINO GİRİŞİ"; document.getElementById('authAltMetin').innerText = "Çiplerini güvende tutmak için kayıt ol veya giriş yap"; document.getElementById('authKullaniciAdi').style.display = 'none'; document.getElementById('loginButonlari').style.display = 'block'; document.getElementById('kayitButonlari').style.display = 'none'; });
 
 document.getElementById('btnMisafir').addEventListener('click', () => {
-    isMisafir = true; const rastgeleId = Math.floor(Math.random() * 9000) + 1000; const misafirIsim = "MİSAFİR_" + rastgeleId;
+    isMisafir = true;
+    const rastgeleId = Math.floor(Math.random() * 9000) + 1000;
+    const misafirIsim = "MİSAFİR_" + rastgeleId;
     benimAnlikCipim = 20000; benimKazanilanOyun = 0; benimEnvanterim = []; aktifKozmetikler = []; benimArkadaslarim = []; sonBonusTarihim = new Date().toLocaleDateString('tr-TR'); 
     document.getElementById('misafirUyariBanner').style.display = 'block';
     oyunaGirisYap(misafirIsim); arayuzGuncelle();
@@ -446,6 +449,20 @@ if(oyunuBaslatBtn) oyunuBaslatBtn.addEventListener('click', () => { socket.emit(
 const hemenOynaBtn = document.querySelector('.btn-hemen-oyna');
 if(hemenOynaBtn) hemenOynaBtn.addEventListener('click', () => { if (suAnkiMasam) return; let musaitMasa = null; for (const [masaAdi, koltuklar] of Object.entries(guncelMasalar)) { if (koltuklar.filter(k => k !== null).length < 4) { musaitMasa = masaAdi; break; } } if (musaitMasa) masayaOtur(musaitMasa); else ozelUyariGoster("Şu an tüm masalar tam kapasite dolu, patron!"); });
 
+// YENİ: Başkası kazandığında veya Admin gönderdiğinde çalışan güvenlik motoru
+socket.on('cip_guncelle_ozel', (data) => { 
+    if(data.isim === aktifKullaniciAdi) {
+        benimAnlikCipim = data.cip; 
+        const cipKutu = document.getElementById('benimCipim');
+        cipKutu.innerText = data.cip.toLocaleString('tr-TR'); 
+        cipKutu.style.color = "#2ecc71";
+        setTimeout(() => cipKutu.style.color = "", 2000);
+        if(auth.currentUser && !isMisafir) { 
+            db.collection("kullanicilar").doc(auth.currentUser.uid).update({ cip: data.cip }); 
+        } 
+    } 
+});
+
 socket.on('masa_kasa_guncelle', (data) => { if(suAnkiMasam === data.masaAdi) { masaKasaBilgisi.style.display = 'block'; masaKasaBilgisi.innerText = 'KASA: ' + data.kasa.toLocaleString('tr-TR') + ' ÇİP'; } });
 
 socket.on('masa_oyun_basladi', (data) => { 
@@ -472,7 +489,6 @@ if(sohbetCekmecesi) {
 
 window.vipEmojiGonder = function(emoji) { if(isMisafir) { ozelUyariGoster("⚠️ MİSAFİR HESAPLAR EMOLİ GÖNDEREMEZ!"); return; } if(suAnkiMasam) { socket.emit('vip_emoji', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi, emoji: emoji }); sohbetCekmecesi.classList.remove('acik'); } }
 
-// YENİ: Sistem Mesajlarına Özel Renk Eklendi (Yeşil yanacak)
 socket.on('yeni_sohbet_mesaji', (data) => { 
     if(data.masaAdi === suAnkiMasam) { 
         let isimRenk = data.isim === "Sistem" ? "#2ecc71" : "#f2c94c"; 
@@ -577,7 +593,6 @@ window.gunlukKasaCevir = function() {
 
 function oduluKaydet(odulMiktari) {
     const bugun = new Date().toLocaleDateString('tr-TR');
-    // SUNUCUYA SORMADAN DOĞRUDAN TELEFONDA HESAPLA!
     benimAnlikCipim += odulMiktari; sonBonusTarihim = bugun;
     if(auth.currentUser) {
         db.collection("kullanicilar").doc(auth.currentUser.uid).update({ cip: benimAnlikCipim, sonBonusTarihi: bugun }).then(() => {
