@@ -71,35 +71,50 @@ document.getElementById('btnMisafir').addEventListener('click', () => {
     arayuzGuncelle();
 });
 
+// YENİ: PROFESYONEL KAYIT SİSTEMİ (NİCK KONTROLLÜ)
 document.getElementById('btnKayit').addEventListener('click', () => {
-    const email = document.getElementById('authEmail').value;
+    const nick = document.getElementById('authKullaniciAdi').value.trim().toUpperCase();
+    const email = document.getElementById('authEmail').value.trim();
     const pass = document.getElementById('authSifre').value;
     
+    if(!nick) { alert("Lütfen kendinize havalı bir Oyuncu Nicki belirleyin!"); return; }
+    if(nick.length < 3) { alert("Nickiniz en az 3 harf olmalı!"); return; }
+    if(nick.startsWith("MİSAFİR") || nick.startsWith("BOT_")) { alert("Bu nick sistem tarafından rezerve edilmiştir, lütfen başka bir nick seçin!"); return; }
     if(!email || !pass) { alert("Lütfen e-posta ve şifre girin patron!"); return; }
     if(pass.length < 6) { alert("Şifre en az 6 haneli olmalı!"); return; }
     
-    auth.createUserWithEmailAndPassword(email, pass).then((userCredential) => {
-        isMisafir = false;
-        document.getElementById('misafirUyariBanner').style.display = 'none';
-        document.getElementById('benimVipRozetim').innerText = "VIP GOLD";
-        document.getElementById('benimVipRozetim').style.background = "";
+    // Veritabanında bu isimden başka var mı diye bak (Profesyonel oyun mantığı)
+    db.collection("kullanicilar").where("isim", "==", nick).get().then((querySnapshot) => {
+        if(!querySnapshot.empty) {
+            alert("Bu nick zaten alınmış patron! Kendine eşsiz başka bir isim bul.");
+            return;
+        }
         
-        const kullaniciAdi = email.split('@')[0].toUpperCase();
-        db.collection("kullanicilar").doc(userCredential.user.uid).set({
-            isim: kullaniciAdi, cip: 250000, envanter: [], aktifKozmetikler: [], sonBonusTarihi: "", arkadaslar: []
-        }).then(() => { 
-            benimAnlikCipim = 250000; benimEnvanterim = []; aktifKozmetikler = []; sonBonusTarihim = ""; benimArkadaslarim = [];
-            oyunaGirisYap(kullaniciAdi); arayuzGuncelle(); gunlukBonusKontrol();
-        }).catch(dbError => { 
-            console.error(dbError); alert("Veritabanı kayıt hatası."); 
-        });
-    }).catch(error => { alert("Sistem Hatası: " + error.message); });
+        // İsim boşsa kaydı tamamla
+        auth.createUserWithEmailAndPassword(email, pass).then((userCredential) => {
+            isMisafir = false;
+            document.getElementById('misafirUyariBanner').style.display = 'none';
+            document.getElementById('benimVipRozetim').innerText = "VIP GOLD";
+            document.getElementById('benimVipRozetim').style.background = "";
+            
+            db.collection("kullanicilar").doc(userCredential.user.uid).set({
+                isim: nick, // Artık e-posta prefixi değil, özel nick kaydediliyor!
+                cip: 250000, envanter: [], aktifKozmetikler: [], sonBonusTarihi: "", arkadaslar: []
+            }).then(() => { 
+                benimAnlikCipim = 250000; benimEnvanterim = []; aktifKozmetikler = []; sonBonusTarihim = ""; benimArkadaslarim = [];
+                oyunaGirisYap(nick); arayuzGuncelle(); gunlukBonusKontrol();
+            }).catch(dbError => { 
+                console.error(dbError); alert("Veritabanı kayıt hatası."); 
+            });
+        }).catch(error => { alert("Sistem Hatası (E-posta zaten kullanımda olabilir): " + error.message); });
+    }).catch(err => { console.error(err); alert("İsim kontrolü yapılamadı."); });
 });
 
+// YENİ: PROFESYONEL GİRİŞ SİSTEMİ
 document.getElementById('btnGiris').addEventListener('click', () => {
-    const email = document.getElementById('authEmail').value;
+    const email = document.getElementById('authEmail').value.trim();
     const pass = document.getElementById('authSifre').value;
-    if(!email || !pass) { alert("Lütfen e-posta ve şifre girin!"); return; }
+    if(!email || !pass) { alert("Lütfen e-posta ve şifrenizi girin!"); return; }
 
     auth.signInWithEmailAndPassword(email, pass).then((userCredential) => {
         isMisafir = false;
@@ -107,23 +122,25 @@ document.getElementById('btnGiris').addEventListener('click', () => {
         document.getElementById('benimVipRozetim').innerText = "VIP GOLD";
         document.getElementById('benimVipRozetim').style.background = "";
 
-        const kullaniciAdi = email.split('@')[0].toUpperCase();
         db.collection("kullanicilar").doc(userCredential.user.uid).get().then(doc => {
+            let kayitliNick = "OYUNCU";
             if(doc.exists) {
+                // Veritabanındaki orijinal nicki çekiyoruz
+                kayitliNick = doc.data().isim || email.split('@')[0].toUpperCase(); 
                 benimAnlikCipim = doc.data().cip || 250000;
                 benimEnvanterim = doc.data().envanter || [];
                 aktifKozmetikler = doc.data().aktifKozmetikler || [];
                 sonBonusTarihim = doc.data().sonBonusTarihi || "";
                 benimArkadaslarim = doc.data().arkadaslar || []; 
             }
-            oyunaGirisYap(kullaniciAdi); 
+            oyunaGirisYap(kayitliNick); 
             arayuzGuncelle(); 
             gunlukBonusKontrol();
         }).catch(dbError => { 
             console.error("Hata:", dbError);
             alert("Veri çekilemedi: " + dbError.message); 
         });
-    }).catch(error => { alert("Giriş Başarısız. Şifre yanlış olabilir."); });
+    }).catch(error => { alert("Giriş Başarısız. E-posta veya şifre yanlış."); });
 });
 
 function oyunaGirisYap(isim) {
@@ -135,23 +152,14 @@ function oyunaGirisYap(isim) {
     socket.emit('kullanici_girisi', { isim: aktifKullaniciAdi, cip: benimAnlikCipim, kozmetikler: aktifKozmetikler });
 }
 
-// YENİ: Liderlik Tablosu Artık Doğrudan Firebase'den Çekiliyor! (Çevrimdışı olsalar bile görünürler)
 window.liderlikTablosunuAc = function() {
     document.getElementById('liderlikEkrani').style.display = 'flex';
     const listeDiv = document.getElementById('liderlikListesi');
     listeDiv.innerHTML = '<p style="text-align:center; color:#f2c94c; font-weight:bold;">Veritabanı taranıyor...</p>';
 
-    // Firebase'den en zengin 5 kişiyi çek
-    db.collection("kullanicilar")
-      .orderBy("cip", "desc")
-      .limit(5)
-      .get()
-      .then((querySnapshot) => {
+    db.collection("kullanicilar").orderBy("cip", "desc").limit(5).get().then((querySnapshot) => {
           listeDiv.innerHTML = '';
-          if(querySnapshot.empty) {
-              listeDiv.innerHTML = '<p style="text-align:center; color:#777;">Henüz sıralama oluşmadı.</p>';
-              return;
-          }
+          if(querySnapshot.empty) { listeDiv.innerHTML = '<p style="text-align:center; color:#777;">Henüz sıralama oluşmadı.</p>'; return; }
 
           let index = 0;
           querySnapshot.forEach((doc) => {
@@ -178,11 +186,7 @@ window.liderlikTablosunuAc = function() {
               `;
               index++;
           });
-      })
-      .catch((error) => {
-          console.log("Liderlik tablosu hatası:", error);
-          listeDiv.innerHTML = '<p style="text-align:center; color:#e74c3c;">Bağlantı hatası, liste alınamadı.</p>';
-      });
+      }).catch((error) => { console.log("Liderlik tablosu hatası:", error); listeDiv.innerHTML = '<p style="text-align:center; color:#e74c3c;">Bağlantı hatası, liste alınamadı.</p>'; });
 }
 
 socket.on('online_oyuncular', (liste) => {
@@ -217,9 +221,7 @@ window.arkadasEkle = function(isim) {
     if(!benimArkadaslarim.includes(isim)) {
         benimArkadaslarim.push(isim);
         if(auth.currentUser) {
-            db.collection("kullanicilar").doc(auth.currentUser.uid).update({ arkadaslar: benimArkadaslarim }).then(() => {
-                alert(`✅ ${isim} arkadaş listene eklendi!`);
-            });
+            db.collection("kullanicilar").doc(auth.currentUser.uid).update({ arkadaslar: benimArkadaslarim }).then(() => { alert(`✅ ${isim} arkadaş listene eklendi!`); });
         }
     }
 }
@@ -358,16 +360,19 @@ function arayuzGuncelle() {
     
     if(avatar) { avatar.style.border = '2px solid #52796f'; avatar.style.boxShadow = 'none'; }
     if(isimKutu) { isimKutu.style.color = '#fff'; isimKutu.style.textShadow = '0 2px 4px rgba(0,0,0,0.5)'; }
+    if(lobiIsim) { lobiIsim.style.color = '#f2c94c'; lobiIsim.style.textShadow = 'none'; }
     
     let tacEki = ""; if(aktifKozmetikler.includes('neon_tac')) { tacEki = "👑 "; }
 
-    if(aktifKullaniciAdi && isimKutu) {
-        isimKutu.innerHTML = tacEki + aktifKullaniciAdi + ' <span style="color:#2ecc71;">✔</span>';
+    if(aktifKullaniciAdi) {
+        if(isimKutu) isimKutu.innerHTML = tacEki + aktifKullaniciAdi + ' <span style="color:#2ecc71;">✔</span>';
+        if(lobiIsim) lobiIsim.innerText = tacEki + aktifKullaniciAdi; 
     }
 
     if(aktifKozmetikler.includes('altin_cerceve') && avatar) { avatar.style.border = '3px solid #f2c94c'; avatar.style.boxShadow = '0 0 15px #f2c94c'; }
-    if(aktifKozmetikler.includes('atesli_isim') && isimKutu) {
-        isimKutu.style.color = '#ff4d4d'; isimKutu.style.textShadow = '0 0 8px #ff0000';
+    if(aktifKozmetikler.includes('atesli_isim')) {
+        if(isimKutu) { isimKutu.style.color = '#ff4d4d'; isimKutu.style.textShadow = '0 0 8px #ff0000'; }
+        if(lobiIsim) { lobiIsim.style.color = '#ff4d4d'; lobiIsim.style.textShadow = '0 0 5px #ff0000'; }
     }
     
     const esyalar = [ {id: 'altin_cerceve', fiyat: '500.000'}, {id: 'neon_tac', fiyat: '1.5M'}, {id: 'atesli_isim', fiyat: '3M'} ];
@@ -384,12 +389,8 @@ function arayuzGuncelle() {
 
 socket.on('kozmetikleri_guncelle', (data) => {
     globalKozmetikler = data;
-    if(suAnkiMasam && guncelMasalar[suAnkiMasam]) {
-        gelişmişKoltukHizala(guncelMasalar[suAnkiMasam]);
-    }
-    if(document.getElementById('lobiEkrani').style.display !== 'none') {
-        socket.emit('kullanici_girisi', { isim: aktifKullaniciAdi, cip: benimAnlikCipim, kozmetikler: aktifKozmetikler });
-    }
+    if(suAnkiMasam && guncelMasalar[suAnkiMasam]) { gelişmişKoltukHizala(guncelMasalar[suAnkiMasam]); }
+    if(document.getElementById('lobiEkrani').style.display !== 'none') { socket.emit('kullanici_girisi', { isim: aktifKullaniciAdi, cip: benimAnlikCipim, kozmetikler: aktifKozmetikler }); }
 });
 
 socket.on('cip_guncelle', (cip) => { benimAnlikCipim = cip; document.getElementById('benimCipim').innerText = cip.toLocaleString('tr-TR'); });
