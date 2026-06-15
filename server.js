@@ -240,6 +240,14 @@ io.on('connection', (socket) => {
       }
   });
 
+  // YENİ: Mağazadan alışveriş yapıldığında anında sunucu hafızasını senkronize eden köprü
+  socket.on('magaza_harcamasi', (data) => {
+      if (oyuncuCipleri[data.isim] !== undefined) {
+          oyuncuCipleri[data.isim] = data.yeniCip; // Eski parayı unut, yeni parayı kaydet!
+          io.emit('admin_guncel_veri', oyuncuCipleri); // Admin panelindeki sayıyı da anında günceller
+      }
+  });
+
   socket.on('kozmetik_guncelle', (data) => {
       oyuncuKozmetikleri[data.isim] = data.kozmetikler;
       io.emit('kozmetikleri_guncelle', oyuncuKozmetikleri);
@@ -445,9 +453,8 @@ io.on('connection', (socket) => {
 
   socket.on('admin_veri_iste', () => { socket.emit('admin_guncel_veri', oyuncuCipleri); });
   
-  // YENİ: KUSURSUZ VE GÜVENLİ ADMIN ÇİP İŞLEMİ
   socket.on('admin_cip_islem', (data) => {
-      let hedefIsim = (data.isim || "").trim().toUpperCase(); // Küçük harf girilse bile büyütür!
+      let hedefIsim = (data.isim || "").trim().toUpperCase(); 
       
       if (oyuncuCipleri[hedefIsim] !== undefined) {
           if (data.islem === 'ekle') { oyuncuCipleri[hedefIsim] += parseInt(data.miktar); } 
@@ -457,7 +464,6 @@ io.on('connection', (socket) => {
           io.emit('admin_guncel_veri', oyuncuCipleri);
           socket.emit('admin_flash_mesaj', `Başarılı: ${hedefIsim} adlı oyuncunun çiplerini güncelledin!`);
       } else {
-          // Oyuncu çevrimdışıysa admine uyarı gönder
           socket.emit('admin_flash_mesaj', `⚠️ HATA: ${hedefIsim} şu an aktif değil! Çip gönderilemedi.`);
       }
   });
