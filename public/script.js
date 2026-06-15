@@ -129,7 +129,7 @@ window.profiliGoster = function(hedefIsim) {
     }).catch(err => { pIsim.innerText = "Bağlantı Hatası"; });
 }
 
-// İŞTE BURASI: TARAYICININ ENGELLEYEMEYECEĞİ, KUSURSUZ HTML CEZA EKRANI!
+// İŞTE BURASI: TARAYICININ ENGELLEYEMEYECEĞİ HTML CEZA EKRANI!
 function masadanAyrilmaIslemi(cezaUygulansinMi = false) {
     if (suAnkiMasam) {
         if (cezaUygulansinMi && masaOyunBasladiMi) {
@@ -150,7 +150,7 @@ function masadanAyrilmaIslemi(cezaUygulansinMi = false) {
                 
                 socket.emit('kullanici_girisi', { isim: aktifKullaniciAdi, cip: benimAnlikCipim, kozmetikler: aktifKozmetikler });
                 
-                // Alert yerine VIP HTML Ceza Penceresini Aç!
+                // VIP HTML Ceza Penceresini Aç
                 document.getElementById('cezaMiktarMetni').innerText = cezaMiktari.toLocaleString('tr-TR') + " ÇİP";
                 document.getElementById('cezaBildirimEkrani').style.display = 'flex';
             }
@@ -189,7 +189,7 @@ document.getElementById('btnCikisYap').addEventListener('click', (e) => {
             document.getElementById('lobiEkrani').style.display = 'none';
             document.getElementById('masaEkrani').style.display = 'none';
             document.querySelector('.vip-header').style.display = 'none';
-            document.getElementById('cezaBildirimEkrani').style.display = 'none'; // Çıkışta açık kalmasın
+            document.getElementById('cezaBildirimEkrani').style.display = 'none'; 
             
             document.getElementById('authEmail').value = '';
             document.getElementById('authSifre').value = '';
@@ -465,8 +465,8 @@ window.arkadaslarMenusuAc = function() {
         }
 
         listeDiv.innerHTML += `
-            <div class="lider-satir">
-                <div class="lider-isim" style="color:${isimRenk}; cursor:pointer;" onclick="profiliGoster('${arkadas}')">${durumNoktasi} ${tac}${arkadas}</div>
+            <div class="lider-satir" style="cursor:pointer;" onclick="profiliGoster('${arkadas}')">
+                <div class="lider-isim" style="color:${isimRenk};">${durumNoktasi} ${tac}${arkadas}</div>
                 ${davetButonu}
             </div>
         `;
@@ -755,6 +755,7 @@ socket.on('ortaya_tas_atildi', (data) => { if(suAnkiMasam === data.masaAdi) { le
 
 socket.on('yandan_alindi_guncelle', (data) => { if(data.masaAdi === suAnkiMasam && data.kimAldi !== aktifKullaniciAdi) { let source = null; if(data.kimAldi === document.getElementById('seatRight').dataset.isim) source = 'benimIskartam'; else if(data.kimAldi === document.getElementById('seatTop').dataset.isim) source = 'iskartaSag'; else if(data.kimAldi === document.getElementById('seatLeft').dataset.isim) source = 'iskartaUst'; if(source) { document.getElementById(source).innerHTML = ''; if(source === 'benimIskartam') document.getElementById('benimIskartam').innerHTML = '<div class="iskarta-yazi" id="iskartaYazi">TAŞ AT<br>⬇</div>'; sesCal(sesTasCek); } } });
 
+// YENİ: Oyun bittiğinde istatistik kaydetme (Senin kodunda zaten mevcuttu, korundu)
 socket.on('oyun_bitti', (data) => { 
     if(suAnkiMasam === data.masaAdi) { 
         const sonucEkrani = document.getElementById('sonucEkrani'); 
@@ -765,14 +766,9 @@ socket.on('oyun_bitti', (data) => {
         if(auth.currentUser && !isMisafir && data.kazanan) {
             const userRef = db.collection("kullanicilar").doc(auth.currentUser.uid);
             if(data.kazanan === aktifKullaniciAdi) {
-                userRef.update({
-                    oynananOyun: firebase.firestore.FieldValue.increment(1),
-                    kazanilanOyun: firebase.firestore.FieldValue.increment(1)
-                });
+                userRef.update({ oynananOyun: firebase.firestore.FieldValue.increment(1), kazanilanOyun: firebase.firestore.FieldValue.increment(1) });
             } else {
-                userRef.update({
-                    oynananOyun: firebase.firestore.FieldValue.increment(1)
-                });
+                userRef.update({ oynananOyun: firebase.firestore.FieldValue.increment(1) });
             }
         }
 
@@ -833,6 +829,7 @@ function koltukStiliUygula(elementId, oyuncuIsmi) {
     if(kozmetikler.includes('atesli_isim')) { el.style.color = '#ff4d4d'; el.style.textShadow = '0 0 5px #ff0000'; } else { el.style.color = '#0dcaf0'; el.style.textShadow = 'none'; }
 }
 
+// İŞTE BURASI: YETERSİZ ÇİP UYARISININ GERİ GELDİĞİ YER
 window.masayaOtur = function(masaAdi) { 
     let bahis = 0;
     if(masaAdi.includes('20K')) bahis = 20000;
