@@ -216,6 +216,9 @@ window.profiliGoster = function(hedefIsim) {
     const pDavetBtn = document.getElementById('profilDavetBtn'); const pLigBadge = document.getElementById('profilLigBadge');
     const pUnvanBadge = document.getElementById('profilUnvanBadge');
     
+    // YENİ Eşya Fırlatma Bölümü
+    const firlatAlani = document.getElementById('profilEsyaFirlatAlani');
+    
     pIsim.innerText = "Yükleniyor..."; pOynanan.innerText = "..."; pKazanilan.innerText = "..."; pCip.innerText = "..."; kazanmaOrani.innerText = "%0";
     pAvatar.style.border = '3px solid #52796f'; pAvatar.style.boxShadow = 'none'; pIsim.style.color = '#fff'; pIsim.style.textShadow = 'none';
     pArkadasBtn.style.display = 'none'; pDavetBtn.style.display = 'none'; pUnvanBadge.style.display = 'none';
@@ -234,6 +237,21 @@ window.profiliGoster = function(hedefIsim) {
         if (benimArkadaslarim.includes(hedefIsim)) { pArkadasBtn.innerText = "❌ Arkadaştan Çıkar"; pArkadasBtn.style.background = "#e74c3c"; } 
         else { pArkadasBtn.innerText = "➕ Arkadaş Ekle"; pArkadasBtn.style.background = ""; }
         if (isOnline && suAnkiMasam) { pDavetBtn.style.display = 'block'; }
+    }
+
+    // YENİ: Masada aynı oyundaysanız eşya fırlatma açılır
+    let masadaMi = false;
+    ['seatRight', 'seatTop', 'seatLeft'].forEach(id => {
+        let el = document.getElementById(id);
+        if(el && el.dataset.isim === hedefIsim) masadaMi = true;
+    });
+
+    if (firlatAlani) {
+        if (suAnkiMasam && masadaMi && isOnline && hedefIsim !== aktifKullaniciAdi) {
+            firlatAlani.style.display = 'flex';
+        } else {
+            firlatAlani.style.display = 'none';
+        }
     }
 
     if(hedefIsim.startsWith("MİSAFİR_")) {
@@ -271,6 +289,60 @@ window.profiliGoster = function(hedefIsim) {
         }
     }).catch(err => { pIsim.innerText = "Bağlantı Hatası"; });
 };
+
+// YENİ: Masada Eşya Fırlatma Tetikleyicisi
+window.esyaFirlatAksiyon = function(esyaIcon) {
+    if(isMisafir) { ozelUyariGoster("⚠️ Misafir hesaplar eşya fırlatamaz!"); return; }
+    const hedef = document.getElementById('profilArkadasBtn').dataset.hedef;
+    if(!hedef || !suAnkiMasam || hedef === aktifKullaniciAdi) return;
+    
+    if(benimAnlikCipim < 5000) { 
+        ozelUyariGoster("⚠️ Bunun için 5.000 ÇİP lazım patron!"); 
+        return; 
+    }
+    
+    socket.emit('esya_firlat', { masaAdi: suAnkiMasam, kimden: aktifKullaniciAdi, kime: hedef, esya: esyaIcon });
+    document.getElementById('profilEkrani').style.display = 'none';
+};
+
+// YENİ: Masada Eşya Fırlatma Animasyonu
+socket.on('esya_firlatildi', (data) => {
+    if(data.masaAdi !== suAnkiMasam) return;
+    
+    let senderEl = null; let receiverEl = null;
+    ['benimAdimKutusu', 'seatRight', 'seatTop', 'seatLeft'].forEach(id => {
+        const el = document.getElementById(id);
+        if(!el) return;
+        let isim = id === 'benimAdimKutusu' ? aktifKullaniciAdi : el.dataset.isim;
+        if(isim === data.kimden) senderEl = el;
+        if(isim === data.kime) receiverEl = el;
+    });
+
+    if(senderEl && receiverEl) {
+        const sRect = senderEl.getBoundingClientRect();
+        const rRect = receiverEl.getBoundingClientRect();
+        
+        const ucanEsya = document.createElement('div');
+        ucanEsya.innerText = data.esya;
+        ucanEsya.style.position = 'fixed';
+        ucanEsya.style.left = sRect.left + (sRect.width/2) + 'px';
+        ucanEsya.style.top = sRect.top + (sRect.height/2) + 'px';
+        ucanEsya.style.fontSize = '45px';
+        ucanEsya.style.zIndex = '999999';
+        ucanEsya.style.transition = 'all 1s cubic-bezier(0.25, 1, 0.5, 1)';
+        ucanEsya.style.pointerEvents = 'none';
+        ucanEsya.style.filter = 'drop-shadow(0px 10px 10px rgba(0,0,0,0.5))';
+        document.body.appendChild(ucanEsya);
+        
+        setTimeout(() => {
+            ucanEsya.style.left = rRect.left + (rRect.width/2) - 20 + 'px';
+            ucanEsya.style.top = rRect.top + (rRect.height/2) - 20 + 'px';
+            ucanEsya.style.transform = 'scale(1.5) rotate(360deg)';
+        }, 50);
+
+        setTimeout(() => { ucanEsya.remove(); }, 1050);
+    }
+});
 
 window.profilArkadasAksiyon = function() {
     const btn = document.getElementById('profilArkadasBtn'); const hedef = btn.dataset.hedef;
@@ -487,13 +559,29 @@ socket.on('davet_geldi', (data) => {
     }
 });
 
-// İŞTE ÇÖZÜM: "OTURDUN ✓" butonuna tıklandığında seni tekrar oturmaya zorlamaz, direk masana fırlatır!
-window.masayaGeriDon = function(masaAdi) {
-    suAnkiMasam = masaAdi;
-    lobiEkrani.style.display = 'none'; masaEkrani.style.display = 'flex';
-    document.getElementById('masaOrtasiYazi').innerText = masaAdi.toUpperCase();
-    socket.emit('masaya_geri_don', { masaAdi: masaAdi, isim: aktifKullaniciAdi });
-};
+const btnHemenOynalar = document.querySelectorAll('.btn-hemen-oyna');
+btnHemenOynalar.forEach(btn => {
+    btn.addEventListener('click', () => { 
+        if (suAnkiMasam) return; 
+        
+        for (const [m, koltuklar] of Object.entries(guncelMasalar)) {
+            if (koltuklar.includes(aktifKullaniciAdi)) {
+                suAnkiMasam = m;
+                lobiEkrani.style.display = 'none'; masaEkrani.style.display = 'flex';
+                document.getElementById('masaOrtasiYazi').innerText = m.toUpperCase();
+                socket.emit('masaya_geri_don', { masaAdi: m, isim: aktifKullaniciAdi });
+                return;
+            }
+        }
+
+        let musaitMasa = null; 
+        for (const [masaAdi, koltuklar] of Object.entries(guncelMasalar)) { 
+            if (koltuklar.filter(k => k !== null).length < 4) { musaitMasa = masaAdi; break; } 
+        } 
+        if (musaitMasa) masayaOtur(musaitMasa); 
+        else ozelUyariGoster("Şu an tüm genel masalar tam kapasite dolu, patron!"); 
+    });
+});
 
 socket.on('masalari_guncelle', (lobidekiMasalar) => { 
     guncelMasalar = lobidekiMasalar; 
@@ -510,6 +598,13 @@ socket.on('masalari_guncelle', (lobidekiMasalar) => {
         if(benBuMasadaMiyim) gelişmişKoltukHizala(koltuklar); 
     } 
 });
+
+window.masayaGeriDon = function(masaAdi) {
+    suAnkiMasam = masaAdi;
+    lobiEkrani.style.display = 'none'; masaEkrani.style.display = 'flex';
+    document.getElementById('masaOrtasiYazi').innerText = masaAdi.toUpperCase();
+    socket.emit('masaya_geri_don', { masaAdi: masaAdi, isim: aktifKullaniciAdi });
+};
 
 function gelişmişKoltukHizala(koltuklar) { 
     const index = koltuklar.indexOf(aktifKullaniciAdi); if (index === -1) return; 
@@ -532,28 +627,6 @@ window.masayaOtur = function(masaAdi) {
 };
 
 if(oyunuBaslatBtn) oyunuBaslatBtn.addEventListener('click', () => { socket.emit('oyunu_baslat', suAnkiMasam); });
-
-// KUSURSUZ HEMEN OYNA: Zaten bir masadaysan seni o masaya yollar, değilsen rastgele boş masaya!
-const btnHemenOynalar = document.querySelectorAll('.btn-hemen-oyna');
-btnHemenOynalar.forEach(btn => {
-    btn.addEventListener('click', () => { 
-        if (suAnkiMasam) return; 
-        
-        for (const [m, koltuklar] of Object.entries(guncelMasalar)) {
-            if (koltuklar.includes(aktifKullaniciAdi)) {
-                masayaGeriDon(m);
-                return;
-            }
-        }
-
-        let musaitMasa = null; 
-        for (const [masaAdi, koltuklar] of Object.entries(guncelMasalar)) { 
-            if (koltuklar.filter(k => k !== null).length < 4) { musaitMasa = masaAdi; break; } 
-        } 
-        if (musaitMasa) masayaOtur(musaitMasa); 
-        else ozelUyariGoster("Şu an tüm genel masalar tam kapasite dolu, patron!"); 
-    });
-});
 
 socket.on('cip_guncelle_ozel', (data) => { 
     if(data.isim === aktifKullaniciAdi) {
