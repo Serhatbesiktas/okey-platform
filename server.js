@@ -190,7 +190,6 @@ function botHamlesiYap(masaAdi) {
     }
 }
 
-// İŞTE BURASI: Artık tek bir masadan değil, sıkıştığı bütün masalardan temizleniyor! (HAYALET MASA FİXİ)
 function kullaniciyiMasadanKaldir(isim) {
     let degisiklikOldu = false;
     for(let m in masalar) {
@@ -275,6 +274,21 @@ io.on('connection', (socket) => {
       }
   });
 
+  // YENİ: Masada Eşya Fırlatma Sistemi
+  socket.on('esya_firlat', (data) => {
+      const masa = masalar[data.masaAdi];
+      if(masa && oyuncuCipleri[data.kimden] >= 5000) {
+          // 5K Çip kesimi yap
+          oyuncuCipleri[data.kimden] = Math.max(0, Number(oyuncuCipleri[data.kimden]) - 5000);
+          io.emit('cip_guncelle_ozel', { isim: data.kimden, cip: oyuncuCipleri[data.kimden] });
+          
+          // Eşya animasyonunu masadaki herkese yayınla
+          io.emit('esya_firlatildi', data);
+      } else if (oyuncuCipleri[data.kimden] < 5000) {
+          socket.emit('hata_mesaji', "Bu eşyayı fırlatmak için en az 5.000 ÇİP'e ihtiyacın var!");
+      }
+  });
+
   socket.on('magaza_harcamasi', (data) => {
       if (oyuncuCipleri[data.isim] !== undefined) {
           oyuncuCipleri[data.isim] = Number(data.yeniCip); 
@@ -301,7 +315,6 @@ io.on('connection', (socket) => {
   });
 
   socket.on('masaya_otur', (data) => {
-    // İŞTE BURASI: Hayalet bug'ını engelleyen ZIRH! Zaten bir masadaysa yenisine ASLA oturtma.
     for(let m in masalar) {
         if(masalar[m].koltuklar.includes(data.isim)) return;
     }
