@@ -24,6 +24,7 @@
         </div>
     </div>
 
+    <!-- VIP MASA KURMA PANELİ -->
     <div id="vipMasaKurPanel" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:9999999; flex-direction:column; justify-content:center; align-items:center;">
         <div class="magaza-kutu" style="max-width: 320px; text-align:center; border:2px solid #ff33aa; box-shadow: 0 0 25px #ff33aa;">
             <h2 style="color:#ff33aa; font-size:22px; margin-bottom:15px; text-shadow:0 0 10px #ff33aa;">👑 VIP MASA AYARLARI</h2>
@@ -234,9 +235,10 @@
             <div id="lobidekilerListesi" style="display:flex; flex-direction:column; gap:5px;"></div>
         </div>
 
-        <div style="display:flex; flex-direction:column; gap:10px; width:100%;">
+        <!-- VIP MASA KUR VE DÜZELTİLMİŞ HEMEN OYNA BUTONU -->
+        <div style="display:flex; flex-direction:column; gap:10px; width:100%; margin-bottom: 80px;">
             <button onclick="document.getElementById('vipMasaKurPanel').style.display='flex'" class="btn-hemen-oyna" style="background: linear-gradient(135deg, #ff33aa 0%, #aa33ff 100%); box-shadow: 0 0 15px #ff33aa;">👑 VIP Masa Kur <span>Özel janjanlı alan</span></button>
-            <button class="btn-hemen-oyna">⚡ Hemen Oyna <span>Rastgele Masa</span></button>
+            <button id="btnRastgeleOyna" class="btn-hemen-oyna">⚡ Hemen Oyna <span>Rastgele Masa</span></button>
         </div>
 
         <div class="alt-menu-container">
@@ -287,12 +289,10 @@
             <div class="masa-ortasi">
                 <div class="masa-isim-ortasi" id="masaOrtasiYazi">MASA</div>
                 <div class="masa-kasa-bilgisi" id="masaKasaBilgisi">KASA: 0 ÇİP</div>
-                
                 <div style="display:flex; flex-direction:column; gap:8px; align-items:center; justify-content:center;">
                     <button class="oyun-baslat-btn" id="oyunuBaslatBtn">🎲 OYUNU BAŞLAT</button>
                     <button id="btnVipGizlilikTetikle" onclick="vipGizlilikDurumuDegistir()" class="oyun-baslat-btn" style="display:none; background:#ff33aa; font-size:11px; padding:6px 15px; margin-top:0;">🔒 MASAYI HERKESE AÇ</button>
                 </div>
-
                 <div class="kalan-tas-bilgi-container" id="oyunAlanObjeleri">
                     <div style="display: flex; gap: 15px; align-items: center;">
                         <div class="gosterge-tasi" id="gostergeTasi" title="Gösterge"></div>
