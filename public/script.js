@@ -143,7 +143,6 @@ document.getElementById('btnGiris').addEventListener('click', () => {
     });
 });
 
-// İŞTE EKSİK OLAN VIP MASA KURMA KOMUTLARI BURADA!
 window.vipMasaKurAksiyon = function() {
     if(isMisafir) {
         ozelUyariGoster("⚠️ Misafir hesaplar VIP Masa kuramaz! Lütfen kayıt ol patron.");
@@ -570,7 +569,14 @@ socket.on('masalari_guncelle', (lobidekiMasalar) => {
     for (const [masaAdi, koltuklar] of Object.entries(lobidekiMasalar)) { 
         const doluKoltukSayisi = koltuklar.filter(k => k !== null).length; const benBuMasadaMiyim = koltuklar.includes(aktifKullaniciAdi); 
         const action = benBuMasadaMiyim ? `masayaGeriDon('${masaAdi}')` : `masayaOtur('${masaAdi}')`; const btnMetni = benBuMasadaMiyim ? 'OTURDUN ✓' : (doluKoltukSayisi>=4 ? 'DOLU' : 'OTUR');
-        const html = `<div class="masa-kart"><div class="masa-watermark"></div><div class="kart-sol"><div class="zar-kutu">🎲</div><div class="masa-kart-isim">${masaAdi}</div></div><div class="kart-sag"><div class="masa-kisi-kutu">🎲 ${doluKoltukSayisi}/4</div><button class="btn-otur ${benBuMasadaMiyim || doluKoltukSayisi>=4 ? 'disabled':''}" style="${benBuMasadaMiyim ? 'background:#2ecc71;color:#111;':''}" onclick="${action}">${btnMetni}</button></div></div>`; 
+        
+        let proStyle = ""; let crownEki = "🎲";
+        if (masaAdi.includes('👑 VIP:')) {
+            proStyle = "border: 2px solid #ff33aa; box-shadow: 0 0 15px #ff33aa, inset 0 0 10px rgba(255,51,170,0.2); background: linear-gradient(135deg, #160011 0%, #000000 100%);";
+            crownEki = "👑";
+        }
+
+        const html = `<div class="masa-kart" style="${proStyle}"><div class="masa-watermark"></div><div class="kart-sol"><div class="zar-kutu">${crownEki}</div><div class="masa-kart-isim">${masaAdi}</div></div><div class="kart-sag"><div class="masa-kisi-kutu">🎲 ${doluKoltukSayisi}/4</div><button class="btn-otur ${benBuMasadaMiyim || doluKoltukSayisi>=4 ? 'disabled':''}" style="${benBuMasadaMiyim ? 'background:#2ecc71;color:#111;':''}" onclick="${action}">${btnMetni}</button></div></div>`; 
         if(masalarAlani) masalarAlani.innerHTML += html; 
         if(benBuMasadaMiyim) gelişmişKoltukHizala(koltuklar); 
     } 
@@ -681,6 +687,47 @@ function masayiTemizle() { masaOyunBasladiMi = false; const flash = document.get
 function checkGosterge() { gostergeBtn.style.display = 'none'; if(!gostergeHakki || !benimSiramMi) return; let gostergeDiv = document.getElementById('gostergeTasi'); if(gostergeDiv.innerText) { let gSayi = gostergeDiv.innerText; let renkClass = Array.from(gostergeDiv.classList).find(c => c.startsWith('tas-')); if(!renkClass) return; let gRenk = renkClass.replace('tas-', ''); let varMi = false; for(let i=0; i<24; i++) { let yuva = document.getElementById('y'+i); if(yuva.children.length > 0) { let t = yuva.children[0]; let tRenkClass = Array.from(t.classList).find(c => c.startsWith('tas-')); if(tRenkClass) { let tRenk = tRenkClass.replace('tas-', ''); if(tRenk === gRenk && t.innerText === gSayi) varMi = true; } } } if(varMi) gostergeBtn.style.display = 'block'; } }
 function elimdekiTasSayisi() { let sayi = 0; for(let i=0; i<24; i++) { if(document.getElementById('y'+i).children.length > 0) sayi++; } return sayi; }
 function getIstakaGruplari() { let gruplar = []; let currentGrup = []; for(let i=0; i<24; i++) { if(i === 12 && currentGrup.length > 0) { gruplar.push(currentGrup); currentGrup = []; } let yuva = document.getElementById('y'+i); if(yuva.children.length > 0) { let tas = yuva.children[0]; let renkClass = Array.from(tas.classList).find(c => c.startsWith('tas-')); let renk = renkClass ? renkClass.replace('tas-', '') : ''; currentGrup.push({ id: tas.id, renk: renk, sayi: tas.innerText }); } else { if(currentGrup.length > 0) { gruplar.push(currentGrup); currentGrup = []; } } } if(currentGrup.length > 0) gruplar.push(currentGrup); return gruplar; }
+
+// İŞTE SENİN GÜZEL TUŞLARININ BEYNİ BURADA!
+window.seriDiz = function() { 
+    let taslar = []; 
+    for(let i=0; i<24; i++) { 
+        let yuva = document.getElementById('y'+i); 
+        if(yuva.children.length > 0) { 
+            let tas = yuva.children[0]; 
+            let renkClass = Array.from(tas.classList).find(c => c.startsWith('tas-')); 
+            let renk = renkClass ? renkClass.replace('tas-', '') : ''; 
+            taslar.push({ el: tas, renk: renk, sayi: parseInt(tas.innerText) || 0 }); 
+        } 
+    } 
+    const renkDeger = { 'kirmizi': 1, 'siyah': 2, 'mavi': 3, 'sari': 4, 'sahte': 5 }; 
+    taslar.sort((a, b) => { 
+        if (renkDeger[a.renk] !== renkDeger[b.renk]) return renkDeger[a.renk] - renkDeger[b.renk]; 
+        return a.sayi - b.sayi; 
+    }); 
+    taslar.forEach((tasObj, index) => { document.getElementById('y'+index).appendChild(tasObj.el); }); 
+    sesCal(sesTasCek); 
+};
+
+window.ciftDiz = function() { 
+    let taslar = []; 
+    for(let i=0; i<24; i++) { 
+        let yuva = document.getElementById('y'+i); 
+        if(yuva.children.length > 0) { 
+            let tas = yuva.children[0]; 
+            let renkClass = Array.from(tas.classList).find(c => c.startsWith('tas-')); 
+            let renk = renkClass ? renkClass.replace('tas-', '') : ''; 
+            taslar.push({ el: tas, renk: renk, sayi: parseInt(tas.innerText) || 0 }); 
+        } 
+    } 
+    taslar.sort((a, b) => { 
+        if (a.sayi !== b.sayi) return a.sayi - b.sayi; 
+        return a.renk.localeCompare(b.renk); 
+    }); 
+    taslar.forEach((tasObj, index) => { document.getElementById('y'+index).appendChild(tasObj.el); }); 
+    sesCal(sesTasCek); 
+};
+
 const sortableOptions = { group: { name: 'istaka', put: (to) => to.el.children.length === 0 }, animation: 100, delay: 0, forceFallback: true, fallbackOnBody: true, fallbackTolerance: 3, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag', easing: "cubic-bezier(0.25, 1, 0.5, 1)", onEnd: function() { sesCal(sesTasKoy); } };
 for(let i=0; i<12; i++) { const yUst = document.createElement('div'); yUst.className = 'yuva'; yUst.id = 'y'+i; ustRaf.appendChild(yUst); new Sortable(yUst, sortableOptions); const yAlt = document.createElement('div'); yAlt.className = 'yuva'; yAlt.id = 'y'+(i+12); altRaf.appendChild(yAlt); new Sortable(yAlt, sortableOptions); }
 new Sortable(document.getElementById('benimIskartam'), { group: { name: 'istaka', put: function (to) { return benimSiramMi && elimdekiTasSayisi() === 15; }, pull: false }, animation: 150, forceFallback: true, fallbackOnBody: true, emptyInsertThreshold: 100, onAdd: function (evt) { gostergeHakki = false; gostergeBtn.style.display = 'none'; document.getElementById('iskartaYazi').style.display = 'none'; const atilanTas = evt.item; atilanTas.style.position = 'absolute'; atilanTas.style.top = '50%'; atilanTas.style.left = '50%'; atilanTas.style.transform = 'translate(-50%, -50%)'; atilanTas.style.margin = '0'; let renkSinifi = Array.from(atilanTas.classList).find(c=>c.startsWith('tas-')); let renk = renkSinifi ? renkSinifi.split('-')[1] : 'siyah'; socket.emit('tas_atildi', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi, tas: { id: atilanTas.id, renk: renk, sayi: atilanTas.innerText } }); sesCal(sesTasKoy); } });
