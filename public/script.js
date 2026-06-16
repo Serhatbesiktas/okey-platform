@@ -55,8 +55,6 @@ if(oyunAlanObjeleri && oyunAlanObjeleri.firstElementChild) {
     oyunAlanObjeleri.firstElementChild.appendChild(gostergeBtn);
 }
 
-lobiEkrani.style.display = 'none'; masaEkrani.style.display = 'none'; vipHeader.style.display = 'none';
-
 window.ozelUyariGoster = function(mesaj) {
     document.getElementById('uyariModalMetni').innerText = mesaj;
     document.getElementById('uyariModalEkrani').style.display = 'flex';
@@ -145,6 +143,47 @@ document.getElementById('btnGiris').addEventListener('click', () => {
     });
 });
 
+// İŞTE EKSİK OLAN VIP MASA KURMA KOMUTLARI BURADA!
+window.vipMasaKurAksiyon = function() {
+    if(isMisafir) {
+        ozelUyariGoster("⚠️ Misafir hesaplar VIP Masa kuramaz! Lütfen kayıt ol patron.");
+        return;
+    }
+
+    let bahisDeger = parseInt(document.getElementById('vipMasaBahis').value);
+    let gizliDeger = document.getElementById('vipMasaGizlilik').value === "true";
+
+    if(benimAnlikCipim < bahisDeger) {
+        ozelUyariGoster("⚠️ Bu masayı kurmak için yeterli çipiniz yok patron!");
+        return;
+    }
+    
+    document.getElementById('vipMasaKurPanel').style.display = 'none';
+    socket.emit('vip_masa_kur', { sahibi: aktifKullaniciAdi, bahis: bahisDeger, gizli: gizliDeger });
+};
+
+window.vipGizlilikDurumuDegistir = function() {
+    if(!suAnkiMasam || !suAnkiMasaVIPMi || suAnkiMasaSahibi !== aktifKullaniciAdi) return;
+    socket.emit('vip_masa_gizlilik_degis', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi });
+};
+
+socket.on('vip_durum_guncelle', (data) => {
+    if(suAnkiMasam === data.masaAdi) {
+        suAnkiMasaGizliMi = data.gizli;
+        if(btnVipGizlilikTetikle) {
+            btnVipGizlilikTetikle.innerText = suAnkiMasaGizliMi ? "🔓 MASAYI HERKESE AÇ" : "🔒 MASAYI KİLİTLE";
+            btnVipGizlilikTetikle.style.background = suAnkiMasaGizliMi ? "#2ecc71" : "#ff33aa";
+        }
+    }
+});
+
+socket.on('vip_masa_kapandi', (data) => {
+    if(suAnkiMasam === data.masaAdi) {
+        alert("🚨 VIP oda sahibi masadan ayrıldığı için oda kapatıldı!");
+        masadanAyrilmaIslemi(false);
+    }
+});
+
 function gorevleriKaydet() {
     if(auth.currentUser && !isMisafir) {
         db.collection("kullanicilar").doc(auth.currentUser.uid).update({ gorevler: benimGorevler }).catch(e=>console.log(e));
@@ -154,7 +193,7 @@ function gorevleriKaydet() {
 window.gorevleriAc = function() {
     if(isMisafir) { ozelUyariGoster("⚠️ Misafir hesaplar görev yapamaz! Lütfen kayıt olun."); return; }
     const ekran = document.getElementById('gorevlerEkrani');
-    if(!ekran) { ozelUyariGoster("Sistem Hatası: Görev ekranı HTML'de bulunamadı!"); return; }
+    if(!ekran) return;
     ekran.style.display = 'flex';
     renderGorevler();
 }
@@ -240,7 +279,6 @@ window.profiliGoster = function(hedefIsim) {
         }
     }
 
-    // BOTLARA ÖZEL PROFİL EKRANI KORUMASI
     if(hedefIsim.startsWith("Bot_")) {
         pIsim.innerText = hedefIsim; pOynanan.innerText = "999+"; pKazanilan.innerText = "999+"; pCip.innerText = "Sınırsız"; kazanmaOrani.innerText = "%100";
         pDurum.innerText = "🟢 Çevrimiçi"; pDurum.style.color = "#2ecc71";
