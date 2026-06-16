@@ -217,22 +217,10 @@ function kullaniciyiMasadanKaldir(isim) {
                 masalar[m].koltuklar[index] = null; 
             }
 
-            // VIP Masa Temizleyici
-            if (masalar[m].isVIP) {
-                if (masalar[m].sahibi === isim) {
-                    io.emit('vip_masa_kapandi', { masaAdi: m });
-                    delete masalar[m];
-                } else {
-                    let humanCount = masalar[m].koltuklar.filter(k => k !== null && !k.startsWith('Bot_')).length;
-                    if (humanCount === 0) delete masalar[m];
-                }
-            } else {
-                if(masalar[m].koltuklar.every(k => k === null || k.startsWith('Bot_'))) {
-                    oyunuSifirla(m, null, 0, "Masada kimse kalmadı.");
-                    masalar[m].koltuklar = [null, null, null, null]; 
-                }
+            if(masalar[m].koltuklar.every(k => k === null || k.startsWith('Bot_'))) {
+                oyunuSifirla(m, null, 0, "Masada kimse kalmadı.");
+                masalar[m].koltuklar = [null, null, null, null]; 
             }
-
             const guncelLobi = {};
             for(let m in masalar) guncelLobi[m] = masalar[m].koltuklar;
             io.emit('masalari_guncelle', guncelLobi);
@@ -251,13 +239,21 @@ io.on('connection', (socket) => {
       let dbCip = typeof data === 'object' ? data.cip : 250000;
       let dbKozmetikler = typeof data === 'object' && data.kozmetikler ? data.kozmetikler : []; 
       
-      if(banliKullanicilar.has(isim)) { socket.emit('admin_islem_uyarisi', { isim: isim, islem: 'ban' }); return; }
-      if(baglantiKopanlar[isim]) { clearTimeout(baglantiKopanlar[isim]); delete baglantiKopanlar[isim]; }
+      if(banliKullanicilar.has(isim)) {
+          socket.emit('admin_islem_uyarisi', { isim: isim, islem: 'ban' });
+          return;
+      }
+
+      if(baglantiKopanlar[isim]) {
+          clearTimeout(baglantiKopanlar[isim]);
+          delete baglantiKopanlar[isim];
+      }
 
       socket.kullaniciAdi = isim;
       oyuncuCipleri[isim] = Number(dbCip); 
       oyuncuKozmetikleri[isim] = dbKozmetikler; 
 
+      socket.emit('cip_guncelle', oyuncuCipleri[isim]);
       io.emit('admin_guncel_veri', oyuncuCipleri);
       io.emit('kozmetikleri_guncelle', oyuncuKozmetikleri); 
       io.emit('online_oyuncular', Object.keys(oyuncuCipleri));
@@ -270,53 +266,7 @@ io.on('connection', (socket) => {
           }
       }
       if(masaBulundu) {
-          socket.emit('sen_masadasin', { masaAdi: masaBulundu, isVIP: masalar[masaBulundu].isVIP || false, sahibi: masalar[masaBulundu].sahibi || "", gizli: masalar[masaBulundu].gizli || false });
-      }
-  });
-
-  socket.on('vip_masa_kur', (data) => {
-      let miktar = Number(data.bahis);
-      if(oyuncuCipleri[data.sahibi] < miktar) {
-          socket.emit('hata_mesaji', "Yetersiz Bakiye! VIP masa kurmak için çipiniz yetersiz.");
-          return;
-      }
-      const vMasaAdi = `👑 VIP: ${data.sahibi}'nin Masası`;
-      masalar[vMasaAdi] = {
-          bahis: miktar,
-          kasa: 0,
-          koltuklar: [data.sahibi, null, null, null],
-          deste: [],
-          gosterge: null,
-          oyunBasladi: false,
-          siradakiOyuncu: null,
-          eller: {},
-          gostergeGosterildi: false,
-          isVIP: true,
-          sahibi: data.sahibi,
-          gizli: data.gizli,
-          davetliler: []
-      };
-      socket.emit('sen_masadasin', { masaAdi: vMasaAdi, isVIP: true, sahibi: data.sahibi, gizli: data.gizli });
-      
-      const guncelLobi = {};
-      for(let m in masalar) guncelLobi[m] = masalar[m].koltuklar;
-      io.emit('masalari_guncelle', guncelLobi);
-  });
-
-  socket.on('vip_masa_gizlilik_degis', (data) => {
-      const masa = masalar[data.masaAdi];
-      if (masa && masa.sahibi === data.isim) {
-          masa.gizli = !masa.gizli;
-          io.emit('yeni_sohbet_mesaji', { 
-              masaAdi: data.masaAdi, 
-              isim: "Sistem", 
-              mesaj: `🔒 Oda durumu güncellendi: ${masa.gizli ? 'SADECE DAVETLİLER' : 'HERKESE AÇIK'}`, 
-              kozmetikler: [] 
-          });
-          io.emit('vip_durum_guncelle', { masaAdi: data.masaAdi, gizli: masa.gizli });
-          const guncelLobi = {};
-          for(let m in masalar) guncelLobi[m] = masalar[m].koltuklar;
-          io.emit('masalari_guncelle', guncelLobi);
+          socket.emit('sen_masadasin', masaBulundu);
       }
   });
 
@@ -342,10 +292,6 @@ io.on('connection', (socket) => {
   });
 
   socket.on('masaya_davet_et', (data) => {
-      const masa = masalar[data.masaAdi];
-      if (masa && masa.isVIP) {
-          if (!masa.davetliler.includes(data.kime)) masa.davetliler.push(data.kime);
-      }
       io.emit('davet_geldi', data);
   });
 
@@ -356,14 +302,6 @@ io.on('connection', (socket) => {
             socket.emit('hata_mesaji', `Yeterli çipiniz yok! Bu masanın bahsi: ${masa.bahis.toLocaleString()} ÇİP.`);
             return;
         }
-        
-        if (masa.isVIP && masa.gizli && masa.sahibi !== data.isim) {
-            if (!masa.davetliler || !masa.davetliler.includes(data.isim)) {
-                socket.emit('hata_mesaji', "🚫 Bu VIP masa kilitlidir! Sadece oda sahibinin davet ettiği kişiler girebilir.");
-                return;
-            }
-        }
-
         const bosKoltukIndex = masa.koltuklar.indexOf(null);
         if (bosKoltukIndex !== -1) {
             masa.koltuklar[bosKoltukIndex] = data.isim;
@@ -397,9 +335,7 @@ io.on('connection', (socket) => {
             }
         });
         
-        io.emit('masa_kasa_guncelle', { masaAdi: masaAdi, kasa: masa.kasa });
         masa.deste = desteYaratVeKaristir(); 
-        
         let secilenGosterge = masa.deste.pop();
         while (secilenGosterge.renk === 'sahte') {
             masa.deste.unshift(secilenGosterge); 
@@ -410,16 +346,21 @@ io.on('connection', (socket) => {
         const baslayacakOyuncu = masa.koltuklar[Math.floor(Math.random() * 4)];
         masa.siradakiOyuncu = baslayacakOyuncu;
         masa.eller = {}; 
-        
-        io.emit('masa_oyun_basladi', { masaAdi: masaAdi, gosterge: masa.gosterge, kalanTas: masa.deste.length, kasa: masa.kasa });
-        io.emit('sistem_mesaji', `🎰 Bahisler alındı! Oyun başladı. Elinde gösterge olan butona bassın!`);
 
+        // 105 BUG'INI KÖKÜNDEN ÇÖZEN BÖLÜM: Önce taşları dağıt, SONRA oyunu başlat emrini gönder!
         masa.koltuklar.forEach(oyuncuIsmi => {
             const kacTasAlacak = (oyuncuIsmi === baslayacakOyuncu) ? 15 : 14;
             const oyuncununTaslari = masa.deste.splice(0, kacTasAlacak); 
             masa.eller[oyuncuIsmi] = oyuncununTaslari; 
+        });
+        
+        // Artık masa.deste.length kesinlikle 48!
+        io.emit('masa_oyun_basladi', { masaAdi: masaAdi, gosterge: masa.gosterge, kalanTas: masa.deste.length, kasa: masa.kasa });
+        io.emit('sistem_mesaji', `🎰 Bahisler alındı! Oyun başladı. Elinde gösterge olan butona bassın!`);
+
+        masa.koltuklar.forEach(oyuncuIsmi => {
             if(!oyuncuIsmi.startsWith('Bot_')) {
-                io.emit('taslari_al', { kime: oyuncuIsmi, taslar: oyuncununTaslari });
+                io.emit('taslari_al', { kime: oyuncuIsmi, taslar: masa.eller[oyuncuIsmi] });
             }
         });
         
