@@ -1,5 +1,5 @@
 const express = require('express');
-const app = express();
+const app = report = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http, {
   cors: { origin: "*", methods: ["GET", "POST"] }
@@ -12,6 +12,7 @@ const oyuncuKozmetikleri = {};
 const banliKullanicilar = new Set(); 
 const baglantiKopanlar = {}; 
 
+// Standart Sabit Masalar
 const masalar = {
     'Acemiler (20K Bahis)': { bahis: 20000, kasa: 0, koltuklar: [null, null, null, null], deste: [], gosterge: null, oyunBasladi: false, siradakiOyuncu: null, eller: {}, gostergeGosterildi: false },
     'Usta Masası (50K Bahis)': { bahis: 50000, kasa: 0, koltuklar: [null, null, null, null], deste: [], gosterge: null, oyunBasladi: false, siradakiOyuncu: null, eller: {}, gostergeGosterildi: false },
@@ -50,7 +51,6 @@ function oyunuSifirla(masaAdi, kazanan = null, odul = 0, sebep = "", okeyleBitti
     }
 }
 
-// İŞTE SİSTEMİN BEYNİ: Artık 12-11-10 dizilimini de tanıyor!
 function eliKontrolEt(gruplar, gosterge) {
     if (!gosterge) return false;
     let okeySayi = gosterge.sayi === 13 ? 1 : parseInt(gosterge.sayi) + 1;
@@ -95,15 +95,14 @@ function eliKontrolEt(gruplar, gosterge) {
         }
         if (colors.size !== normalTiles.length) isAyniSayi = false; 
 
-        let isSeriArtan = true; // Küçükten büyüğe (10-11-12)
-        let isSeriAzalan = true; // Büyükten küçüğe (12-11-10)
+        let isSeriArtan = true; 
+        let isSeriAzalan = true; 
         let firstNormalIdx = grup.findIndex(t => !getEffectiveTile(t).isOkey);
 
         if (firstNormalIdx !== -1) {
             let cSayi = getEffectiveTile(grup[firstNormalIdx]).sayi;
             let cRenk = getEffectiveTile(grup[firstNormalIdx]).renk;
             
-            // ARTAN (Küçükten Büyüğe) KONTROL
             let expFwdArtan = cSayi;
             for (let i = firstNormalIdx + 1; i < grup.length; i++) {
                 expFwdArtan = expFwdArtan === 13 ? 1 : expFwdArtan + 1;
@@ -117,7 +116,6 @@ function eliKontrolEt(gruplar, gosterge) {
                 if (!eff.isOkey) { if (eff.renk !== cRenk || eff.sayi !== expBwdArtan) { isSeriArtan = false; break; } }
             }
 
-            // AZALAN (Büyükten Küçüğe) KONTROL (Senin kullandığın stil!)
             let expFwdAzalan = cSayi;
             for (let i = firstNormalIdx + 1; i < grup.length; i++) {
                 expFwdAzalan = expFwdAzalan === 1 ? 13 : expFwdAzalan - 1;
@@ -130,13 +128,10 @@ function eliKontrolEt(gruplar, gosterge) {
                 let eff = getEffectiveTile(grup[i]);
                 if (!eff.isOkey) { if (eff.renk !== cRenk || eff.sayi !== expBwdAzalan) { isSeriAzalan = false; break; } }
             }
-
         } else { 
-            isSeriArtan = false; 
-            isSeriAzalan = false; 
+            isSeriArtan = false; isSeriAzalan = false; 
         }
 
-        // Ya renkleri aynı, ya küçükten büyüğe seri, ya da büyükten küçüğe seri olmak zorunda!
         if (!isAyniSayi && !isSeriArtan && !isSeriAzalan) return false;
     }
     return true;
@@ -223,10 +218,22 @@ function kullaniciyiMasadanKaldir(isim) {
                 masalar[m].koltuklar[index] = null; 
             }
 
-            if(masalar[m].koltuklar.every(k => k === null || k.startsWith('Bot_'))) {
-                oyunuSifirla(m, null, 0, "Masada kimse kalmadı.");
-                masalar[m].koltuklar = [null, null, null, null]; 
+            // YENİ: Akıllı VIP Temizlik Kalkanı (Hayalet Masa Engelleme)
+            if (masalar[m].isVIP) {
+                if (masalar[m].sahibi === isim) {
+                    io.emit('vip_masa_kapandi', { masaAdi: m });
+                    delete masalar[m];
+                } else {
+                    let humanCount = masalar[m].koltuklar.filter(k => k !== null && !k.startsWith('Bot_')).length;
+                    if (humanCount === 0) delete masalar[m];
+                }
+            } else {
+                if(masalar[m].koltuklar.every(k => k === null || k.startsWith('Bot_'))) {
+                    oyunuSifirla(m, null, 0, "Masada kimse kalmadı.");
+                    masalar[m].koltuklar = [null, null, null, null]; 
+                }
             }
+
             const guncelLobi = {};
             for(let m in masalar) guncelLobi[m] = masalar[m].koltuklar;
             io.emit('masalari_guncelle', guncelLobi);
@@ -259,6 +266,7 @@ io.on('connection', (socket) => {
       oyuncuCipleri[isim] = Number(dbCip); 
       oyuncuKozmetikleri[isim] = dbKozmetikler; 
 
+      socket.emit('cip_guncelle', oyuncuCipleri[isim]);
       io.emit('admin_guncel_veri', oyuncuCipleri);
       io.emit('kozmetikleri_guncelle', oyuncuKozmetikleri); 
       io.emit('online_oyuncular', Object.keys(oyuncuCipleri));
@@ -271,7 +279,55 @@ io.on('connection', (socket) => {
           }
       }
       if(masaBulundu) {
-          socket.emit('sen_masadasin', masaBulundu);
+          socket.emit('sen_masadasin', { masaAdi: masaBulundu, isVIP: masalar[masaBulundu].isVIP || false, sahibi: masalar[masaBulundu].sahibi || "", gizli: masalar[masaBulundu].gizli || false });
+      }
+  });
+
+  // YENİ: Dinamik VIP Masa Kurma İsteği
+  socket.on('vip_masa_kur', (data) => {
+      let miktar = Number(data.bahis);
+      if(oyuncuCipleri[data.sahibi] < miktar) {
+          socket.emit('hata_mesaji', "Yetersiz Bakiye! VIP masa kurmak için çipiniz yetersiz.");
+          return;
+      }
+      const vMasaAdi = `👑 VIP: ${data.sahibi}'nin Masası`;
+      masalar[vMasaAdi] = {
+          bahis: miktar,
+          kasa: 0,
+          koltuklar: [data.sahibi, null, null, null],
+          deste: [],
+          gosterge: null,
+          oyunBasladi: false,
+          siradakiOyuncu: null,
+          eller: {},
+          gostergeGosterildi: false,
+          isVIP: true,
+          sahibi: data.sahibi,
+          gizli: data.gizli, // true = Kilitli (Sadece davet), false = Herkese Açık
+          davetliler: []
+      };
+      socket.emit('sen_masadasin', { masaAdi: vMasaAdi, isVIP: true, sahibi: data.sahibi, gizli: data.gizli });
+      
+      const guncelLobi = {};
+      for(let m in masalar) guncelLobi[m] = masalar[m].koltuklar;
+      io.emit('masalari_guncelle', guncelLobi);
+  });
+
+  // YENİ: Masada Kilit Durumu Değiştirme (Gizlilik Ayarı)
+  socket.on('vip_masa_gizlilik_degis', (data) => {
+      const masa = masalar[data.masaAdi];
+      if (masa && masa.sahibi === data.isim) {
+          masa.gizli = !masa.gizli;
+          io.emit('yeni_sohbet_mesaji', { 
+              masaAdi: data.masaAdi, 
+              isim: "Sistem", 
+              mesaj: `🔒 Oda durumu güncellendi: ${masa.gizli ? 'SADECE DAVETLİLER' : 'HERKESE AÇIK'}`, 
+              kozmetikler: [] 
+          });
+          io.emit('vip_durum_guncelle', { masaAdi: data.masaAdi, gizli: masa.gizli });
+          const guncelLobi = {};
+          for(let m in masalar) guncelLobi[m] = masalar[m].koltuklar;
+          io.emit('masalari_guncelle', guncelLobi);
       }
   });
 
@@ -287,16 +343,11 @@ io.on('connection', (socket) => {
       io.emit('kozmetikleri_guncelle', oyuncuKozmetikleri);
   });
 
-  socket.on('liderlik_tablosu_iste', () => {
-      const siraliList = Object.entries(oyuncuCipleri)
-          .map(entry => ({ isim: entry[0], cip: entry[1] }))
-          .filter(k => !k.isim.startsWith('MİSAFİR_')) 
-          .sort((a, b) => b.cip - a.cip)
-          .slice(0, 10);
-      socket.emit('liderlik_tablosu_guncelle', siraliList);
-  });
-
   socket.on('masaya_davet_et', (data) => {
+      const masa = masalar[data.masaAdi];
+      if (masa && masa.isVIP) {
+          if (!masa.davetliler.includes(data.kime)) masa.davetliler.push(data.kime);
+      }
       io.emit('davet_geldi', data);
   });
 
@@ -307,6 +358,15 @@ io.on('connection', (socket) => {
             socket.emit('hata_mesaji', `Yeterli çipiniz yok! Bu masanın bahsi: ${masa.bahis.toLocaleString()} ÇİP.`);
             return;
         }
+        
+        // YENİ: VIP Davetiye Kalkanı Kontrolü
+        if (masa.isVIP && masa.gizli && masa.sahibi !== data.isim) {
+            if (!masa.davetliler || !masa.davetliler.includes(data.isim)) {
+                socket.emit('hata_mesaji', "🚫 Bu VIP masa kilitlidir! Sadece oda sahibinin davet ettiği şanslı kişiler girebilir.");
+                return;
+            }
+        }
+
         const bosKoltukIndex = masa.koltuklar.indexOf(null);
         if (bosKoltukIndex !== -1) {
             masa.koltuklar[bosKoltukIndex] = data.isim;
@@ -378,7 +438,7 @@ io.on('connection', (socket) => {
       if(masa && masa.oyunBasladi && !masa.gostergeGosterildi) {
           const hasTile = masa.eller[data.isim].some(t => t.renk === masa.gosterge.renk && t.sayi === masa.gosterge.sayi);
           if(hasTile) {
-              masa.gostergeGosterildi = true;
+              true; masa.gostergeGosterildi = true;
               const odul = masa.bahis;
               oyuncuCipleri[data.isim] = Number(oyuncuCipleri[data.isim]) + Number(odul);
               io.emit('cip_guncelle_ozel', { isim: data.isim, cip: oyuncuCipleri[data.isim] });
