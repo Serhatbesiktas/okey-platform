@@ -190,7 +190,9 @@ function botHamlesiYap(masaAdi) {
     }
 }
 
+// İŞTE BURASI: Artık tek bir masadan değil, sıkıştığı bütün masalardan temizleniyor! (HAYALET MASA FİXİ)
 function kullaniciyiMasadanKaldir(isim) {
+    let degisiklikOldu = false;
     for(let m in masalar) {
         let index = masalar[m].koltuklar.indexOf(isim);
         if(index !== -1) {
@@ -221,11 +223,14 @@ function kullaniciyiMasadanKaldir(isim) {
                 oyunuSifirla(m, null, 0, "Masada kimse kalmadı.");
                 masalar[m].koltuklar = [null, null, null, null]; 
             }
-            const guncelLobi = {};
-            for(let m in masalar) guncelLobi[m] = masalar[m].koltuklar;
-            io.emit('masalari_guncelle', guncelLobi);
-            break;
+            degisiklikOldu = true;
         }
+    }
+    
+    if(degisiklikOldu) {
+        const guncelLobi = {};
+        for(let m in masalar) guncelLobi[m] = masalar[m].koltuklar;
+        io.emit('masalari_guncelle', guncelLobi);
     }
 }
 
@@ -296,6 +301,11 @@ io.on('connection', (socket) => {
   });
 
   socket.on('masaya_otur', (data) => {
+    // İŞTE BURASI: Hayalet bug'ını engelleyen ZIRH! Zaten bir masadaysa yenisine ASLA oturtma.
+    for(let m in masalar) {
+        if(masalar[m].koltuklar.includes(data.isim)) return;
+    }
+
     const masa = masalar[data.masaAdi];
     if (masa && !masa.koltuklar.includes(data.isim)) {
         if(oyuncuCipleri[data.isim] < masa.bahis) {
@@ -346,15 +356,13 @@ io.on('connection', (socket) => {
         const baslayacakOyuncu = masa.koltuklar[Math.floor(Math.random() * 4)];
         masa.siradakiOyuncu = baslayacakOyuncu;
         masa.eller = {}; 
-
-        // 105 BUG'INI KÖKÜNDEN ÇÖZEN BÖLÜM: Önce taşları dağıt, SONRA oyunu başlat emrini gönder!
+        
         masa.koltuklar.forEach(oyuncuIsmi => {
             const kacTasAlacak = (oyuncuIsmi === baslayacakOyuncu) ? 15 : 14;
             const oyuncununTaslari = masa.deste.splice(0, kacTasAlacak); 
             masa.eller[oyuncuIsmi] = oyuncununTaslari; 
         });
         
-        // Artık masa.deste.length kesinlikle 48!
         io.emit('masa_oyun_basladi', { masaAdi: masaAdi, gosterge: masa.gosterge, kalanTas: masa.deste.length, kasa: masa.kasa });
         io.emit('sistem_mesaji', `🎰 Bahisler alındı! Oyun başladı. Elinde gösterge olan butona bassın!`);
 
