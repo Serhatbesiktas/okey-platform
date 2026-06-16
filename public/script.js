@@ -564,9 +564,19 @@ btnHemenOynalar.forEach(btn => {
     });
 });
 
+// İŞTE ÇÖZÜMÜ BURADA: Lobi çizilirken isim VIP ise onu EN ÜSTE çıkartıyoruz!
 socket.on('masalari_guncelle', (lobidekiMasalar) => { 
     guncelMasalar = lobidekiMasalar; if(masalarAlani) masalarAlani.innerHTML = ''; 
-    for (const [masaAdi, koltuklar] of Object.entries(lobidekiMasalar)) { 
+    
+    const siraliMasalar = Object.entries(lobidekiMasalar).sort((a, b) => {
+        let aIsVIP = a[0].includes('👑 VIP:');
+        let bIsVIP = b[0].includes('👑 VIP:');
+        if(aIsVIP && !bIsVIP) return -1; // A VIP ise üste at
+        if(!aIsVIP && bIsVIP) return 1;  // B VIP ise üste at
+        return 0; // İkisi de aynıysa sırayı bozma
+    });
+
+    for (const [masaAdi, koltuklar] of siraliMasalar) { 
         const doluKoltukSayisi = koltuklar.filter(k => k !== null).length; const benBuMasadaMiyim = koltuklar.includes(aktifKullaniciAdi); 
         const action = benBuMasadaMiyim ? `masayaGeriDon('${masaAdi}')` : `masayaOtur('${masaAdi}')`; const btnMetni = benBuMasadaMiyim ? 'OTURDUN ✓' : (doluKoltukSayisi>=4 ? 'DOLU' : 'OTUR');
         
@@ -688,7 +698,7 @@ function checkGosterge() { gostergeBtn.style.display = 'none'; if(!gostergeHakki
 function elimdekiTasSayisi() { let sayi = 0; for(let i=0; i<24; i++) { if(document.getElementById('y'+i).children.length > 0) sayi++; } return sayi; }
 function getIstakaGruplari() { let gruplar = []; let currentGrup = []; for(let i=0; i<24; i++) { if(i === 12 && currentGrup.length > 0) { gruplar.push(currentGrup); currentGrup = []; } let yuva = document.getElementById('y'+i); if(yuva.children.length > 0) { let tas = yuva.children[0]; let renkClass = Array.from(tas.classList).find(c => c.startsWith('tas-')); let renk = renkClass ? renkClass.replace('tas-', '') : ''; currentGrup.push({ id: tas.id, renk: renk, sayi: tas.innerText }); } else { if(currentGrup.length > 0) { gruplar.push(currentGrup); currentGrup = []; } } } if(currentGrup.length > 0) gruplar.push(currentGrup); return gruplar; }
 
-// İŞTE SENİN GÜZEL TUŞLARININ BEYNİ BURADA!
+// BÜTÜN TUŞLAR DAHİL!
 window.seriDiz = function() { 
     let taslar = []; 
     for(let i=0; i<24; i++) { 
