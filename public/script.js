@@ -18,7 +18,6 @@ let onlineOyuncularListesi = [];
 let masaOyunBasladiMi = false; 
 let cikisIcinBekleyenLogout = false; 
 
-// YENİ: Görev Takip Değişkeni (Sadece telefonda çalışır, sunucuyu yormaz)
 let benimGorevler = { kazanma: 0, mesaj: 0, gosterge: 0, tarih: "", alinanlar: {} };
 
 const sesTasCek = new Audio('sounds/tas_cek.mp3');
@@ -141,14 +140,12 @@ document.getElementById('btnGiris').addEventListener('click', () => {
     });
 });
 
-// YENİ: Görevleri Veritabanına Kaydetme
 function gorevleriKaydet() {
     if(auth.currentUser && !isMisafir) {
         db.collection("kullanicilar").doc(auth.currentUser.uid).update({ gorevler: benimGorevler }).catch(e=>console.log(e));
     }
 }
 
-// YENİ: Arayüzden Görev Ekranını Açma ve Çizme
 window.gorevleriAc = function() {
     if(isMisafir) { ozelUyariGoster("⚠️ Misafir hesaplar görev yapamaz! Lütfen kayıt olun."); return; }
     const ekran = document.getElementById('gorevlerEkrani');
@@ -194,7 +191,6 @@ function renderGorevler() {
     });
 }
 
-// YENİ: Telefonda çipi ekleyip animasyonla yansıtan fonksiyon
 window.gorevOduluAl = function(id, miktar) {
     if(benimGorevler.alinanlar[id]) return;
     benimGorevler.alinanlar[id] = true;
@@ -491,13 +487,25 @@ socket.on('davet_geldi', (data) => {
     }
 });
 
+// İŞTE ÇÖZÜM: "OTURDUN ✓" butonuna tıklandığında seni tekrar oturmaya zorlamaz, direk masana fırlatır!
+window.masayaGeriDon = function(masaAdi) {
+    suAnkiMasam = masaAdi;
+    lobiEkrani.style.display = 'none'; masaEkrani.style.display = 'flex';
+    document.getElementById('masaOrtasiYazi').innerText = masaAdi.toUpperCase();
+    socket.emit('masaya_geri_don', { masaAdi: masaAdi, isim: aktifKullaniciAdi });
+};
+
 socket.on('masalari_guncelle', (lobidekiMasalar) => { 
     guncelMasalar = lobidekiMasalar; 
     if(masalarAlani) masalarAlani.innerHTML = ''; 
     for (const [masaAdi, koltuklar] of Object.entries(lobidekiMasalar)) { 
         const doluKoltukSayisi = koltuklar.filter(k => k !== null).length; 
         const benBuMasadaMiyim = koltuklar.includes(aktifKullaniciAdi); 
-        const html = `<div class="masa-kart"><div class="masa-watermark"></div><div class="kart-sol"><div class="zar-kutu">🎲</div><div class="masa-kart-isim">${masaAdi}</div></div><div class="kart-sag"><div class="masa-kisi-kutu">🎲 ${doluKoltukSayisi}/4</div><button class="btn-otur ${benBuMasadaMiyim || doluKoltukSayisi>=4 ? 'disabled':''}" style="${benBuMasadaMiyim ? 'background:#2ecc71;color:#111;':''}" onclick="masayaOtur('${masaAdi}')">${benBuMasadaMiyim ? 'OTURDUN ✓' : (doluKoltukSayisi>=4 ? 'DOLU' : 'OTUR')}</button></div></div>`; 
+        
+        const action = benBuMasadaMiyim ? `masayaGeriDon('${masaAdi}')` : `masayaOtur('${masaAdi}')`;
+        const btnMetni = benBuMasadaMiyim ? 'OTURDUN ✓' : (doluKoltukSayisi>=4 ? 'DOLU' : 'OTUR');
+
+        const html = `<div class="masa-kart"><div class="masa-watermark"></div><div class="kart-sol"><div class="zar-kutu">🎲</div><div class="masa-kart-isim">${masaAdi}</div></div><div class="kart-sag"><div class="masa-kisi-kutu">🎲 ${doluKoltukSayisi}/4</div><button class="btn-otur ${benBuMasadaMiyim || doluKoltukSayisi>=4 ? 'disabled':''}" style="${benBuMasadaMiyim ? 'background:#2ecc71;color:#111;':''}" onclick="${action}">${btnMetni}</button></div></div>`; 
         if(masalarAlani) masalarAlani.innerHTML += html; 
         if(benBuMasadaMiyim) gelişmişKoltukHizala(koltuklar); 
     } 
@@ -525,10 +533,19 @@ window.masayaOtur = function(masaAdi) {
 
 if(oyunuBaslatBtn) oyunuBaslatBtn.addEventListener('click', () => { socket.emit('oyunu_baslat', suAnkiMasam); });
 
-const btnRastgeleOyna = document.getElementById('btnRastgeleOyna');
-if(btnRastgeleOyna) {
-    btnRastgeleOyna.addEventListener('click', () => { 
+// KUSURSUZ HEMEN OYNA: Zaten bir masadaysan seni o masaya yollar, değilsen rastgele boş masaya!
+const btnHemenOynalar = document.querySelectorAll('.btn-hemen-oyna');
+btnHemenOynalar.forEach(btn => {
+    btn.addEventListener('click', () => { 
         if (suAnkiMasam) return; 
+        
+        for (const [m, koltuklar] of Object.entries(guncelMasalar)) {
+            if (koltuklar.includes(aktifKullaniciAdi)) {
+                masayaGeriDon(m);
+                return;
+            }
+        }
+
         let musaitMasa = null; 
         for (const [masaAdi, koltuklar] of Object.entries(guncelMasalar)) { 
             if (koltuklar.filter(k => k !== null).length < 4) { musaitMasa = masaAdi; break; } 
@@ -536,7 +553,7 @@ if(btnRastgeleOyna) {
         if (musaitMasa) masayaOtur(musaitMasa); 
         else ozelUyariGoster("Şu an tüm genel masalar tam kapasite dolu, patron!"); 
     });
-}
+});
 
 socket.on('cip_guncelle_ozel', (data) => { 
     if(data.isim === aktifKullaniciAdi) {
@@ -605,6 +622,7 @@ socket.on('oyun_bitti', (data) => {
             if(data.kazanan === aktifKullaniciAdi) {
                 userRef.update({ oynananOyun: firebase.firestore.FieldValue.increment(1), kazanilanOyun: firebase.firestore.FieldValue.increment(1) });
                 benimKazanilanOyun++; 
+                
                 benimGorevler.kazanma++; gorevleriKaydet();
                 arayuzGuncelle(); 
             } else {
