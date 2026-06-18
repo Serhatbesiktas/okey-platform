@@ -24,6 +24,17 @@
         </div>
     </div>
 
+    <div id="masaDavetEkrani" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:99999; flex-direction:column; justify-content:center; align-items:center;">
+        <div class="magaza-kutu" style="max-height: 85vh; display: flex; flex-direction: column; width: 95%; max-width: 400px; border:2px solid #ff33aa; box-shadow: 0 0 20px rgba(255, 51, 170, 0.4);">
+            <div class="magaza-header" style="border-bottom: 1px solid #ff33aa; padding-bottom: 10px; margin-bottom: 15px;">
+                <h2 style="color:#ff33aa;">👥 OYUNCU DAVET ET</h2>
+                <button onclick="document.getElementById('masaDavetEkrani').style.display='none'" style="background:none;border:none;color:#e74c3c;font-size:24px;cursor:pointer;font-weight:bold;">X</button>
+            </div>
+            <p style="color:#a3c4bc; font-size:12px; text-align:center; margin-bottom:15px;">Aşağıdan aktif oyuncuları seçip masana çağırabilirsin patron.</p>
+            <div id="masaDavetListesi" style="overflow-y:auto; padding-right:5px; flex:1; display:flex; flex-direction:column; gap:10px;"></div>
+        </div>
+    </div>
+
     <div id="vipMasaKurPanel" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:9999999; flex-direction:column; justify-content:center; align-items:center;">
         <div class="magaza-kutu" style="max-width: 320px; text-align:center; border:2px solid #ff33aa; box-shadow: 0 0 25px #ff33aa;">
             <h2 style="color:#ff33aa; font-size:22px; margin-bottom:15px; text-shadow:0 0 10px #ff33aa;">👑 VIP MASA AYARLARI</h2>
@@ -56,6 +67,15 @@
             </div>
             <p style="color:#a3c4bc; font-size:12px; text-align:center; margin-bottom:15px;">Her gece saat 00:00'da görevler yenilenir. Çipleri kap patron!</p>
             <div id="gorevListesi" style="display:flex; flex-direction:column; gap:10px; overflow-y:auto; padding-right:5px;"></div>
+        </div>
+    </div>
+
+    <div id="cezaBildirimEkrani" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:999999; flex-direction:column; justify-content:center; align-items:center;">
+        <div class="magaza-kutu" style="text-align:center; border: 3px solid #e74c3c; box-shadow: 0 0 30px rgba(231, 76, 60, 0.4);">
+            <div style="font-size:55px; margin-bottom:10px;">📉</div>
+            <h2 style="color:#e74c3c; margin-bottom:10px; text-shadow: 0 0 10px rgba(231, 76, 60, 0.5);">CEZA KESİLDİ!</h2>
+            <p style="color:#fff; font-size:14px; margin-bottom:20px;">Oyun ortasında masadan ayrıldığın için <strong id="cezaMiktarMetni" style="color:#f2c94c; font-size:16px;">...</strong> hesabından düşüldü.</p>
+            <button onclick="cezaAnladimKapat()" class="satin-al-btn" style="background:#e74c3c; color:#fff; font-size: 14px; padding: 12px;">ANLADIM</button>
         </div>
     </div>
 
@@ -92,7 +112,6 @@
 
             <div style="display:flex; flex-direction:column; gap:8px;">
                 <button id="profilArkadasBtn" onclick="profilArkadasAksiyon()" class="satin-al-btn" style="display:none; font-size:13px; padding:10px; font-weight:bold;"></button>
-                <button id="profilDavetBtn" onclick="profilDavetAksiyon()" class="satin-al-btn" style="display:none; background:#2ecc71; color:#fff; font-size:13px; padding:10px; font-weight:bold;">🎲 Masaya Davet Et</button>
             </div>
 
             <div id="profilEsyaFirlatAlani" style="display:none; flex-direction:column; gap:5px; margin-top:15px; border-top:1px solid rgba(255,255,255,0.1); padding-top:15px;">
@@ -104,7 +123,6 @@
                     <button onclick="esyaFirlatAksiyon('💣')" title="Bomba Yolla" style="background:#2c3e50; border:1px solid #e74c3c; border-radius:8px; padding:8px 12px; font-size:24px; cursor:pointer; transition:0.2s;">💣</button>
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -247,13 +265,10 @@
             <div id="lobidekilerListesi" style="display:flex; flex-direction:column; gap:5px;"></div>
         </div>
 
-        <button onclick="document.getElementById('vipMasaKurPanel').style.display='flex'" class="btn-hemen-oyna" style="bottom: 150px !important; background: linear-gradient(135deg, #ff33aa 0%, #aa33ff 100%) !important; box-shadow: 0 0 15px #ff33aa !important;">
-            👑 VIP Masa Kur <span>Özel janjanlı alan</span>
-        </button>
-
-        <button class="btn-hemen-oyna" id="btnRastgeleOyna">
-            ⚡ Hemen Oyna <span>Rastgele Masa</span>
-        </button>
+        <div style="display:flex; flex-direction:column; gap:10px; width:100%; margin-bottom: 80px;">
+            <button onclick="document.getElementById('vipMasaKurPanel').style.display='flex'" class="btn-hemen-oyna" style="background: linear-gradient(135deg, #ff33aa 0%, #aa33ff 100%); box-shadow: 0 0 15px #ff33aa;">👑 VIP Masa Kur <span>Özel janjanlı alan</span></button>
+            <button id="btnRastgeleOyna" class="btn-hemen-oyna">⚡ Hemen Oyna <span>Rastgele Masa</span></button>
+        </div>
 
         <div class="alt-menu-container" style="justify-content: space-around;">
             <div class="alt-menu-item active"><div class="alt-menu-ikon">🏠</div><span>Lobi</span></div>
@@ -296,6 +311,8 @@
 
         <div class="okey-table-ui">
             <button class="return-lobby-btn" id="lobiyeDonBtn">⬅ Lobiye Dön</button>
+            
+            <button class="return-lobby-btn" id="masaIciDavetBtn" onclick="masaIciDavetAc()" style="right:10px; left:auto; background:#f2c94c; color:#000;">➕ Davet Et</button>
             
             <div class="player-seat seat-top" id="seatTop" data-isim="" onclick="profiliGoster(this.dataset.isim)" style="cursor:pointer;">Bekleniyor...</div>
             <div class="player-seat seat-left" id="seatLeft" data-isim="" onclick="profiliGoster(this.dataset.isim)" style="cursor:pointer;">Bekleniyor...</div>
