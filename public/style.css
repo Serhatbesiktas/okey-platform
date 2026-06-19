@@ -158,15 +158,16 @@ body { background-color: #050d08; color: #fff; font-family: 'Segoe UI', Tahoma, 
 .offline-nokta { display: inline-block; width: 8px; height: 8px; background-color: #e74c3c; border-radius: 50%; margin-right: 5px; opacity: 0.5; }
 
 
-/* --- YENİ DÜZENLENMİŞ İLETİŞİM BUTONLARI --- */
+/* --- KUSURSUZ SOL SÜTUN İLETİŞİM BUTONLARI --- */
 
-/* 1. Ses Butonu (Lobide de görünsün diye z-index devasa yapıldı) */
+/* 1. Ses Butonu (Giriş ekranında gizlenmesi için z-index düşürüldü) */
 #sound-toggle-btn {
     position: fixed !important;
     top: 85px !important;    
     left: 15px !important;   
     right: auto !important;  
-    z-index: 99999 !important; /* Lobi dahil her yerde en üstte kalsın */
+    /* Giriş ekranı (authEkrani) 99999 z-index'e sahip, ses butonu arkada kalacak! */
+    z-index: 9998 !important; 
 }
 
 /* 2. Ortadaki Yeşil Sohbet Butonu (Sola Sabit) */
@@ -192,7 +193,7 @@ body { background-color: #050d08; color: #fff; font-family: 'Segoe UI', Tahoma, 
     margin: 0 !important;
 }
 
-/* 3. En Alttaki Mavi Mesaj Butonu (Sadece Genel Mesaj - Sola Sabit) */
+/* 3. Genel Mesaj Butonu (Sola Sabit) */
 #mesajlarBtn, #mesaj-btn, .genel-mesaj-btn {
     position: fixed !important;
     top: 195px !important;   
@@ -215,12 +216,12 @@ body { background-color: #050d08; color: #fff; font-family: 'Segoe UI', Tahoma, 
     margin: 0 !important;
 }
 
-/* 4. ÖZEL MESAJ BUTONU (Kurban giden buton sağdaki krallığına geri döndü!) */
+/* 4. ÖZEL MESAJ BUTONU (SAĞDAN SÖKÜLÜP SOLA GETİRİLDİ!) */
 #ozelMesajBtn, .ozel-mesaj-btn, [id*="ozel"] {
     position: fixed !important;
-    top: 85px !important;     /* Sağda rahat bir konuma aldım */
-    right: 15px !important;   /* SAĞA SABİTLEDİM */
-    left: auto !important;    /* Sol kuralını sildim */
+    top: 250px !important;    /* Genel Mesajın Hemen Altına */
+    left: 15px !important;    /* SOLA YASLANDI */
+    right: auto !important;   /* SAĞ İPTAL EDİLDİ */
     z-index: 9998 !important;
     width: 40px !important;
     height: 40px !important;
@@ -229,7 +230,7 @@ body { background-color: #050d08; color: #fff; font-family: 'Segoe UI', Tahoma, 
     justify-content: center !important;
     align-items: center !important;
     background: rgba(11, 38, 20, 0.8) !important;
-    border: 2px solid #e74c3c !important; /* Özel mesaja kırmızımsı şık bir renk verdim */
+    border: 2px solid #e74c3c !important; /* Özel mesajı ayırmak için kırmızımsı çerçeve */
     color: #fff !important;
     font-size: 20px !important;
     box-shadow: 0 0 10px rgba(231, 76, 60, 0.5) !important;
