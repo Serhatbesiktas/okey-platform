@@ -84,18 +84,15 @@ auth.onAuthStateChanged((user) => {
     if (user && !aktifKullaniciAdi) {
         db.collection("kullanicilar").doc(user.uid).get().then(doc => {
             let kayitliNick = ""; let bugun = new Date().toLocaleDateString('tr-TR');
-
             if(doc.exists && doc.data().isim) {
                 kayitliNick = doc.data().isim;
                 benimAnlikCipim = doc.data().cip !== undefined ? doc.data().cip : 250000;
                 if(isNaN(benimAnlikCipim) || benimAnlikCipim === null) benimAnlikCipim = 0;
-                
                 benimEnvanterim = doc.data().envanter || [];
                 aktifKozmetikler = doc.data().aktifKozmetikler || [];
                 sonBonusTarihim = doc.data().sonBonusTarihi || "";
                 benimArkadaslarim = doc.data().arkadaslar || []; 
                 benimKazanilanOyun = doc.data().kazanilanOyun || 0; 
-                
                 if(doc.data().gorevler) {
                     benimGorevler = doc.data().gorevler;
                     if(benimGorevler.tarih !== bugun) { benimGorevler = { kazanma: 0, mesaj: 0, gosterge: 0, tarih: bugun, alinanlar: {} }; }
@@ -190,8 +187,39 @@ window.gorevOduluAl = function(id, miktar) {
     ozelUyariGoster(`🎉 Görev tamamlandı! ${miktar.toLocaleString()} ÇİP hesabına eklendi!`); renderGorevler();
 }
 
+// İŞTE BURASI YENİLENDİ: Boş koltuğa tıklayınca online listeyi açıp kolayca davet etmeni sağlar!
+window.davetMenusuAc = function() {
+    if(isMisafir) { ozelUyariGoster("⚠️ Misafir hesaplar davet edemez."); return; }
+    const ekran = document.getElementById('arkadaslarEkrani');
+    const listeDiv = document.getElementById('arkadasListesiDiv');
+    const header = ekran.querySelector('h2');
+    if(header) header.innerText = "📥 OYUNCU DAVET ET";
+    
+    ekran.style.display = 'flex';
+    listeDiv.innerHTML = '<p style="color:#a3c4bc; font-size:11px; text-align:center; margin-bottom:10px;">Masaya çağırmak için aktif bir oyuncu seçin</p>';
+    
+    let onlineSayisi = 0;
+    onlineOyuncularListesi.forEach(oyuncu => {
+        if(oyuncu === aktifKullaniciAdi || oyuncu.startsWith('Bot_')) return; 
+        onlineSayisi++;
+        let kozmetikler = globalKozmetikler[oyuncu] || [];
+        let isimRenk = kozmetikler.includes('atesli_isim') ? '#ff4d4d' : '#fff';
+        let tac = kozmetikler.includes('neon_tac') ? '👑 ' : '';
+        let davetButonu = `<button class="btn-davet-et" style="background:#2ecc71; border:none; padding:6px 12px; border-radius:5px; color:#111; font-weight:bold; cursor:pointer;" onclick="masayaDavetEt('${oyuncu}')">Davet Et</button>`;
+        listeDiv.innerHTML += `<div class="lider-satir" style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.5); padding:10px; border-radius:8px; margin-bottom:5px;"><div style="color:${isimRenk}; font-weight:bold;"><span class="online-nokta"></span> ${tac}${oyuncu}</div>${davetButonu}</div>`;
+    });
+
+    if(onlineSayisi === 0) {
+        listeDiv.innerHTML += '<p style="text-align:center; color:#777; font-size:12px;">Şu an aktif başka oyuncu yok.</p>';
+    }
+};
+
 window.profiliGoster = function(hedefIsim) {
-    if(!hedefIsim || hedefIsim === "" || hedefIsim === "Bekleniyor...") return;
+    if(!hedefIsim || hedefIsim === "" || hedefIsim === "Bekleniyor...") {
+        if(suAnkiMasam) davetMenusuAc(); // Boş koltuğa tıklanırsa davet menüsü açılır!
+        return;
+    }
+    
     const pAvatar = document.getElementById('profilAvatarAlan'); const pIsim = document.getElementById('profilIsim'); const pOynanan = document.getElementById('profilOynanan'); const pKazanilan = document.getElementById('profilKazanilan'); const pCip = document.getElementById('profilCip'); const kazanmaOrani = document.getElementById('profilKazanmaOrani'); const pDurum = document.getElementById('profilDurumBadge'); const pArkadasBtn = document.getElementById('profilArkadasBtn'); const pDavetBtn = document.getElementById('profilDavetBtn'); const pLigBadge = document.getElementById('profilLigBadge'); const pUnvanBadge = document.getElementById('profilUnvanBadge'); const firlatAlani = document.getElementById('profilEsyaFirlatAlani');
     
     document.getElementById('profilEkrani').style.display = 'flex';
@@ -212,7 +240,7 @@ window.profiliGoster = function(hedefIsim) {
     if (hedefIsim !== aktifKullaniciAdi) {
         pArkadasBtn.style.display = 'block';
         if (benimArkadaslarim.includes(hedefIsim)) { pArkadasBtn.innerText = "❌ Arkadaştan Çıkar"; pArkadasBtn.style.background = "#e74c3c"; } else { pArkadasBtn.innerText = "➕ Arkadaş Ekle"; pArkadasBtn.style.background = ""; }
-        if (isOnline) { pDavetBtn.style.display = 'block'; } // İŞTE BU! Sadece senin masanda diye şartı KALDIRDIM. Her an davet edebilirsin.
+        if (isOnline) { pDavetBtn.style.display = 'block'; } 
     }
 
     if(hedefIsim.startsWith("MİSAFİR_")) {
@@ -314,7 +342,24 @@ document.getElementById('btnKayitTamamla').addEventListener('click', () => {
 
 function oyunaGirisYap(isim) { aktifKullaniciAdi = isim; document.getElementById('benimCipim').innerText = benimAnlikCipim.toLocaleString('tr-TR'); authEkrani.style.display = 'none'; vipHeader.style.display = 'flex'; lobiEkrani.style.display = 'flex'; socket.emit('kullanici_girisi', { isim: aktifKullaniciAdi, cip: benimAnlikCipim, kozmetikler: aktifKozmetikler }); }
 
+window.arkadaslarMenusuAc = function() {
+    if(isMisafir) { ozelUyariGoster("⚠️ Misafir hesapların arkadaş listesi kapalıdır."); return; }
+    const ekran = document.getElementById('arkadaslarEkrani');
+    const header = ekran.querySelector('h2');
+    if(header) header.innerText = "👥 ARKADAŞ LİSTESİ";
+    document.getElementById('arkadaslarEkrani').style.display = 'flex'; const listeDiv = document.getElementById('arkadasListesiDiv'); listeDiv.innerHTML = '';
+    if(benimArkadaslarim.length === 0) { listeDiv.innerHTML = '<p style="text-align:center; color:#777; font-size:12px;">Henüz hiç arkadaşın yok.</p>'; return; }
+    benimArkadaslarim.forEach(arkadas => {
+        let isOnline = onlineOyuncularListesi.includes(arkadas); let durumNoktasi = isOnline ? '<span class="online-nokta"></span>' : '<span class="offline-nokta"></span>';
+        let kozmetikler = globalKozmetikler[arkadas] || []; let isimRenk = kozmetikler.includes('atesli_isim') ? '#ff4d4d' : '#fff'; let tac = kozmetikler.includes('neon_tac') ? '👑 ' : '';
+        let davetButonu = ''; if(isOnline && suAnkiMasam) { davetButonu = `<button class="btn-davet-et" onclick="masayaDavetEt('${arkadas}')">📥 Davet Et</button>`; }
+        listeDiv.innerHTML += `<div class="lider-satir" style="cursor:pointer;" onclick="profiliGoster('${arkadas}')"><div class="lider-isim" style="color:${isimRenk};">${durumNoktasi} ${tac}${arkadas}</div>${davetButonu}</div>`;
+    });
+}
+
+// İŞTE BURASI: Oyun Bitti Ekranını Zorla Temizleyen Silecek!
 socket.on('sen_masadasin', (data) => {
+    masayiTemizle(); // Her masaya girişte eski çöpleri temizler!
     suAnkiMasam = data.masaAdi || data; suAnkiMasaVIPMi = data.isVIP || false; suAnkiMasaSahibi = data.sahibi || ""; suAnkiMasaGizliMi = data.gizli || false; lobiEkrani.style.display = 'none'; masaEkrani.style.display = 'flex'; document.getElementById('masaOrtasiYazi').innerText = suAnkiMasam.toUpperCase();
     if(suAnkiMasaVIPMi && suAnkiMasaSahibi === aktifKullaniciAdi) { if(btnVipGizlilikTetikle) { btnVipGizlilikTetikle.style.display = "block"; btnVipGizlilikTetikle.innerText = suAnkiMasaGizliMi ? "🔓 MASAYI HERKESE AÇ" : "🔒 MASAYI KİLİTLE"; btnVipGizlilikTetikle.style.background = suAnkiMasaGizliMi ? "#2ecc71" : "#ff33aa"; } } else { if(btnVipGizlilikTetikle) btnVipGizlilikTetikle.style.display = "none"; }
     socket.emit('masaya_geri_don', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi });
@@ -347,10 +392,15 @@ socket.on('online_oyuncular', (liste) => {
 });
 
 window.arkadasEkle = function(isim) { if(isMisafir) return; if(!benimArkadaslarim.includes(isim)) { benimArkadaslarim.push(isim); if(auth.currentUser) { db.collection("kullanicilar").doc(auth.currentUser.uid).update({ arkadaslar: benimArkadaslarim }).then(() => { ozelUyariGoster(`✅ ${isim} arkadaş listene eklendi!`); }); } } }
-window.arkadaslarMenusuAc = function() { if(isMisafir) { ozelUyariGoster("⚠️ Misafir hesapların arkadaş listesi kapalıdır."); return; } document.getElementById('arkadaslarEkrani').style.display = 'flex'; const listeDiv = document.getElementById('arkadasListesiDiv'); listeDiv.innerHTML = ''; if(benimArkadaslarim.length === 0) { listeDiv.innerHTML = '<p style="text-align:center; color:#777; font-size:12px;">Henüz hiç arkadaşın yok.</p>'; return; } benimArkadaslarim.forEach(arkadas => { let isOnline = onlineOyuncularListesi.includes(arkadas); let durumNoktasi = isOnline ? '<span class="online-nokta"></span>' : '<span class="offline-nokta"></span>'; let kozmetikler = globalKozmetikler[arkadas] || []; let isimRenk = kozmetikler.includes('atesli_isim') ? '#ff4d4d' : '#fff'; let tac = kozmetikler.includes('neon_tac') ? '👑 ' : ''; let davetButonu = ''; if(isOnline && suAnkiMasam) { davetButonu = `<button class="btn-davet-et" onclick="masayaDavetEt('${arkadas}')">📥 Davet Et</button>`; } listeDiv.innerHTML += `<div class="lider-satir" style="cursor:pointer;" onclick="profiliGoster('${arkadas}')"><div class="lider-isim" style="color:${isimRenk};">${durumNoktasi} ${tac}${arkadas}</div>${davetButonu}</div>`; }); }
-window.masayaDavetEt = function(arkadasIsmi) { event.stopPropagation(); if(!suAnkiMasam) return; socket.emit('masaya_davet_et', { kimden: aktifKullaniciAdi, kime: arkadasIsmi, masaAdi: suAnkiMasam }); ozelUyariGoster(`💌 ${arkadasIsmi} adlı oyuncuya davet gönderildi!`); document.getElementById('arkadaslarEkrani').style.display = 'none'; }
 
-// İŞTE ÇÖZÜM: Karşı taraf Nerede olursa olsun Davet Ekranda PATLAYACAK!
+// İŞTE BURASI: Davet atılınca anında gitmesini sağlayan sistem!
+window.masayaDavetEt = function(arkadasIsmi) { 
+    event.stopPropagation(); if(!suAnkiMasam) return; 
+    socket.emit('masaya_davet_et', { kimden: aktifKullaniciAdi, kime: arkadasIsmi, masaAdi: suAnkiMasam }); 
+    ozelUyariGoster(`💌 ${arkadasIsmi} adlı oyuncuya davet gönderildi!`); 
+    document.getElementById('arkadaslarEkrani').style.display = 'none'; 
+}
+
 socket.on('davet_geldi', (data) => {
     if(data.kime === aktifKullaniciAdi) { 
         const metinEl = document.getElementById('davetMetni');
@@ -358,12 +408,8 @@ socket.on('davet_geldi', (data) => {
         document.getElementById('davetGeldiEkrani').style.display = 'flex';
         document.getElementById('btnDavetKabul').onclick = function() { 
             document.getElementById('davetGeldiEkrani').style.display = 'none'; 
-            if(suAnkiMasam) {
-                // Mevcut masadan zorla kalksın
-                socket.emit('masadan_kalk', { isim: aktifKullaniciAdi, masaAdi: suAnkiMasam }); 
-                suAnkiMasam = null; 
-            }
-            setTimeout(() => { masayaOtur(data.masaAdi); }, 300); // 300ms sonra VIP'ye ışınla
+            if(suAnkiMasam) { socket.emit('masadan_kalk', { isim: aktifKullaniciAdi, masaAdi: suAnkiMasam }); suAnkiMasam = null; }
+            setTimeout(() => { masayaOtur(data.masaAdi); }, 300);
         };
     }
 });
@@ -392,8 +438,25 @@ socket.on('masalari_guncelle', (lobidekiMasalar) => {
 });
 
 window.masayaGeriDon = function(masaAdi) { suAnkiMasam = masaAdi; lobiEkrani.style.display = 'none'; masaEkrani.style.display = 'flex'; document.getElementById('masaOrtasiYazi').innerText = masaAdi.toUpperCase(); socket.emit('masaya_geri_don', { masaAdi: masaAdi, isim: aktifKullaniciAdi }); };
+
 function gelişmişKoltukHizala(koltuklar) { const index = koltuklar.indexOf(aktifKullaniciAdi); if (index === -1) return; const sR = koltuklar[(index + 1) % 4] || ""; const sT = koltuklar[(index + 2) % 4] || ""; const sL = koltuklar[(index + 3) % 4] || ""; document.getElementById('seatRight').dataset.isim = sR; document.getElementById('seatTop').dataset.isim = sT; document.getElementById('seatLeft').dataset.isim = sL; koltukStiliUygula('seatRight', sR); koltukStiliUygula('seatTop', sT); koltukStiliUygula('seatLeft', sL); }
-function koltukStiliUygula(elementId, oyuncuIsmi) { const el = document.getElementById(elementId); if(!oyuncuIsmi || oyuncuIsmi.startsWith('Bot_')) { el.innerText = oyuncuIsmi || "Bekleniyor..."; el.style.color = "#0dcaf0"; el.style.textShadow = "none"; return; } let kozmetikler = globalKozmetikler[oyuncuIsmi] || []; let tac = kozmetikler.includes('neon_tac') ? "👑 " : ""; el.innerText = tac + oyuncuIsmi; if(kozmetikler.includes('atesli_isim')) { el.style.color = '#ff4d4d'; el.style.textShadow = '0 0 5px #ff0000'; } else { el.style.color = '#0dcaf0'; el.style.textShadow = 'none'; } }
+
+// İŞTE BURASI: Boş koltuklara tıklanabilir yemyeşil "DAVET ET" yazısı çakıldı!
+function koltukStiliUygula(elementId, oyuncuIsmi) { 
+    const el = document.getElementById(elementId); 
+    if(!oyuncuIsmi) { 
+        el.innerHTML = '<span style="color:#2ecc71; font-weight:bold; font-size:13px;">➕ DAVET ET</span>'; 
+        el.style.textShadow = "none"; 
+        return; 
+    }
+    if(oyuncuIsmi.startsWith('Bot_')) { 
+        el.innerText = oyuncuIsmi; 
+        el.style.color = "#0dcaf0"; 
+        el.style.textShadow = "none"; 
+        return; 
+    } 
+    let kozmetikler = globalKozmetikler[oyuncuIsmi] || []; let tac = kozmetikler.includes('neon_tac') ? "👑 " : ""; el.innerText = tac + oyuncuIsmi; if(kozmetikler.includes('atesli_isim')) { el.style.color = '#ff4d4d'; el.style.textShadow = '0 0 5px #ff0000'; } else { el.style.color = '#0dcaf0'; el.style.textShadow = 'none'; } 
+}
 
 window.masayaOtur = function(masaAdi) { 
     let bahis = 0; if(masaAdi.includes('20K')) bahis = 20000; else if(masaAdi.includes('50K')) bahis = 50000; else if(masaAdi.includes('10K')) bahis = 10000;
