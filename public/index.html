@@ -5,40 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>VIP Okey Sunucusu</title>
     <link rel="stylesheet" href="style.css">
+    
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+    
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 </head>
 <body>
-
-    <button id="gelenKutusuTetikleyici" style="position:fixed; top:70px; right:15px; background:#2c3e50; border:2px solid #f2c94c; border-radius:50%; width:45px; height:45px; font-size:20px; z-index:999; display:none; justify-content:center; align-items:center; cursor:pointer; box-shadow: 0 0 10px rgba(0,0,0,0.5);">
-        ✉️
-        <span id="okunmamisMesajSayisi" style="display:none; position:absolute; top:-5px; right:-5px; background:#e74c3c; color:#fff; font-size:10px; font-weight:bold; width:18px; height:18px; border-radius:50%; justify-content:center; align-items:center;">0</span>
-    </button>
-
-    <div id="postaKutusuEkrani" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:999999; flex-direction:column; justify-content:center; align-items:center;">
-        <div class="magaza-kutu" style="max-height: 85vh; display: flex; flex-direction: column; width: 95%; max-width: 400px; border:2px solid #3498db; box-shadow: 0 0 20px rgba(52, 152, 219, 0.4);">
-            <div class="magaza-header" style="border-bottom: 1px solid #3498db; padding-bottom: 10px; margin-bottom: 15px;">
-                <h2 style="color:#3498db;">✉️ GELEN KUTUSU</h2>
-                <button onclick="document.getElementById('postaKutusuEkrani').style.display='none'" style="background:none;border:none;color:#e74c3c;font-size:24px;cursor:pointer;font-weight:bold;">X</button>
-            </div>
-            <div id="postaListesi" style="display:flex; flex-direction:column; gap:10px; overflow-y:auto; padding-right:5px; flex:1;"></div>
-        </div>
-    </div>
-
-    <div id="dmYazEkrani" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:9999999; flex-direction:column; justify-content:center; align-items:center;">
-        <div class="magaza-kutu" style="width: 90%; max-width: 320px; text-align:center; border:2px solid #3498db;">
-            <h2 style="color:#3498db; margin-bottom:10px;">✉️ MESAJ GÖNDER</h2>
-            <p style="color:#a3c4bc; font-size:12px; margin-bottom:15px;">Alıcı: <strong id="dmAliciIsim" style="color:#f2c94c;">...</strong></p>
-            <textarea id="dmMesajIcerik" rows="4" style="width:100%; background:#111; color:#fff; border:1px solid #555; padding:10px; border-radius:8px; margin-bottom:15px; resize:none;" placeholder="Mesajını buraya yaz..." maxlength="100"></textarea>
-            <div style="display:flex; gap:10px;">
-                <button onclick="dmGonderAksiyon()" class="satin-al-btn" style="flex:1; background:#3498db; color:#fff;">GÖNDER</button>
-                <button onclick="document.getElementById('dmYazEkrani').style.display='none'" class="satin-al-btn" style="flex:1; background:#e74c3c; color:#fff;">İPTAL</button>
-            </div>
-        </div>
-    </div>
 
     <div id="uyariModalEkrani" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999999; flex-direction:column; justify-content:center; align-items:center;">
         <div class="magaza-kutu" style="text-align:center; border: 2px solid #f2c94c; max-width: 300px; padding: 25px;">
@@ -84,15 +59,6 @@
         </div>
     </div>
 
-    <div id="cezaBildirimEkrani" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:999999; flex-direction:column; justify-content:center; align-items:center;">
-        <div class="magaza-kutu" style="text-align:center; border: 3px solid #e74c3c; box-shadow: 0 0 30px rgba(231, 76, 60, 0.4);">
-            <div style="font-size:55px; margin-bottom:10px;">📉</div>
-            <h2 style="color:#e74c3c; margin-bottom:10px; text-shadow: 0 0 10px rgba(231, 76, 60, 0.5);">CEZA KESİLDİ!</h2>
-            <p style="color:#fff; font-size:14px; margin-bottom:20px;">Oyun ortasında masadan ayrıldığın için <strong id="cezaMiktarMetni" style="color:#f2c94c; font-size:16px;">...</strong> hesabından düşüldü.</p>
-            <button onclick="cezaAnladimKapat()" class="satin-al-btn" style="background:#e74c3c; color:#fff; font-size: 14px; padding: 12px;">ANLADIM</button>
-        </div>
-    </div>
-
     <div id="profilEkrani" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999999; flex-direction:column; justify-content:center; align-items:center;">
         <div class="magaza-kutu" style="max-width: 320px; text-align: center; padding: 30px 20px; position:relative;">
             <button onclick="document.getElementById('profilEkrani').style.display='none'" style="position:absolute; top:15px; right:20px; background:none; border:none; color:#e74c3c; font-size:24px; cursor:pointer; font-weight:bold;">X</button>
@@ -125,9 +91,8 @@
             </div>
 
             <div style="display:flex; flex-direction:column; gap:8px;">
-                <button id="profilDmBtn" onclick="dmGondermeEkraniAc()" class="satin-al-btn" style="display:none; background:#3498db; color:#fff; font-size:13px; padding:10px; font-weight:bold;">✉️ Özel Mesaj At</button>
-                
                 <button id="profilArkadasBtn" onclick="profilArkadasAksiyon()" class="satin-al-btn" style="display:none; font-size:13px; padding:10px; font-weight:bold;"></button>
+                
                 <button id="profilDavetBtn" onclick="profilDavetAksiyon()" class="satin-al-btn" style="position: relative !important; top: auto !important; right: auto !important; display:none; background:#2ecc71; color:#fff; font-size:13px; padding:10px; font-weight:bold;">🎲 Masaya Davet Et</button>
             </div>
 
