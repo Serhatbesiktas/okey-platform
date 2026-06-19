@@ -157,14 +157,24 @@ body { background-color: #050d08; color: #fff; font-family: 'Segoe UI', Tahoma, 
 .online-nokta { display: inline-block; width: 8px; height: 8px; background-color: #2ecc71; border-radius: 50%; box-shadow: 0 0 5px #2ecc71; margin-right: 5px; }
 .offline-nokta { display: inline-block; width: 8px; height: 8px; background-color: #e74c3c; border-radius: 50%; margin-right: 5px; opacity: 0.5; }
 
-/* --- SOL ÜST İLETİŞİM SÜTUNU (SES, SOHBET, MESAJ) --- */
-/* Orijinal Ses Butonu zaten muzik.js'den 15px top ile geliyor, bu yüzden dokunmuyoruz. */
+/* --- SAĞ ÜST İLETİŞİM SÜTUNU (SADECE OYUN MASASINDA) --- */
+/* Masadan kalkma butonu sağ üstte top: 10px'te olduğu için bunları altına asıyoruz. */
 
-/* Ortadaki Yeşil Sohbet Butonu */
+/* 1. Ses Butonu */
+#sound-toggle-btn {
+    position: fixed !important;
+    top: 60px !important;    /* Masadan kalk butonunun altı */
+    left: auto !important;   /* Eski sol ayarını İPTAL ET */
+    right: 15px !important;  /* SAĞA YASLA */
+    z-index: 9998 !important;
+}
+
+/* 2. Ortadaki Yeşil Sohbet Butonu */
 .pro-sohbet-tetikleyici, #sohbetAcBtn {
     position: fixed !important;
-    top: 70px !important;
-    left: 15px !important;
+    top: 115px !important;   /* Ses butonunun altı */
+    left: auto !important;   /* Eski sol ayarını İPTAL ET */
+    right: 15px !important;  /* SAĞA YASLA */
     z-index: 9998 !important;
     width: 40px !important;
     height: 40px !important;
@@ -182,11 +192,12 @@ body { background-color: #050d08; color: #fff; font-family: 'Segoe UI', Tahoma, 
     margin: 0 !important;
 }
 
-/* En Alttaki Mavi Mesaj Butonu */
+/* 3. En Alttaki Mavi Mesaj Butonu */
 #mesajlarBtn, #mesaj-btn, [id*="mesaj"] {
     position: fixed !important;
-    top: 125px !important;
-    left: 15px !important;
+    top: 170px !important;   /* Sohbet butonunun altı */
+    left: auto !important;   /* Eski sol ayarını İPTAL ET */
+    right: 15px !important;  /* SAĞA YASLA */
     z-index: 9998 !important;
     width: 40px !important;
     height: 40px !important;
