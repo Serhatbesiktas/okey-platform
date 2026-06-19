@@ -157,24 +157,24 @@ body { background-color: #050d08; color: #fff; font-family: 'Segoe UI', Tahoma, 
 .online-nokta { display: inline-block; width: 8px; height: 8px; background-color: #2ecc71; border-radius: 50%; box-shadow: 0 0 5px #2ecc71; margin-right: 5px; }
 .offline-nokta { display: inline-block; width: 8px; height: 8px; background-color: #e74c3c; border-radius: 50%; margin-right: 5px; opacity: 0.5; }
 
-/* --- SOL ÜST İLETİŞİM SÜTUNU (BOŞ ARAZİYE) --- */
-/* Resimde gösterdiğin sol taraftaki boşluğa jilet gibi asıyoruz. */
 
-/* 1. Ses Butonu */
+/* --- YENİ DÜZENLENMİŞ İLETİŞİM BUTONLARI --- */
+
+/* 1. Ses Butonu (Lobide de görünsün diye z-index devasa yapıldı) */
 #sound-toggle-btn {
     position: fixed !important;
     top: 85px !important;    
-    left: 15px !important;   /* SOLA YASLA */
-    right: auto !important;  /* Sağ ayarını eziyoruz */
-    z-index: 9998 !important;
+    left: 15px !important;   
+    right: auto !important;  
+    z-index: 99999 !important; /* Lobi dahil her yerde en üstte kalsın */
 }
 
-/* 2. Ortadaki Yeşil Sohbet Butonu */
+/* 2. Ortadaki Yeşil Sohbet Butonu (Sola Sabit) */
 .pro-sohbet-tetikleyici, #sohbetAcBtn {
     position: fixed !important;
-    top: 140px !important;   /* Ses butonunun altı */
-    left: 15px !important;   /* SOLA YASLA */
-    right: auto !important;  /* Sağ ayarını eziyoruz */
+    top: 140px !important;   
+    left: 15px !important;   
+    right: auto !important;  
     z-index: 9998 !important;
     width: 40px !important;
     height: 40px !important;
@@ -192,12 +192,12 @@ body { background-color: #050d08; color: #fff; font-family: 'Segoe UI', Tahoma, 
     margin: 0 !important;
 }
 
-/* 3. En Alttaki Mavi Mesaj Butonu */
-#mesajlarBtn, #mesaj-btn, [id*="mesaj"] {
+/* 3. En Alttaki Mavi Mesaj Butonu (Sadece Genel Mesaj - Sola Sabit) */
+#mesajlarBtn, #mesaj-btn, .genel-mesaj-btn {
     position: fixed !important;
-    top: 195px !important;   /* Sohbet butonunun altı */
-    left: 15px !important;   /* SOLA YASLA */
-    right: auto !important;  /* Sağ ayarını eziyoruz */
+    top: 195px !important;   
+    left: 15px !important;   
+    right: auto !important;  
     z-index: 9998 !important;
     width: 40px !important;
     height: 40px !important;
@@ -210,6 +210,29 @@ body { background-color: #050d08; color: #fff; font-family: 'Segoe UI', Tahoma, 
     color: #fff !important;
     font-size: 20px !important;
     box-shadow: 0 0 10px rgba(52, 152, 219, 0.5) !important;
+    cursor: pointer !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* 4. ÖZEL MESAJ BUTONU (Kurban giden buton sağdaki krallığına geri döndü!) */
+#ozelMesajBtn, .ozel-mesaj-btn, [id*="ozel"] {
+    position: fixed !important;
+    top: 85px !important;     /* Sağda rahat bir konuma aldım */
+    right: 15px !important;   /* SAĞA SABİTLEDİM */
+    left: auto !important;    /* Sol kuralını sildim */
+    z-index: 9998 !important;
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    background: rgba(11, 38, 20, 0.8) !important;
+    border: 2px solid #e74c3c !important; /* Özel mesaja kırmızımsı şık bir renk verdim */
+    color: #fff !important;
+    font-size: 20px !important;
+    box-shadow: 0 0 10px rgba(231, 76, 60, 0.5) !important;
     cursor: pointer !important;
     padding: 0 !important;
     margin: 0 !important;
