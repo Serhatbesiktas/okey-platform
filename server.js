@@ -187,7 +187,6 @@ function botHamlesiYap(masaAdi) {
     }
 }
 
-// İŞTE ÇÖZÜMÜMÜZ: Hayaletleri Silen Süpürge Fonksiyonu!
 function kullaniciyiMasadanKaldir(isim) {
     let degisiklikOldu = false;
     let silinecekMasalar = [];
@@ -234,7 +233,7 @@ function kullaniciyiMasadanKaldir(isim) {
                 }
             }
             degisiklikOldu = true;
-            break; // Oyuncu birden fazla yerde olamaz, sildiysek çık!
+            break; 
         }
     }
     
@@ -286,7 +285,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('vip_masa_kur', (data) => {
-      kullaniciyiMasadanKaldir(data.sahibi); // ZIRH: Eğer başka masadaysa önce oradan sök al!
+      kullaniciyiMasadanKaldir(data.sahibi); 
 
       let miktar = Number(data.bahis);
       let pCip = Number(oyuncuCipleri[data.sahibi]); if(isNaN(pCip)) pCip = 0;
@@ -317,8 +316,13 @@ io.on('connection', (socket) => {
   socket.on('liderlik_tablosu_iste', () => { const siraliList = Object.entries(oyuncuCipleri).map(entry => ({ isim: entry[0], cip: entry[1] })).filter(k => !k.isim.startsWith('MİSAFİR_')).sort((a, b) => b.cip - a.cip).slice(0, 10); socket.emit('liderlik_tablosu_guncelle', siraliList); });
   socket.on('masaya_davet_et', (data) => { const masa = masalar[data.masaAdi]; if (masa && masa.isVIP) { if (!masa.davetliler.includes(data.kime)) masa.davetliler.push(data.kime); } io.emit('davet_geldi', data); });
 
+  // YENİ EKLENEN KOD: Özel Mesajı (DM) hedef kişiye ilet!
+  socket.on('ozel_mesaj_bildirim', (data) => {
+      io.emit('ozel_mesaj_geldi', data);
+  });
+
   socket.on('masaya_otur', (data) => {
-    kullaniciyiMasadanKaldir(data.isim); // ZIRH: Başka masadaysa sök al!
+    kullaniciyiMasadanKaldir(data.isim); 
     
     const masa = masalar[data.masaAdi];
     if (masa && !masa.koltuklar.includes(data.isim)) {
@@ -364,7 +368,6 @@ io.on('connection', (socket) => {
             const oyuncununTaslari = masa.deste.splice(0, kacTasAlacak); masa.eller[oyuncuIsmi] = oyuncununTaslari; 
         });
         
-        // BOT GECİKME FIXİ: Koltukları ve bot isimlerini direkt telefona gönder!
         io.emit('masa_oyun_basladi', { masaAdi: masaAdi, gosterge: masa.gosterge, kalanTas: masa.deste.length, kasa: masa.kasa, koltuklar: masa.koltuklar });
         io.emit('sistem_mesaji', `🎰 Bahisler alındı! Oyun başladı. Elinde gösterge olan butona bassın!`);
 
