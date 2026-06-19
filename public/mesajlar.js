@@ -1,4 +1,4 @@
-// --- PROFESYONEL CANLI SOHBET MODÜLÜ (OYUN İÇİ BİLDİRİM VE TOAST EKLENTİLİ) --- //
+// --- PROFESYONEL CANLI SOHBET MODÜLÜ (SOHBET SİLME EKLENTİLİ) --- //
 
 const mesajStilleri = document.createElement('style');
 mesajStilleri.innerHTML = `
@@ -62,7 +62,6 @@ mesajStilleri.innerHTML = `
     }
     .btn-gonder-ok:active { transform: scale(0.9); }
 
-    /* YENİ: Bildirim Animasyonları */
     @keyframes pulseAlert {
         0% { transform: scale(1); box-shadow: 0 0 5px #e74c3c; }
         50% { transform: scale(1.2); box-shadow: 0 0 15px #e74c3c; }
@@ -79,7 +78,7 @@ function getKendiAdim() {
     return kutu.innerText.replace('✔', '').replace('👑', '').trim();
 }
 
-// 2. Ekranların ve Toast (Bildirim) Sisteminin Sayfaya Eklenmesi
+// Ekranların Eklenmesi
 document.body.insertAdjacentHTML('beforeend', `
     <div id="pmToast" style="position:fixed; top:-100px; left:50%; transform:translateX(-50%); background:linear-gradient(135deg, #f39c12, #e67e22); color:#fff; padding:10px 20px; border-radius:30px; font-weight:bold; font-size:13px; z-index:999999999; box-shadow:0 5px 15px rgba(0,0,0,0.5); transition:0.4s; pointer-events:none; border:2px solid #f2c94c;">
         ✉️ Yeni Özel Mesaj!
@@ -113,9 +112,7 @@ document.body.insertAdjacentHTML('beforeend', `
     </div>
 `);
 
-// Alt Menu, Profil Tuşu ve YENİ MASA İÇİ BUTONUN EKLENMESİ
 setTimeout(() => {
-    // Lobideki Alt Menü Butonu
     const altMenu = document.querySelector('.alt-menu-container');
     if(altMenu) {
         const mesajBtn = document.createElement('div');
@@ -134,14 +131,12 @@ setTimeout(() => {
         altMenu.appendChild(mesajBtn);
     }
 
-    // Profil Ekranındaki Mesaj Gönder Butonu
     const profilFirlatAlani = document.getElementById('profilEsyaFirlatAlani');
     if(profilFirlatAlani) {
         const btnMesajAtHTML = `<button onclick="profilldenMesajAt()" class="satin-al-btn" style="width:100%; margin-top:5px; margin-bottom:15px; background:linear-gradient(135deg, #128C7E, #27ae60); color:#fff; font-size:13px; padding:10px; font-weight:900; box-shadow: 0 0 10px rgba(46, 204, 113, 0.4); border-radius:10px;">💬 ÖZEL MESAJ GÖNDER</button>`;
         profilFirlatAlani.insertAdjacentHTML('beforebegin', btnMesajAtHTML);
     }
 
-    // YENİ: Masadayken Görülecek Özel Zarf Butonu
     const masaEkrani = document.getElementById('masaEkrani');
     if(masaEkrani) {
         masaEkrani.insertAdjacentHTML('beforeend', `
@@ -189,7 +184,6 @@ window.profilldenMesajAt = function() {
     sohbetiAc(kime);
 };
 
-// Mesaj Gönderim Motoru
 window.sohbetGonderAksiyon = function() {
     try {
         const inputEl = document.getElementById('sohbetMesajInput');
@@ -201,14 +195,12 @@ window.sohbetGonderAksiyon = function() {
         const gonderen = getKendiAdim();
         const yeniMesaj = { kimden: gonderen, icerik: icerik, tarih: new Date().toISOString() };
 
-        // 1. Kendi DB'me yaz
         db.collection("kullanicilar").doc(auth.currentUser.uid).set({
             sohbetler: {
                 [aktifSohbetHedefi]: firebase.firestore.FieldValue.arrayUnion(yeniMesaj)
             }
         }, { merge: true });
 
-        // 2. Karşı tarafın DB'sine yaz
         db.collection("kullanicilar").where("isim", "==", aktifSohbetHedefi).get().then(snapshot => {
             if(!snapshot.empty) {
                 const hedefDoc = snapshot.docs[0];
@@ -274,6 +266,24 @@ function ekranaBalonlariCiz() {
     setTimeout(() => { balonAlani.scrollTop = balonAlani.scrollHeight; }, 50);
 }
 
+// İŞTE BURASI: SOHBETİ KOMPLE ÇÖPE ATMA (SİLME) FONKSİYONU
+window.sohbetiKompleSil = function(hedefIsim) {
+    // Tıklamanın altındaki "sohbetiAc" fonksiyonunu tetiklemesini engelle!
+    if(event) event.stopPropagation();
+    
+    const onay = confirm(`⚠️ DİKKAT!\n${hedefIsim} ile olan tüm sohbet geçmişini silmek istediğinize emin misiniz?`);
+    if(!onay) return;
+
+    if(typeof auth === 'undefined' || !auth.currentUser) return;
+
+    // Firebase'den hedefIsim altındaki tüm mesajları sil
+    db.collection("kullanicilar").doc(auth.currentUser.uid).update({
+        [`sohbetler.${hedefIsim}`]: firebase.firestore.FieldValue.delete()
+    }).then(() => {
+        if(window.ozelUyariGoster) ozelUyariGoster(`🗑️ ${hedefIsim} ile olan sohbet kalıcı olarak silindi.`);
+    });
+};
+
 function canliSohbetiBaslat() {
     const benimAdim = getKendiAdim();
     if(!auth || !auth.currentUser || benimAdim.startsWith("MİSAFİR_")) return;
@@ -310,17 +320,21 @@ function canliSohbetiBaslat() {
                 let sonM = veri.son;
                 let mesajOnizleme = sonM.icerik.length > 25 ? sonM.icerik.substring(0, 25) + '...' : sonM.icerik;
                 let isYeni = okunmamisListesi.includes(k) && k !== aktifSohbetHedefi; 
-                let yeniEtiketi = isYeni ? `<span style="background:#2ecc71; color:#111; font-size:10px; padding:2px 6px; border-radius:10px; font-weight:bold;">YENİ</span>` : '';
+                let yeniEtiketi = isYeni ? `<span style="background:#2ecc71; color:#111; font-size:10px; padding:2px 6px; border-radius:10px; font-weight:bold; margin-right:5px;">YENİ</span>` : '';
 
+                // DİKKAT: Sağ tarafa kırmızı "Sil 🗑️" butonu eklendi!
                 listDiv.innerHTML += `
                     <div class="sohbet-liste-satir" onclick="sohbetiAc('${k}')">
-                        <div style="display:flex; flex-direction:column; gap:5px;">
+                        <div style="display:flex; flex-direction:column; gap:5px; flex:1;">
                             <strong style="color:#fff; font-size:14px;">${k}</strong>
                             <span style="color:#7f8c8d; font-size:12px;">${mesajOnizleme}</span>
                         </div>
-                        <div style="display:flex; flex-direction:column; align-items:flex-end; gap:5px;">
+                        <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
                             <span style="color:#52796f; font-size:10px;">${new Date(sonM.tarih).toLocaleDateString('tr-TR')}</span>
-                            ${yeniEtiketi}
+                            <div style="display:flex; align-items:center;">
+                                ${yeniEtiketi}
+                                <button onclick="window.sohbetiKompleSil('${k}')" title="Sohbeti Sil" style="background:rgba(231, 76, 60, 0.15); color:#e74c3c; border:1px solid rgba(231, 76, 60, 0.5); border-radius:5px; padding:4px 8px; font-size:11px; font-weight:bold; cursor:pointer;">Sil 🗑️</button>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -343,14 +357,13 @@ function canliSohbetiBaslat() {
             if(lobiBildirim) lobiBildirim.style.display = 'block';
             if(masaBildirim) masaBildirim.style.display = 'block';
             
-            // YENİ BİR MESAJ GELDİYSE TOAST GÖSTER!
             if(gercekOkunmamis.length > oncekiOkunmamisSayisi) {
                 const toast = document.getElementById('pmToast');
                 if(toast) {
                     const kimdenGeldi = gercekOkunmamis[gercekOkunmamis.length - 1];
                     toast.innerHTML = `✉️ <span style="color:#111;">${kimdenGeldi}</span> sana mesaj gönderdi!`;
                     toast.style.top = "20px";
-                    setTimeout(() => { toast.style.top = "-100px"; }, 3000); // 3 saniye sonra geri yukarı kaçar
+                    setTimeout(() => { toast.style.top = "-100px"; }, 3000); 
                 }
             }
         } else {
