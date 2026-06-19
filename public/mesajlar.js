@@ -64,7 +64,6 @@ mesajStilleri.innerHTML = `
 `;
 document.head.appendChild(mesajStilleri);
 
-// İŞTE BURASI: onkeypress ve onclick HTML'in içine çakıldı, kaybolması İMKANSIZ.
 document.body.insertAdjacentHTML('beforeend', `
     <div id="sohbetListesiEkrani" class="vip-mesaj-modal">
         <div class="vip-mesaj-kutu">
@@ -85,8 +84,7 @@ document.body.insertAdjacentHTML('beforeend', `
                 <h2 id="sohbetBaslikIsim" style="color:#fff; font-size:15px;">...</h2>
                 <button onclick="aktifKisiyiEngelle()" title="Kullanıcıyı Engelle" style="background:none;border:none;color:#e74c3c;font-size:20px;cursor:pointer;">🚫</button>
             </div>
-            <div id="sohbetBalonlariAlani" class="sohbet-alani">
-            </div>
+            <div id="sohbetBalonlariAlani" class="sohbet-alani"></div>
             <div class="sohbet-yazma-alani">
                 <input type="text" id="sohbetMesajInput" class="sohbet-input" placeholder="Mesaj yaz..." maxlength="150" autocomplete="off" onkeypress="if(event.key === 'Enter') window.sohbetGonderAksiyon()">
                 <button id="btnSohbetGonder" class="btn-gonder-ok" onclick="window.sohbetGonderAksiyon()">➤</button>
@@ -138,56 +136,69 @@ window.sohbetPenceresindenGeriDon = function() {
 };
 
 window.profilldenMesajAt = function() {
-    const benimAdim = typeof aktifKullaniciAdi !== 'undefined' ? aktifKullaniciAdi : "";
-    if(benimAdim.startsWith('MİSAFİR_')) { if(window.ozelUyariGoster) ozelUyariGoster("⚠️ Misafirler mesaj atamaz!"); return; }
+    if(typeof aktifKullaniciAdi !== 'undefined' && aktifKullaniciAdi.startsWith('MİSAFİR_')) { 
+        if(window.ozelUyariGoster) ozelUyariGoster("⚠️ Misafirler mesaj atamaz!"); 
+        return; 
+    }
     
     const hedefBtn = document.getElementById('profilArkadasBtn');
     if(!hedefBtn || !hedefBtn.dataset.hedef) return;
     const kime = hedefBtn.dataset.hedef;
     
-    if(kime === benimAdim) return; 
+    if(kime === aktifKullaniciAdi) return; 
+    
+    // Misafir Koruması Eklendi!
+    if(kime.startsWith("MİSAFİR_")) {
+        if(window.ozelUyariGoster) ozelUyariGoster("⚠️ Misafir hesaplara özel mesaj gönderilemez!");
+        return;
+    }
 
     document.getElementById('profilEkrani').style.display = 'none';
     sohbetiAc(kime);
 };
 
-// İŞTE YENİ, ZIRHLI VE GÜVENLİ GÖNDERİM MOTORU
+// İŞTE SIFIR HATA VEREN, GÜVENLİ GÖNDERİM MOTORU!
 window.sohbetGonderAksiyon = function() {
-    const icerik = document.getElementById('sohbetMesajInput').value.trim();
-    const gonderen = typeof aktifKullaniciAdi !== 'undefined' ? aktifKullaniciAdi : "Oyuncu";
-    const myAuth = firebase.auth().currentUser;
+    try {
+        const inputEl = document.getElementById('sohbetMesajInput');
+        const icerik = inputEl.value.trim();
+        
+        // Eğer boşsa, hedef yoksa veya veritabanı (auth) henüz yüklenmediyse durdur.
+        if(icerik === "" || !aktifSohbetHedefi || typeof auth === 'undefined' || !auth.currentUser) return;
 
-    if(icerik === "" || !aktifSohbetHedefi || !myAuth) return;
+        inputEl.value = ""; // Mesajı anında kutudan sil
+        
+        const gonderen = aktifKullaniciAdi;
+        const yeniMesaj = { kimden: gonderen, icerik: icerik, tarih: new Date().toISOString() };
 
-    document.getElementById('sohbetMesajInput').value = ""; 
-    
-    const yeniMesaj = { kimden: gonderen, icerik: icerik, tarih: new Date().toISOString() };
-    const fdb = firebase.firestore();
-
-    // 1. Kendi klasörüme ekle (Eğer klasör yoksa 'set' komutu zorla yaratır)
-    fdb.collection("kullanicilar").doc(myAuth.uid).set({
-        sohbetler: {
-            [aktifSohbetHedefi]: firebase.firestore.FieldValue.arrayUnion(yeniMesaj)
-        }
-    }, { merge: true });
-
-    // 2. Karşı tarafın klasörüne ekle
-    fdb.collection("kullanicilar").where("isim", "==", aktifSohbetHedefi).get().then(snapshot => {
-        if(!snapshot.empty) {
-            const hedefDocId = snapshot.docs[0].id;
-            const engellenenler = snapshot.docs[0].data().engellenenler || [];
-            
-            // Eğer beni engellemediyse mermiyi içeri at!
-            if(!engellenenler.includes(gonderen)) {
-                fdb.collection("kullanicilar").doc(hedefDocId).set({
-                    sohbetler: {
-                        [gonderen]: firebase.firestore.FieldValue.arrayUnion(yeniMesaj)
-                    },
-                    okunmamisSohbetler: firebase.firestore.FieldValue.arrayUnion(gonderen)
-                }, { merge: true });
+        // 1. Kendi klasörüme ekle
+        db.collection("kullanicilar").doc(auth.currentUser.uid).set({
+            sohbetler: {
+                [aktifSohbetHedefi]: firebase.firestore.FieldValue.arrayUnion(yeniMesaj)
             }
-        }
-    });
+        }, { merge: true }).catch(err => console.log("Gönderim hatası 1"));
+
+        // 2. Karşı tarafın klasörüne ekle
+        db.collection("kullanicilar").where("isim", "==", aktifSohbetHedefi).get().then(snapshot => {
+            if(!snapshot.empty) {
+                const hedefDoc = snapshot.docs[0];
+                const engellenenler = hedefDoc.data().engellenenler || [];
+                
+                // Karşı taraf beni engellemediyse mermiyi at!
+                if(!engellenenler.includes(gonderen)) {
+                    db.collection("kullanicilar").doc(hedefDoc.id).set({
+                        sohbetler: {
+                            [gonderen]: firebase.firestore.FieldValue.arrayUnion(yeniMesaj)
+                        },
+                        okunmamisSohbetler: firebase.firestore.FieldValue.arrayUnion(gonderen)
+                    }, { merge: true }).catch(err => console.log("Gönderim hatası 2"));
+                }
+            }
+        }).catch(err => console.log("Sorgu hatası"));
+        
+    } catch(err) {
+        console.log("Mesaj gönderilirken kritik hata: ", err);
+    }
 };
 
 window.sohbetiAc = function(kisiIsmi) {
@@ -199,9 +210,8 @@ window.sohbetiAc = function(kisiIsmi) {
     document.getElementById('sohbetBaslikIsim').innerText = kisiIsmi;
     ekran.style.display = 'flex';
     
-    const myUid = firebase.auth().currentUser ? firebase.auth().currentUser.uid : null;
-    if(myUid) {
-        firebase.firestore().collection("kullanicilar").doc(myUid).update({
+    if(typeof auth !== 'undefined' && auth.currentUser) {
+        db.collection("kullanicilar").doc(auth.currentUser.uid).update({
             okunmamisSohbetler: firebase.firestore.FieldValue.arrayRemove(kisiIsmi)
         }).catch(e=>{});
     }
@@ -214,7 +224,7 @@ function ekranaBalonlariCiz() {
     balonAlani.innerHTML = '';
     const benimAdim = typeof aktifKullaniciAdi !== 'undefined' ? aktifKullaniciAdi : "";
     
-    if(!aktifSohbetHedefi || !tumSohbetVerisi[aktifSohbetHedefi]) {
+    if(!aktifSohbetHedefi || !tumSohbetVerisi[aktifSohbetHedefi] || tumSohbetVerisi[aktifSohbetHedefi].length === 0) {
         balonAlani.innerHTML = '<p style="color:#777; text-align:center; font-size:12px; margin-top:20px;">Sohbete başla...</p>';
         return;
     }
@@ -240,12 +250,11 @@ function ekranaBalonlariCiz() {
 
 function canliSohbetiBaslat() {
     const benimAdim = typeof aktifKullaniciAdi !== 'undefined' ? aktifKullaniciAdi : "";
-    if(!firebase.auth().currentUser || benimAdim.startsWith("MİSAFİR_")) return;
+    if(!auth || !auth.currentUser || benimAdim.startsWith("MİSAFİR_")) return;
     
     if(canliYayinAboneligi) canliYayinAboneligi(); 
-    const myUid = firebase.auth().currentUser.uid;
     
-    canliYayinAboneligi = firebase.firestore().collection("kullanicilar").doc(myUid).onSnapshot(doc => {
+    canliYayinAboneligi = db.collection("kullanicilar").doc(auth.currentUser.uid).onSnapshot(doc => {
         if(!doc.exists) return;
         
         const data = doc.data();
@@ -298,7 +307,7 @@ function canliSohbetiBaslat() {
         if(aktifSohbetHedefi && document.getElementById('sohbetPenceresi').style.display !== 'none') {
             ekranaBalonlariCiz();
             if(okunmamisListesi.includes(aktifSohbetHedefi)) {
-                firebase.firestore().collection("kullanicilar").doc(myUid).update({ okunmamisSohbetler: firebase.firestore.FieldValue.arrayRemove(aktifSohbetHedefi) }).catch(e=>{});
+                db.collection("kullanicilar").doc(auth.currentUser.uid).update({ okunmamisSohbetler: firebase.firestore.FieldValue.arrayRemove(aktifSohbetHedefi) }).catch(e=>{});
             }
         }
 
@@ -313,12 +322,11 @@ window.aktifKisiyiEngelle = function() {
     const onay = confirm(`⚠️ DİKKAT!\n${aktifSohbetHedefi} adlı oyuncuyu engellemek istediğinize emin misiniz?\nSohbet geçmişi silinecek ve size bir daha mesaj atamayacak.`);
     if(!onay) return;
 
-    const myUid = firebase.auth().currentUser ? firebase.auth().currentUser.uid : null;
-    if(!myUid) return;
+    if(typeof auth === 'undefined' || !auth.currentUser) return;
     
     if(!engellenenKullanicilar.includes(aktifSohbetHedefi)) engellenenKullanicilar.push(aktifSohbetHedefi);
     
-    firebase.firestore().collection("kullanicilar").doc(myUid).update({
+    db.collection("kullanicilar").doc(auth.currentUser.uid).update({
         engellenenler: engellenenKullanicilar,
         [`sohbetler.${aktifSohbetHedefi}`]: firebase.firestore.FieldValue.delete()
     }).then(() => {
@@ -327,4 +335,10 @@ window.aktifKisiyiEngelle = function() {
     });
 };
 
-setTimeout(() => { canliSohbetiBaslat(); }, 3000);
+// Sistemi ayağa kaldırma beklemesi (Bağlantı kurulduğundan emin olmak için Interval kullanıyoruz)
+let sohbetBaslatici = setInterval(() => {
+    if(typeof auth !== 'undefined' && auth.currentUser) {
+        clearInterval(sohbetBaslatici);
+        canliSohbetiBaslat();
+    }
+}, 1000);
