@@ -1,6 +1,5 @@
-// --- PROFESYONEL CANLI SOHBET MODÜLÜ (KOMPAKT BOYUT & HATASIZ) --- //
+// --- PROFESYONEL CANLI SOHBET MODÜLÜ (TAMAMEN GÜVENLİ GÖNDERİM) --- //
 
-// 1. VIP Sohbet Stilleri (BOYUTLAR KÜÇÜLTÜLDÜ VE ŞIKLAŞTIRILDI)
 const mesajStilleri = document.createElement('style');
 mesajStilleri.innerHTML = `
     .vip-mesaj-modal {
@@ -11,7 +10,7 @@ mesajStilleri.innerHTML = `
     }
     .vip-mesaj-kutu {
         width: 95%; max-width: 400px; 
-        height: 60vh; min-height: 400px; max-height: 550px; /* EKRANIN YARISI KADAR KİBAR OLDU */
+        height: 60vh; min-height: 400px; max-height: 550px; 
         background: #0a0f0c; border: 2px solid #2ecc71; border-radius: 20px;
         box-shadow: 0 15px 40px rgba(46, 204, 113, 0.25);
         display: flex; flex-direction: column; overflow: hidden;
@@ -29,7 +28,6 @@ mesajStilleri.innerHTML = `
     }
     .sohbet-liste-satir:active { background: rgba(255,255,255,0.05); }
     
-    /* WhatsApp Balonları */
     .sohbet-alani {
         flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px;
         background: #0d1410; overscroll-behavior: contain;
@@ -48,7 +46,6 @@ mesajStilleri.innerHTML = `
     }
     .mesaj-zaman { font-size: 9px; color: rgba(255,255,255,0.6); display: block; text-align: right; margin-top: 4px; }
     
-    /* Modern Yazma Alanı */
     .sohbet-yazma-alani {
         padding: 12px; background: #16221a; border-top: 1px solid rgba(46, 204, 113, 0.3);
         display: flex; gap: 10px; align-items: center;
@@ -67,14 +64,7 @@ mesajStilleri.innerHTML = `
 `;
 document.head.appendChild(mesajStilleri);
 
-// Yardımcı Fonksiyon (Diğer dosyadan etkilenmeden kendi adımızı güvenle bulmamızı sağlar)
-function getKendiAdim() {
-    const kutu = document.getElementById('benimAdimKutusu');
-    if(!kutu) return "";
-    return kutu.innerText.replace('✔', '').replace('👑', '').trim();
-}
-
-// 2. Ekranların Sayfaya Eklenmesi
+// İŞTE BURASI: onkeypress ve onclick HTML'in içine çakıldı, kaybolması İMKANSIZ.
 document.body.insertAdjacentHTML('beforeend', `
     <div id="sohbetListesiEkrani" class="vip-mesaj-modal">
         <div class="vip-mesaj-kutu">
@@ -96,16 +86,15 @@ document.body.insertAdjacentHTML('beforeend', `
                 <button onclick="aktifKisiyiEngelle()" title="Kullanıcıyı Engelle" style="background:none;border:none;color:#e74c3c;font-size:20px;cursor:pointer;">🚫</button>
             </div>
             <div id="sohbetBalonlariAlani" class="sohbet-alani">
-                </div>
+            </div>
             <div class="sohbet-yazma-alani">
-                <input type="text" id="sohbetMesajInput" class="sohbet-input" placeholder="Mesaj yaz..." maxlength="150" autocomplete="off">
-                <button id="btnSohbetGonder" class="btn-gonder-ok">➤</button>
+                <input type="text" id="sohbetMesajInput" class="sohbet-input" placeholder="Mesaj yaz..." maxlength="150" autocomplete="off" onkeypress="if(event.key === 'Enter') window.sohbetGonderAksiyon()">
+                <button id="btnSohbetGonder" class="btn-gonder-ok" onclick="window.sohbetGonderAksiyon()">➤</button>
             </div>
         </div>
     </div>
 `);
 
-// Tuşların Bağlanması
 setTimeout(() => {
     const altMenu = document.querySelector('.alt-menu-container');
     if(altMenu) {
@@ -113,7 +102,7 @@ setTimeout(() => {
         mesajBtn.className = 'alt-menu-item';
         mesajBtn.style.cursor = 'pointer'; mesajBtn.style.position = 'relative';
         mesajBtn.onclick = () => {
-            if(getKendiAdim().startsWith('MİSAFİR_')) { if(window.ozelUyariGoster) ozelUyariGoster("⚠️ Misafir hesaplar mesajlaşamaz!"); return; }
+            if(typeof aktifKullaniciAdi !== 'undefined' && aktifKullaniciAdi.startsWith('MİSAFİR_')) { if(window.ozelUyariGoster) ozelUyariGoster("⚠️ Misafir hesaplar mesajlaşamaz!"); return; }
             document.body.style.overflow = 'hidden';
             document.getElementById('sohbetListesiEkrani').style.display = 'flex';
         };
@@ -149,65 +138,53 @@ window.sohbetPenceresindenGeriDon = function() {
 };
 
 window.profilldenMesajAt = function() {
-    const benimAdim = getKendiAdim();
+    const benimAdim = typeof aktifKullaniciAdi !== 'undefined' ? aktifKullaniciAdi : "";
     if(benimAdim.startsWith('MİSAFİR_')) { if(window.ozelUyariGoster) ozelUyariGoster("⚠️ Misafirler mesaj atamaz!"); return; }
     
     const hedefBtn = document.getElementById('profilArkadasBtn');
     if(!hedefBtn || !hedefBtn.dataset.hedef) return;
     const kime = hedefBtn.dataset.hedef;
     
-    if(kime === benimAdim) return; // Kendine mesaj atamaz
+    if(kime === benimAdim) return; 
 
     document.getElementById('profilEkrani').style.display = 'none';
     sohbetiAc(kime);
 };
 
-// Enter ile gönderme
-document.getElementById('sohbetMesajInput').addEventListener('keypress', function(e) {
-    if(e.key === 'Enter') window.sohbetGonderAksiyon();
-});
-
-document.getElementById('btnSohbetGonder').onclick = function() { window.sohbetGonderAksiyon(); };
-
-// İŞTE ÇÖZÜM: BAĞIMSIZ, HATA VERMEYEN MESAJ GÖNDERME MOTORU
+// İŞTE YENİ, ZIRHLI VE GÜVENLİ GÖNDERİM MOTORU
 window.sohbetGonderAksiyon = function() {
     const icerik = document.getElementById('sohbetMesajInput').value.trim();
-    const gonderen = getKendiAdim();
-    const myUid = firebase.auth().currentUser ? firebase.auth().currentUser.uid : null;
+    const gonderen = typeof aktifKullaniciAdi !== 'undefined' ? aktifKullaniciAdi : "Oyuncu";
+    const myAuth = firebase.auth().currentUser;
 
-    if(icerik === "" || !aktifSohbetHedefi || !myUid) return;
+    if(icerik === "" || !aktifSohbetHedefi || !myAuth) return;
 
-    document.getElementById('sohbetMesajInput').value = ""; // Anında sil, bekletme!
+    document.getElementById('sohbetMesajInput').value = ""; 
     
     const yeniMesaj = { kimden: gonderen, icerik: icerik, tarih: new Date().toISOString() };
+    const fdb = firebase.firestore();
 
-    // 1. Kendi veri tabanımı güncelle
-    const benimRef = firebase.firestore().collection("kullanicilar").doc(myUid);
-    benimRef.update({
-        [`sohbetler.${aktifSohbetHedefi}`]: firebase.firestore.FieldValue.arrayUnion(yeniMesaj)
-    }).catch(() => {
-        // Eğer daha önce hiç sohbet açılmamışsa update hata verir, set ile oluştururuz.
-        benimRef.set({ sohbetler: { [aktifSohbetHedefi]: [yeniMesaj] } }, { merge: true });
-    });
+    // 1. Kendi klasörüme ekle (Eğer klasör yoksa 'set' komutu zorla yaratır)
+    fdb.collection("kullanicilar").doc(myAuth.uid).set({
+        sohbetler: {
+            [aktifSohbetHedefi]: firebase.firestore.FieldValue.arrayUnion(yeniMesaj)
+        }
+    }, { merge: true });
 
-    // 2. Karşı tarafın veri tabanına mermiyi ateşle
-    firebase.firestore().collection("kullanicilar").where("isim", "==", aktifSohbetHedefi).get().then(snapshot => {
+    // 2. Karşı tarafın klasörüne ekle
+    fdb.collection("kullanicilar").where("isim", "==", aktifSohbetHedefi).get().then(snapshot => {
         if(!snapshot.empty) {
             const hedefDocId = snapshot.docs[0].id;
             const engellenenler = snapshot.docs[0].data().engellenenler || [];
             
-            // Eğer karşı taraf beni engellemediyse mesajı kutusuna koy!
+            // Eğer beni engellemediyse mermiyi içeri at!
             if(!engellenenler.includes(gonderen)) {
-                const hedefRef = firebase.firestore().collection("kullanicilar").doc(hedefDocId);
-                hedefRef.update({
-                    [`sohbetler.${gonderen}`]: firebase.firestore.FieldValue.arrayUnion(yeniMesaj),
+                fdb.collection("kullanicilar").doc(hedefDocId).set({
+                    sohbetler: {
+                        [gonderen]: firebase.firestore.FieldValue.arrayUnion(yeniMesaj)
+                    },
                     okunmamisSohbetler: firebase.firestore.FieldValue.arrayUnion(gonderen)
-                }).catch(() => {
-                    hedefRef.set({
-                        sohbetler: { [gonderen]: [yeniMesaj] },
-                        okunmamisSohbetler: [gonderen]
-                    }, { merge: true });
-                });
+                }, { merge: true });
             }
         }
     });
@@ -222,7 +199,6 @@ window.sohbetiAc = function(kisiIsmi) {
     document.getElementById('sohbetBaslikIsim').innerText = kisiIsmi;
     ekran.style.display = 'flex';
     
-    // Açıldığında okunmamış listesinden bu kişiyi çıkar
     const myUid = firebase.auth().currentUser ? firebase.auth().currentUser.uid : null;
     if(myUid) {
         firebase.firestore().collection("kullanicilar").doc(myUid).update({
@@ -236,7 +212,7 @@ window.sohbetiAc = function(kisiIsmi) {
 function ekranaBalonlariCiz() {
     const balonAlani = document.getElementById('sohbetBalonlariAlani');
     balonAlani.innerHTML = '';
-    const benimAdim = getKendiAdim();
+    const benimAdim = typeof aktifKullaniciAdi !== 'undefined' ? aktifKullaniciAdi : "";
     
     if(!aktifSohbetHedefi || !tumSohbetVerisi[aktifSohbetHedefi]) {
         balonAlani.innerHTML = '<p style="color:#777; text-align:center; font-size:12px; margin-top:20px;">Sohbete başla...</p>';
@@ -262,9 +238,9 @@ function ekranaBalonlariCiz() {
     setTimeout(() => { balonAlani.scrollTop = balonAlani.scrollHeight; }, 50);
 }
 
-// CANLI YAYIN (Veritabanını Dinleme)
 function canliSohbetiBaslat() {
-    if(!firebase.auth().currentUser || getKendiAdim().startsWith("MİSAFİR_")) return;
+    const benimAdim = typeof aktifKullaniciAdi !== 'undefined' ? aktifKullaniciAdi : "";
+    if(!firebase.auth().currentUser || benimAdim.startsWith("MİSAFİR_")) return;
     
     if(canliYayinAboneligi) canliYayinAboneligi(); 
     const myUid = firebase.auth().currentUser.uid;
@@ -351,6 +327,4 @@ window.aktifKisiyiEngelle = function() {
     });
 };
 
-// Sistemi ayağa kaldırma beklemesi
 setTimeout(() => { canliSohbetiBaslat(); }, 3000);
-
