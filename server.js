@@ -12,6 +12,9 @@ const oyuncuKozmetikleri = {};
 const banliKullanicilar = new Set(); 
 const baglantiKopanlar = {}; 
 
+// YENİ: Posta Kutusu Veritabanı (Geçici Hafıza)
+const postaKutusu = {}; 
+
 const masalar = {
     'Acemiler (20K Bahis)': { bahis: 20000, kasa: 0, koltuklar: [null, null, null, null], deste: [], gosterge: null, oyunBasladi: false, siradakiOyuncu: null, eller: {}, gostergeGosterildi: false },
     'Usta Masası (50K Bahis)': { bahis: 50000, kasa: 0, koltuklar: [null, null, null, null], deste: [], gosterge: null, oyunBasladi: false, siradakiOyuncu: null, eller: {}, gostergeGosterildi: false },
@@ -267,10 +270,41 @@ io.on('connection', (socket) => {
       io.emit('admin_guncel_veri', oyuncuCipleri);
       io.emit('kozmetikleri_guncelle', oyuncuKozmetikleri); 
       io.emit('online_oyuncular', Object.keys(oyuncuCipleri));
+
+      // Kullanıcı giriş yapınca posta kutusunu da gönder
+      socket.emit('posta_kutusu_verisi', postaKutusu[isim] || []);
       
       let masaBulundu = null;
       for(let m in masalar) { if(masalar[m].koltuklar.includes(isim)) { masaBulundu = m; break; } }
       if(masaBulundu) { socket.emit('sen_masadasin', { masaAdi: masaBulundu, isVIP: masalar[masaBulundu].isVIP || false, sahibi: masalar[masaBulundu].sahibi || "", gizli: masalar[masaBulundu].gizli || false }); }
+  });
+
+  // YENİ: ÖZEL MESAJLAŞMA (DM) ALTYAPISI
+  socket.on('ozel_mesaj_gonder', (data) => {
+      const { kimden, kime, mesaj } = data;
+      if (!postaKutusu[kime]) postaKutusu[kime] = [];
+      
+      const yeniMesaj = {
+          id: Date.now(),
+          kimden: kimden,
+          mesaj: mesaj,
+          tarih: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
+          okundu: false
+      };
+      
+      postaKutusu[kime].push(yeniMesaj);
+      io.emit('yeni_ozel_mesaj_bildirimi', { kime: kime }); // Alıcıya bildirim gönder
+  });
+
+  socket.on('posta_kutusu_iste', (isim) => {
+      socket.emit('posta_kutusu_verisi', postaKutusu[isim] || []);
+  });
+
+  socket.on('mesajlari_okundu_yap', (isim) => {
+      if (postaKutusu[isim]) {
+          postaKutusu[isim].forEach(m => m.okundu = true);
+      }
+      socket.emit('posta_kutusu_verisi', postaKutusu[isim] || []); // Güncel listeyi geri yolla
   });
 
   socket.on('esya_firlat', (data) => {
@@ -315,11 +349,6 @@ io.on('connection', (socket) => {
   socket.on('kozmetik_guncelle', (data) => { oyuncuKozmetikleri[data.isim] = data.kozmetikler; io.emit('kozmetikleri_guncelle', oyuncuKozmetikleri); });
   socket.on('liderlik_tablosu_iste', () => { const siraliList = Object.entries(oyuncuCipleri).map(entry => ({ isim: entry[0], cip: entry[1] })).filter(k => !k.isim.startsWith('MİSAFİR_')).sort((a, b) => b.cip - a.cip).slice(0, 10); socket.emit('liderlik_tablosu_guncelle', siraliList); });
   socket.on('masaya_davet_et', (data) => { const masa = masalar[data.masaAdi]; if (masa && masa.isVIP) { if (!masa.davetliler.includes(data.kime)) masa.davetliler.push(data.kime); } io.emit('davet_geldi', data); });
-
-  // YENİ EKLENEN KOD: Özel Mesajı (DM) hedef kişiye ilet!
-  socket.on('ozel_mesaj_bildirim', (data) => {
-      io.emit('ozel_mesaj_geldi', data);
-  });
 
   socket.on('masaya_otur', (data) => {
     kullaniciyiMasadanKaldir(data.isim); 
