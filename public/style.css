@@ -157,24 +157,24 @@ body { background-color: #050d08; color: #fff; font-family: 'Segoe UI', Tahoma, 
 .online-nokta { display: inline-block; width: 8px; height: 8px; background-color: #2ecc71; border-radius: 50%; box-shadow: 0 0 5px #2ecc71; margin-right: 5px; }
 .offline-nokta { display: inline-block; width: 8px; height: 8px; background-color: #e74c3c; border-radius: 50%; margin-right: 5px; opacity: 0.5; }
 
-/* --- SAĞ ÜST İLETİŞİM SÜTUNU (SADECE OYUN MASASINDA) --- */
-/* Masadan kalkma butonu sağ üstte top: 10px'te olduğu için bunları altına asıyoruz. */
+/* --- SOL ÜST İLETİŞİM SÜTUNU (BOŞ ARAZİYE) --- */
+/* Resimde gösterdiğin sol taraftaki boşluğa jilet gibi asıyoruz. */
 
 /* 1. Ses Butonu */
 #sound-toggle-btn {
     position: fixed !important;
-    top: 60px !important;    /* Masadan kalk butonunun altı */
-    left: auto !important;   /* Eski sol ayarını İPTAL ET */
-    right: 15px !important;  /* SAĞA YASLA */
+    top: 85px !important;    
+    left: 15px !important;   /* SOLA YASLA */
+    right: auto !important;  /* Sağ ayarını eziyoruz */
     z-index: 9998 !important;
 }
 
 /* 2. Ortadaki Yeşil Sohbet Butonu */
 .pro-sohbet-tetikleyici, #sohbetAcBtn {
     position: fixed !important;
-    top: 115px !important;   /* Ses butonunun altı */
-    left: auto !important;   /* Eski sol ayarını İPTAL ET */
-    right: 15px !important;  /* SAĞA YASLA */
+    top: 140px !important;   /* Ses butonunun altı */
+    left: 15px !important;   /* SOLA YASLA */
+    right: auto !important;  /* Sağ ayarını eziyoruz */
     z-index: 9998 !important;
     width: 40px !important;
     height: 40px !important;
@@ -195,9 +195,9 @@ body { background-color: #050d08; color: #fff; font-family: 'Segoe UI', Tahoma, 
 /* 3. En Alttaki Mavi Mesaj Butonu */
 #mesajlarBtn, #mesaj-btn, [id*="mesaj"] {
     position: fixed !important;
-    top: 170px !important;   /* Sohbet butonunun altı */
-    left: auto !important;   /* Eski sol ayarını İPTAL ET */
-    right: 15px !important;  /* SAĞA YASLA */
+    top: 195px !important;   /* Sohbet butonunun altı */
+    left: 15px !important;   /* SOLA YASLA */
+    right: auto !important;  /* Sağ ayarını eziyoruz */
     z-index: 9998 !important;
     width: 40px !important;
     height: 40px !important;
