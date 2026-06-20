@@ -220,4 +220,25 @@ body { background-color: #050d08; color: #fff; font-family: 'Segoe UI', Tahoma, 
     right: 15px !important;
     left: auto !important; /* Sol hizalamasını iptal et ki sağa yapışsın */
     border: 2px solid #e74c3c !important; 
+    /* --- LOBİDEKİ OYUNCULAR LİSTESİ (KAYDIRILABİLİR KUTU YAPIMI) --- */
+#lobidekilerListesi {
+    max-height: 220px !important; /* Listenin uzayabileceği maksimum boy */
+    overflow-y: auto !important;  /* Taşan kısmı aşağı kaydırmalı yap */
+    padding-right: 5px;
+    margin-bottom: 20px;
+}
+
+/* Şık ve İnce Kaydırma Çubuğu (VIP Tasarım) */
+#lobidekilerListesi::-webkit-scrollbar { 
+    width: 4px; 
+}
+#lobidekilerListesi::-webkit-scrollbar-track { 
+    background: rgba(0, 0, 0, 0.3); 
+    border-radius: 10px; 
+}
+#lobidekilerListesi::-webkit-scrollbar-thumb { 
+    background: #f2c94c; /* Altın sarısı scrollbar */
+    border-radius: 10px; 
+}
+
 }
