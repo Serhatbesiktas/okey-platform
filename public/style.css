@@ -98,7 +98,7 @@ body { background-color: #050d08; color: #fff; font-family: 'Segoe UI', Tahoma, 
 .flash-bildirim.goster { display: block; animation: flashAnim 3.5s forwards; }
 
 /* ----------------------------------------------------- */
-/* 👇 BURASI YANLIŞLIKLA SİLDİĞİM HAYATİ GİRİŞ EKRANI KODLARI 👇 */
+/* GİRİŞ EKRANI KODLARI  */
 /* ----------------------------------------------------- */
 #authEkrani { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 45%, #1f5934 0%, #11361c 55%, #050d08 100%); z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
 .auth-kutu { background: linear-gradient(135deg, #112618 0%, #06120b 100%); border: 3px solid #f2c94c; padding: 40px 30px; border-radius: 20px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.8), 0 0 20px rgba(242, 201, 76, 0.2); }
@@ -163,40 +163,15 @@ body { background-color: #050d08; color: #fff; font-family: 'Segoe UI', Tahoma, 
 .online-nokta { display: inline-block; width: 8px; height: 8px; background-color: #2ecc71; border-radius: 50%; box-shadow: 0 0 5px #2ecc71; margin-right: 5px; }
 .offline-nokta { display: inline-block; width: 8px; height: 8px; background-color: #e74c3c; border-radius: 50%; margin-right: 5px; opacity: 0.5; }
 
-/* --- JİLET GİBİ SOL SÜTUN VE ZARF BUTONU --- */
-.m-sol-btn {
-    position: fixed !important;
-    left: 15px !important;
-    width: 40px !important; 
-    height: 40px !important; 
-    border-radius: 50% !important; 
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    background: rgba(11, 38, 20, 0.8) !important;
-    color: #fff !important;
-    font-size: 18px !important; 
-    cursor: pointer !important;
-    z-index: 9998 !important;
-    border: 2px solid transparent !important; 
-    transition: all 0.2s ease;
-    padding: 0 !important; 
-    margin: 0 !important;
-}
 
-#sound-toggle-btn { top: 85px !important; border-color: #2ecc71 !important; }
-#sound-toggle-btn.ses-kapali { border-color: #e74c3c !important; }
+/* --- JİLET GİBİ İLETİŞİM BUTONLARI (Kusursuz Boyut ve Hizalama) --- */
 
-.pro-sohbet-tetikleyici, #sohbetAcBtn { top: 140px !important; border-color: #2ecc71 !important; }
-
-#mesajlarBtn, #mesaj-btn, .genel-mesaj-btn { top: 195px !important; border-color: #3498db !important; }
-
-/* Zarf (Özel Mesaj) Butonunu da zorla sola taşıdım */
+/* 1. Bütün Butonlara Ortak Şekil ve Boyut (HTML'e dokunmadan ID/Class üzerinden) */
+#sound-toggle-btn,
+.pro-sohbet-tetikleyici, #sohbetAcBtn,
+#mesajlarBtn, #mesaj-btn, .genel-mesaj-btn,
 #ozelMesajBtn, .ozel-mesaj-btn, [id*="ozel"], [class*="ozel-mesaj"], [id*="zarf"], .zarf-btn, .pm-btn, .mesaj-kutusu-btn {
     position: fixed !important;
-    top: 250px !important;
-    left: 15px !important;
-    right: auto !important;
     width: 40px !important; 
     height: 40px !important; 
     border-radius: 50% !important; 
@@ -208,8 +183,41 @@ body { background-color: #050d08; color: #fff; font-family: 'Segoe UI', Tahoma, 
     font-size: 18px !important; 
     cursor: pointer !important;
     z-index: 9998 !important;
-    border: 2px solid #e74c3c !important; 
-    transition: all 0.2s ease;
     padding: 0 !important; 
     margin: 0 !important;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5) !important;
+}
+
+/* 2. Tek Tek Yerleşimleri ve Çerçeve Renkleri */
+
+/* SES BUTONU (Sol Üst) */
+#sound-toggle-btn {
+    top: 85px !important;
+    left: 15px !important;
+    border: 2px solid #2ecc71 !important; 
+}
+#sound-toggle-btn.ses-kapali {
+    border-color: #e74c3c !important; 
+}
+
+/* SOHBET BUTONU (Sesin hemen altı) */
+.pro-sohbet-tetikleyici, #sohbetAcBtn {
+    top: 140px !important;   
+    left: 15px !important;   
+    border: 2px solid #2ecc71 !important; 
+}
+
+/* GENEL MESAJ BUTONU (Sohbetin altı) */
+#mesajlarBtn, #mesaj-btn, .genel-mesaj-btn {
+    top: 195px !important;   
+    left: 15px !important;   
+    border: 2px solid #3498db !important; 
+}
+
+/* ZARF / ÖZEL MESAJ BUTONU (Sağda kalsın demiştin, yerini bozmadan şeklini düzelttik) */
+#ozelMesajBtn, .ozel-mesaj-btn, [id*="ozel"], [class*="ozel-mesaj"], [id*="zarf"], .zarf-btn, .pm-btn, .mesaj-kutusu-btn {
+    top: 85px !important;
+    right: 15px !important;
+    left: auto !important; /* Sol hizalamasını iptal et ki sağa yapışsın */
+    border: 2px solid #e74c3c !important; 
 }
