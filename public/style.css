@@ -259,3 +259,35 @@ body { background-color: #050d08; color: #fff; font-family: 'Segoe UI', Tahoma, 
     gap: 5px;
 }
 .btn-izle:active { transform: scale(0.95); box-shadow: none; }
+/* --- BİLGİSAYAR (PC) EKRANLARI İÇİN GÖRÜNÜM DÜZELTMESİ --- */
+@media (min-width: 800px) {
+    body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: #020503; /* PC'de arka planı iyice koyulaştır */
+    }
+    
+    /* Oyun alanını telefon/tablet boyutunda sabitle ve ortaya al */
+    .vip-header, .main-container, #lobiEkrani, #masaEkrani {
+        width: 100% !important;
+        max-width: 600px !important; 
+        margin: 0 auto !important;
+        position: relative;
+    }
+
+    /* Alt menüyü de o çerçevenin altına sabitle */
+    .alt-menu-container {
+        max-width: 600px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+    }
+
+    /* O sol ve sağdaki yuvarlak butonların (Ses, Sohbet, Zarf) PC'de çok kenara kaçmasını engelle */
+    #sound-toggle-btn, .pro-sohbet-tetikleyici, #sohbetAcBtn, #mesajlarBtn, #mesaj-btn, .genel-mesaj-btn {
+        left: calc(50% - 280px) !important; /* 600'lük çerçevenin hemen sol dışı */
+    }
+    #ozelMesajBtn, .ozel-mesaj-btn, [id*="ozel"], [class*="ozel-mesaj"], [id*="zarf"], .zarf-btn, .pm-btn, .mesaj-kutusu-btn {
+        right: calc(50% - 280px) !important; /* Çerçevenin sağ dışı */
+    }
+}
