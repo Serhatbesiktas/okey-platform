@@ -160,13 +160,12 @@ body { background-color: #050d08; color: #fff; font-family: 'Segoe UI', Tahoma, 
 
 /* --- KUSURSUZ SOL SÜTUN İLETİŞİM BUTONLARI --- */
 
-/* 1. Ses Butonu (Giriş ekranında gizlenmesi için z-index düşürüldü) */
+/* 1. Ses Butonu (Artık body'de değil, masanın içinde. Yeri sabit.) */
 #sound-toggle-btn {
     position: fixed !important;
     top: 85px !important;    
     left: 15px !important;   
     right: auto !important;  
-    /* Giriş ekranı (authEkrani) 99999 z-index'e sahip, ses butonu arkada kalacak! */
     z-index: 9998 !important; 
 }
 
@@ -177,20 +176,6 @@ body { background-color: #050d08; color: #fff; font-family: 'Segoe UI', Tahoma, 
     left: 15px !important;   
     right: auto !important;  
     z-index: 9998 !important;
-    width: 40px !important;
-    height: 40px !important;
-    border-radius: 50% !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    background: rgba(11, 38, 20, 0.8) !important;
-    border: 2px solid #2ecc71 !important;
-    color: #fff !important;
-    font-size: 20px !important;
-    box-shadow: 0 0 10px rgba(46, 204, 113, 0.5) !important;
-    cursor: pointer !important;
-    padding: 0 !important;
-    margin: 0 !important;
 }
 
 /* 3. Genel Mesaj Butonu (Sola Sabit) */
@@ -200,41 +185,15 @@ body { background-color: #050d08; color: #fff; font-family: 'Segoe UI', Tahoma, 
     left: 15px !important;   
     right: auto !important;  
     z-index: 9998 !important;
-    width: 40px !important;
-    height: 40px !important;
-    border-radius: 50% !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    background: rgba(11, 38, 20, 0.8) !important;
-    border: 2px solid #3498db !important;
-    color: #fff !important;
-    font-size: 20px !important;
-    box-shadow: 0 0 10px rgba(52, 152, 219, 0.5) !important;
-    cursor: pointer !important;
-    padding: 0 !important;
-    margin: 0 !important;
 }
 
-/* 4. ÖZEL MESAJ BUTONU (SAĞDAN SÖKÜLÜP SOLA GETİRİLDİ!) */
-#ozelMesajBtn, .ozel-mesaj-btn, [id*="ozel"] {
+/* 4. ÖZEL MESAJ (ZARF) BUTONUNU SAĞDAN SOLA KAZIMA OPERASYONU */
+/* O butonu yakalamak için olası tüm senaryoları yazdım */
+#ozelMesajBtn, .ozel-mesaj-btn, [id*="ozel"], [class*="ozel-mesaj"], 
+[id*="zarf"], .zarf-btn, .pm-btn, .mesaj-kutusu-btn, button:has(img[src*="zarf"]) {
     position: fixed !important;
     top: 250px !important;    /* Genel Mesajın Hemen Altına */
-    left: 15px !important;    /* SOLA YASLANDI */
-    right: auto !important;   /* SAĞ İPTAL EDİLDİ */
+    left: 15px !important;    /* SOLA ZORLA */
+    right: auto !important;   /* SAĞI İPTAL ET */
     z-index: 9998 !important;
-    width: 40px !important;
-    height: 40px !important;
-    border-radius: 50% !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    background: rgba(11, 38, 20, 0.8) !important;
-    border: 2px solid #e74c3c !important; /* Özel mesajı ayırmak için kırmızımsı çerçeve */
-    color: #fff !important;
-    font-size: 20px !important;
-    box-shadow: 0 0 10px rgba(231, 76, 60, 0.5) !important;
-    cursor: pointer !important;
-    padding: 0 !important;
-    margin: 0 !important;
 }
