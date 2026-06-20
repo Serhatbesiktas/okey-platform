@@ -29,7 +29,18 @@ const sesTasKoy = new Audio('sounds/tas_koy.mp3');
 const sesSiraSende = new Audio('sounds/sira_sende.mp3');
 
 sesTasCek.preload = 'auto'; sesTasKoy.preload = 'auto'; sesSiraSende.preload = 'auto';
-function sesCal(sesObje) { try { let yeniSes = sesObje.cloneNode(); yeniSes.volume = 0.5; yeniSes.play().catch(e => console.log(e)); } catch(err) {} }
+
+// İŞTE AMELİYAT YAPILAN ANA SES ŞALTERİ BURASI!
+function sesCal(sesObje) { 
+    // Eğer buton kapalıysa (false ise) hiçbir ses çalma, direkt çık!
+    if(window.oyunSesleriAktif === false) return; 
+
+    try { 
+        let yeniSes = sesObje.cloneNode(); 
+        yeniSes.volume = 0.5; 
+        yeniSes.play().catch(e => console.log(e)); 
+    } catch(err) {} 
+}
 
 const authEkrani = document.getElementById('authEkrani');
 const lobiEkrani = document.getElementById('lobiEkrani');
@@ -187,7 +198,6 @@ window.gorevOduluAl = function(id, miktar) {
     ozelUyariGoster(`🎉 Görev tamamlandı! ${miktar.toLocaleString()} ÇİP hesabına eklendi!`); renderGorevler();
 }
 
-// İŞTE BURASI YENİLENDİ: Boş koltuğa tıklayınca online listeyi açıp kolayca davet etmeni sağlar!
 window.davetMenusuAc = function() {
     if(isMisafir) { ozelUyariGoster("⚠️ Misafir hesaplar davet edemez."); return; }
     const ekran = document.getElementById('arkadaslarEkrani');
@@ -216,7 +226,7 @@ window.davetMenusuAc = function() {
 
 window.profiliGoster = function(hedefIsim) {
     if(!hedefIsim || hedefIsim === "" || hedefIsim === "Bekleniyor...") {
-        if(suAnkiMasam) davetMenusuAc(); // Boş koltuğa tıklanırsa davet menüsü açılır!
+        if(suAnkiMasam) davetMenusuAc(); 
         return;
     }
     
@@ -357,9 +367,8 @@ window.arkadaslarMenusuAc = function() {
     });
 }
 
-// İŞTE BURASI: Oyun Bitti Ekranını Zorla Temizleyen Silecek!
 socket.on('sen_masadasin', (data) => {
-    masayiTemizle(); // Her masaya girişte eski çöpleri temizler!
+    masayiTemizle(); 
     suAnkiMasam = data.masaAdi || data; suAnkiMasaVIPMi = data.isVIP || false; suAnkiMasaSahibi = data.sahibi || ""; suAnkiMasaGizliMi = data.gizli || false; lobiEkrani.style.display = 'none'; masaEkrani.style.display = 'flex'; document.getElementById('masaOrtasiYazi').innerText = suAnkiMasam.toUpperCase();
     if(suAnkiMasaVIPMi && suAnkiMasaSahibi === aktifKullaniciAdi) { if(btnVipGizlilikTetikle) { btnVipGizlilikTetikle.style.display = "block"; btnVipGizlilikTetikle.innerText = suAnkiMasaGizliMi ? "🔓 MASAYI HERKESE AÇ" : "🔒 MASAYI KİLİTLE"; btnVipGizlilikTetikle.style.background = suAnkiMasaGizliMi ? "#2ecc71" : "#ff33aa"; } } else { if(btnVipGizlilikTetikle) btnVipGizlilikTetikle.style.display = "none"; }
     socket.emit('masaya_geri_don', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi });
@@ -393,7 +402,6 @@ socket.on('online_oyuncular', (liste) => {
 
 window.arkadasEkle = function(isim) { if(isMisafir) return; if(!benimArkadaslarim.includes(isim)) { benimArkadaslarim.push(isim); if(auth.currentUser) { db.collection("kullanicilar").doc(auth.currentUser.uid).update({ arkadaslar: benimArkadaslarim }).then(() => { ozelUyariGoster(`✅ ${isim} arkadaş listene eklendi!`); }); } } }
 
-// İŞTE BURASI: Davet atılınca anında gitmesini sağlayan sistem!
 window.masayaDavetEt = function(arkadasIsmi) { 
     event.stopPropagation(); if(!suAnkiMasam) return; 
     socket.emit('masaya_davet_et', { kimden: aktifKullaniciAdi, kime: arkadasIsmi, masaAdi: suAnkiMasam }); 
@@ -441,7 +449,6 @@ window.masayaGeriDon = function(masaAdi) { suAnkiMasam = masaAdi; lobiEkrani.sty
 
 function gelişmişKoltukHizala(koltuklar) { const index = koltuklar.indexOf(aktifKullaniciAdi); if (index === -1) return; const sR = koltuklar[(index + 1) % 4] || ""; const sT = koltuklar[(index + 2) % 4] || ""; const sL = koltuklar[(index + 3) % 4] || ""; document.getElementById('seatRight').dataset.isim = sR; document.getElementById('seatTop').dataset.isim = sT; document.getElementById('seatLeft').dataset.isim = sL; koltukStiliUygula('seatRight', sR); koltukStiliUygula('seatTop', sT); koltukStiliUygula('seatLeft', sL); }
 
-// İŞTE BURASI: Boş koltuklara tıklanabilir yemyeşil "DAVET ET" yazısı çakıldı!
 function koltukStiliUygula(elementId, oyuncuIsmi) { 
     const el = document.getElementById(elementId); 
     if(!oyuncuIsmi) { 
