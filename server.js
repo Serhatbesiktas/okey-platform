@@ -170,10 +170,8 @@ function botHamlesiYap(masaAdi) {
     if(!masa || !masa.oyunBasladi) return;
 
     const siradaki = masa.siradakiOyuncu;
-    // BOT ZEKASI: startsWith('Bot_') yerine isSistemBotu kullanıyoruz ki gerçekçi isimler de oynayabilsin
     if(siradaki && isSistemBotu(siradaki)) {
         
-        // YAPAY ZEKA DÜŞÜNME SÜRESİ: Anında atmaz, 2.5 ile 5.5 saniye arası bekler (Gerçekçi hissiyat)
         const dusunmeSuresi = Math.floor(Math.random() * 3000) + 2500; 
 
         setTimeout(() => {
@@ -184,7 +182,6 @@ function botHamlesiYap(masaAdi) {
                 return;
             }
 
-            // YAPAY ZEKA RASTGELE OYUN İÇİ SOHBET ( %8 İhtimalle )
             if (Math.random() < 0.08) {
                 const rastgeleLaflar = ["Taş gelmiyor ki", "Hadi bitelim artık", "Okeye dönüyorum kimse atmasın :)", "Çay yok mu çay :D", "Bu el kesin bende", "Güzel el", "Şanssızlık diz boyu", "Çifte gidiyorum"];
                 const laf = rastgeleLaflar[Math.floor(Math.random() * rastgeleLaflar.length)];
@@ -225,9 +222,8 @@ function botHamlesiYap(masaAdi) {
                 io.emit('sistem_mesaji', `${siradaki} hamlesini yaptı. Sıra ${masa.siradakiOyuncu}'da!`);
                 io.emit('sira_guncelle', { masaAdi: masaAdi, kimde: masa.siradakiOyuncu });
                 
-                // Sıradaki de botsa döngü devam eder
                 if(masa.siradakiOyuncu && isSistemBotu(masa.siradakiOyuncu)) { botHamlesiYap(masaAdi); }
-            }, 1000); // 1 saniye taşı inceleme/atma süresi
+            }, 1000); 
         }, dusunmeSuresi); 
     }
 }
@@ -248,8 +244,6 @@ function kullaniciyiMasadanKaldir(isim) {
                     io.emit('cip_guncelle_ozel', { isim: isim, cip: oyuncuCipleri[isim] });
                 }
                 
-                // ESKİ SİSTEM: const yeniBot = "Bot_123"
-                // YENİ SİSTEM: Masadan düşenin yerine sahte isimli yapay zeka geçer
                 const yeniBot = getRastgeleBotIsmi();
                 aktifBotIsimleri.add(yeniBot);
                 if(oyuncuCipleri[yeniBot] === undefined) {
@@ -367,8 +361,38 @@ io.on('connection', (socket) => {
 
   socket.on('magaza_harcamasi', (data) => { if (oyuncuCipleri[data.isim] !== undefined) { oyuncuCipleri[data.isim] = Number(data.yeniCip); io.emit('admin_guncel_veri', oyuncuCipleri); } });
   socket.on('kozmetik_guncelle', (data) => { oyuncuKozmetikleri[data.isim] = data.kozmetikler; io.emit('kozmetikleri_guncelle', oyuncuKozmetikleri); });
-  socket.on('liderlik_tablosu_iste', () => { const siraliList = Object.entries(oyuncuCipleri).map(entry => ({ isim: entry[0], cip: entry[1] })).filter(k => !k.isim.startsWith('MİSAFİR_')).sort((a, b) => b.cip - a.cip).slice(0, 10); socket.emit('liderlik_tablosu_guncelle', siraliList); });
-  socket.on('masaya_davet_et', (data) => { const masa = masalar[data.masaAdi]; if (masa && masa.isVIP) { if (!masa.davetliler.includes(data.kime)) masa.davetliler.push(data.kime); } io.emit('davet_geldi', data); });
+  
+  // 🔥 GÜNCELLENEN LİDERLİK TABLOSU VERİ KAYNAĞI
+  socket.on('liderlik_tablosu_iste', () => { 
+      const siraliList = Object.entries(oyuncuCipleri)
+          .map(entry => ({ isim: entry[0], cip: entry[1] }))
+          .filter(k => !k.isim.startsWith('MİSAFİR_')) // Sadece test misafirlerini gizle
+          .sort((a, b) => b.cip - a.cip)
+          .slice(0, 5); // Liderlik tablosu (TOP 5)
+      socket.emit('liderlik_tablosu_guncelle', siraliList); 
+  });
+
+  // 🔥 DAVET KABUL EDEN BOT SİSTEMİ
+  socket.on('masaya_davet_et', (data) => { 
+      const masa = masalar[data.masaAdi]; 
+      if (masa && masa.isVIP) { if (!masa.davetliler.includes(data.kime)) masa.davetliler.push(data.kime); } 
+      io.emit('davet_geldi', data); 
+
+      // Eğer davet edilen kişi bir botsa
+      if(isSistemBotu(data.kime)) {
+          setTimeout(() => {
+              if(masalar[data.masaAdi] && !masalar[data.masaAdi].oyunBasladi) {
+                  let bosIndex = masalar[data.masaAdi].koltuklar.indexOf(null);
+                  if(bosIndex !== -1) {
+                      masalar[data.masaAdi].koltuklar[bosIndex] = data.kime;
+                      const guncelLobi = {}; for(let ms in masalar) guncelLobi[ms] = masalar[ms].koltuklar;
+                      io.emit('masalari_guncelle', guncelLobi);
+                      io.emit('yeni_sohbet_mesaji', { masaAdi: data.masaAdi, isim: "Sistem", mesaj: `👋 ${data.kime} daveti kabul etti ve masaya oturdu.`, kozmetikler: [] });
+                  }
+              }
+          }, Math.floor(Math.random() * 2000) + 1500); // 1.5 - 3.5 saniye düşünüp gelir
+      }
+  });
 
   socket.on('masaya_otur', (data) => {
     kullaniciyiMasadanKaldir(data.isim); 
@@ -400,7 +424,7 @@ io.on('connection', (socket) => {
                 aktifBotIsimleri.add(yeniBot);
                 if(oyuncuCipleri[yeniBot] === undefined) {
                     oyuncuCipleri[yeniBot] = Math.floor(Math.random() * 5000000) + 1000000;
-                    oyuncuKozmetikleri[yeniBot] = [['neon_tac']]; // Botlara bling ver
+                    oyuncuKozmetikleri[yeniBot] = [['neon_tac']]; 
                 }
                 masa.koltuklar[i] = yeniBot; 
             } 
@@ -409,7 +433,7 @@ io.on('connection', (socket) => {
 
         masa.koltuklar.forEach(isim => {
             masa.kasa += masa.bahis; 
-            if(!isSistemBotu(isim)) { // Gerçek oyuncuların çipi düşer
+            if(!isSistemBotu(isim)) { 
                 let uCip = Number(oyuncuCipleri[isim]); if(isNaN(uCip)) uCip = 0;
                 oyuncuCipleri[isim] = Math.max(0, uCip - Number(masa.bahis)); 
                 io.emit('cip_guncelle_ozel', { isim: isim, cip: oyuncuCipleri[isim] });
@@ -489,8 +513,6 @@ io.on('connection', (socket) => {
   
   socket.on('sohbet_mesaji', (data) => { 
       io.emit('yeni_sohbet_mesaji', data); 
-      
-      // YAPAY ZEKA SOHBET CEVAPLAYICI 
       const msg = data.mesaj.toLowerCase();
       const masa = masalar[data.masaAdi];
       if (masa && !isSistemBotu(data.isim)) {
@@ -510,13 +532,13 @@ io.on('connection', (socket) => {
                   reply = "Okey bende boşuna bekleme :)";
               }
 
-              if (reply && Math.random() < 0.7) { // %70 ihtimalle cevap versin ki çok sırıtmasın
+              if (reply && Math.random() < 0.7) { 
                   const cevapVerenBot = masaBotlari[Math.floor(Math.random() * masaBotlari.length)];
                   setTimeout(() => {
                       if(masalar[data.masaAdi]) { 
                           io.emit('yeni_sohbet_mesaji', { masaAdi: data.masaAdi, isim: cevapVerenBot, mesaj: reply, kozmetikler: oyuncuKozmetikleri[cevapVerenBot] || [] });
                       }
-                  }, Math.floor(Math.random() * 3000) + 2000); // 2-5 saniye sonra cevap verir
+                  }, Math.floor(Math.random() * 3000) + 2000); 
               }
           }
       }
@@ -541,22 +563,40 @@ io.on('connection', (socket) => {
   socket.on('admin_oyuncu_ban', (isim) => { let hedefIsim = (isim || "").trim().toUpperCase(); banliKullanicilar.add(hedefIsim); kullaniciyiMasadanKaldir(hedefIsim); io.emit('admin_islem_uyarisi', { isim: hedefIsim, islem: 'ban' }); });
 });
 
-// --- HAYALET KULLANICI (LOBİ KALABALIĞI) MOTORU ---
-// Her 12 saniyede bir, sistemde 75 bot olana kadar yavaş yavaş yeni zengin oyuncular ekler.
+// 🔥 KENDİ KENDİNE MASA KURAN VE LOBİYİ DOLDURAN BOT MOTORU
 setInterval(() => {
     let botCount = Array.from(aktifBotIsimleri).filter(b => oyuncuCipleri[b] !== undefined).length;
     if (botCount < 75) {
         const yeniBot = getRastgeleBotIsmi();
         aktifBotIsimleri.add(yeniBot);
-        
-        // Botlara 1 Milyon ile 20 Milyon arası rastgele çip verir (Liderlik tablosu şenlensin)
         oyuncuCipleri[yeniBot] = Math.floor(Math.random() * 19000000) + 1000000; 
-        
-        // Zenginlik göstergesi VIP Taç ve Ateşli İsim ataması
         const kozmetikIhtimalleri = [['atesli_isim'], ['neon_tac'], ['altin_cerceve'], ['neon_tac', 'atesli_isim'], [], [], []];
         oyuncuKozmetikleri[yeniBot] = kozmetikIhtimalleri[Math.floor(Math.random() * kozmetikIhtimalleri.length)];
-        
         io.emit('online_oyuncular', Object.keys(oyuncuCipleri));
+        io.emit('kozmetikleri_guncelle', oyuncuKozmetikleri); 
+    }
+
+    // --- BOTLARIN BOŞ MASALARA OTURMASI ---
+    for(let m in masalar) {
+        if(!masalar[m].isVIP && !masalar[m].oyunBasladi) { 
+            let botSayisi = masalar[m].koltuklar.filter(k => isSistemBotu(k)).length;
+            let bosSayisi = masalar[m].koltuklar.filter(k => k === null).length;
+            
+            // Masada en fazla 3 bot olsun (Gerçek oyuncuya kesin 1 kişilik yer kalsın)
+            if(bosSayisi > 0 && botSayisi < 3 && Math.random() < 0.35) {
+                let bostaKalanBotlar = Array.from(aktifBotIsimleri).filter(b => {
+                    for(let masaAdi in masalar) { if(masalar[masaAdi].koltuklar.includes(b)) return false; }
+                    return true;
+                });
+                if(bostaKalanBotlar.length > 0) {
+                    let secilenBot = bostaKalanBotlar[0];
+                    let bosIndex = masalar[m].koltuklar.indexOf(null);
+                    masalar[m].koltuklar[bosIndex] = secilenBot;
+                    const guncelLobi = {}; for(let ms in masalar) guncelLobi[ms] = masalar[ms].koltuklar;
+                    io.emit('masalari_guncelle', guncelLobi);
+                }
+            }
+        }
     }
 }, 12000); 
 
