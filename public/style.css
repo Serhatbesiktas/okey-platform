@@ -242,3 +242,20 @@ body { background-color: #050d08; color: #fff; font-family: 'Segoe UI', Tahoma, 
 }
 
 }
+/* --- İZLE (YANCI) BUTONU CSS --- */
+.btn-izle {
+    background: linear-gradient(180deg, #9b59b6 0%, #8e44ad 100%);
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 13px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(142, 68, 173, 0.3);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.btn-izle:active { transform: scale(0.95); box-shadow: none; }
