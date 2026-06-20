@@ -45,9 +45,9 @@ const banliKullanicilar = new Set();
 const baglantiKopanlar = {}; 
 
 const masalar = {
-    'Acemiler (20K Bahis)': { bahis: 20000, kasa: 0, koltuklar: [null, null, null, null], deste: [], gosterge: null, oyunBasladi: false, siradakiOyuncu: null, eller: {}, gostergeGosterildi: false },
-    'Usta Masası (50K Bahis)': { bahis: 50000, kasa: 0, koltuklar: [null, null, null, null], deste: [], gosterge: null, oyunBasladi: false, siradakiOyuncu: null, eller: {}, gostergeGosterildi: false },
-    'Hızlı Oyun (10K Bahis)': { bahis: 10000, kasa: 0, koltuklar: [null, null, null, null], deste: [], gosterge: null, oyunBasladi: false, siradakiOyuncu: null, eller: {}, gostergeGosterildi: false }
+    'Acemiler (20K Bahis)': { bahis: 20000, kasa: 0, koltuklar: [null, null, null, null], izleyiciler: [], deste: [], gosterge: null, oyunBasladi: false, siradakiOyuncu: null, eller: {}, gostergeGosterildi: false },
+    'Usta Masası (50K Bahis)': { bahis: 50000, kasa: 0, koltuklar: [null, null, null, null], izleyiciler: [], deste: [], gosterge: null, oyunBasladi: false, siradakiOyuncu: null, eller: {}, gostergeGosterildi: false },
+    'Hızlı Oyun (10K Bahis)': { bahis: 10000, kasa: 0, koltuklar: [null, null, null, null], izleyiciler: [], deste: [], gosterge: null, oyunBasladi: false, siradakiOyuncu: null, eller: {}, gostergeGosterildi: false }
 };
 
 function desteYaratVeKaristir() {
@@ -233,6 +233,16 @@ function kullaniciyiMasadanKaldir(isim) {
     let silinecekMasalar = [];
     
     for(let m in masalar) {
+        // İZLEYİCİ KONTROLÜ
+        if (masalar[m].izleyiciler) {
+            let izIndex = masalar[m].izleyiciler.indexOf(isim);
+            if (izIndex !== -1) {
+                masalar[m].izleyiciler.splice(izIndex, 1);
+                io.emit('yeni_sohbet_mesaji', { masaAdi: m, isim: "Sistem", mesaj: `🏃 ${isim} izlemeyi bıraktı.`, kozmetikler: [] });
+                degisiklikOldu = true;
+            }
+        }
+
         let index = masalar[m].koltuklar.indexOf(isim);
         if(index !== -1) {
             if (masalar[m].oyunBasladi) {
@@ -341,7 +351,7 @@ io.on('connection', (socket) => {
       
       const vMasaAdi = `👑 VIP: ${data.sahibi} Masası`;
       masalar[vMasaAdi] = {
-          bahis: miktar, kasa: 0, koltuklar: [data.sahibi, null, null, null],
+          bahis: miktar, kasa: 0, koltuklar: [data.sahibi, null, null, null], izleyiciler: [],
           deste: [], gosterge: null, oyunBasladi: false, siradakiOyuncu: null, eller: {}, gostergeGosterildi: false,
           isVIP: true, sahibi: data.sahibi, gizli: data.gizli, davetliler: []
       };
@@ -362,23 +372,20 @@ io.on('connection', (socket) => {
   socket.on('magaza_harcamasi', (data) => { if (oyuncuCipleri[data.isim] !== undefined) { oyuncuCipleri[data.isim] = Number(data.yeniCip); io.emit('admin_guncel_veri', oyuncuCipleri); } });
   socket.on('kozmetik_guncelle', (data) => { oyuncuKozmetikleri[data.isim] = data.kozmetikler; io.emit('kozmetikleri_guncelle', oyuncuKozmetikleri); });
   
-  // 🔥 GÜNCELLENEN LİDERLİK TABLOSU VERİ KAYNAĞI
   socket.on('liderlik_tablosu_iste', () => { 
       const siraliList = Object.entries(oyuncuCipleri)
           .map(entry => ({ isim: entry[0], cip: entry[1] }))
-          .filter(k => !k.isim.startsWith('MİSAFİR_')) // Sadece test misafirlerini gizle
+          .filter(k => !k.isim.startsWith('MİSAFİR_')) 
           .sort((a, b) => b.cip - a.cip)
-          .slice(0, 5); // Liderlik tablosu (TOP 5)
+          .slice(0, 5); 
       socket.emit('liderlik_tablosu_guncelle', siraliList); 
   });
 
-  // 🔥 DAVET KABUL EDEN BOT SİSTEMİ
   socket.on('masaya_davet_et', (data) => { 
       const masa = masalar[data.masaAdi]; 
       if (masa && masa.isVIP) { if (!masa.davetliler.includes(data.kime)) masa.davetliler.push(data.kime); } 
       io.emit('davet_geldi', data); 
 
-      // Eğer davet edilen kişi bir botsa
       if(isSistemBotu(data.kime)) {
           setTimeout(() => {
               if(masalar[data.masaAdi] && !masalar[data.masaAdi].oyunBasladi) {
@@ -390,7 +397,7 @@ io.on('connection', (socket) => {
                       io.emit('yeni_sohbet_mesaji', { masaAdi: data.masaAdi, isim: "Sistem", mesaj: `👋 ${data.kime} daveti kabul etti ve masaya oturdu.`, kozmetikler: [] });
                   }
               }
-          }, Math.floor(Math.random() * 2000) + 1500); // 1.5 - 3.5 saniye düşünüp gelir
+          }, Math.floor(Math.random() * 2000) + 1500); 
       }
   });
 
@@ -412,6 +419,27 @@ io.on('connection', (socket) => {
             const guncelLobi = {}; for(let m in masalar) guncelLobi[m] = masalar[m].koltuklar; io.emit('masalari_guncelle', guncelLobi);
         }
     }
+  });
+
+  // 🔥 YANCI (İZLEYİCİ) OLARAK KATILMA MOTORU
+  socket.on('masayi_izle', (data) => {
+      kullaniciyiMasadanKaldir(data.isim); 
+      const masa = masalar[data.masaAdi];
+      if(masa) {
+          if(!masa.izleyiciler) masa.izleyiciler = [];
+          if(!masa.izleyiciler.includes(data.isim)) masa.izleyiciler.push(data.isim);
+          
+          socket.emit('izleyici_olarak_katildin', {
+              masaAdi: data.masaAdi,
+              kasa: masa.kasa,
+              gosterge: masa.gosterge,
+              koltuklar: masa.koltuklar,
+              oyunBasladi: masa.oyunBasladi,
+              kalanTas: masa.deste.length,
+              siradaki: masa.siradakiOyuncu
+          });
+          io.emit('yeni_sohbet_mesaji', { masaAdi: data.masaAdi, isim: "Sistem", mesaj: `👀 ${data.isim} masayı izlemeye başladı.`, kozmetikler: [] });
+      }
   });
 
   socket.on('oyunu_baslat', (masaAdi) => {
@@ -563,7 +591,6 @@ io.on('connection', (socket) => {
   socket.on('admin_oyuncu_ban', (isim) => { let hedefIsim = (isim || "").trim().toUpperCase(); banliKullanicilar.add(hedefIsim); kullaniciyiMasadanKaldir(hedefIsim); io.emit('admin_islem_uyarisi', { isim: hedefIsim, islem: 'ban' }); });
 });
 
-// 🔥 KENDİ KENDİNE MASA KURAN VE LOBİYİ DOLDURAN BOT MOTORU
 setInterval(() => {
     let botCount = Array.from(aktifBotIsimleri).filter(b => oyuncuCipleri[b] !== undefined).length;
     if (botCount < 75) {
@@ -576,13 +603,11 @@ setInterval(() => {
         io.emit('kozmetikleri_guncelle', oyuncuKozmetikleri); 
     }
 
-    // --- BOTLARIN BOŞ MASALARA OTURMASI ---
     for(let m in masalar) {
         if(!masalar[m].isVIP && !masalar[m].oyunBasladi) { 
             let botSayisi = masalar[m].koltuklar.filter(k => isSistemBotu(k)).length;
             let bosSayisi = masalar[m].koltuklar.filter(k => k === null).length;
             
-            // Masada en fazla 3 bot olsun (Gerçek oyuncuya kesin 1 kişilik yer kalsın)
             if(bosSayisi > 0 && botSayisi < 3 && Math.random() < 0.35) {
                 let bostaKalanBotlar = Array.from(aktifBotIsimleri).filter(b => {
                     for(let masaAdi in masalar) { if(masalar[masaAdi].koltuklar.includes(b)) return false; }
