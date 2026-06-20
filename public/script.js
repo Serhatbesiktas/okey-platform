@@ -221,8 +221,6 @@ window.davetMenusuAc = function() {
     }
 };
 
-
-// 🌟 YENİ İSTATİSTİK ALGORİTMASI 🌟
 window.profiliGoster = function(hedefIsim) {
     if(!hedefIsim || hedefIsim === "" || hedefIsim === "Bekleniyor...") {
         if(suAnkiMasam) davetMenusuAc(); 
@@ -258,36 +256,22 @@ window.profiliGoster = function(hedefIsim) {
 
     db.collection("kullanicilar").where("isim", "==", hedefIsim).get().then((querySnapshot) => {
         if(!querySnapshot.empty) {
-            // GERÇEK OYUNCULAR
             const data = querySnapshot.docs[0].data(); let kozmetikler = data.aktifKozmetikler || []; let tac = kozmetikler.includes('neon_tac') ? "👑 " : ""; pIsim.innerHTML = tac + data.isim; pIsim.style.color = kozmetikler.includes('atesli_isim') ? '#ff4d4d' : '#fff'; pIsim.style.textShadow = kozmetikler.includes('atesli_isim') ? '0 0 8px #ff0000' : 'none';
             if (kozmetikler.includes('atesli_isim')) { pUnvanBadge.innerText = "🔥 ATEŞ USTASI"; pUnvanBadge.style.display = "inline-block"; } else if (kozmetikler.includes('neon_tac')) { pUnvanBadge.innerText = "👑 OKEY KRALI"; pUnvanBadge.style.display = "inline-block"; }
             if(kozmetikler.includes('altin_cerceve')) { pAvatar.style.border = '3px solid #f2c94c'; pAvatar.style.boxShadow = '0 0 15px #f2c94c'; }
             
-            let oynanan = data.oynananOyun || 0; 
-            let kazanilan = data.kazanilanOyun || 0; 
-            let kaybedilen = Math.max(0, oynanan - kazanilan);
+            let oynanan = data.oynananOyun || 0; let kazanilan = data.kazanilanOyun || 0; let kaybedilen = Math.max(0, oynanan - kazanilan);
             let oran = oynanan > 0 ? Math.round((kazanilan / oynanan) * 100) : 0; 
-            
-            pOynanan.innerText = oynanan; 
-            pKazanilan.innerHTML = `<span style="color:#2ecc71; font-weight:900;">${kazanilan}</span> <span style="color:#777">/</span> <span style="color:#e74c3c; font-weight:900;">${kaybedilen}</span>`;
-            kazanmaOrani.innerText = "%" + oran; 
-            
-            let gorunenCip = Number(data.cip); if(isNaN(gorunenCip)) gorunenCip = 0; pCip.innerText = gorunenCip.toLocaleString('tr-TR'); let ligAyar = getLigRozeti(kazanilan, false); pLigBadge.innerText = ligAyar.metin; pLigBadge.style.background = ligAyar.renk; pLigBadge.style.color = ligAyar.yaziRenk;
+            pOynanan.innerText = oynanan; pKazanilan.innerHTML = `<span style="color:#2ecc71; font-weight:900;">${kazanilan}</span> <span style="color:#777">/</span> <span style="color:#e74c3c; font-weight:900;">${kaybedilen}</span>`;
+            kazanmaOrani.innerText = "%" + oran; let gorunenCip = Number(data.cip); if(isNaN(gorunenCip)) gorunenCip = 0; pCip.innerText = gorunenCip.toLocaleString('tr-TR'); let ligAyar = getLigRozeti(kazanilan, false); pLigBadge.innerText = ligAyar.metin; pLigBadge.style.background = ligAyar.renk; pLigBadge.style.color = ligAyar.yaziRenk;
         } else { 
-            // 🤖 BOTLAR (HAYALET OYUNCULAR) İÇİN GERÇEKÇİ SAHTE İSTATİSTİK
             let hash = 0;
-            for (let i = 0; i < hedefIsim.length; i++) {
-                hash = hedefIsim.charCodeAt(i) + ((hash << 5) - hash);
-            }
+            for (let i = 0; i < hedefIsim.length; i++) { hash = hedefIsim.charCodeAt(i) + ((hash << 5) - hash); }
             hash = Math.abs(hash);
 
-            let bOynanan = (hash % 1150) + 75; // 75 ile 1225 arası oyun
-            let bOran = (hash % 25) + 38; // %38 ile %63 arası gerçekçi win rate
-            let bKazanilan = Math.floor(bOynanan * (bOran / 100));
-            let bKaybedilen = bOynanan - bKazanilan;
-            let bCip = (hash % 14500000) + 1200000; // 1.2M ile 15M arası çip
+            let bOynanan = (hash % 1150) + 75; let bOran = (hash % 25) + 38; let bKazanilan = Math.floor(bOynanan * (bOran / 100));
+            let bKaybedilen = bOynanan - bKazanilan; let bCip = (hash % 14500000) + 1200000; 
 
-            // İsim ve Kozmetik Ayarları (Botlar için globals'den çekeriz veya simüle ederiz)
             let bKozmetikler = globalKozmetikler[hedefIsim] || []; 
             let bTac = bKozmetikler.includes('neon_tac') ? "👑 " : "";
             pIsim.innerHTML = bTac + hedefIsim;
@@ -295,16 +279,8 @@ window.profiliGoster = function(hedefIsim) {
             if(bKozmetikler.includes('neon_tac')) { pUnvanBadge.innerText = "👑 OKEY KRALI"; pUnvanBadge.style.display = "inline-block"; }
             if(bKozmetikler.includes('altin_cerceve')) { pAvatar.style.border = '3px solid #f2c94c'; pAvatar.style.boxShadow = '0 0 15px #f2c94c'; }
 
-            // İstatistikleri Ekrana Bas
-            pOynanan.innerText = bOynanan;
-            pKazanilan.innerHTML = `<span style="color:#2ecc71; font-weight:900;">${bKazanilan}</span> <span style="color:#777">/</span> <span style="color:#e74c3c; font-weight:900;">${bKaybedilen}</span>`;
-            kazanmaOrani.innerText = "%" + bOran;
-            pCip.innerText = bCip.toLocaleString('tr-TR');
-
-            let bLigAyar = getLigRozeti(bKazanilan, false);
-            pLigBadge.innerText = bLigAyar.metin;
-            pLigBadge.style.background = bLigAyar.renk;
-            pLigBadge.style.color = bLigAyar.yaziRenk;
+            pOynanan.innerText = bOynanan; pKazanilan.innerHTML = `<span style="color:#2ecc71; font-weight:900;">${bKazanilan}</span> <span style="color:#777">/</span> <span style="color:#e74c3c; font-weight:900;">${bKaybedilen}</span>`; kazanmaOrani.innerText = "%" + bOran; pCip.innerText = bCip.toLocaleString('tr-TR');
+            let bLigAyar = getLigRozeti(bKazanilan, false); pLigBadge.innerText = bLigAyar.metin; pLigBadge.style.background = bLigAyar.renk; pLigBadge.style.color = bLigAyar.yaziRenk;
         }
     }).catch(err => { pIsim.innerText = "Bağlantı Hatası"; });
 };
@@ -414,21 +390,38 @@ socket.on('sen_masadasin', (data) => {
     socket.emit('masaya_geri_don', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi });
 });
 
+// 🔥 YENİ: LİDERLİK TABLOSU ARTIK SUNUCUDAN ÇEKİLİYOR
 window.liderlikTablosunuAc = function() {
-    document.getElementById('liderlikEkrani').style.display = 'flex'; const listeDiv = document.getElementById('liderlikListesi'); listeDiv.innerHTML = '<p style="text-align:center; color:#f2c94c; font-weight:bold;">Veritabanı taranıyor...</p>';
-    db.collection("kullanicilar").orderBy("cip", "desc").limit(5).get().then((querySnapshot) => {
-          listeDiv.innerHTML = ''; if(querySnapshot.empty) { listeDiv.innerHTML = '<p style="text-align:center; color:#777;">Henüz sıralama oluşmadı.</p>'; return; }
-          let index = 0;
-          querySnapshot.forEach((doc) => {
-              const oyuncu = doc.data(); if(oyuncu.isim.startsWith('MİSAFİR_')) return; 
-              let siraClass = ''; let kupa = ''; if(index === 0) { siraClass = 'sira-1'; kupa = '🏆'; } else if(index === 1) { siraClass = 'sira-2'; kupa = '🥈'; } else if(index === 2) { siraClass = 'sira-3'; kupa = '🥉'; } else { siraClass = ''; kupa = '🏅'; }
-              let kozmetikler = oyuncu.aktifKozmetikler || []; let isimRenk = kozmetikler.includes('atesli_isim') ? '#ff4d4d' : '#fff'; let isimGolge = kozmetikler.includes('atesli_isim') ? '0 0 5px #ff0000' : 'none'; let tac = kozmetikler.includes('neon_tac') ? '👑 ' : '';
-              let gCip = Number(oyuncu.cip); if(isNaN(gCip)) gCip = 0;
-              listeDiv.innerHTML += `<div class="lider-satir" style="cursor:pointer;" onclick="profiliGoster('${oyuncu.isim}')"><div class="lider-sira ${siraClass}">${index + 1}.</div><div class="lider-isim" style="color:${isimRenk}; text-shadow:${isimGolge};">${kupa} ${tac}${oyuncu.isim}</div><div class="lider-cip">${gCip.toLocaleString('tr-TR')} ÇİP</div></div>`;
-              index++;
-          });
-      }).catch((error) => { console.log(error); listeDiv.innerHTML = '<p style="text-align:center; color:#e74c3c;">Bağlantı hatası.</p>'; });
+    document.getElementById('liderlikEkrani').style.display = 'flex'; 
+    const listeDiv = document.getElementById('liderlikListesi'); 
+    listeDiv.innerHTML = '<p style="text-align:center; color:#f2c94c; font-weight:bold;">Zenginler taranıyor...</p>';
+    socket.emit('liderlik_tablosu_iste');
 }
+
+socket.on('liderlik_tablosu_guncelle', (siraliList) => {
+    const listeDiv = document.getElementById('liderlikListesi'); 
+    listeDiv.innerHTML = ''; 
+    if(siraliList.length === 0) { listeDiv.innerHTML = '<p style="text-align:center; color:#777;">Henüz sıralama oluşmadı.</p>'; return; }
+    let index = 0;
+    siraliList.forEach((oyuncu) => {
+        let siraClass = ''; let kupa = ''; 
+        if(index === 0) { siraClass = 'sira-1'; kupa = '🏆'; } 
+        else if(index === 1) { siraClass = 'sira-2'; kupa = '🥈'; } 
+        else if(index === 2) { siraClass = 'sira-3'; kupa = '🥉'; } 
+        else { siraClass = ''; kupa = '🏅'; }
+        
+        let kozmetikler = globalKozmetikler[oyuncu.isim] || []; 
+        let isimRenk = kozmetikler.includes('atesli_isim') ? '#ff4d4d' : '#fff'; 
+        let isimGolge = kozmetikler.includes('atesli_isim') ? '0 0 5px #ff0000' : 'none'; 
+        let tac = kozmetikler.includes('neon_tac') ? '👑 ' : '';
+        
+        let gCip = Number(oyuncu.cip); if(isNaN(gCip)) gCip = 0;
+        listeDiv.innerHTML += `<div class="lider-satir" style="cursor:pointer;" onclick="profiliGoster('${oyuncu.isim}')"><div class="lider-sira ${siraClass}">${index + 1}.</div><div class="lider-isim" style="color:${isimRenk}; text-shadow:${isimGolge};">${kupa} ${tac}${oyuncu.isim}</div><div class="lider-cip">${gCip.toLocaleString('tr-TR')} ÇİP</div></div>`;
+        index++;
+    });
+});
+
+socket.on('kozmetikleri_guncelle', (data) => { globalKozmetikler = data; });
 
 socket.on('online_oyuncular', (liste) => {
     onlineOyuncularListesi = liste; const lobiDiv = document.getElementById('lobidekilerListesi'); if(!lobiDiv) return; lobiDiv.innerHTML = '';
