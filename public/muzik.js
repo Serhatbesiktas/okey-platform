@@ -3,11 +3,10 @@ document.addEventListener('DOMContentLoaded', () => {
     soundBtn.id = 'sound-toggle-btn';
     soundBtn.innerHTML = '🔊';
     
-    /* --- SOL ÜST KÖŞE TAM AYARLARI --- */
     soundBtn.style.position = 'fixed';
-    soundBtn.style.top = '15px';
+    soundBtn.style.top = '85px';
     soundBtn.style.left = '15px';
-    soundBtn.style.zIndex = '9999';
+    soundBtn.style.zIndex = '9998';
     soundBtn.style.width = '40px';
     soundBtn.style.height = '40px';
     soundBtn.style.borderRadius = '50%';
@@ -21,7 +20,14 @@ document.addEventListener('DOMContentLoaded', () => {
     soundBtn.style.alignItems = 'center';
     soundBtn.style.boxShadow = '0 0 10px rgba(46, 204, 113, 0.5)';
 
-    document.body.appendChild(soundBtn);
+    // BÜYÜK DEĞİŞİKLİK: Body yerine sadece Masa Ekranına ekliyoruz!
+    // Böylece masa kapalıyken (lobide/girişte) bu buton asla görünmez.
+    const masaEkrani = document.getElementById('masaEkrani');
+    if (masaEkrani) {
+        masaEkrani.appendChild(soundBtn);
+    } else {
+        document.body.appendChild(soundBtn); // Hata önlemi
+    }
 
     let soundEnabled = true;
     window.oyunSesleriAktif = true; 
