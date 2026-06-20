@@ -30,11 +30,8 @@ const sesSiraSende = new Audio('sounds/sira_sende.mp3');
 
 sesTasCek.preload = 'auto'; sesTasKoy.preload = 'auto'; sesSiraSende.preload = 'auto';
 
-// İŞTE AMELİYAT YAPILAN ANA SES ŞALTERİ BURASI!
 function sesCal(sesObje) { 
-    // Eğer buton kapalıysa (false ise) hiçbir ses çalma, direkt çık!
     if(window.oyunSesleriAktif === false) return; 
-
     try { 
         let yeniSes = sesObje.cloneNode(); 
         yeniSes.volume = 0.5; 
@@ -210,7 +207,7 @@ window.davetMenusuAc = function() {
     
     let onlineSayisi = 0;
     onlineOyuncularListesi.forEach(oyuncu => {
-        if(oyuncu === aktifKullaniciAdi || oyuncu.startsWith('Bot_')) return; 
+        if(oyuncu === aktifKullaniciAdi) return; 
         onlineSayisi++;
         let kozmetikler = globalKozmetikler[oyuncu] || [];
         let isimRenk = kozmetikler.includes('atesli_isim') ? '#ff4d4d' : '#fff';
@@ -224,6 +221,8 @@ window.davetMenusuAc = function() {
     }
 };
 
+
+// 🌟 YENİ İSTATİSTİK ALGORİTMASI 🌟
 window.profiliGoster = function(hedefIsim) {
     if(!hedefIsim || hedefIsim === "" || hedefIsim === "Bekleniyor...") {
         if(suAnkiMasam) davetMenusuAc(); 
@@ -241,10 +240,6 @@ window.profiliGoster = function(hedefIsim) {
 
     if (firlatAlani) { if (suAnkiMasam && masadaMi && hedefIsim !== aktifKullaniciAdi) { firlatAlani.style.display = 'flex'; } else { firlatAlani.style.display = 'none'; } }
 
-    if(hedefIsim.startsWith("Bot_")) {
-        pIsim.innerText = hedefIsim; pOynanan.innerText = "999+"; pKazanilan.innerText = "999+"; pCip.innerText = "Sınırsız"; kazanmaOrani.innerText = "%100"; pDurum.innerText = "🟢 Çevrimiçi"; pDurum.style.color = "#2ecc71"; pLigBadge.innerText = "🤖 SİSTEM BOTU"; pLigBadge.style.background = "#555"; pArkadasBtn.style.display = 'none'; pDavetBtn.style.display = 'none'; pUnvanBadge.style.display = 'none'; pAvatar.style.border = '3px solid #52796f'; pAvatar.style.boxShadow = 'none'; pIsim.style.color = '#fff'; pIsim.style.textShadow = 'none'; return;
-    }
-
     if(isOnline) { pDurum.innerText = "🟢 Çevrimiçi"; pDurum.style.color = "#2ecc71"; } else { pDurum.innerText = "🔴 Çevrimdışı"; pDurum.style.color = "#e74c3c"; }
 
     if (hedefIsim !== aktifKullaniciAdi) {
@@ -254,18 +249,63 @@ window.profiliGoster = function(hedefIsim) {
     }
 
     if(hedefIsim.startsWith("MİSAFİR_")) {
-        pIsim.innerText = hedefIsim; pOynanan.innerText = "0"; pKazanilan.innerText = "0"; pCip.innerText = "20.000"; let ligAyar = getLigRozeti(0, true); pLigBadge.innerText = ligAyar.metin; pLigBadge.style.background = ligAyar.renk; pLigBadge.style.color = ligAyar.yaziRenk; pArkadasBtn.style.display = 'none'; pDavetBtn.style.display = (suAnkiMasam && isOnline) ? 'block' : 'none'; return;
+        pIsim.innerText = hedefIsim; pOynanan.innerText = "0"; 
+        pKazanilan.innerHTML = `<span style="color:#2ecc71">0</span> <span style="color:#777">/</span> <span style="color:#e74c3c">0</span>`; 
+        pCip.innerText = "20.000"; let ligAyar = getLigRozeti(0, true); pLigBadge.innerText = ligAyar.metin; pLigBadge.style.background = ligAyar.renk; pLigBadge.style.color = ligAyar.yaziRenk; pArkadasBtn.style.display = 'none'; pDavetBtn.style.display = (suAnkiMasam && isOnline) ? 'block' : 'none'; return;
     }
 
     pIsim.innerText = "Yükleniyor..."; pOynanan.innerText = "..."; pKazanilan.innerText = "..."; pCip.innerText = "..."; kazanmaOrani.innerText = "%0"; pAvatar.style.border = '3px solid #52796f'; pAvatar.style.boxShadow = 'none'; pIsim.style.color = '#fff'; pIsim.style.textShadow = 'none'; pUnvanBadge.style.display = 'none'; pLigBadge.innerText = "Yükleniyor..."; pLigBadge.style.background = "#333";
 
     db.collection("kullanicilar").where("isim", "==", hedefIsim).get().then((querySnapshot) => {
         if(!querySnapshot.empty) {
+            // GERÇEK OYUNCULAR
             const data = querySnapshot.docs[0].data(); let kozmetikler = data.aktifKozmetikler || []; let tac = kozmetikler.includes('neon_tac') ? "👑 " : ""; pIsim.innerHTML = tac + data.isim; pIsim.style.color = kozmetikler.includes('atesli_isim') ? '#ff4d4d' : '#fff'; pIsim.style.textShadow = kozmetikler.includes('atesli_isim') ? '0 0 8px #ff0000' : 'none';
             if (kozmetikler.includes('atesli_isim')) { pUnvanBadge.innerText = "🔥 ATEŞ USTASI"; pUnvanBadge.style.display = "inline-block"; } else if (kozmetikler.includes('neon_tac')) { pUnvanBadge.innerText = "👑 OKEY KRALI"; pUnvanBadge.style.display = "inline-block"; }
             if(kozmetikler.includes('altin_cerceve')) { pAvatar.style.border = '3px solid #f2c94c'; pAvatar.style.boxShadow = '0 0 15px #f2c94c'; }
-            let oynanan = data.oynananOyun || 0; let kazanilan = data.kazanilanOyun || 0; let oran = oynanan > 0 ? Math.round((kazanilan / oynanan) * 100) : 0; pOynanan.innerText = oynanan; pKazanilan.innerText = kazanilan; kazanmaOrani.innerText = "%" + oran; let gorunenCip = Number(data.cip); if(isNaN(gorunenCip)) gorunenCip = 0; pCip.innerText = gorunenCip.toLocaleString('tr-TR'); let ligAyar = getLigRozeti(kazanilan, false); pLigBadge.innerText = ligAyar.metin; pLigBadge.style.background = ligAyar.renk; pLigBadge.style.color = ligAyar.yaziRenk;
-        } else { pIsim.innerText = hedefIsim; pOynanan.innerText = "Gizli"; pKazanilan.innerText = "Gizli"; pCip.innerText = "Gizli"; }
+            
+            let oynanan = data.oynananOyun || 0; 
+            let kazanilan = data.kazanilanOyun || 0; 
+            let kaybedilen = Math.max(0, oynanan - kazanilan);
+            let oran = oynanan > 0 ? Math.round((kazanilan / oynanan) * 100) : 0; 
+            
+            pOynanan.innerText = oynanan; 
+            pKazanilan.innerHTML = `<span style="color:#2ecc71; font-weight:900;">${kazanilan}</span> <span style="color:#777">/</span> <span style="color:#e74c3c; font-weight:900;">${kaybedilen}</span>`;
+            kazanmaOrani.innerText = "%" + oran; 
+            
+            let gorunenCip = Number(data.cip); if(isNaN(gorunenCip)) gorunenCip = 0; pCip.innerText = gorunenCip.toLocaleString('tr-TR'); let ligAyar = getLigRozeti(kazanilan, false); pLigBadge.innerText = ligAyar.metin; pLigBadge.style.background = ligAyar.renk; pLigBadge.style.color = ligAyar.yaziRenk;
+        } else { 
+            // 🤖 BOTLAR (HAYALET OYUNCULAR) İÇİN GERÇEKÇİ SAHTE İSTATİSTİK
+            let hash = 0;
+            for (let i = 0; i < hedefIsim.length; i++) {
+                hash = hedefIsim.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            hash = Math.abs(hash);
+
+            let bOynanan = (hash % 1150) + 75; // 75 ile 1225 arası oyun
+            let bOran = (hash % 25) + 38; // %38 ile %63 arası gerçekçi win rate
+            let bKazanilan = Math.floor(bOynanan * (bOran / 100));
+            let bKaybedilen = bOynanan - bKazanilan;
+            let bCip = (hash % 14500000) + 1200000; // 1.2M ile 15M arası çip
+
+            // İsim ve Kozmetik Ayarları (Botlar için globals'den çekeriz veya simüle ederiz)
+            let bKozmetikler = globalKozmetikler[hedefIsim] || []; 
+            let bTac = bKozmetikler.includes('neon_tac') ? "👑 " : "";
+            pIsim.innerHTML = bTac + hedefIsim;
+            if(bKozmetikler.includes('atesli_isim')) { pIsim.style.color = '#ff4d4d'; pIsim.style.textShadow = '0 0 8px #ff0000'; pUnvanBadge.innerText = "🔥 ATEŞ USTASI"; pUnvanBadge.style.display = "inline-block"; }
+            if(bKozmetikler.includes('neon_tac')) { pUnvanBadge.innerText = "👑 OKEY KRALI"; pUnvanBadge.style.display = "inline-block"; }
+            if(bKozmetikler.includes('altin_cerceve')) { pAvatar.style.border = '3px solid #f2c94c'; pAvatar.style.boxShadow = '0 0 15px #f2c94c'; }
+
+            // İstatistikleri Ekrana Bas
+            pOynanan.innerText = bOynanan;
+            pKazanilan.innerHTML = `<span style="color:#2ecc71; font-weight:900;">${bKazanilan}</span> <span style="color:#777">/</span> <span style="color:#e74c3c; font-weight:900;">${bKaybedilen}</span>`;
+            kazanmaOrani.innerText = "%" + bOran;
+            pCip.innerText = bCip.toLocaleString('tr-TR');
+
+            let bLigAyar = getLigRozeti(bKazanilan, false);
+            pLigBadge.innerText = bLigAyar.metin;
+            pLigBadge.style.background = bLigAyar.renk;
+            pLigBadge.style.color = bLigAyar.yaziRenk;
+        }
     }).catch(err => { pIsim.innerText = "Bağlantı Hatası"; });
 };
 
@@ -456,7 +496,7 @@ function koltukStiliUygula(elementId, oyuncuIsmi) {
         el.style.textShadow = "none"; 
         return; 
     }
-    if(oyuncuIsmi.startsWith('Bot_')) { 
+    if(oyuncuIsmi.startsWith('Bot_') || oyuncuIsmi.startsWith('MisafirBot_')) { 
         el.innerText = oyuncuIsmi; 
         el.style.color = "#0dcaf0"; 
         el.style.textShadow = "none"; 
@@ -510,7 +550,7 @@ socket.on('gosterge_basarili', (data) => { if (data.isim === aktifKullaniciAdi) 
 socket.on('oyun_bitti', (data) => { 
     if(suAnkiMasam === data.masaAdi) { 
         const sonucEkrani = document.getElementById('sonucEkrani'); const baslik = document.getElementById('sonucBaslik'); const metin = document.getElementById('sonucMetin'); const odul = document.getElementById('sonucOdul'); 
-        if(auth.currentUser && !isMisafir && data.kazanan && !data.kazanan.startsWith('Bot_')) {
+        if(auth.currentUser && !isMisafir && data.kazanan && !data.kazanan.startsWith('Bot_') && !data.kazanan.startsWith('MisafirBot_')) {
             const userRef = db.collection("kullanicilar").doc(auth.currentUser.uid);
             if(data.kazanan === aktifKullaniciAdi) { userRef.update({ oynananOyun: firebase.firestore.FieldValue.increment(1), kazanilanOyun: firebase.firestore.FieldValue.increment(1) }); benimKazanilanOyun++; benimGorevler.kazanma++; gorevleriKaydet(); arayuzGuncelle(); } 
             else { userRef.update({ oynananOyun: firebase.firestore.FieldValue.increment(1) }); }
