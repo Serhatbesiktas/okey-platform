@@ -353,18 +353,28 @@ function masadanAyrilmaIslemi(cezaUygulansinMi = false) {
 window.cezaAnladimKapat = function() { document.getElementById('cezaBildirimEkrani').style.display = 'none'; if(cikisIcinBekleyenLogout) { tamamenCikisYap(); } }
 
 // 🔥 ŞİMŞEK ÇIKIŞ: ARTIK EKRANI BEKLETMEDEN ANINDA SIFIRLAR VE GİRİŞE ATAR
-function tamamenCikisYap() { 
-    auth.signOut();
-    aktifKullaniciAdi = ""; suAnkiMasam = null; masaOyunBasladiMi = false; cikisIcinBekleyenLogout = false; benimKazanilanOyun = 0; 
-    document.getElementById('authEkrani').style.display = 'flex'; 
-    document.getElementById('lobiEkrani').style.display = 'none'; 
-    document.getElementById('masaEkrani').style.display = 'none'; 
-    document.querySelector('.vip-header').style.display = 'none'; 
-    document.getElementById('cezaBildirimEkrani').style.display = 'none'; 
-    document.getElementById('authEmail').value = ''; document.getElementById('authSifre').value = ''; document.getElementById('authKullaniciAdi').value = ''; 
-}
+window.tamamenCikisYap = function() { 
+    auth.signOut().then(() => {
+        window.location.reload(); 
+    }).catch((err) => {
+        console.log(err);
+        window.location.reload();
+    });
+};
 
-document.getElementById('btnCikisYap').addEventListener('click', (e) => { e.stopPropagation(); const cikisOnay = confirm("Hesabınızdan çıkış yapmak istediğinize emin misiniz?"); if(cikisOnay) { if(suAnkiMasam && masaOyunBasladiMi) { cikisIcinBekleyenLogout = true; masadanAyrilmaIslemi(true); } else { if (suAnkiMasam) masadanAyrilmaIslemi(false); tamamenCikisYap(); } } });
+document.getElementById('btnCikisYap').addEventListener('click', (e) => { 
+    e.stopPropagation(); 
+    const cikisOnay = confirm("Hesabınızdan çıkış yapmak istediğinize emin misiniz?"); 
+    if(cikisOnay) { 
+        if(suAnkiMasam && masaOyunBasladiMi && !izleyiciModu) { 
+            cikisIcinBekleyenLogout = true; 
+            masadanAyrilmaIslemi(true); 
+        } else { 
+            if (suAnkiMasam) socket.emit('masadan_kalk', { isim: aktifKullaniciAdi, masaAdi: suAnkiMasam });
+            tamamenCikisYap(); 
+        } 
+    } 
+});
 
 const lobiyeDonBtn = document.getElementById('lobiyeDonBtn');
 lobiyeDonBtn.addEventListener('click', () => { if (suAnkiMasam && masaOyunBasladiMi && !izleyiciModu) { document.getElementById('cikisUyariEkrani').style.display = 'flex'; } else { masadanAyrilmaIslemi(false); } });
