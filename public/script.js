@@ -25,6 +25,89 @@ let suAnkiMasaGizliMi = false;
 
 let benimGorevler = { kazanma: 0, mesaj: 0, gosterge: 0, tarih: "", alinanlar: {} };
 
+// 🔥 BEYCO GAMES & REKLAM İZLE SİSTEMİ 🔥
+function markaVeReklamKurulumu() {
+    // 1. Giriş Ekranını Seri Okey ve Beyco Games olarak damgala
+    const authBaslik = document.getElementById('authBaslik');
+    if(authBaslik) authBaslik.innerText = "SERİ OKEY VIP";
+    const authKutu = document.querySelector('.auth-kutu');
+    if(authKutu && !document.querySelector('.beyco-imza')) {
+        const imza = document.createElement('div');
+        imza.className = 'beyco-imza';
+        imza.innerHTML = 'A <span>Beyco Games</span> Product';
+        authKutu.appendChild(imza);
+    }
+
+    // 2. Reklam Ekranı Altyapısını Gizlice Sayfaya Ekle
+    if(!document.getElementById('reklamEkrani')) {
+        const reklamHTML = `
+        <div id="reklamEkrani">
+            <div class="reklam-kutu">
+                <h2 style="color:#2ecc71; margin-bottom:5px;">Sponsorlu İçerik</h2>
+                <p style="color:#aaa; font-size:13px; line-height:1.5;">Lütfen videoyu sonuna kadar izle. Çıkarsan ödülü alamazsın patron!</p>
+                <div class="reklam-sayac" id="reklamSayac">15</div>
+                <div style="width:100%; height:200px; background:#0a0a0a; border:1px solid #2ecc71; border-radius:10px; display:flex; justify-content:center; align-items:center; color:#555; margin-top:15px; font-size:11px; text-transform:uppercase;">[Beyco Games Ad Network]</div>
+                <button class="btn-reklam-kapat" id="btnReklamKapat" onclick="reklamOduluAl()">🎁 25.000 ÇİPİ AL</button>
+            </div>
+        </div>`;
+        document.body.insertAdjacentHTML('beforeend', reklamHTML);
+    }
+
+    // 3. Alt Menüye "Bedava Çip" Butonunu Çak!
+    const altMenu = document.querySelector('.alt-menu-container');
+    if(altMenu && !document.getElementById('reklamMenusu')) {
+        const btn = document.createElement('div');
+        btn.className = 'alt-menu-item';
+        btn.id = 'reklamMenusu';
+        btn.innerHTML = '<div class="alt-menu-ikon">📺</div><span>Bedava Çip</span>';
+        btn.onclick = () => reklamIzleAksiyon();
+        altMenu.appendChild(btn);
+    }
+}
+window.addEventListener('DOMContentLoaded', markaVeReklamKurulumu);
+setTimeout(markaVeReklamKurulumu, 1000); // Garanti olsun diye 1 saniye sonra tekrar zorla
+
+// 🔥 REKLAM İZLEME MOTORU 🔥
+let reklamIzlendi = false;
+let reklamSayiciInt = null;
+window.reklamIzleAksiyon = function() {
+    if(isMisafir) { ozelUyariGoster("⚠️ Misafir hesaplar reklam izleyip çip kazanamaz. Lütfen kayıt ol patron!"); return; }
+    
+    document.getElementById('reklamEkrani').style.display = 'flex';
+    document.getElementById('btnReklamKapat').style.display = 'none';
+    let saniye = 15;
+    document.getElementById('reklamSayac').innerText = saniye;
+    
+    clearInterval(reklamSayiciInt);
+    reklamSayiciInt = setInterval(() => {
+        saniye--;
+        document.getElementById('reklamSayac').innerText = saniye;
+        if(saniye <= 0) {
+            clearInterval(reklamSayiciInt);
+            document.getElementById('reklamSayac').innerText = "0";
+            const btnKapat = document.getElementById('btnReklamKapat');
+            btnKapat.style.display = 'block';
+            btnKapat.style.background = 'linear-gradient(180deg, #ffe066 0%, #db9d13 100%)';
+            btnKapat.style.color = '#111';
+            btnKapat.style.boxShadow = '0 5px 15px rgba(255, 224, 102, 0.4)';
+            reklamIzlendi = true;
+        }
+    }, 1000);
+};
+
+window.reklamOduluAl = function() {
+    if(reklamIzlendi) {
+        document.getElementById('reklamEkrani').style.display = 'none';
+        benimAnlikCipim += 25000;
+        const cipKutu = document.getElementById('benimCipim');
+        if(cipKutu) { cipKutu.innerText = benimAnlikCipim.toLocaleString('tr-TR'); cipKutu.style.color = "#2ecc71"; setTimeout(() => cipKutu.style.color = "", 2000); }
+        if(auth.currentUser && !isMisafir) { db.collection("kullanicilar").doc(auth.currentUser.uid).update({ cip: benimAnlikCipim }); }
+        socket.emit('magaza_harcamasi', { isim: aktifKullaniciAdi, yeniCip: benimAnlikCipim }); 
+        ozelUyariGoster("📺 Beyco Games Sponsorluğunda 25.000 ÇİP hesabına yatırıldı!");
+        reklamIzlendi = false;
+    }
+};
+
 const sesTasCek = new Audio('sounds/tas_cek.mp3');
 const sesTasKoy = new Audio('sounds/tas_koy.mp3');
 const sesSiraSende = new Audio('sounds/sira_sende.mp3');
@@ -192,7 +275,8 @@ window.gorevOduluAl = function(id, miktar) {
     benimAnlikCipim += miktar; const cipKutu = document.getElementById('benimCipim');
     if(cipKutu) { cipKutu.innerText = benimAnlikCipim.toLocaleString('tr-TR'); cipKutu.style.color = "#2ecc71"; setTimeout(() => cipKutu.style.color = "", 2000); }
     if(auth.currentUser && !isMisafir) { db.collection("kullanicilar").doc(auth.currentUser.uid).update({ cip: benimAnlikCipim }); }
-    socket.emit('magaza_harcamasi', { isim: aktifKullaniciAdi, yeniCip: benimAnlikCipim }); // Çip senkronu
+    socket.emit('kullanici_girisi', { isim: aktifKullaniciAdi, cip: benimAnlikCipim, kozmetikler: aktifKozmetikler });
+    socket.emit('magaza_harcamasi', { isim: aktifKullaniciAdi, yeniCip: benimAnlikCipim });
     ozelUyariGoster(`🎉 Görev tamamlandı! ${miktar.toLocaleString()} ÇİP hesabına eklendi!`); renderGorevler();
 }
 
@@ -323,10 +407,8 @@ window.profilDavetAksiyon = function() {
     socket.emit('masaya_davet_et', { kimden: aktifKullaniciAdi, kime: hedef, masaAdi: suAnkiMasam }); ozelUyariGoster(`💌 ${hedef} adlı oyuncuya davet gönderildi!`); document.getElementById('profilEkrani').style.display = 'none';
 };
 
-// 🔥 HATA YAKALAYICI ZIRHLI VE SENKRON AYRILMA SİSTEMİ 🔥
 function masadanAyrilmaIslemi(cezaUygulansinMi = false) {
     if (suAnkiMasam) {
-        // Önce masadan kalktığımızı sunucuya iletip bizi sistemden silmesini sağlıyoruz
         socket.emit('masadan_kalk', { isim: aktifKullaniciAdi, masaAdi: suAnkiMasam }); 
         
         if (cezaUygulansinMi && masaOyunBasladiMi && !izleyiciModu) {
@@ -337,7 +419,6 @@ function masadanAyrilmaIslemi(cezaUygulansinMi = false) {
                 try { const cipKutu = document.getElementById('benimCipim'); if(cipKutu) { cipKutu.innerText = benimAnlikCipim.toLocaleString('tr-TR'); cipKutu.style.color = "#e74c3c"; setTimeout(() => cipKutu.style.color = "", 2000); } } catch(e){}
                 if (auth.currentUser && !isMisafir) { db.collection("kullanicilar").doc(auth.currentUser.uid).update({ cip: benimAnlikCipim }); }
                 
-                // PİNG-PONG HATASINI ÇÖZEN SATIR: Kullanıcı_girisi yerine sadece arkadan çipi güncelliyoruz.
                 socket.emit('magaza_harcamasi', { isim: aktifKullaniciAdi, yeniCip: benimAnlikCipim }); 
                 
                 try { document.getElementById('cezaMiktarMetni').innerText = cezaMiktari.toLocaleString('tr-TR') + " ÇİP"; document.getElementById('cezaBildirimEkrani').style.display = 'flex'; } catch(e){}
@@ -345,7 +426,6 @@ function masadanAyrilmaIslemi(cezaUygulansinMi = false) {
         }
     }
     
-    // Değişkenleri güvenle sıfırlıyoruz
     suAnkiMasam = null; suAnkiMasaVIPMi = false; suAnkiMasaSahibi = ""; suAnkiMasaGizliMi = false; 
     izleyiciModu = false; 
     
@@ -669,34 +749,7 @@ socket.on('taslari_al', (data) => { if (data.kime === aktifKullaniciAdi && !izle
 socket.on('tas_cekildi', (tas) => { if(!izleyiciModu){ for(let i=0; i<24; i++) { if(document.getElementById('y'+i).children.length === 0) { tasEkle(tas, 'y'+i); break; } } } });
 
 function tasEkle(tasData, yuvaId) { const div = document.createElement('div'); div.className = `okey-tasi tas-${tasData.renk}`; div.innerText = tasData.sayi; div.id = tasData.id; let sonDokunma = 0; let surukleniyorMu = false; div.addEventListener('touchstart', () => { surukleniyorMu = false; }, {passive: true}); div.addEventListener('touchmove', () => { surukleniyorMu = true; }, {passive: true}); div.addEventListener('touchend', function(e) { if(surukleniyorMu) return; const simdi = new Date().getTime(); if (simdi - sonDokunma < 300) { e.preventDefault(); otomatikTasAt(this); } sonDokunma = simdi; }); div.addEventListener('dblclick', function() { otomatikTasAt(this); }); document.getElementById(yuvaId).appendChild(div); }
-
-// 🔥 İSİM YANIP SÖNMESİ DÜZELTİLDİ
-socket.on('sira_guncelle', (data) => { 
-    if(suAnkiMasam === data.masaAdi) { 
-        kurtarmaSinyaliGonder(); 
-        const eskiSira = benimSiramMi; 
-        benimSiramMi = (!izleyiciModu && data.kimde === aktifKullaniciAdi); 
-        if(benimSiramMi && !eskiSira) sesCal(sesSiraSende); 
-        const iskarta = document.getElementById('benimIskartam'); 
-        if(benimSiramMi) iskarta.classList.remove('kilitli-iskarta'); else iskarta.classList.add('kilitli-iskarta'); 
-        
-        let benimKutuIsmim = izleyiciModu ? document.getElementById('benimAdimKutusu').dataset.isim : aktifKullaniciAdi;
-        
-        const koltuklar = [ 
-            { id: 'benimAdimKutusu', isim: benimKutuIsmim }, 
-            { id: 'seatRight', isim: document.getElementById('seatRight').dataset.isim }, 
-            { id: 'seatTop', isim: document.getElementById('seatTop').dataset.isim }, 
-            { id: 'seatLeft', isim: document.getElementById('seatLeft').dataset.isim } 
-        ]; 
-        koltuklar.forEach(k => { 
-            const el = document.getElementById(k.id); 
-            if(el && k.isim === data.kimde) el.classList.add('aktif-sira'); 
-            else if(el) el.classList.remove('aktif-sira'); 
-        }); 
-        checkGosterge(); 
-    } 
-});
-
+socket.on('sira_guncelle', (data) => { if(suAnkiMasam === data.masaAdi) { kurtarmaSinyaliGonder(); const eskiSira = benimSiramMi; benimSiramMi = (!izleyiciModu && data.kimde === aktifKullaniciAdi); if(benimSiramMi && !eskiSira) sesCal(sesSiraSende); const iskarta = document.getElementById('benimIskartam'); if(benimSiramMi) iskarta.classList.remove('kilitli-iskarta'); else iskarta.classList.add('kilitli-iskarta'); const koltuklar = [ { id: 'benimAdimKutusu', isim: document.getElementById('benimAdimKutusu').dataset.isim }, { id: 'seatRight', isim: document.getElementById('seatRight').dataset.isim }, { id: 'seatTop', isim: document.getElementById('seatTop').dataset.isim }, { id: 'seatLeft', isim: document.getElementById('seatLeft').dataset.isim } ]; koltuklar.forEach(k => { const el = document.getElementById(k.id); if(el && k.isim === data.kimde) el.classList.add('aktif-sira'); else if(el) el.classList.remove('aktif-sira'); }); checkGosterge(); } });
 socket.on('masa_ortasi_guncelle', (data) => { if(suAnkiMasam === data.masaAdi) { kurtarmaSinyaliGonder(); kalanTasBilgi.innerText = data.kalanTas; if(data.gosterge) { const gostergeDiv = document.getElementById('gostergeTasi'); gostergeDiv.innerText = data.gosterge.sayi; gostergeDiv.className = `gosterge-tasi tas-${data.gosterge.renk}`; } } });
 
 if(sohbetCekmecesi) {
