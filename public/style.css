@@ -1,372 +1,457 @@
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { background-color: #050d08; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; height: 100dvh; overflow: hidden; }
-.vip-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: linear-gradient(180deg, #0b1c11 0%, #050d08 100%); flex-shrink: 0; border-bottom: 1px solid rgba(46, 204, 113, 0.15); box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
-.profil-bilgi { display: flex; align-items: center; gap: 10px; }
-.profil-avatar { width: 45px; height: 45px; background: radial-gradient(circle, #1e3f28 0%, #0d1f14 100%); border-radius: 50%; border: 2px solid #52796f; display: flex; justify-content: center; align-items: center; font-size: 20px; transition: all 0.3s; }
-.profil-isim-kutu { display: flex; flex-direction: column; align-items: flex-start; }
-.profil-isim { font-size: 15px; font-weight: bold; margin: 0; color: #fff; display: flex; align-items: center; gap: 5px; transition: all 0.3s; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-.vip-badge { background: linear-gradient(180deg, #f2d94c 0%, #d4af37 100%); color: #000; font-size: 9px; font-weight: 900; padding: 2px 6px; border-radius: 4px; margin-top: 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
-.cip-kutu { background: rgba(13, 43, 26, 0.6); border: 1px solid #2ecc71; box-shadow: 0 0 12px rgba(46, 204, 113, 0.4), inset 0 0 6px rgba(46, 204, 113, 0.2); padding: 8px 15px; border-radius: 12px; display: flex; align-items: center; gap: 8px; font-weight: bold; color: #fff; font-size: 16px; position: relative;}
-.cip-ikon { background: linear-gradient(180deg, #ffe066 0%, #f5b041 100%); color: #000; width: 20px; height: 20px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 12px; font-weight: 900; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
-.sistem-mesaji { padding: 10px 20px; font-size: 12px; color: #a3c4bc; display: flex; align-items: center; gap: 8px; background-color: rgba(11, 28, 17, 0.5); flex-shrink: 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
-.sistem-mesaji::before { content: ''; display: inline-block; width: 8px; height: 8px; background-color: #2ecc71; border-radius: 50%; box-shadow: 0 0 8px #2ecc71; }
-.main-container { display: flex; flex-direction: column; flex: 1; overflow-y: auto; }
-#lobiEkrani { display: flex; flex-direction: column; flex: 1; position: relative; padding-bottom: 140px; }
-.masa-sec-baslik { padding: 15px 20px 5px 20px; font-size: 12px; font-weight: 800; color: #52796f; letter-spacing: 2px; text-transform: uppercase; }
-.tables-panel { padding: 10px 20px; display: flex; flex-direction: column; gap: 15px; flex: 1; overflow-y: auto; }
-.masa-kart { background: linear-gradient(135deg, #142d1b 0%, #0b1a12 100%); border: 1px solid rgba(39, 174, 96, 0.2); border-radius: 15px; padding: 15px; display: flex; justify-content: space-between; align-items: center; position: relative; overflow: hidden; box-shadow: 0 6px 15px rgba(0,0,0,0.4); }
-.masa-watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 140px; height: 65px; border: 2px dashed rgba(255,255,255,0.04); border-radius: 40px; pointer-events: none; }
-.masa-watermark::before, .masa-watermark::after { content: ''; position: absolute; width: 20px; height: 10px; border: 2px solid rgba(255,255,255,0.06); border-radius: 5px; left: 50%; transform: translateX(-50%); }
-.masa-watermark::before { top: -10px; }
-.masa-watermark::after { bottom: -10px; }
-.kart-sol { display: flex; align-items: center; gap: 12px; z-index: 2; }
-.zar-kutu { width: 40px; height: 40px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: 20px; box-shadow: inset 0 2px 4px rgba(255,255,255,0.05); }
-.masa-kart-isim { font-size: 15px; font-weight: bold; color: #fff; letter-spacing: 0.3px; }
-.kart-sag { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; z-index: 2; }
-.masa-kisi-kutu { background-color: rgba(0,0,0,0.4); padding: 4px 10px; border-radius: 10px; font-size: 11px; font-weight: bold; color: #84a59d; display: flex; align-items: center; gap: 5px; border: 1px solid rgba(255,255,255,0.03); }
-.btn-otur { background: linear-gradient(180deg, #fad766 0%, #db9d13 100%); color: #111; border: none; padding: 8px 25px; border-radius: 8px; font-weight: 800; font-size: 13px; cursor: pointer; box-shadow: 0 4px 10px rgba(219, 157, 19, 0.3); transition: all 0.2s ease; }
-.btn-otur:active { transform: scale(0.95); box-shadow: none; }
-.btn-otur.disabled { background: #223329; color: #4f6356; box-shadow: none; cursor: not-allowed; border: 1px solid rgba(255,255,255,0.02); }
-.alt-menu-container { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; background: linear-gradient(0deg, #050d08 0%, #0c1c12 100%); border-top: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-around; align-items: center; padding: 0 10px; z-index: 10; }
-.alt-menu-item { display: flex; flex-direction: column; align-items: center; gap: 5px; color: #52796f; font-size: 10px; font-weight: bold; cursor: pointer; transition: color 0.2s; }
-.alt-menu-item.active { color: #f2c94c; }
-.alt-menu-ikon { font-size: 20px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
-.btn-hemen-oyna { position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%); background: linear-gradient(180deg, #ffe066 0%, #e6a100 100%); color: #111; border: none; padding: 12px 30px; border-radius: 12px; font-weight: 900; font-size: 14px; cursor: pointer; box-shadow: 0 10px 25px rgba(230, 161, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.4); display: flex; flex-direction: column; align-items: center; gap: 2px; width: 180px; z-index: 15; transition: all 0.15s ease; }
-.btn-hemen-oyna:active { transform: translateX(-50%) scale(0.95); box-shadow: 0 4px 10px rgba(230, 161, 0, 0.2); }
-.btn-hemen-oyna span { font-size: 10px; font-weight: 600; color: rgba(5, 13, 8, 0.7); text-transform: uppercase; letter-spacing: 0.5px; }
-#masaEkrani { display: none; flex: 1; background-color: #040a05; position: relative; padding: 10px; flex-direction: column; overflow: hidden; }
-.okey-table-ui { background: radial-gradient(circle at 50% 45%, #1f5934 0%, #11361c 55%, #07190b 100%); border: 4px solid #0a170e; border-radius: 20px; width: 100%; flex: 1; position: relative; box-shadow: inset 0 0 40px rgba(0,0,0,0.85), 0 8px 25px rgba(0,0,0,0.6); margin-bottom: 5px; }
-.return-lobby-btn { position: absolute; top: 10px; right: 10px; background: rgba(220, 53, 69, 0.25); color: #ff99a2; border: 1px solid rgba(220, 53, 69, 0.4); padding: 8px 14px; border-radius: 8px; font-size: 11px; font-weight: bold; z-index: 10; cursor: pointer; backdrop-filter: blur(5px); transition: background 0.2s; }
-.return-lobby-btn:active { background: rgba(220, 53, 69, 0.5); }
-.player-seat { position: absolute; background: rgba(0,0,0,0.65); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); padding: 8px 14px; border-radius: 12px; color: #f2c94c; font-size: 12px; font-weight: bold; border: 1.5px solid rgba(255,255,255,0.1); max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; z-index: 5; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); transition: all 0.3s ease; }
-.seat-top { top: 10px; left: 50%; transform: translateX(-50%); border-color: rgba(13, 202, 240, 0.5); color: #0dcaf0; }
-.seat-right { top: 25%; right: -25px; transform: translateY(-50%) rotate(-90deg); border-color: rgba(13, 202, 240, 0.5); color: #0dcaf0; }
-.seat-left { bottom: 25%; left: -25px; transform: translateY(-50%) rotate(90deg); border-color: rgba(13, 202, 240, 0.5); color: #0dcaf0; }
-@keyframes pulse-glow { 0% { box-shadow: 0 0 10px #2ecc71, inset 0 0 5px #2ecc71; border-color: #2ecc71; background: rgba(46, 204, 113, 0.15); } 50% { box-shadow: 0 0 30px #2ecc71, inset 0 0 15px #2ecc71; border-color: #ffffff; background: rgba(46, 204, 113, 0.35); } 100% { box-shadow: 0 0 10px #2ecc71, inset 0 0 5px #2ecc71; border-color: #2ecc71; background: rgba(46, 204, 113, 0.15); } }
-.aktif-sira { animation: pulse-glow 1.4s infinite alternate !important; color: #ffffff !important; text-shadow: 0 0 4px #fff; z-index: 10; }
-.iskarta-alani { position: absolute; width: 44px; height: 60px; background-color: rgba(0, 0, 0, 0.35); border: 1.5px solid rgba(255, 255, 255, 0.12); border-radius: 6px; display: flex; align-items: center; justify-content: center; z-index: 4; box-shadow: inset 0 2px 6px rgba(0,0,0,0.5); }
-#iskartaUst { top: 15px; left: 25%; }
-#iskartaSag { top: 25%; right: 30px; transform: translateY(-50%); }
-#iskartaSol { bottom: 25%; left: 30px; transform: translateY(50%); cursor: pointer; }
-#iskartaSol:active { transform: translateY(50%) scale(0.92); }
-#benimIskartam { position: absolute; bottom: 100px; right: 15px; width: 60px; height: 80px; background-color: rgba(0, 0, 0, 0.45); border: 2px dashed #f2c94c; border-radius: 10px; display: flex; align-items: center; justify-content: center; z-index: 10; transition: all 0.2s ease;}
-#benimIskartam.sortable-drag-over { background-color: rgba(242, 201, 76, 0.25); border-color: #ffffff; box-shadow: 0 0 15px #f2c94c; }
-.iskarta-yazi { pointer-events: none; color: #f2c94c; font-weight: bold; font-size: 11px; text-align: center; text-shadow: 0 2px 4px #000; }
-.kilitli-iskarta { border-color: #dc3545 !important; opacity: 0.4; box-shadow: none !important; }
-.iskarta-alani .okey-tasi { position: absolute !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; width: 38px !important; height: 52px !important; font-size: 18px !important; border-bottom-width: 3px !important; pointer-events: none !important; }
-.masa-ortasi { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 12px; background: rgba(8, 20, 13, 0.45); backdrop-filter: blur(12px); padding: 20px 25px; border-radius: 18px; border: 1px solid rgba(242, 201, 76, 0.25); z-index: 4; box-shadow: 0 12px 35px rgba(0, 0, 0, 0.55), inset 0 1px 1px rgba(255,255,255,0.1); }
-.masa-isim-ortasi { color: rgba(255,255,255,0.35); font-weight: 800; font-size: 13px; text-transform: uppercase; letter-spacing: 2.5px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-.masa-kasa-bilgisi { display: none; color: #2ecc71; font-weight: bold; font-size: 14px; text-shadow: 0 0 8px rgba(46, 204, 113, 0.6); border: 1px dashed #2ecc71; padding: 5px 14px; border-radius: 12px; background-color: rgba(0,0,0,0.6); letter-spacing: 0.3px; }
-.oyun-baslat-btn { background: linear-gradient(180deg, #ffe266 0%, #d49a00 100%); color: #050d08; border: none; padding: 12px 28px; border-radius: 10px; font-weight: bold; font-size: 15px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.4); margin-top: 5px; transition: transform 0.1s; z-index: 50; position: relative;}
-.oyun-baslat-btn:active { transform: scale(0.95); }
-.kalan-tas-bilgi-container { display: none; flex-direction: column; align-items: center; gap: 8px; }
-.kapali-deste { width: 44px; height: 58px; background: linear-gradient(135deg, #ffffff 0%, #eae3d2 100%); border: 1px solid #c8bfae; border-bottom: 5px solid #ab9f8a; border-radius: 6px; box-shadow: -4px 5px 10px rgba(0,0,0,0.65), inset 0 1px 0 #fff; display: flex; align-items: center; justify-content: center; color: #111111; font-weight: 900; font-size: 18px; cursor: pointer; transition: transform 0.1s;}
-.kapali-deste:active { transform: translateY(2px); border-bottom-width: 2px; }
-.gosterge-tasi { width: 44px; height: 58px; background: linear-gradient(135deg, #fffff5 0%, #f4ebd9 100%); border: 1px solid #c8bfae; border-bottom: 5px solid #ab9f8a; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 18px; box-shadow: 0 5px 8px rgba(0,0,0,0.5), inset 0 1px 0 #fff; font-family: Arial, sans-serif; pointer-events: none; }
-#bitisAlani { position: relative; display: none; width: 48px; height: 64px; background-color: rgba(220, 53, 69, 0.15); border: 2px dashed #dc3545; border-radius: 8px; align-items: center; justify-content: center; color: #ff99a2; font-weight: bold; font-size: 11px; text-align: center; transition: all 0.2s ease;}
-#bitisAlani.sortable-drag-over { background-color: rgba(220, 53, 69, 0.5); color: white; border-color: #ffffff; box-shadow: 0 0 15px #dc3545; }
-#bitisAlani .okey-tasi { position: absolute !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; width: 38px !important; height: 52px !important; font-size: 18px !important; border-bottom-width: 3px !important; pointer-events: none !important; }
-#sonucEkrani { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.88); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
-.sonuc-kutu { background: linear-gradient(135deg, #112618 0%, #06120b 100%); border: 4px solid #f2c94c; padding: 35px 30px; border-radius: 24px; text-align: center; color: white; width: 100%; max-width: 400px; box-shadow: 0 15px 40px rgba(0,0,0,0.9); }
-#sonucBaslik { color: #f2c94c; font-size: 28px; margin-bottom: 15px; font-weight: 900; text-transform: uppercase; text-shadow: 0 2px 8px rgba(242,201,76,0.3); }
-#sonucMetin { font-size: 16px; margin-bottom: 15px; color: #e2ece9; line-height: 1.5; }
-#sonucOdul { font-size: 26px; font-weight: bold; color: #2ecc71; margin-bottom: 25px; text-shadow: 0 0 15px rgba(46, 204, 113, 0.5); }
-.sonuc-btn { background: linear-gradient(180deg, #ffe066 0%, #db9d13 100%); color: #050d08; border: none; padding: 14px 35px; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.4); transition: transform 0.15s ease; }
-.sonuc-btn:active { transform: scale(0.95); }
-.okey-istaka-tuslar-area { width: 100%; display: flex; flex-direction: column; gap: 4px; }
-.pro-tus-takimi { width: 100%; display: flex; justify-content: flex-start; align-items: center; padding: 2px 5px; gap: 8px; z-index: 10; }
-.pro-tus { padding: 0 16px; height: 36px; background-color: #112618; border: 1px solid #1e3f28; color: #f2c94c; border-radius: 8px; font-weight: bold; font-size: 12px; text-transform: uppercase; cursor: pointer; box-shadow: 0 3px 6px rgba(0,0,0,0.4); transition: all 0.1s ease;}
-.pro-tus:active { transform: scale(0.95); background-color: #0b1c11; }
-.istaka-container { width: 100%; height: 140px; background: linear-gradient(180deg, #50280b 0%, #351802 100%); border-radius: 12px; border: 4px solid #241001; box-shadow: 0 12px 30px rgba(0,0,0,0.85), inset 0 1px 2px rgba(255,255,255,0.1); display: flex; flex-direction: column; padding: 5px; gap: 5px; position: relative; z-index: 20;}
-.istaka-raf { display: flex; flex: 1; width: 100%; gap: 3px; border-radius: 6px; padding: 3px 2px; }
-.raf-ust { background: linear-gradient(to bottom, #2b1404, #442008); box-shadow: inset 0 5px 10px rgba(0,0,0,0.85); }
-.raf-alt { background: linear-gradient(to bottom, #603416, #4b230b); box-shadow: inset 0 3px 6px rgba(0,0,0,0.6); border-top: 2px solid rgba(255,255,255,0.04); }
-.yuva { flex: 1; height: 100%; background: rgba(0, 0, 0, 0.38); border-radius: 4px; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: inset 0 3px 5px rgba(0,0,0,0.8);}
-.okey-tasi { width: 100%; height: 94%; max-width: 38px; background: linear-gradient(135deg, #fffff9 0%, #f6f0de 100%); border-radius: 6px; border: 1px solid #dcd3c1; border-bottom: 5px solid #baa891; box-shadow: 0 5px 8px rgba(0,0,0,0.6), inset 0 1px 1px #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 900; font-size: clamp(15px, 4.5vw, 22px); font-family: 'Arial Black', Arial, sans-serif; cursor: grab; touch-action: manipulation; user-select: none; z-index: 30; transition: transform 0.1s;}
-.okey-tasi:active { cursor: grabbing; border-bottom-width: 2px; transform: translateY(3px); box-shadow: 0 2px 4px rgba(0,0,0,0.4); }
-.okey-tasi::after { content: ''; position: absolute; top: 2px; left: 2px; right: 2px; bottom: 2px; border: 1px solid rgba(0,0,0,0.03); border-radius: 4px; }
-.sortable-ghost { opacity: 0.1; }
-.sortable-drag { box-shadow: 8px 20px 30px rgba(0,0,0,0.8) !important; transform: scale(1.18) translateY(-22px) !important; z-index: 99999 !important; border-bottom-width: 7px !important; }
-.tas-kirmizi { color: #e74c3c; text-shadow: 0 0.5px 1px rgba(0,0,0,0.1); }
-.tas-siyah { color: #1c2833; text-shadow: 0 0.5px 1px rgba(0,0,0,0.1); }
-.tas-mavi { color: #2980b9; text-shadow: 0 0.5px 1px rgba(0,0,0,0.1); }
-.tas-sari { color: #27ae60; text-shadow: 0 0.5px 1px rgba(0,0,0,0.1); }
-.tas-sahte { color: #8e44ad; font-weight: 900; text-shadow: 0 0.5px 1px rgba(0,0,0,0.1); }
-.gosterge-btn { background: linear-gradient(180deg, #9b59b6 0%, #8e44ad 100%); color: #fff; border: none; padding: 6px 14px; border-radius: 8px; font-weight: bold; font-size: 11px; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.5); animation: pulse-glow 1.3s infinite alternate; margin-left: 10px; display: none; }
-.gosterge-btn:active { transform: scale(0.95); }
-.flash-bildirim { position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%); background: linear-gradient(135deg, #ffe266, #d49a00); color: #050d08; padding: 16px 32px; border-radius: 50px; font-weight: 900; font-size: 16px; text-transform: uppercase; box-shadow: 0 15px 40px rgba(0,0,0,0.85), 0 0 25px rgba(255, 226, 102, 0.6); z-index: 9999; text-align: center; border: 3px solid #ffffff; pointer-events: none; opacity: 0; display: none; }
-.flash-bildirim.goster { display: block; animation: flashAnim 3.5s forwards; }
+/* ==========================================================================
+   BEYCO GAMES - SERİ OKEY VIP - ANA TASARIM DOSYASI (KUSURSUZ APP MODU)
+   ========================================================================== */
 
-/* ----------------------------------------------------- */
-/* GİRİŞ EKRANI KODLARI  */
-/* ----------------------------------------------------- */
-#authEkrani { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 45%, #1f5934 0%, #11361c 55%, #050d08 100%); z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
-.auth-kutu { background: linear-gradient(135deg, #112618 0%, #06120b 100%); border: 3px solid #f2c94c; padding: 40px 30px; border-radius: 20px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.8), 0 0 20px rgba(242, 201, 76, 0.2); }
-.auth-kutu h2 { color: #f2c94c; margin-bottom: 5px; font-weight: 900; letter-spacing: 1px; }
-.zar-ikon { font-size: 40px; margin-bottom: 10px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5)); }
-.auth-input { width: 100%; padding: 14px; margin-bottom: 15px; border-radius: 10px; border: 1px solid rgba(242,201,76,0.3); background: rgba(0,0,0,0.6); color: #fff; font-size: 14px; text-align: center; outline: none; transition: 0.3s; }
-.auth-input:focus { border-color: #2ecc71; box-shadow: 0 0 10px rgba(46, 204, 113, 0.4); }
-.auth-btn { width: 100%; padding: 14px; border-radius: 10px; border: none; font-weight: 900; font-size: 14px; cursor: pointer; transition: transform 0.1s, box-shadow: 0.2s; margin-bottom: 12px; text-transform: uppercase; }
-.auth-btn:active { transform: scale(0.95); }
-.btn-sari { background: linear-gradient(180deg, #ffe066 0%, #db9d13 100%); color: #111; box-shadow: 0 5px 15px rgba(0,0,0,0.4); }
-.btn-yesil { background: linear-gradient(180deg, #2ecc71 0%, #1e8449 100%); color: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.4); }
-.btn-gri { background: linear-gradient(180deg, #7f8c8d 0%, #34495e 100%); color: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.4); margin-bottom: 0; }
-/* ----------------------------------------------------- */
-
-.sohbet-cekmecesi { position: fixed; top: 0; right: -320px; width: 300px; height: 100%; background: linear-gradient(to left, rgba(6, 18, 11, 1) 0%, rgba(10, 25, 15, 0.98) 100%); border-left: 2px solid #2ecc71; box-shadow: -10px 0 30px rgba(0,0,0,0.9); z-index: 99999; display: flex; flex-direction: column; transition: right 0.3s cubic-bezier(0.25, 1, 0.5, 1); }
-.sohbet-cekmecesi.acik { right: 0; }
-.cekmence-header { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(0,0,0,0.5); border-bottom: 1px solid rgba(46, 204, 113, 0.3); color: #f2c94c; font-weight: bold; }
-.cekmence-header button { background: none; border: none; color: #dc3545; font-size: 20px; font-weight: bold; cursor: pointer; }
-.cekmence-mesajlar { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
-.pro-mesaj { background: rgba(255,255,255,0.04); padding: 8px 12px; border-radius: 12px; border-bottom-left-radius: 2px; font-size: 13px; color: #fff; line-height: 1.4; border-left: 3px solid #f2c94c; }
-.pro-mesaj-isim { color: #f2c94c; font-weight: bold; margin-bottom: 4px; font-size: 11px; display: block; }
-.cekmence-emojiler { display: flex; justify-content: space-around; padding: 10px; background: rgba(0,0,0,0.3); border-top: 1px solid rgba(255,255,255,0.05); }
-.cekmence-emojiler button { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; font-size: 20px; padding: 8px 15px; cursor: pointer; transition: 0.2s;}
-.cekmence-emojiler button:active { background: #2ecc71; transform: scale(0.9); }
-.cekmence-input { display: flex; padding: 15px; background: rgba(0,0,0,0.5); gap: 10px; }
-.cekmence-input input { flex: 1; background: rgba(255,255,255,0.1); border: 1px solid rgba(46, 204, 113, 0.4); border-radius: 8px; color: white; padding: 10px; outline: none; }
-.cekmence-input button { background: #2ecc71; color: #000; border: none; border-radius: 8px; padding: 0 15px; font-weight: bold; cursor: pointer; }
-.cekmence-input button:active { transform: scale(0.95); }
-.anlik-mesaj-alani { position: absolute; top: 70px; left: 15px; z-index: 40; pointer-events: none; display: flex; flex-direction: column; gap: 5px; }
-.anlik-mesaj { background: rgba(5, 15, 8, 0.85); border: 1px solid #2ecc71; color: #fff; padding: 8px 15px; border-radius: 20px; font-size: 12px; animation: silin 4s forwards; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-.ucan-emoji { position: absolute; top: 50%; left: 50%; font-size: 80px; pointer-events: none; z-index: 99999; animation: ucGit 2.5s ease-out forwards; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.8)); }
-.magaza-kutu { background: linear-gradient(135deg, #112618, #06120b); border: 2px solid #f2c94c; border-radius: 15px; width: 95%; max-width: 600px; padding: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.9); }
-.magaza-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(46,204,113,0.3); padding-bottom: 15px; margin-bottom: 20px; color: #f2c94c; }
-.magaza-icerik { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
-.urun-kart { background: rgba(0,0,0,0.5); border: 1px solid #1e3f28; border-radius: 12px; padding: 20px; text-align: center; min-width: 140px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; gap: 10px; flex: 1;}
-.urun-ikon { font-size: 35px; width: 65px; height: 65px; display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.05); border-radius: 50%; margin-bottom: 5px; }
-.urun-kart h3 { color: #fff; font-size: 14px; }
-.urun-kart p { color: #aaa; font-size: 11px; margin-bottom: 10px; line-height: 1.3;}
-.satin-al-btn { background: linear-gradient(180deg, #ffe066 0%, #db9d13 100%); color: #000; border: none; padding: 10px 5px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; width: 100%; box-shadow: 0 4px 10px rgba(0,0,0,0.5); transition: 0.2s;}
-.satin-al-btn.sahip { background: #2ecc71; color: #fff; pointer-events: none; box-shadow: none; border: 1px solid #1e8449;}
-.bonus-kutu { background: linear-gradient(135deg, #112618 0%, #06120b 100%); border: 3px solid #2ecc71; border-radius: 20px; padding: 40px 30px; text-align: center; box-shadow: 0 0 50px rgba(46, 204, 113, 0.4); width: 90%; max-width: 400px; }
-.bonus-kutu h2 { color: #2ecc71; font-size: 26px; margin-bottom: 10px; text-shadow: 0 0 10px rgba(46,204,113,0.5); }
-.bonus-kutu p { color: #a3c4bc; font-size: 13px; margin-bottom: 25px; }
-.dijital-gosterge { background: #000; color: #f2c94c; font-family: 'Courier New', Courier, monospace; font-size: 45px; font-weight: 900; padding: 15px 20px; border-radius: 10px; border: 2px inset #f2c94c; letter-spacing: 5px; margin-bottom: 25px; box-shadow: inset 0 0 20px rgba(242, 201, 76, 0.2); }
-.bonus-btn { background: linear-gradient(180deg, #ffe066 0%, #db9d13 100%); color: #000; border: none; padding: 15px 40px; border-radius: 12px; font-weight: 900; font-size: 18px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.4); width: 100%; transition: all 0.2s; }
-.guest-warning-banner { background: linear-gradient(90deg, #d35400, #c0392b); color: #fff; padding: 10px 15px; font-size: 11px; font-weight: 800; text-align: center; border-bottom: 2px solid #f1c40f; animation: glowBanner 2s infinite alternate; z-index: 99; }
-@keyframes glowBanner { 0% { box-shadow: 0 0 5px #c0392b; } 100% { box-shadow: 0 0 20px #f1c40f; } }
-.lider-satir { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.4); border: 1px solid #1e3f28; padding: 15px; border-radius: 12px; transition: 0.2s; }
-.lider-satir:hover { background: rgba(46, 204, 113, 0.1); border-color: #2ecc71; }
-.lider-sira { font-size: 18px; font-weight: 900; color: #52796f; width: 35px; text-align: center; }
-.lider-isim { font-size: 15px; font-weight: bold; color: #fff; flex: 1; display: flex; align-items: center; gap: 8px; margin-left: 10px; }
-.lider-cip { font-size: 15px; font-weight: 900; color: #2ecc71; background: rgba(0,0,0,0.6); padding: 5px 10px; border-radius: 8px; border: 1px dashed #2ecc71; }
-.sira-1 { color: #f1c40f; text-shadow: 0 0 15px #f1c40f; font-size: 24px; }
-.sira-2 { color: #bdc3c7; text-shadow: 0 0 10px #bdc3c7; font-size: 22px; }
-.sira-3 { color: #cd7f32; text-shadow: 0 0 10px #cd7f32; font-size: 20px; }
-.lobi-oyuncu-satir { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: rgba(0,0,0,0.4); border-bottom: 1px solid #1e3f28; border-radius: 6px; }
-.lobi-oyuncu-isim { font-weight: bold; color: #0dcaf0; font-size: 13px;}
-.btn-arkadas-ekle { background: #2ecc71; color: #000; border: none; padding: 4px 10px; border-radius: 4px; font-weight: bold; font-size: 11px; cursor: pointer; }
-.btn-arkadas-ekle:active { transform: scale(0.9); }
-.btn-davet-et { background: #f1c40f; color: #000; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 11px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.5);}
-.btn-davet-et:active { transform: scale(0.9); }
-.online-nokta { display: inline-block; width: 8px; height: 8px; background-color: #2ecc71; border-radius: 50%; box-shadow: 0 0 5px #2ecc71; margin-right: 5px; }
-.offline-nokta { display: inline-block; width: 8px; height: 8px; background-color: #e74c3c; border-radius: 50%; margin-right: 5px; opacity: 0.5; }
-
-
-/* --- JİLET GİBİ İLETİŞİM BUTONLARI (Kusursuz Boyut ve Hizalama) --- */
-
-/* 1. Bütün Butonlara Ortak Şekil ve Boyut (HTML'e dokunmadan ID/Class üzerinden) */
-#sound-toggle-btn,
-.pro-sohbet-tetikleyici, #sohbetAcBtn,
-#mesajlarBtn, #mesaj-btn, .genel-mesaj-btn,
-#ozelMesajBtn, .ozel-mesaj-btn, [id*="ozel"], [class*="ozel-mesaj"], [id*="zarf"], .zarf-btn, .pm-btn, .mesaj-kutusu-btn {
-    position: fixed !important;
-    width: 40px !important; 
-    height: 40px !important; 
-    border-radius: 50% !important; 
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    background: rgba(11, 38, 20, 0.8) !important;
-    color: #fff !important;
-    font-size: 18px !important; 
-    cursor: pointer !important;
-    z-index: 9998 !important;
-    padding: 0 !important; 
-    margin: 0 !important;
-    box-shadow: 0 0 10px rgba(0,0,0,0.5) !important;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
-/* 2. Tek Tek Yerleşimleri ve Çerçeve Renkleri */
-
-/* SES BUTONU (Sol Üst) */
-#sound-toggle-btn {
-    top: 85px !important;
-    left: 15px !important;
-    border: 2px solid #2ecc71 !important; 
-}
-#sound-toggle-btn.ses-kapali {
-    border-color: #e74c3c !important; 
-}
-
-/* SOHBET BUTONU (Sesin hemen altı) */
-.pro-sohbet-tetikleyici, #sohbetAcBtn {
-    top: 140px !important;   
-    left: 15px !important;   
-    border: 2px solid #2ecc71 !important; 
-}
-
-/* GENEL MESAJ BUTONU (Sohbetin altı) */
-#mesajlarBtn, #mesaj-btn, .genel-mesaj-btn {
-    top: 195px !important;   
-    left: 15px !important;   
-    border: 2px solid #3498db !important; 
-}
-
-/* ZARF / ÖZEL MESAJ BUTONU (Sağda kalsın demiştin, yerini bozmadan şeklini düzelttik) */
-#ozelMesajBtn, .ozel-mesaj-btn, [id*="ozel"], [class*="ozel-mesaj"], [id*="zarf"], .zarf-btn, .pm-btn, .mesaj-kutusu-btn {
-    top: 85px !important;
-    right: 15px !important;
-    left: auto !important; /* Sol hizalamasını iptal et ki sağa yapışsın */
-    border: 2px solid #e74c3c !important; 
-    /* --- LOBİDEKİ OYUNCULAR LİSTESİ (KAYDIRILABİLİR KUTU YAPIMI) --- */
-#lobidekilerListesi {
-    max-height: 220px !important; /* Listenin uzayabileceği maksimum boy */
-    overflow-y: auto !important;  /* Taşan kısmı aşağı kaydırmalı yap */
-    padding-right: 5px;
-    margin-bottom: 20px;
-}
-
-/* Şık ve İnce Kaydırma Çubuğu (VIP Tasarım) */
-#lobidekilerListesi::-webkit-scrollbar { 
-    width: 4px; 
-}
-#lobidekilerListesi::-webkit-scrollbar-track { 
-    background: rgba(0, 0, 0, 0.3); 
-    border-radius: 10px; 
-}
-#lobidekilerListesi::-webkit-scrollbar-thumb { 
-    background: #f2c94c; /* Altın sarısı scrollbar */
-    border-radius: 10px; 
-}
-
-}
-/* --- İZLE (YANCI) BUTONU CSS --- */
-.btn-izle {
-    background: linear-gradient(180deg, #9b59b6 0%, #8e44ad 100%);
+/* 🔥 SİSTEMİ WEB SİTESİ OLMAKTAN ÇIKARIP "APP" (UYGULAMA) YAPAN ZIRH 🔥 */
+html, body {
+    width: 100% !important;
+    height: 100% !important;
+    background-color: #020503; /* Koyu Casino Yeşili Siyahı */
     color: #fff;
+    overflow: hidden !important; /* Ekranın komple kaymasını (web sitesi gibi) ENGELLER */
+    position: fixed !important;
+    touch-action: none !important; /* Mobilde sündürmeyi engeller */
+}
+
+/* --- ORTAK BUTON VE KUTU STİLLERİ --- */
+.satin-al-btn {
+    background: linear-gradient(180deg, #f2c94c 0%, #d4af37 100%);
+    color: #111;
     border: none;
-    padding: 8px 12px;
-    border-radius: 8px;
-    font-weight: 800;
-    font-size: 13px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: bold;
     cursor: pointer;
-    box-shadow: 0 4px 10px rgba(142, 68, 173, 0.3);
-    transition: all 0.2s ease;
+    box-shadow: 0 4px 10px rgba(242, 201, 76, 0.4);
+    transition: 0.2s;
+    text-transform: uppercase;
+}
+.satin-al-btn:active { transform: scale(0.95); box-shadow: none; }
+
+.magaza-kutu {
+    background: linear-gradient(135deg, #112618 0%, #06120b 100%);
+    border: 2px solid #2ecc71;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 10px 40px rgba(46, 204, 113, 0.3);
+    width: 90%;
+}
+.magaza-header {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 5px;
+    border-bottom: 1px solid rgba(46, 204, 113, 0.3);
+    padding-bottom: 10px;
+    margin-bottom: 15px;
 }
-.btn-izle:active { transform: scale(0.95); box-shadow: none; }
-/* --- BİLGİSAYAR (PC) EKRANLARI İÇİN GÖRÜNÜM DÜZELTMESİ --- */
-@media (min-width: 800px) {
-    body {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        background-color: #020503; /* PC'de arka planı iyice koyulaştır */
-    }
-    
-    /* Oyun alanını telefon/tablet boyutunda sabitle ve ortaya al */
-    .vip-header, .main-container, #lobiEkrani, #masaEkrani {
-        width: 100% !important;
-        max-width: 600px !important; 
-        margin: 0 auto !important;
-        position: relative;
-    }
 
-    /* Alt menüyü de o çerçevenin altına sabitle */
-    .alt-menu-container {
-        max-width: 600px !important;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
-    }
-
-    /* O sol ve sağdaki yuvarlak butonların (Ses, Sohbet, Zarf) PC'de çok kenara kaçmasını engelle */
-    #sound-toggle-btn, .pro-sohbet-tetikleyici, #sohbetAcBtn, #mesajlarBtn, #mesaj-btn, .genel-mesaj-btn {
-        left: calc(50% - 280px) !important; /* 600'lük çerçevenin hemen sol dışı */
-    }
-    #ozelMesajBtn, .ozel-mesaj-btn, [id*="ozel"], [class*="ozel-mesaj"], [id*="zarf"], .zarf-btn, .pm-btn, .mesaj-kutusu-btn {
-        right: calc(50% - 280px) !important; /* Çerçevenin sağ dışı */
-    }
+/* --- GİRİŞ (AUTH) EKRANI --- */
+#authEkrani {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    background: radial-gradient(circle, #0a1f12 0%, #020503 100%);
 }
-/* --- BEYCO GAMES MARKALAMA & REKLAM EKRANI CSS --- */
+.auth-kutu {
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid #2ecc71;
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    width: 90%;
+    max-width: 350px;
+    box-shadow: 0 0 30px rgba(46, 204, 113, 0.2);
+}
+.zar-ikon { font-size: 50px; margin-bottom: 10px; animation: zarDon 3s infinite linear; }
+@keyframes zarDon { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+.auth-kutu h2 { color: #f2c94c; margin-bottom: 20px; font-size: 22px; letter-spacing: 1px; }
+.auth-input {
+    width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px;
+    border: 1px solid #52796f; background: #111; color: #fff; font-size: 14px;
+}
+.auth-btn {
+    width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold;
+    font-size: 15px; cursor: pointer; margin-bottom: 10px; transition: 0.2s;
+}
+.btn-sari { background: #f2c94c; color: #000; box-shadow: 0 4px 10px rgba(242, 201, 76, 0.3); }
+.btn-yesil { background: #2ecc71; color: #111; box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3); }
+.btn-gri { background: #333; color: #fff; border: 1px solid #555; }
+.auth-btn:active { transform: scale(0.95); }
+
+/* BEYCO GAMES İMZASI */
 .beyco-imza {
     font-size: 11px; color: #7f8c8d; text-align: center; margin-top: 20px; letter-spacing: 2px; text-transform: uppercase;
 }
-.beyco-imza span { color: #f2c94c; font-weight: 900; font-family: 'Segoe UI', Tahoma, sans-serif; text-shadow: 0 0 5px rgba(242, 201, 76, 0.3);}
+.beyco-imza span { color: #f2c94c; font-weight: 900; text-shadow: 0 0 5px rgba(242, 201, 76, 0.3); }
 
-#reklamEkrani {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 999999; display: none; flex-direction: column; justify-content: center; align-items: center; color: white;
+/* --- ÜST BİLGİ BARI (VIP HEADER) --- */
+.vip-header {
+    display: none; justify-content: space-between; align-items: center;
+    background: linear-gradient(90deg, #112618 0%, #06120b 100%);
+    padding: 10px 15px; border-bottom: 2px solid #2ecc71;
+    position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
 }
-.reklam-kutu {
-    text-align: center; max-width: 400px; padding: 25px; border: 2px solid #2ecc71; border-radius: 15px; background: linear-gradient(135deg, #112618, #06120b); box-shadow: 0 10px 40px rgba(46, 204, 113, 0.3);
+.profil-bilgi { display: flex; align-items: center; gap: 10px; }
+.profil-avatar {
+    width: 40px; height: 40px; border-radius: 50%; background: #1e3f28;
+    display: flex; justify-content: center; align-items: center; font-size: 20px; border: 2px solid #52796f;
 }
-.reklam-sayac {
-    font-size: 45px; color: #f2c94c; font-weight: 900; margin: 15px 0; text-shadow: 0 0 15px rgba(242, 201, 76, 0.5);
+.profil-isim-kutu { display: flex; flex-direction: column; }
+.profil-isim { font-weight: bold; color: #fff; font-size: 14px; }
+.vip-badge {
+    font-size: 10px; background: #f2c94c; color: #000; padding: 2px 6px;
+    border-radius: 4px; font-weight: 900; display: inline-block; width: fit-content;
 }
-.btn-reklam-kapat {
-    background: #333; color: #888; padding: 12px 20px; border-radius: 8px; border: none; font-weight: 900; display: none; cursor: pointer; margin-top: 20px; width: 100%; transition: 0.3s;
+.cip-kutu {
+    background: rgba(0,0,0,0.5); padding: 5px 12px; border-radius: 20px;
+    border: 1px solid #f2c94c; display: flex; align-items: center; gap: 5px;
+    font-weight: 900; color: #f2c94c; font-size: 15px;
 }
-/* 🔥 LOBİ EKRANI PRO HİZALAMA VE KAYDIRMA (SCROLL) SİSTEMİ 🔥 */
+.cip-ikon {
+    background: #f2c94c; color: #000; width: 20px; height: 20px;
+    border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 12px;
+}
+.cikis-btn {
+    background: #e74c3c; color: white; border: none; padding: 5px 10px;
+    border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 11px; margin-left: 5px;
+}
+
+/* --- LOBİ EKRANI (PRO KUSURSUZ HİZALAMA) --- */
 #lobiEkrani {
-    justify-content: flex-start !important; /* Tahterevalli iptal! Her şey en tepeden aşağı dizilir */
-    padding-top: 80px !important; /* Mobilde VIP barın altında ezilmesin diye boşluk */
-    padding-bottom: 100px !important; /* Alt menü kapatmasın diye boşluk */
-    height: 100vh !important;
-    overflow-y: auto !important; /* Gerekirse sayfa aşağı kaysın */
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    padding-top: 70px; /* Header'ın altında kalmasın */
+    padding-bottom: 90px; /* Alt menünün altında kalmasın */
+    background: radial-gradient(circle, #0a1f12 0%, #020503 100%);
+    overflow: hidden !important; /* Ekran kaymaz */
 }
 
-/* Masalar alanının sınırlandırılması */
-#masalarAlani {
-    margin-bottom: 20px !important;
-}
-
-/* Lobideki Oyuncular listesini hapseden KUTU (Pro Sistem) */
-#lobidekilerListesi {
-    max-height: 220px !important; /* Maksimum boyu sabitledik */
-    overflow-y: auto !important; /* Taşan oyuncular için içine scroll (kaydırma) ekledik */
-    background: rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(46, 204, 113, 0.2);
-    border-radius: 12px;
+/* Masalar Kutusu (Sadece İçi Kayar) */
+#lobiMasaHizalayici {
+    flex: 1 1 auto;
+    overflow-y: auto; /* Masalar buranın içinde kayar */
     padding: 10px;
+    max-height: 55vh; /* Masaların çok fazla aşağı taşmasını önler */
+}
+
+.masa-sec-baslik {
+    text-align: center; color: #2ecc71; font-weight: 900; font-size: 16px;
+    letter-spacing: 2px; text-shadow: 0 0 10px rgba(46,204,113,0.5); margin: 5px 0;
+}
+
+#masalarAlani { display: flex; flex-direction: column; gap: 10px; padding-bottom: 10px; }
+
+.masa-kart {
+    background: linear-gradient(90deg, #112618 0%, #0a170d 100%);
+    border: 1px solid #2ecc71; border-radius: 12px; padding: 12px 15px;
+    display: flex; justify-content: space-between; align-items: center;
+    position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
+.masa-watermark { position: absolute; right: -10px; opacity: 0.05; font-size: 40px; pointer-events: none; }
+.kart-sol { display: flex; align-items: center; gap: 10px; z-index: 2; }
+.zar-kutu {
+    background: rgba(0,0,0,0.5); width: 35px; height: 35px; border-radius: 8px;
+    display: flex; justify-content: center; align-items: center; font-size: 20px; border: 1px solid #52796f;
+}
+.masa-kart-isim { font-weight: bold; color: #fff; font-size: 14px; }
+.kart-sag { display: flex; align-items: center; gap: 10px; z-index: 2; }
+.masa-kisi-kutu { background: rgba(0,0,0,0.5); padding: 4px 8px; border-radius: 6px; font-size: 12px; color: #a3c4bc; border: 1px solid #333; }
+.btn-otur {
+    background: #f2c94c; color: #000; border: none; padding: 6px 15px;
+    border-radius: 6px; font-weight: 900; cursor: pointer; transition: 0.2s;
+}
+.btn-otur.disabled { background: #555; color: #888; cursor: not-allowed; }
+.btn-izle {
+    background: linear-gradient(180deg, #9b59b6 0%, #8e44ad 100%); color: #fff;
+    border: none; padding: 6px 12px; border-radius: 6px; font-weight: 800; font-size: 12px; cursor: pointer;
+}
+
+/* Oyuncular Kutusu (Sadece İçi Kayar) */
+.players-panel {
+    flex: 0 0 auto;
+    padding: 0 10px;
     margin-bottom: 20px;
 }
-
-/* PC ve Mobil için havalı ince kaydırma çubuğu (Scrollbar) tasarımı */
-#lobidekilerListesi::-webkit-scrollbar {
-    width: 6px;
-}
-#lobidekilerListesi::-webkit-scrollbar-track {
-    background: rgba(0,0,0,0.2); 
-    border-radius: 10px;
-}
-#lobidekilerListesi::-webkit-scrollbar-thumb {
-    background: #2ecc71; 
-    border-radius: 10px;
-}
-/* 🔥 LOBİ EKRANI PRO HİZALAMA VE KAYDIRMA (SCROLL) SİSTEMİ 🔥 */
-#lobiEkrani {
-    justify-content: flex-start !important; 
-    padding-top: 80px !important; 
-    padding-bottom: 120px !important; 
-    height: 100vh !important;
-    overflow-y: auto !important; 
-}
-
-/* Lobideki Oyuncular listesini hapseden KUTU (Pro Sistem) */
 .lobi-oyuncu-kutu {
-    max-height: 250px !important; 
-    overflow-y: auto !important; 
-    background: rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(46, 204, 113, 0.2);
-    border-radius: 12px;
-    padding: 10px;
-    margin-bottom: 20px;
+    background: rgba(0,0,0,0.4); border: 1px solid rgba(46,204,113,0.2);
+    border-radius: 12px; padding: 10px;
+    max-height: 20vh; /* Lobi oyuncu listesinin boyu sabitlendi */
+    overflow-y: auto; /* İçi kaydırılabilir */
+}
+.lobi-oyuncu-satir {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.lobi-oyuncu-isim { font-weight: bold; font-size: 13px; display: flex; align-items: center; gap: 5px; }
+.online-nokta { width: 8px; height: 8px; background: #2ecc71; border-radius: 50%; box-shadow: 0 0 5px #2ecc71; }
+.offline-nokta { width: 8px; height: 8px; background: #e74c3c; border-radius: 50%; }
+.btn-arkadas-ekle { background: #3498db; color: white; border: none; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; }
+
+/* Scrollbar Tasarımı (PC ve Kutu İçleri İçin) */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 10px; }
+::-webkit-scrollbar-thumb { background: #2ecc71; border-radius: 10px; }
+
+/* Hemen Oyna Butonları */
+.btn-hemen-oyna {
+    position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%);
+    width: 90%; max-width: 350px; background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+    color: #111; border: none; padding: 12px; border-radius: 12px;
+    font-size: 16px; font-weight: 900; cursor: pointer;
+    box-shadow: 0 5px 20px rgba(46, 204, 113, 0.4); text-transform: uppercase;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999;
+}
+.btn-hemen-oyna span { font-size: 10px; color: #000; font-weight: bold; opacity: 0.8; margin-top: 2px; }
+
+/* Alt Menü */
+.alt-menu-container {
+    position: fixed; bottom: 0; left: 0; width: 100%;
+    background: #0a140f; display: flex; justify-content: space-around;
+    padding: 10px 0; border-top: 1px solid #1e3f28; z-index: 1000;
+    box-shadow: 0 -4px 15px rgba(0,0,0,0.8);
+}
+.alt-menu-item { display: flex; flex-direction: column; align-items: center; color: #7f8c8d; cursor: pointer; transition: 0.2s; }
+.alt-menu-item.active { color: #2ecc71; }
+.alt-menu-ikon { font-size: 22px; margin-bottom: 2px; }
+.alt-menu-item span { font-size: 10px; font-weight: bold; }
+
+/* --- OYUN MASASI (MASA EKRANI) --- */
+#masaEkrani {
+    display: none; width: 100%; height: 100%; position: relative;
+    background: radial-gradient(circle, #0d2616 0%, #020503 100%);
+    overflow: hidden !important;
 }
 
-/* Şık Scrollbar */
-.lobi-oyuncu-kutu::-webkit-scrollbar { width: 6px; }
-.lobi-oyuncu-kutu::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 10px; }
-.lobi-oyuncu-kutu::-webkit-scrollbar-thumb { background: #2ecc71; border-radius: 10px; }
+.okey-table-ui {
+    position: absolute; top: 15%; left: 5%; right: 5%; bottom: 35%;
+    background: #0f301d; border: 4px solid #1a4f2d; border-radius: 30px;
+    box-shadow: inset 0 0 50px rgba(0,0,0,0.8), 0 10px 30px rgba(0,0,0,0.9);
+}
+
+.return-lobby-btn {
+    position: absolute; top: -45px; left: 0; background: #e74c3c; color: white;
+    border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 12px; z-index: 100;
+}
+
+/* Koltuklar (Oyuncu İsimleri) */
+.player-seat {
+    position: absolute; background: rgba(0,0,0,0.7); color: #0dcaf0;
+    padding: 6px 12px; border-radius: 10px; font-weight: bold; font-size: 12px;
+    border: 1px solid #1a4f2d; text-align: center; min-width: 90px; z-index: 10;
+}
+.seat-top { top: -20px; left: 50%; transform: translateX(-50%); }
+.seat-left { top: 50%; left: -25px; transform: translateY(-50%); writing-mode: vertical-rl; text-orientation: mixed; padding: 12px 6px; }
+.seat-right { top: 50%; right: -25px; transform: translateY(-50%); writing-mode: vertical-rl; text-orientation: mixed; padding: 12px 6px; }
+
+/* Masanın Tam Ortası (Gösterge, Kasa vs) */
+.masa-ortasi {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 60%; height: 60%; display: flex; flex-direction: column;
+    justify-content: center; align-items: center; background: rgba(0,0,0,0.2);
+    border-radius: 20px; border: 1px dashed rgba(46,204,113,0.3);
+}
+.masa-isim-ortasi { font-size: 16px; color: rgba(255,255,255,0.2); font-weight: 900; letter-spacing: 2px; text-align: center; }
+.masa-kasa-bilgisi { font-size: 13px; color: #f2c94c; font-weight: 900; margin-top: 5px; text-shadow: 0 0 5px rgba(242, 201, 76, 0.5); }
+
+.kalan-tas-bilgi-container { display: none; margin-top: 15px; }
+.kapali-deste {
+    width: 40px; height: 55px; background: #e0e0e0; border-radius: 6px;
+    display: flex; justify-content: center; align-items: center; font-weight: 900;
+    color: #333; font-size: 18px; box-shadow: -2px 2px 0px #ccc, -4px 4px 0px #bbb;
+    border: 1px solid #999; cursor: pointer;
+}
+.gosterge-tasi {
+    width: 40px; height: 55px; border-radius: 6px; display: flex;
+    justify-content: center; align-items: center; font-weight: 900; font-size: 22px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.5); opacity: 0.8;
+}
+
+#bitisAlani {
+    width: 50px; height: 50px; border: 2px dashed #f2c94c; border-radius: 10px;
+    display: flex; justify-content: center; align-items: center;
+    color: #f2c94c; font-size: 10px; font-weight: bold; text-align: center;
+    background: rgba(242, 201, 76, 0.1);
+}
+
+.oyun-baslat-btn {
+    background: linear-gradient(180deg, #2ecc71 0%, #27ae60 100%); color: #111;
+    border: none; padding: 10px 20px; border-radius: 8px; font-weight: 900;
+    cursor: pointer; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4); margin-top: 15px;
+}
+
+/* İskarta (Taş Atma) Alanları */
+.iskarta-alani {
+    position: absolute; width: 45px; height: 60px; background: rgba(0,0,0,0.4);
+    border: 1px dashed #52796f; border-radius: 6px;
+}
+#iskartaUst { top: 10px; left: 50%; transform: translateX(-50%); }
+#iskartaSag { top: 50%; right: 10px; transform: translateY(-50%); }
+#iskartaSol { top: 50%; left: 10px; transform: translateY(-50%); }
+#benimIskartam { bottom: -70px; right: 10%; border-color: #e74c3c; background: rgba(231, 76, 60, 0.1); }
+.iskarta-yazi { color: #e74c3c; font-size: 10px; font-weight: bold; text-align: center; margin-top: 15px; }
+
+/* ISTAKA VE DİZİLİM ALANI */
+.okey-istaka-tuslar-area {
+    position: absolute; bottom: 10px; left: 0; width: 100%;
+    display: flex; flex-direction: column; align-items: center; gap: 5px; z-index: 50;
+}
+.pro-tus-takimi { display: flex; gap: 10px; }
+.pro-tus {
+    background: linear-gradient(180deg, #34495e 0%, #2c3e50 100%); color: #fff;
+    border: 1px solid #52796f; padding: 6px 15px; border-radius: 20px;
+    font-size: 11px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+}
+.istaka-container {
+    width: 96%; max-width: 500px; background: #8b4513; border: 3px solid #5c2e0b;
+    border-radius: 15px; display: flex; flex-direction: column; padding: 5px;
+    box-shadow: inset 0 10px 20px rgba(0,0,0,0.5), 0 5px 15px rgba(0,0,0,0.8);
+    position: relative;
+}
+.istaka-raf { display: flex; height: 50px; background: rgba(0,0,0,0.3); border-radius: 8px; margin-bottom: 2px; }
+.raf-alt { margin-bottom: 0; }
+.yuva { flex: 1; border-right: 1px solid rgba(255,255,255,0.05); position: relative; }
+.yuva:last-child { border-right: none; }
+
+/* Okey Taşları */
+.okey-tasi {
+    width: 100%; height: 100%; background: linear-gradient(180deg, #fdfbfb 0%, #ebedee 100%);
+    border-radius: 5px; display: flex; justify-content: center; align-items: center;
+    font-size: 20px; font-weight: 900; border: 1px solid #bdc3c7; cursor: grab;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3), inset 0 -3px 0 rgba(0,0,0,0.1); position: relative;
+}
+.tas-kirmizi { color: #e74c3c; }
+.tas-siyah { color: #2c3e50; }
+.tas-mavi { color: #3498db; }
+.tas-sari { color: #f1c40f; text-shadow: 0.5px 0.5px 0px #000; }
+.tas-sahte { color: #8e44ad; font-size: 24px; }
+
+.gosterge-btn {
+    position: absolute; bottom: -40px; left: 50%; transform: translateX(-50%);
+    background: #f1c40f; color: #000; border: none; padding: 5px 10px; border-radius: 5px;
+    font-weight: bold; font-size: 11px; cursor: pointer; display: none; z-index: 20;
+    box-shadow: 0 0 10px #f1c40f; animation: yanipSon 1s infinite;
+}
+
+/* SIRA BENDE ANİMASYONU */
+.aktif-sira {
+    box-shadow: 0 0 15px #2ecc71, inset 0 0 10px #2ecc71 !important;
+    border-color: #2ecc71 !important;
+    color: #fff !important;
+    animation: yanipSon 1.5s infinite;
+}
+@keyframes yanipSon { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+/* --- İLETİŞİM BUTONLARI (SOL KENAR) --- */
+.pro-sohbet-tetikleyici {
+    position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.6);
+    border: 1px solid #2ecc71; color: white; border-radius: 50%; width: 40px; height: 40px;
+    font-size: 18px; cursor: pointer; z-index: 100;
+}
+
+.sohbet-cekmecesi {
+    position: absolute; top: 0; left: -300px; width: 280px; height: 100%;
+    background: rgba(10, 31, 18, 0.95); border-right: 2px solid #2ecc71;
+    transition: 0.3s; z-index: 1000; display: flex; flex-direction: column;
+}
+.sohbet-cekmecesi.acik { left: 0; }
+.cekmence-header { display: flex; justify-content: space-between; padding: 15px; background: #06120b; color: #2ecc71; font-weight: bold; border-bottom: 1px solid #2ecc71; }
+.cekmence-header button { background: none; border: none; color: #e74c3c; font-size: 16px; font-weight: bold; cursor: pointer; }
+.cekmence-mesajlar { flex: 1; padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+.pro-mesaj { font-size: 12px; color: #ccc; line-height: 1.4; background: rgba(0,0,0,0.4); padding: 6px 10px; border-radius: 8px; }
+.pro-mesaj-isim { font-weight: bold; display: inline-block; margin-right: 5px; }
+.cekmence-emojiler { display: flex; justify-content: space-around; padding: 10px; border-top: 1px solid #1e3f28; }
+.cekmence-emojiler button { background: none; border: none; font-size: 20px; cursor: pointer; transition: 0.2s; }
+.cekmence-emojiler button:active { transform: scale(1.5); }
+.cekmence-input { display: flex; padding: 10px; background: #06120b; }
+.cekmence-input input { flex: 1; padding: 8px; border-radius: 4px 0 0 4px; border: 1px solid #52796f; background: #111; color: #fff; outline: none; }
+.cekmence-input button { background: #2ecc71; color: #111; border: none; padding: 8px 15px; border-radius: 0 4px 4px 0; font-weight: bold; cursor: pointer; }
+
+/* Anlık Mesaj Alani */
+.anlik-mesaj-alani { position: absolute; bottom: 120px; left: 10px; display: flex; flex-direction: column; gap: 5px; z-index: 90; pointer-events: none; }
+.anlik-mesaj { background: rgba(0,0,0,0.7); color: white; padding: 6px 12px; border-radius: 8px; font-size: 12px; border-left: 3px solid #2ecc71; animation: slideIn 0.3s forwards; }
+
+.flash-bildirim {
+    position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+    background: linear-gradient(135deg, #c0392b, #8e44ad); color: white;
+    padding: 15px 30px; border-radius: 10px; font-weight: 900; font-size: 16px;
+    z-index: 999999; border: 2px solid #f2c94c; text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8); transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.flash-bildirim.goster { top: 20px; }
+
+/* Oyun Sonu (Result) Ekranı */
+#sonucEkrani {
+    display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.9); z-index: 2000; flex-direction: column;
+    justify-content: center; align-items: center;
+}
+.sonuc-kutu { text-align: center; background: #112618; padding: 30px; border-radius: 20px; border: 2px solid #f2c94c; box-shadow: 0 0 30px rgba(242, 201, 76, 0.4); }
+.sonuc-btn { background: #2ecc71; color: #111; padding: 10px 20px; border: none; border-radius: 8px; font-weight: 900; margin-top: 20px; cursor: pointer; }
+
+/* Diğer Modallar için ortak hizalama */
+.guest-warning-banner { background: #e74c3c; color: white; text-align: center; padding: 8px; font-size: 11px; font-weight: bold; }
+.sistem-mesaji { background: #f2c94c; color: #000; padding: 8px; text-align: center; font-size: 12px; font-weight: bold; }
+.lider-satir { display: flex; align-items: center; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 8px; margin-bottom: 5px; border: 1px solid rgba(255,255,255,0.1); }
+.lider-sira { font-size: 16px; font-weight: 900; width: 30px; text-align: center; }
+.lider-isim { flex: 1; font-weight: bold; font-size: 14px; margin-left: 10px; }
+.lider-cip { color: #f2c94c; font-weight: 900; font-size: 13px; }
+
+.bonus-kutu { background: linear-gradient(135deg, #112618, #06120b); border: 2px solid #f2c94c; border-radius: 20px; padding: 30px; text-align: center; width: 90%; max-width: 350px; }
+.dijital-gosterge { font-size: 40px; font-family: 'Courier New', Courier, monospace; font-weight: 900; color: #e74c3c; background: #000; padding: 15px; border-radius: 10px; border: 2px inset #333; margin: 20px 0; letter-spacing: 5px; }
+.bonus-btn { background: #f2c94c; color: #111; font-size: 18px; font-weight: 900; border: none; padding: 15px 30px; border-radius: 10px; cursor: pointer; text-transform: uppercase; }
+
+/* Mağaza İçeriği */
+.magaza-icerik { display: flex; flex-direction: column; gap: 15px; overflow-y: auto; padding-right: 5px; max-height: 60vh; }
+.urun-kart { background: rgba(0,0,0,0.5); border: 1px solid rgba(46,204,113,0.3); border-radius: 10px; padding: 15px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.urun-ikon { font-size: 40px; width: 70px; height: 70px; background: #111; border-radius: 50%; display: flex; justify-content: center; align-items: center; }
+
+/* ========================================================
+   🔥 BİLGİSAYARLAR (PC) İÇİN GÜVENLİ MERKEZLEME 🔥
+   Bu kod, PC'de açıldığında oyunu devasa sündürmek yerine
+   telefon ekranı gibi ortada sabitler. App mantığını bozmaz.
+   ======================================================== */
+@media (min-width: 800px) {
+    body {
+        display: flex;
+        justify-content: center; /* Ekranı ortaya al */
+        background-image: url('https://www.transparenttextures.com/patterns/dark-matter.png');
+    }
+    
+    /* Tüm ana ekranları 500px genişliğe kilitle (Telefon boyutu) */
+    #authEkrani, #lobiEkrani, #masaEkrani, .vip-header {
+        max-width: 500px !important;
+        margin: 0 auto;
+        position: relative;
+        border-left: 1px solid #333;
+        border-right: 1px solid #333;
+    }
+    
+    /* Alt menüyü o 500px'in altına oturt */
+    .alt-menu-container {
+        max-width: 500px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        border-left: 1px solid #333;
+        border-right: 1px solid #333;
+    }
+    
+    /* Sohbet penceresini de oyun alanının sınırlarına al */
+    .sohbet-cekmecesi {
+        left: -300px;
+    }
+}
