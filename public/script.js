@@ -37,7 +37,6 @@ function markaVeReklamKurulumu() {
         authKutu.appendChild(imza);
     }
 
-    // Lobi Mesajı Damgası
     setInterval(() => {
         document.querySelectorAll('*').forEach(el => {
             if(el.childNodes.length === 1 && el.textContent.includes('Sistem: VIP Oyuna Hoş Geldiniz!')) {
@@ -75,12 +74,12 @@ socket.on('canli_arkadaslik_talebi', (data) => {
     if (data.kime === aktifKullaniciAdi) {
         const reqDiv = document.createElement('div');
         reqDiv.id = "canliIstekKutusu";
-        reqDiv.style = "position:fixed; top:20px; left:50%; transform:translateX(-50%); background:linear-gradient(135deg, #112618, #06120b); border:2px solid #f2c94c; padding:15px 25px; border-radius:12px; z-index:999999; text-align:center; box-shadow:0 10px 30px rgba(0,0,0,0.8);";
+        reqDiv.style = "position:fixed; top:20px; left:50%; transform:translateX(-50%); background:linear-gradient(135deg, #112618, #06120b); border:2px solid #f2c94c; padding:15px 25px; border-radius:12px; z-index:999999; text-align:center; box-shadow:0 10px 30px rgba(0,0,0,0.8); width: 90%; max-width: 350px;";
         reqDiv.innerHTML = `
-            <div style='color:#fff; font-weight:bold; margin-bottom:10px;'>👥 ${data.kimden} sana arkadaşlık isteği gönderdi!</div>
+            <div style='color:#fff; font-weight:bold; margin-bottom:15px; font-size:14px;'>👥 <span style="color:#f2c94c">${data.kimden}</span> sana arkadaşlık isteği gönderdi!</div>
             <div style='display:flex; gap:10px; justify-content:center;'>
-                <button style='background:#2ecc71; border:none; padding:6px 15px; border-radius:6px; color:#fff; font-weight:bold; cursor:pointer;' id='btnAcceptReq'>Kabul Et</button>
-                <button style='background:#e74c3c; border:none; padding:6px 15px; border-radius:6px; color:#fff; font-weight:bold; cursor:pointer;' id='btnRejectReq'>Reddet</button>
+                <button style='background:#2ecc71; border:none; padding:8px 20px; border-radius:6px; color:#111; font-weight:bold; cursor:pointer; flex:1;' id='btnAcceptReq'>Kabul Et</button>
+                <button style='background:#e74c3c; border:none; padding:8px 20px; border-radius:6px; color:#fff; font-weight:bold; cursor:pointer; flex:1;' id='btnRejectReq'>Reddet</button>
             </div>`;
         document.body.appendChild(reqDiv);
 
@@ -114,6 +113,7 @@ socket.on('canli_arkadaslik_sonuc', (data) => {
     }
 });
 
+// 🔥 ARKADAŞ EKLEME (İSTEK GÖNDERME) FONKSİYONU 🔥
 window.arkadasEkle = function(isim) {
     if(isMisafir) return;
     socket.emit('arkadaslik_istegi_gonder', { kimden: aktifKullaniciAdi, kime: isim });
@@ -184,12 +184,28 @@ window.davetMenusuAc = function() {
 window.profiliGoster = function(hedefIsim) {
     if(!hedefIsim || hedefIsim === "" || hedefIsim === "Bekleniyor...") { if(suAnkiMasam && !izleyiciModu) davetMenusuAc(); return; }
     const pIsim = document.getElementById('profilIsim'); const pOynanan = document.getElementById('profilOynanan'); const pKazanilan = document.getElementById('profilKazanilan'); const pCip = document.getElementById('profilCip'); const kazanmaOrani = document.getElementById('profilKazanmaOrani'); const pDurum = document.getElementById('profilDurumBadge'); const pArkadasBtn = document.getElementById('profilArkadasBtn'); const pDavetBtn = document.getElementById('profilDavetBtn'); const pLigBadge = document.getElementById('profilLigBadge');
-    document.getElementById('profilEkrani').style.display = 'flex'; pArkadasBtn.dataset.hedef = ServerIsim = hedefIsim;
+    document.getElementById('profilEkrani').style.display = 'flex'; pArkadasBtn.dataset.hedef = hedefIsim;
     
     let isOnline = onlineOyuncularListesi.includes(hedefIsim); pDurum.innerText = isOnline ? "🟢 Çevrimiçi" : "🔴 Çevrimdışı";
     pArkadasBtn.style.display = (hedefIsim !== aktifKullaniciAdi) ? 'block' : 'none';
+    
     pArkadasBtn.innerText = benimArkadaslarim.includes(hedefIsim) ? "❌ Arkadaştan Çıkar" : "➕ Arkadaş Ekle";
-    pArkadasBtn.onclick = () => { if(benimArkadaslarim.includes(hedefIsim)) { benimArkadaslarim = benimArkadaslarim.filter(n=>n!==hedefIsim); } else { arkadasEkle(hedefIsim); } if(auth.currentUser) db.collection("kullanicilar").doc(auth.currentUser.uid).update({ arkadaslar: benimArkadaslarim }); arayuzGuncelle(); document.getElementById('profilEkrani').style.display='none'; };
+    
+    // 🔥 PROFİL EKRANI ARKADAŞ EKLEME/SİLME ONAYI 🔥
+    pArkadasBtn.onclick = () => { 
+        if(benimArkadaslarim.includes(hedefIsim)) { 
+            if(confirm(`${hedefIsim} adlı kişiyi arkadaş listenden çıkarmak istediğine emin misin?`)) {
+                benimArkadaslarim = benimArkadaslarim.filter(n=>n!==hedefIsim); 
+                pArkadasBtn.innerText = "➕ Arkadaş Ekle"; 
+                ozelUyariGoster(`❌ ${hedefIsim} arkadaş listenden çıkarıldı.`);
+                if(auth.currentUser) db.collection("kullanicilar").doc(auth.currentUser.uid).update({ arkadaslar: benimArkadaslarim }); 
+                arayuzGuncelle();
+            }
+        } else { 
+            arkadasEkle(hedefIsim); 
+            document.getElementById('profilEkrani').style.display='none'; 
+        } 
+    };
 
     let hash = 0; for (let i = 0; i < hedefIsim.length; i++) hash = hedefIsim.charCodeAt(i) + ((hash << 5) - hash); hash = Math.abs(hash);
     let bOynanan = (hash % 1150) + 75; let bOran = (hash % 25) + 38; let bKazanilan = Math.floor(bOynanan * (bOran / 100));
