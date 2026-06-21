@@ -346,3 +346,27 @@ body { background-color: #050d08; color: #fff; font-family: 'Segoe UI', Tahoma, 
     background: #2ecc71; 
     border-radius: 10px;
 }
+/* 🔥 LOBİ EKRANI PRO HİZALAMA VE KAYDIRMA (SCROLL) SİSTEMİ 🔥 */
+#lobiEkrani {
+    justify-content: flex-start !important; 
+    padding-top: 80px !important; 
+    padding-bottom: 120px !important; 
+    height: 100vh !important;
+    overflow-y: auto !important; 
+}
+
+/* Lobideki Oyuncular listesini hapseden KUTU (Pro Sistem) */
+.lobi-oyuncu-kutu {
+    max-height: 250px !important; 
+    overflow-y: auto !important; 
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(46, 204, 113, 0.2);
+    border-radius: 12px;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+/* Şık Scrollbar */
+.lobi-oyuncu-kutu::-webkit-scrollbar { width: 6px; }
+.lobi-oyuncu-kutu::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 10px; }
+.lobi-oyuncu-kutu::-webkit-scrollbar-thumb { background: #2ecc71; border-radius: 10px; }
