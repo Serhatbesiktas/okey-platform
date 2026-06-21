@@ -29,12 +29,12 @@ let benimGorevler = { kazanma: 0, mesaj: 0, gosterge: 0, tarih: "", alinanlar: {
 function markaVeReklamKurulumu() {
     // 1. Giriş Ekranını Seri Okey ve Beyco Games olarak damgala
     const authBaslik = document.getElementById('authBaslik');
-    if(authBaslik) authBaslik.innerText = "SERİ OKEY VIP";
+    if(authBaslik) authBaslik.innerText = "SERİ OKEY";
     const authKutu = document.querySelector('.auth-kutu');
     if(authKutu && !document.querySelector('.beyco-imza')) {
         const imza = document.createElement('div');
         imza.className = 'beyco-imza';
-        imza.innerHTML = 'A <span>Beyco Games</span> Product';
+        imza.innerHTML = 'MADE BY <span>BEYCO GAMES</span>';
         authKutu.appendChild(imza);
     }
 
@@ -491,7 +491,7 @@ lobiyeDonBtn.addEventListener('click', () => { if (suAnkiMasam && masaOyunBaslad
 document.getElementById('btnCikisOnayla').addEventListener('click', () => { document.getElementById('cikisUyariEkrani').style.display = 'none'; masadanAyrilmaIslemi(true); });
 
 document.getElementById('btnGecisKayit').addEventListener('click', () => { document.getElementById('authBaslik').innerText = "YENİ HESAP OLUŞTUR"; document.getElementById('authAltMetin').innerText = "Milyonların arasına katılmak için efsanevi nickini seç!"; document.getElementById('authKullaniciAdi').style.display = 'block'; document.getElementById('loginButonlari').style.display = 'none'; document.getElementById('kayitButonlari').style.display = 'block'; document.getElementById('authEmail').value = ''; document.getElementById('authSifre').value = ''; });
-document.getElementById('btnGecisGiris').addEventListener('click', () => { document.getElementById('authBaslik').innerText = "VIP CASINO GİRİŞİ"; document.getElementById('authAltMetin').innerText = "Çiplerini güvende tutmak için kayıt ol veya giriş yap"; document.getElementById('authKullaniciAdi').style.display = 'none'; document.getElementById('loginButonlari').style.display = 'block'; document.getElementById('kayitButonlari').style.display = 'none'; });
+document.getElementById('btnGecisGiris').addEventListener('click', () => { document.getElementById('authBaslik').innerText = "SERİ OKEY"; document.getElementById('authAltMetin').innerText = "Çiplerini güvende tutmak için kayıt ol veya giriş yap"; document.getElementById('authKullaniciAdi').style.display = 'none'; document.getElementById('loginButonlari').style.display = 'block'; document.getElementById('kayitButonlari').style.display = 'none'; });
 
 document.getElementById('btnMisafir').addEventListener('click', () => { isMisafir = true; const rastgeleId = Math.floor(Math.random() * 9000) + 1000; const misafirIsim = "MİSAFİR_" + rastgeleId; benimAnlikCipim = 20000; benimKazanilanOyun = 0; benimEnvanterim = []; aktifKozmetikler = []; benimArkadaslarim = []; sonBonusTarihim = new Date().toLocaleDateString('tr-TR'); document.getElementById('misafirUyariBanner').style.display = 'block'; oyunaGirisYap(misafirIsim); arayuzGuncelle(); });
 
