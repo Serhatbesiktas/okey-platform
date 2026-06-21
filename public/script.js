@@ -192,7 +192,7 @@ window.gorevOduluAl = function(id, miktar) {
     benimAnlikCipim += miktar; const cipKutu = document.getElementById('benimCipim');
     if(cipKutu) { cipKutu.innerText = benimAnlikCipim.toLocaleString('tr-TR'); cipKutu.style.color = "#2ecc71"; setTimeout(() => cipKutu.style.color = "", 2000); }
     if(auth.currentUser && !isMisafir) { db.collection("kullanicilar").doc(auth.currentUser.uid).update({ cip: benimAnlikCipim }); }
-    socket.emit('kullanici_girisi', { isim: aktifKullaniciAdi, cip: benimAnlikCipim, kozmetikler: aktifKozmetikler });
+    socket.emit('magaza_harcamasi', { isim: aktifKullaniciAdi, yeniCip: benimAnlikCipim }); // Çip senkronu
     ozelUyariGoster(`🎉 Görev tamamlandı! ${miktar.toLocaleString()} ÇİP hesabına eklendi!`); renderGorevler();
 }
 
@@ -323,9 +323,12 @@ window.profilDavetAksiyon = function() {
     socket.emit('masaya_davet_et', { kimden: aktifKullaniciAdi, kime: hedef, masaAdi: suAnkiMasam }); ozelUyariGoster(`💌 ${hedef} adlı oyuncuya davet gönderildi!`); document.getElementById('profilEkrani').style.display = 'none';
 };
 
-// 🔥 HATA YAKALAYICI ZIRHLI AYRILMA SİSTEMİ 🔥
+// 🔥 HATA YAKALAYICI ZIRHLI VE SENKRON AYRILMA SİSTEMİ 🔥
 function masadanAyrilmaIslemi(cezaUygulansinMi = false) {
     if (suAnkiMasam) {
+        // Önce masadan kalktığımızı sunucuya iletip bizi sistemden silmesini sağlıyoruz
+        socket.emit('masadan_kalk', { isim: aktifKullaniciAdi, masaAdi: suAnkiMasam }); 
+        
         if (cezaUygulansinMi && masaOyunBasladiMi && !izleyiciModu) {
             let cezaMiktari = 0;
             if (suAnkiMasam.includes('20K')) cezaMiktari = 20000; else if (suAnkiMasam.includes('50K')) cezaMiktari = 50000; else if (suAnkiMasam.includes('10K')) cezaMiktari = 10000;
@@ -333,28 +336,29 @@ function masadanAyrilmaIslemi(cezaUygulansinMi = false) {
                 benimAnlikCipim -= cezaMiktari; if (benimAnlikCipim < 0) benimAnlikCipim = 0; 
                 try { const cipKutu = document.getElementById('benimCipim'); if(cipKutu) { cipKutu.innerText = benimAnlikCipim.toLocaleString('tr-TR'); cipKutu.style.color = "#e74c3c"; setTimeout(() => cipKutu.style.color = "", 2000); } } catch(e){}
                 if (auth.currentUser && !isMisafir) { db.collection("kullanicilar").doc(auth.currentUser.uid).update({ cip: benimAnlikCipim }); }
-                socket.emit('kullanici_girisi', { isim: aktifKullaniciAdi, cip: benimAnlikCipim, kozmetikler: aktifKozmetikler }); 
+                
+                // PİNG-PONG HATASINI ÇÖZEN SATIR: Kullanıcı_girisi yerine sadece arkadan çipi güncelliyoruz.
+                socket.emit('magaza_harcamasi', { isim: aktifKullaniciAdi, yeniCip: benimAnlikCipim }); 
+                
                 try { document.getElementById('cezaMiktarMetni').innerText = cezaMiktari.toLocaleString('tr-TR') + " ÇİP"; document.getElementById('cezaBildirimEkrani').style.display = 'flex'; } catch(e){}
             }
         }
-        socket.emit('masadan_kalk', { isim: aktifKullaniciAdi, masaAdi: suAnkiMasam }); 
     }
+    
+    // Değişkenleri güvenle sıfırlıyoruz
     suAnkiMasam = null; suAnkiMasaVIPMi = false; suAnkiMasaSahibi = ""; suAnkiMasaGizliMi = false; 
     izleyiciModu = false; 
     
     try { if(btnVipGizlilikTetikle) btnVipGizlilikTetikle.style.display = "none"; } catch(e){}
     try { masayiTemizle(); } catch(e){}
     
-    // ZIRH 1: Istakayı ararken çökerse bile oyunu durdurma!
     try {
         let istakaKutu = document.querySelector('.istaka-container') || document.getElementById('istakaContainer');
         if (istakaKutu) istakaKutu.style.display = 'flex';
-        
         let tusKutu = document.querySelector('.okey-istaka-tuslar-area');
         if (tusKutu) tusKutu.style.display = 'flex';
     } catch(err) { console.log(err); }
     
-    // ZIRH 2: İsimleri sıfırlarken çökerse bile durma!
     try {
         document.getElementById('seatTop').innerText = "Bekleniyor..."; 
         document.getElementById('seatLeft').innerText = "Bekleniyor..."; 
@@ -364,7 +368,6 @@ function masadanAyrilmaIslemi(cezaUygulansinMi = false) {
         document.getElementById('seatRight').dataset.isim = ""; 
     } catch(err) { console.log(err); }
     
-    // ZIRH 3: Ekranları zorla değiştir ve günceller
     try {
         masaEkrani.style.display = 'none'; 
         lobiEkrani.style.display = 'flex';
@@ -377,7 +380,6 @@ window.cezaAnladimKapat = function() {
     if(cikisIcinBekleyenLogout) { tamamenCikisYap(); } 
 }
 
-// 🔥 ŞİMŞEK ÇIKIŞ: ARTIK EKRANI ZORLA YENİLER VE GİRİŞE ATAR 🔥
 window.tamamenCikisYap = function() { 
     try {
         auth.signOut().then(() => {
@@ -667,7 +669,34 @@ socket.on('taslari_al', (data) => { if (data.kime === aktifKullaniciAdi && !izle
 socket.on('tas_cekildi', (tas) => { if(!izleyiciModu){ for(let i=0; i<24; i++) { if(document.getElementById('y'+i).children.length === 0) { tasEkle(tas, 'y'+i); break; } } } });
 
 function tasEkle(tasData, yuvaId) { const div = document.createElement('div'); div.className = `okey-tasi tas-${tasData.renk}`; div.innerText = tasData.sayi; div.id = tasData.id; let sonDokunma = 0; let surukleniyorMu = false; div.addEventListener('touchstart', () => { surukleniyorMu = false; }, {passive: true}); div.addEventListener('touchmove', () => { surukleniyorMu = true; }, {passive: true}); div.addEventListener('touchend', function(e) { if(surukleniyorMu) return; const simdi = new Date().getTime(); if (simdi - sonDokunma < 300) { e.preventDefault(); otomatikTasAt(this); } sonDokunma = simdi; }); div.addEventListener('dblclick', function() { otomatikTasAt(this); }); document.getElementById(yuvaId).appendChild(div); }
-socket.on('sira_guncelle', (data) => { if(suAnkiMasam === data.masaAdi) { kurtarmaSinyaliGonder(); const eskiSira = benimSiramMi; benimSiramMi = (!izleyiciModu && data.kimde === aktifKullaniciAdi); if(benimSiramMi && !eskiSira) sesCal(sesSiraSende); const iskarta = document.getElementById('benimIskartam'); if(benimSiramMi) iskarta.classList.remove('kilitli-iskarta'); else iskarta.classList.add('kilitli-iskarta'); const koltuklar = [ { id: 'benimAdimKutusu', isim: document.getElementById('benimAdimKutusu').dataset.isim }, { id: 'seatRight', isim: document.getElementById('seatRight').dataset.isim }, { id: 'seatTop', isim: document.getElementById('seatTop').dataset.isim }, { id: 'seatLeft', isim: document.getElementById('seatLeft').dataset.isim } ]; koltuklar.forEach(k => { const el = document.getElementById(k.id); if(el && k.isim === data.kimde) el.classList.add('aktif-sira'); else if(el) el.classList.remove('aktif-sira'); }); checkGosterge(); } });
+
+// 🔥 İSİM YANIP SÖNMESİ DÜZELTİLDİ
+socket.on('sira_guncelle', (data) => { 
+    if(suAnkiMasam === data.masaAdi) { 
+        kurtarmaSinyaliGonder(); 
+        const eskiSira = benimSiramMi; 
+        benimSiramMi = (!izleyiciModu && data.kimde === aktifKullaniciAdi); 
+        if(benimSiramMi && !eskiSira) sesCal(sesSiraSende); 
+        const iskarta = document.getElementById('benimIskartam'); 
+        if(benimSiramMi) iskarta.classList.remove('kilitli-iskarta'); else iskarta.classList.add('kilitli-iskarta'); 
+        
+        let benimKutuIsmim = izleyiciModu ? document.getElementById('benimAdimKutusu').dataset.isim : aktifKullaniciAdi;
+        
+        const koltuklar = [ 
+            { id: 'benimAdimKutusu', isim: benimKutuIsmim }, 
+            { id: 'seatRight', isim: document.getElementById('seatRight').dataset.isim }, 
+            { id: 'seatTop', isim: document.getElementById('seatTop').dataset.isim }, 
+            { id: 'seatLeft', isim: document.getElementById('seatLeft').dataset.isim } 
+        ]; 
+        koltuklar.forEach(k => { 
+            const el = document.getElementById(k.id); 
+            if(el && k.isim === data.kimde) el.classList.add('aktif-sira'); 
+            else if(el) el.classList.remove('aktif-sira'); 
+        }); 
+        checkGosterge(); 
+    } 
+});
+
 socket.on('masa_ortasi_guncelle', (data) => { if(suAnkiMasam === data.masaAdi) { kurtarmaSinyaliGonder(); kalanTasBilgi.innerText = data.kalanTas; if(data.gosterge) { const gostergeDiv = document.getElementById('gostergeTasi'); gostergeDiv.innerText = data.gosterge.sayi; gostergeDiv.className = `gosterge-tasi tas-${data.gosterge.renk}`; } } });
 
 if(sohbetCekmecesi) {
