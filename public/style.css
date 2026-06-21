@@ -309,3 +309,40 @@ body { background-color: #050d08; color: #fff; font-family: 'Segoe UI', Tahoma, 
 .btn-reklam-kapat {
     background: #333; color: #888; padding: 12px 20px; border-radius: 8px; border: none; font-weight: 900; display: none; cursor: pointer; margin-top: 20px; width: 100%; transition: 0.3s;
 }
+/* 🔥 LOBİ EKRANI PRO HİZALAMA VE KAYDIRMA (SCROLL) SİSTEMİ 🔥 */
+#lobiEkrani {
+    justify-content: flex-start !important; /* Tahterevalli iptal! Her şey en tepeden aşağı dizilir */
+    padding-top: 80px !important; /* Mobilde VIP barın altında ezilmesin diye boşluk */
+    padding-bottom: 100px !important; /* Alt menü kapatmasın diye boşluk */
+    height: 100vh !important;
+    overflow-y: auto !important; /* Gerekirse sayfa aşağı kaysın */
+}
+
+/* Masalar alanının sınırlandırılması */
+#masalarAlani {
+    margin-bottom: 20px !important;
+}
+
+/* Lobideki Oyuncular listesini hapseden KUTU (Pro Sistem) */
+#lobidekilerListesi {
+    max-height: 220px !important; /* Maksimum boyu sabitledik */
+    overflow-y: auto !important; /* Taşan oyuncular için içine scroll (kaydırma) ekledik */
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(46, 204, 113, 0.2);
+    border-radius: 12px;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+/* PC ve Mobil için havalı ince kaydırma çubuğu (Scrollbar) tasarımı */
+#lobidekilerListesi::-webkit-scrollbar {
+    width: 6px;
+}
+#lobidekilerListesi::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.2); 
+    border-radius: 10px;
+}
+#lobidekilerListesi::-webkit-scrollbar-thumb {
+    background: #2ecc71; 
+    border-radius: 10px;
+}
