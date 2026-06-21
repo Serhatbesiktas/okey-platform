@@ -323,15 +323,18 @@ window.profilDavetAksiyon = function() {
     socket.emit('masaya_davet_et', { kimden: aktifKullaniciAdi, kime: hedef, masaAdi: suAnkiMasam }); ozelUyariGoster(`💌 ${hedef} adlı oyuncuya davet gönderildi!`); document.getElementById('profilEkrani').style.display = 'none';
 };
 
+// 🔥 HATA YAKALAYICI ZIRHLI AYRILMA SİSTEMİ 🔥
 function masadanAyrilmaIslemi(cezaUygulansinMi = false) {
     if (suAnkiMasam) {
         if (cezaUygulansinMi && masaOyunBasladiMi && !izleyiciModu) {
             let cezaMiktari = 0;
             if (suAnkiMasam.includes('20K')) cezaMiktari = 20000; else if (suAnkiMasam.includes('50K')) cezaMiktari = 50000; else if (suAnkiMasam.includes('10K')) cezaMiktari = 10000;
             if (cezaMiktari > 0) {
-                benimAnlikCipim -= cezaMiktari; if (benimAnlikCipim < 0) benimAnlikCipim = 0; const cipKutu = document.getElementById('benimCipim'); if(cipKutu) { cipKutu.innerText = benimAnlikCipim.toLocaleString('tr-TR'); cipKutu.style.color = "#e74c3c"; setTimeout(() => cipKutu.style.color = "", 2000); }
+                benimAnlikCipim -= cezaMiktari; if (benimAnlikCipim < 0) benimAnlikCipim = 0; 
+                try { const cipKutu = document.getElementById('benimCipim'); if(cipKutu) { cipKutu.innerText = benimAnlikCipim.toLocaleString('tr-TR'); cipKutu.style.color = "#e74c3c"; setTimeout(() => cipKutu.style.color = "", 2000); } } catch(e){}
                 if (auth.currentUser && !isMisafir) { db.collection("kullanicilar").doc(auth.currentUser.uid).update({ cip: benimAnlikCipim }); }
-                socket.emit('kullanici_girisi', { isim: aktifKullaniciAdi, cip: benimAnlikCipim, kozmetikler: aktifKozmetikler }); document.getElementById('cezaMiktarMetni').innerText = cezaMiktari.toLocaleString('tr-TR') + " ÇİP"; document.getElementById('cezaBildirimEkrani').style.display = 'flex';
+                socket.emit('kullanici_girisi', { isim: aktifKullaniciAdi, cip: benimAnlikCipim, kozmetikler: aktifKozmetikler }); 
+                try { document.getElementById('cezaMiktarMetni').innerText = cezaMiktari.toLocaleString('tr-TR') + " ÇİP"; document.getElementById('cezaBildirimEkrani').style.display = 'flex'; } catch(e){}
             }
         }
         socket.emit('masadan_kalk', { isim: aktifKullaniciAdi, masaAdi: suAnkiMasam }); 
@@ -339,26 +342,52 @@ function masadanAyrilmaIslemi(cezaUygulansinMi = false) {
     suAnkiMasam = null; suAnkiMasaVIPMi = false; suAnkiMasaSahibi = ""; suAnkiMasaGizliMi = false; 
     izleyiciModu = false; 
     
-    if(btnVipGizlilikTetikle) btnVipGizlilikTetikle.style.display = "none";
-    masayiTemizle(); 
+    try { if(btnVipGizlilikTetikle) btnVipGizlilikTetikle.style.display = "none"; } catch(e){}
+    try { masayiTemizle(); } catch(e){}
     
-    document.querySelector('.istaka-container').style.display = 'flex';
-    document.querySelector('.okey-istaka-tuslar-area').style.display = 'flex';
+    // ZIRH 1: Istakayı ararken çökerse bile oyunu durdurma!
+    try {
+        let istakaKutu = document.querySelector('.istaka-container') || document.getElementById('istakaContainer');
+        if (istakaKutu) istakaKutu.style.display = 'flex';
+        
+        let tusKutu = document.querySelector('.okey-istaka-tuslar-area');
+        if (tusKutu) tusKutu.style.display = 'flex';
+    } catch(err) { console.log(err); }
     
-    document.getElementById('seatTop').innerText = "Bekleniyor..."; document.getElementById('seatLeft').innerText = "Bekleniyor..."; document.getElementById('seatRight').innerText = "Bekleniyor..."; document.getElementById('seatTop').dataset.isim = ""; document.getElementById('seatLeft').dataset.isim = ""; document.getElementById('seatRight').dataset.isim = ""; 
-    masaEkrani.style.display = 'none'; lobiEkrani.style.display = 'flex';
-    arayuzGuncelle();
+    // ZIRH 2: İsimleri sıfırlarken çökerse bile durma!
+    try {
+        document.getElementById('seatTop').innerText = "Bekleniyor..."; 
+        document.getElementById('seatLeft').innerText = "Bekleniyor..."; 
+        document.getElementById('seatRight').innerText = "Bekleniyor..."; 
+        document.getElementById('seatTop').dataset.isim = ""; 
+        document.getElementById('seatLeft').dataset.isim = ""; 
+        document.getElementById('seatRight').dataset.isim = ""; 
+    } catch(err) { console.log(err); }
+    
+    // ZIRH 3: Ekranları zorla değiştir ve günceller
+    try {
+        masaEkrani.style.display = 'none'; 
+        lobiEkrani.style.display = 'flex';
+        arayuzGuncelle();
+    } catch(err) { console.log(err); }
 }
 
-window.cezaAnladimKapat = function() { document.getElementById('cezaBildirimEkrani').style.display = 'none'; if(cikisIcinBekleyenLogout) { tamamenCikisYap(); } }
+window.cezaAnladimKapat = function() { 
+    try { document.getElementById('cezaBildirimEkrani').style.display = 'none'; } catch(e){} 
+    if(cikisIcinBekleyenLogout) { tamamenCikisYap(); } 
+}
 
+// 🔥 ŞİMŞEK ÇIKIŞ: ARTIK EKRANI ZORLA YENİLER VE GİRİŞE ATAR 🔥
 window.tamamenCikisYap = function() { 
-    auth.signOut().then(() => {
-        window.location.reload(); 
-    }).catch((err) => {
-        console.log(err);
+    try {
+        auth.signOut().then(() => {
+            window.location.reload(); 
+        }).catch((err) => {
+            window.location.reload();
+        });
+    } catch(err) {
         window.location.reload();
-    });
+    }
 };
 
 document.getElementById('btnCikisYap').addEventListener('click', (e) => { 
@@ -528,8 +557,11 @@ socket.on('izleyici_olarak_katildin', (data) => {
     masaEkrani.style.display = 'flex'; 
     document.getElementById('masaOrtasiYazi').innerText = data.masaAdi.toUpperCase() + " (👁️ İZLEYİCİ)";
     
-    document.querySelector('.istaka-container').style.display = 'none';
-    document.querySelector('.okey-istaka-tuslar-area').style.display = 'none';
+    try {
+        let ista = document.querySelector('.istaka-container'); if(ista) ista.style.display = 'none';
+        let tusa = document.querySelector('.okey-istaka-tuslar-area'); if(tusa) tusa.style.display = 'none';
+    } catch(e) {}
+    
     oyunuBaslatBtn.style.display = 'none';
     
     if(data.oyunBasladi) {
