@@ -1,3 +1,5 @@
+// --- BEYCO ÖZEL SOHBET MODÜLÜ (GELİŞMİŞ BİLDİRİM) --- //
+
 const msgStilleri = document.createElement('style');
 msgStilleri.innerHTML = `
     .vip-mesaj-modal {
@@ -39,8 +41,10 @@ function getKendiAdim() {
     return kutu ? kutu.innerText.replace('✔', '').replace('👑', '').trim() : "";
 }
 
+// BEYCO Özel WhatsApp Yeşili Toast Bildirimi!
 document.body.insertAdjacentHTML('beforeend', `
-    <div id="pmToast" style="position:fixed; top:-100px; left:50%; transform:translateX(-50%); background:linear-gradient(135deg, #f39c12, #e67e22); color:#fff; padding:10px 20px; border-radius:30px; font-weight:bold; font-size:13px; z-index:999999999; box-shadow:0 5px 15px rgba(0,0,0,0.5); transition:0.4s; border:2px solid #f2c94c;">✉️ Yeni Özel Mesaj!</div>
+    <div id="pmToast" style="position:fixed; top:-100px; left:50%; transform:translateX(-50%); background:linear-gradient(135deg, #128C7E, #25D366); color:#fff; padding:10px 20px; border-radius:30px; font-weight:bold; font-size:13px; z-index:999999999; box-shadow:0 5px 15px rgba(37, 211, 102, 0.4); transition:0.4s; border:2px solid #fff;">✉️ Yeni Özel Mesaj!</div>
+    
     <div id="sohbetListesiEkrani" class="vip-mesaj-modal">
         <div class="vip-mesaj-kutu">
             <div class="vip-mesaj-header">
@@ -71,7 +75,7 @@ setTimeout(() => {
     if(altMenu) {
         const mBtn = document.createElement('div'); mBtn.className = 'alt-menu-item'; mBtn.style.cursor = 'pointer'; mBtn.style.position = 'relative';
         mBtn.onclick = () => {
-            if(getKendiAdim().startsWith('MİSAFİR_')) { if(window.ozelUyariGoster) ozelUyariGoster("⚠️ Misafir hesaplar mesajlaşamaz!"); return; }
+            if(getKendiAdim().startsWith('MİSAFİR_')) { if(window.ozelUyariGoster) ozelUyariGoster("⚠️ BEYCO Misafir hesapları mesajlaşamaz!"); return; }
             document.body.style.overflow = 'hidden'; document.getElementById('sohbetListesiEkrani').style.display = 'flex';
         };
         mBtn.innerHTML = `<div class="alt-menu-ikon">💬</div><span style="color:#2ecc71; font-weight:bold;">Sohbet</span><span id="yeniMesajBildirim" style="display:none; position:absolute; top:-5px; right:5px; background:#e74c3c; color:#fff; border-radius:50%; width:16px; height:16px; font-size:10px; line-height:16px; text-align:center; font-weight:bold;">!</span>`;
@@ -92,9 +96,8 @@ setTimeout(() => {
             masaEkrani.appendChild(solGrup);
         }
         
-        // 3. Özel Mesaj Zarfı (En Altta)
         if(!document.getElementById('masaIciOzelMesajBtn')) {
-            solGrup.insertAdjacentHTML('beforeend', `<button id="masaIciOzelMesajBtn" class="masa-sol-btn" style="order:3;" onclick="document.body.style.overflow='hidden'; document.getElementById('sohbetListesiEkrani').style.display='flex';" title="Özel Mesajlar">✉️<span id="masaYeniMesajBildirim" class="pulse-anim" style="display:none; position:absolute; top:-3px; right:-3px; background:#e74c3c; color:#fff; border-radius:50%; width:18px; height:18px; font-size:11px; line-height:18px; text-align:center; font-weight:bold;">!</span></button>`);
+            solGrup.insertAdjacentHTML('beforeend', `<button id="masaIciOzelMesajBtn" class="masa-sol-btn" style="order:3; position:relative;" onclick="document.body.style.overflow='hidden'; document.getElementById('sohbetListesiEkrani').style.display='flex';" title="Özel Mesajlar">✉️<span id="masaYeniMesajBildirim" class="pulse-anim" style="display:none; position:absolute; top:-3px; right:-3px; background:#e74c3c; color:#fff; border-radius:50%; width:18px; height:18px; font-size:11px; line-height:18px; text-align:center; font-weight:bold;">!</span></button>`);
         }
     }
 }, 1200);
@@ -129,7 +132,14 @@ window.sohbetGonderAksiyon = function() {
 window.sohbetiAc = function(kisiIsmi) {
     aktifSohbetHedefi = kisiIsmi; document.getElementById('sohbetListesiEkrani').style.display = 'none'; document.body.style.overflow = 'hidden';
     const ekran = document.getElementById('sohbetPenceresi'); document.getElementById('sohbetBaslikIsim').innerText = kisiIsmi; ekran.style.display = 'flex';
-    if(typeof firebase !== 'undefined' && firebase.auth().currentUser) { firebase.firestore().collection("kullanicilar").doc(firebase.auth().currentUser.uid).update({ okunmamisSohbetler: firebase.firestore.FieldValue.arrayRemove(kisiIsmi) }).catch(e=>{}); }
+    
+    // ANINDA OKUNDU TEPKİSİ: Kullanıcı tıkladığı an kırmızı bildirimleri ekrandan sertçe siliyoruz!
+    const lobiB = document.getElementById('yeniMesajBildirim'); const masaB = document.getElementById('masaYeniMesajBildirim');
+    if(lobiB) lobiB.style.display = 'none'; if(masaB) masaB.style.display = 'none';
+
+    if(typeof firebase !== 'undefined' && firebase.auth().currentUser) { 
+        firebase.firestore().collection("kullanicilar").doc(firebase.auth().currentUser.uid).update({ okunmamisSohbetler: firebase.firestore.FieldValue.arrayRemove(kisiIsmi) }).catch(e=>{}); 
+    }
     ekranaBalonlariCiz();
 };
 
@@ -177,7 +187,7 @@ function canliSohbetiBaslat() {
             if(lobiB) lobiB.style.display = 'block'; if(masaB) masaB.style.display = 'block';
             if(gercekOkunmamis.length > oncekiOkunmamisSayisi) {
                 const toast = document.getElementById('pmToast');
-                if(toast) { toast.innerHTML = `✉️ <span style="color:#111;">${gercekOkunmamis[gercekOkunmamis.length - 1]}</span> sana mesaj gönderdi!`; toast.style.top = "20px"; setTimeout(() => { toast.style.top = "-100px"; }, 3000); }
+                if(toast) { toast.innerHTML = `✉️ <span style="color:#fff;">${gercekOkunmamis[gercekOkunmamis.length - 1]}</span> sana mesaj gönderdi!`; toast.style.top = "20px"; setTimeout(() => { toast.style.top = "-100px"; }, 3000); }
             }
         } else { if(lobiB) lobiB.style.display = 'none'; if(masaB) masaB.style.display = 'none'; }
         oncekiOkunmamisSayisi = gercekOkunmamis.length;
