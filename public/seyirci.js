@@ -1,4 +1,4 @@
-// --- BEYCO SERİ OKEY - İZLEYİCİ (YANCI) MODÜLÜ --- //
+// --- BEYCO SERİ OKEY - İZLEYİCİ (YANCI) MODÜLÜ PRO --- //
 
 const seyirciStil = document.createElement('style');
 seyirciStil.innerHTML = `
@@ -11,7 +11,7 @@ seyirciStil.innerHTML = `
     }
     .btn-izle:active { transform: scale(0.95); }
     
-    /* Seyirci Modu Aktifken Oyuncu Kontrollerini Kökünden Gizle */
+    /* Seyirci Modu Aktifken Ana Oyun Kontrollerini Kökünden Gizle */
     body.seyirci-aktif #benimIstakam,
     body.seyirci-aktif .pro-tus-takimi,
     body.seyirci-aktif #bitisAlani,
@@ -21,7 +21,7 @@ seyirciStil.innerHTML = `
         display: none !important;
     }
     
-    /* Seyirci ortadaki ıskartayı görsün ama tıklayamasın */
+    /* Seyirci ıskartayı görebilsin ama asla tıklayamasın */
     body.seyirci-aktif #benimIskartam {
         pointer-events: none !important;
     }
@@ -34,7 +34,7 @@ document.head.appendChild(seyirciStil);
 
 window.isSeyirci = false;
 
-// Lobideki Masa Kartlarına Otomatik 'İzle' Butonu Ekleme Motoru
+// Lobideki Masa Kartlarına "İzle" Butonu Basma
 setInterval(() => {
     const masalarAlani = document.getElementById('masalarAlani');
     if(!masalarAlani) return;
@@ -71,7 +71,7 @@ window.masayiIzle = function(masaAdi) {
     const yazi = document.getElementById('masaOrtasiYazi');
     if(yazi) yazi.innerHTML = masaAdi.toUpperCase() + '<br><span style="color:#9b59b6; font-size:12px;">(👁️ İZLEYİCİ)</span>';
 
-    // 4. Koltuk (Aşağıdaki) için HTML elementi oluştur
+    // Seyirci Alt Koltuğu
     let seatB = document.getElementById('seatBottomSeyirci');
     if(!seatB) {
         seatB = document.createElement('div');
@@ -83,11 +83,9 @@ window.masayiIzle = function(masaAdi) {
         if(ui) ui.appendChild(seatB);
     }
 
-    // Masadaki oyuncuları çekip koltuklara yerleştir
     if(window.guncelMasalar && window.guncelMasalar[masaAdi]) {
         const koltuklar = window.guncelMasalar[masaAdi];
         const idList = ['seatBottomSeyirci', 'seatRight', 'seatTop', 'seatLeft'];
-        
         idList.forEach((id, index) => {
             const el = document.getElementById(id);
             if(el) {
@@ -98,9 +96,15 @@ window.masayiIzle = function(masaAdi) {
             }
         });
     }
+
+    // İŞTE BURASI: Sunucuya "Ben Geldim" Sinyali Gönderiyoruz!
+    if(typeof socket !== 'undefined') {
+        const benimAdim = document.getElementById('benimAdimKutusu') ? document.getElementById('benimAdimKutusu').innerText.replace('✔', '').replace('👑', '').trim() : "Oyuncu";
+        socket.emit('seyirci_girisi', { masaAdi: masaAdi, isim: benimAdim });
+    }
 };
 
-// Alt oyuncu taş attığında seyircinin ortadaki iskarta kutusunda görmesi için
+// Seyirci atılan yeni taşları canlı görsün
 if(typeof socket !== 'undefined') {
     socket.on('ortaya_tas_atildi', (data) => {
         if(window.isSeyirci && window.suAnkiMasam === data.masaAdi) {
@@ -120,7 +124,7 @@ if(typeof socket !== 'undefined') {
     });
 }
 
-// Lobiye dönüşte seyirci kostümünü çıkar
+// Çıkışta Kostümü Çıkar
 document.addEventListener('click', (e) => {
     if(e.target && e.target.id === 'lobiyeDonBtn') {
         document.body.classList.remove('seyirci-aktif');
