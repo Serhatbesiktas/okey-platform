@@ -285,6 +285,31 @@ io.on('connection', (socket) => {
 
   socket.on('masaya_geri_don', (data) => { const masa = masalar[data.masaAdi]; if (masa && masa.oyunBasladi && masa.koltuklar.includes(data.isim)) { socket.emit('masa_oyun_basladi', { masaAdi: data.masaAdi, gosterge: masa.gosterge, kalanTas: masa.deste.length, kasa: masa.kasa, koltuklar: masa.koltuklar }); if(masa.eller[data.isim]) { socket.emit('taslari_al', { kime: data.isim, taslar: masa.eller[data.isim] }); } socket.emit('sira_guncelle', { masaAdi: data.masaAdi, kimde: masa.siradakiOyuncu }); } });
   socket.on('masadan_kalk', (data) => { kullaniciyiMasadanKaldir(data.isim); });
+
+  // --- BEYCO SEYİRCİ (YANCI) MODÜLÜ SUNUCU KAPISI ---
+  socket.on('seyirci_girisi', (data) => {
+      const masa = masalar[data.masaAdi];
+      if(masa) {
+          io.emit('yeni_sohbet_mesaji', {
+              masaAdi: data.masaAdi,
+              isim: "Sistem",
+              mesaj: `👁️ ${data.isim} masaya izleyici olarak katıldı.`,
+              kozmetikler: []
+          });
+          if(masa.oyunBasladi) {
+              socket.emit('masa_oyun_basladi', {
+                  masaAdi: data.masaAdi,
+                  gosterge: masa.gosterge,
+                  kalanTas: masa.deste.length,
+                  kasa: masa.kasa,
+                  koltuklar: masa.koltuklar
+              });
+              socket.emit('sira_guncelle', { masaAdi: data.masaAdi, kimde: masa.siradakiOyuncu });
+          }
+      }
+  });
+  // --------------------------------------------------
+
   socket.on('disconnect', () => { const kopanIsim = socket.kullaniciAdi; if(kopanIsim) { baglantiKopanlar[kopanIsim] = setTimeout(() => { kullaniciyiMasadanKaldir(kopanIsim); delete oyuncuCipleri[kopanIsim]; io.emit('online_oyuncular', Object.keys(oyuncuCipleri)); delete baglantiKopanlar[kopanIsim]; }, 20000); } });
   socket.on('sohbet_mesaji', (data) => { io.emit('yeni_sohbet_mesaji', data); });
   socket.on('vip_emoji', (data) => { io.emit('yeni_vip_emoji', data); });
