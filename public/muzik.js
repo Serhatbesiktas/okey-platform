@@ -1,11 +1,8 @@
-// --- VIP CASINO OYUN SESLERİ (EFEKTLER) KONTROL MODÜLÜ --- //
+// --- VIP CASINO OYUN SESLERİ KONTROL MODÜLÜ --- //
 
 const sesStilleri = document.createElement('style');
 sesStilleri.innerHTML = `
-    .vip-ses-btn {
-        position: fixed; 
-        bottom: 90px; right: 20px; 
-        z-index: 9999; 
+    .masa-sol-btn {
         background: rgba(10, 15, 12, 0.85); 
         backdrop-filter: blur(5px);
         border: 2px solid #2ecc71; 
@@ -14,32 +11,60 @@ sesStilleri.innerHTML = `
         display: flex; justify-content: center; align-items: center;
         box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3); 
         cursor: pointer; transition: 0.3s;
+        color: #fff; font-size: 20px;
+        padding: 0; margin: 0;
     }
-    .vip-ses-btn.sessiz { border-color: #e74c3c; box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3); }
-    .vip-ses-btn:active { transform: scale(0.9); }
-    .ses-ikon { font-size: 20px; }
+    .masa-sol-btn:active { transform: scale(0.9); }
+    .masa-sol-btn.sessiz { border-color: #e74c3c; box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3); }
 `;
 document.head.appendChild(sesStilleri);
 
-document.body.insertAdjacentHTML('beforeend', `
-    <button id="btnOyunSesiToggle" class="vip-ses-btn" title="Oyun Sesleri Aç/Kapat">
-        <span id="sesToggleIkon" class="ses-ikon">🔊</span>
-    </button>
-`);
+// Sadece Masa Açıldığında Sol Üste Eklenen Grup Sistemi
+setTimeout(() => {
+    const masaEkrani = document.getElementById('masaEkrani');
+    if(masaEkrani) {
+        let solGrup = document.getElementById('solButonGrubu');
+        if(!solGrup) {
+            solGrup = document.createElement('div');
+            solGrup.id = 'solButonGrubu';
+            solGrup.style.cssText = 'position:absolute; top:20px; left:20px; display:flex; flex-direction:column; gap:12px; z-index:999;';
+            masaEkrani.appendChild(solGrup);
+            
+            // HTML'deki Genel Sohbet Butonunu al ve gruba taşı (Ortaya)
+            const genelSohbetBtn = document.getElementById('sohbetAcBtn');
+            if(genelSohbetBtn) {
+                genelSohbetBtn.style.position = 'static';
+                genelSohbetBtn.className = 'masa-sol-btn'; 
+                genelSohbetBtn.style.order = '2'; 
+                solGrup.appendChild(genelSohbetBtn);
+            }
+        }
 
-window.oyunSesiAcik = true;
+        // Ses Butonunu Gruba Ekle (En Üste)
+        solGrup.insertAdjacentHTML('beforeend', `
+            <button id="btnOyunSesiToggle" class="masa-sol-btn" style="order:1;" title="Oyun Sesleri Aç/Kapat">
+                <span id="sesToggleIkon">🔊</span>
+            </button>
+        `);
 
-const orijinalSesCal = window.sesCal;
-window.sesCal = function(sesObje) {
-    if(!window.oyunSesiAcik) return; 
-    if(orijinalSesCal) orijinalSesCal(sesObje);
-};
+        // Ses Şalteri Bağlantısı
+        window.oyunSesiAcik = true; 
+        const orijinalSesCal = window.sesCal;
+        window.sesCal = function(sesObje) { 
+            try { 
+                if(!window.oyunSesiAcik) return; 
+                let yeniSes = sesObje.cloneNode(); 
+                yeniSes.volume = 0.5; 
+                yeniSes.play().catch(e => console.log(e)); 
+            } catch(err) {} 
+        };
 
-document.getElementById('btnOyunSesiToggle').addEventListener('click', function() {
-    window.oyunSesiAcik = !window.oyunSesiAcik;
-    const btn = document.getElementById('btnOyunSesiToggle');
-    const ikon = document.getElementById('sesToggleIkon');
-    
-    if(window.oyunSesiAcik) { btn.classList.remove('sessiz'); ikon.innerText = "🔊"; } 
-    else { btn.classList.add('sessiz'); ikon.innerText = "🔇"; }
-});
+        document.getElementById('btnOyunSesiToggle').addEventListener('click', function() {
+            window.oyunSesiAcik = !window.oyunSesiAcik;
+            const btn = document.getElementById('btnOyunSesiToggle');
+            const ikon = document.getElementById('sesToggleIkon');
+            if(window.oyunSesiAcik) { btn.classList.remove('sessiz'); ikon.innerText = "🔊"; } 
+            else { btn.classList.add('sessiz'); ikon.innerText = "🔇"; }
+        });
+    }
+}, 1000);
