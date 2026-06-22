@@ -96,6 +96,10 @@ body { background-color: #050d08; color: #fff; font-family: 'Segoe UI', Tahoma, 
 .gosterge-btn:active { transform: scale(0.95); }
 .flash-bildirim { position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%); background: linear-gradient(135deg, #ffe266, #d49a00); color: #050d08; padding: 16px 32px; border-radius: 50px; font-weight: 900; font-size: 16px; text-transform: uppercase; box-shadow: 0 15px 40px rgba(0,0,0,0.85), 0 0 25px rgba(255, 226, 102, 0.6); z-index: 9999; text-align: center; border: 3px solid #ffffff; pointer-events: none; opacity: 0; display: none; }
 .flash-bildirim.goster { display: block; animation: flashAnim 3.5s forwards; }
+
+/* ----------------------------------------------------- */
+/* GİRİŞ EKRANI KODLARI  */
+/* ----------------------------------------------------- */
 #authEkrani { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 45%, #1f5934 0%, #11361c 55%, #050d08 100%); z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
 .auth-kutu { background: linear-gradient(135deg, #112618 0%, #06120b 100%); border: 3px solid #f2c94c; padding: 40px 30px; border-radius: 20px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.8), 0 0 20px rgba(242, 201, 76, 0.2); }
 .auth-kutu h2 { color: #f2c94c; margin-bottom: 5px; font-weight: 900; letter-spacing: 1px; }
@@ -107,6 +111,8 @@ body { background-color: #050d08; color: #fff; font-family: 'Segoe UI', Tahoma, 
 .btn-sari { background: linear-gradient(180deg, #ffe066 0%, #db9d13 100%); color: #111; box-shadow: 0 5px 15px rgba(0,0,0,0.4); }
 .btn-yesil { background: linear-gradient(180deg, #2ecc71 0%, #1e8449 100%); color: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.4); }
 .btn-gri { background: linear-gradient(180deg, #7f8c8d 0%, #34495e 100%); color: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.4); margin-bottom: 0; }
+/* ----------------------------------------------------- */
+
 .sohbet-cekmecesi { position: fixed; top: 0; right: -320px; width: 300px; height: 100%; background: linear-gradient(to left, rgba(6, 18, 11, 1) 0%, rgba(10, 25, 15, 0.98) 100%); border-left: 2px solid #2ecc71; box-shadow: -10px 0 30px rgba(0,0,0,0.9); z-index: 99999; display: flex; flex-direction: column; transition: right 0.3s cubic-bezier(0.25, 1, 0.5, 1); }
 .sohbet-cekmecesi.acik { right: 0; }
 .cekmence-header { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(0,0,0,0.5); border-bottom: 1px solid rgba(46, 204, 113, 0.3); color: #f2c94c; font-weight: bold; }
@@ -158,42 +164,60 @@ body { background-color: #050d08; color: #fff; font-family: 'Segoe UI', Tahoma, 
 .offline-nokta { display: inline-block; width: 8px; height: 8px; background-color: #e74c3c; border-radius: 50%; margin-right: 5px; opacity: 0.5; }
 
 
-/* --- KUSURSUZ SOL SÜTUN İLETİŞİM BUTONLARI --- */
+/* --- JİLET GİBİ İLETİŞİM BUTONLARI (Kusursuz Boyut ve Hizalama) --- */
 
-/* 1. Ses Butonu (Artık body'de değil, masanın içinde. Yeri sabit.) */
-#sound-toggle-btn {
+/* 1. Bütün Butonlara Ortak Şekil ve Boyut (HTML'e dokunmadan ID/Class üzerinden) */
+#sound-toggle-btn,
+.pro-sohbet-tetikleyici, #sohbetAcBtn,
+#mesajlarBtn, #mesaj-btn, .genel-mesaj-btn,
+#ozelMesajBtn, .ozel-mesaj-btn, [id*="ozel"], [class*="ozel-mesaj"], [id*="zarf"], .zarf-btn, .pm-btn, .mesaj-kutusu-btn {
     position: fixed !important;
-    top: 85px !important;    
-    left: 15px !important;   
-    right: auto !important;  
-    z-index: 9998 !important; 
+    width: 40px !important; 
+    height: 40px !important; 
+    border-radius: 50% !important; 
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    background: rgba(11, 38, 20, 0.8) !important;
+    color: #fff !important;
+    font-size: 18px !important; 
+    cursor: pointer !important;
+    z-index: 9998 !important;
+    padding: 0 !important; 
+    margin: 0 !important;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5) !important;
 }
 
-/* 2. Ortadaki Yeşil Sohbet Butonu (Sola Sabit) */
+/* 2. Tek Tek Yerleşimleri ve Çerçeve Renkleri */
+
+/* SES BUTONU (Sol Üst) */
+#sound-toggle-btn {
+    top: 85px !important;
+    left: 15px !important;
+    border: 2px solid #2ecc71 !important; 
+}
+#sound-toggle-btn.ses-kapali {
+    border-color: #e74c3c !important; 
+}
+
+/* SOHBET BUTONU (Sesin hemen altı) */
 .pro-sohbet-tetikleyici, #sohbetAcBtn {
-    position: fixed !important;
     top: 140px !important;   
     left: 15px !important;   
-    right: auto !important;  
-    z-index: 9998 !important;
+    border: 2px solid #2ecc71 !important; 
 }
 
-/* 3. Genel Mesaj Butonu (Sola Sabit) */
+/* GENEL MESAJ BUTONU (Sohbetin altı) */
 #mesajlarBtn, #mesaj-btn, .genel-mesaj-btn {
-    position: fixed !important;
     top: 195px !important;   
     left: 15px !important;   
-    right: auto !important;  
-    z-index: 9998 !important;
+    border: 2px solid #3498db !important; 
 }
 
-/* 4. ÖZEL MESAJ (ZARF) BUTONUNU SAĞDAN SOLA KAZIMA OPERASYONU */
-/* O butonu yakalamak için olası tüm senaryoları yazdım */
-#ozelMesajBtn, .ozel-mesaj-btn, [id*="ozel"], [class*="ozel-mesaj"], 
-[id*="zarf"], .zarf-btn, .pm-btn, .mesaj-kutusu-btn, button:has(img[src*="zarf"]) {
-    position: fixed !important;
-    top: 250px !important;    /* Genel Mesajın Hemen Altına */
-    left: 15px !important;    /* SOLA ZORLA */
-    right: auto !important;   /* SAĞI İPTAL ET */
-    z-index: 9998 !important;
+/* ZARF / ÖZEL MESAJ BUTONU (Sağda kalsın demiştin, yerini bozmadan şeklini düzelttik) */
+#ozelMesajBtn, .ozel-mesaj-btn, [id*="ozel"], [class*="ozel-mesaj"], [id*="zarf"], .zarf-btn, .pm-btn, .mesaj-kutusu-btn {
+    top: 85px !important;
+    right: 15px !important;
+    left: auto !important; /* Sol hizalamasını iptal et ki sağa yapışsın */
+    border: 2px solid #e74c3c !important; 
 }
