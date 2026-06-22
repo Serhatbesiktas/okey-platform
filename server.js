@@ -288,22 +288,6 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => { const kopanIsim = socket.kullaniciAdi; if(kopanIsim) { baglantiKopanlar[kopanIsim] = setTimeout(() => { kullaniciyiMasadanKaldir(kopanIsim); delete oyuncuCipleri[kopanIsim]; io.emit('online_oyuncular', Object.keys(oyuncuCipleri)); delete baglantiKopanlar[kopanIsim]; }, 20000); } });
   socket.on('sohbet_mesaji', (data) => { io.emit('yeni_sohbet_mesaji', data); });
   socket.on('vip_emoji', (data) => { io.emit('yeni_vip_emoji', data); });
-  socket.on('admin_giris', (sifre) => { if(sifre === "BJK1903") { socket.emit('admin_onay', { basarili: true }); socket.emit('admin_guncel_veri', oyuncuCipleri); } else { socket.emit('admin_onay', { basarili: false }); } });
-  socket.on('admin_veri_iste', () => { socket.emit('admin_guncel_veri', oyuncuCipleri); });
-  
-  socket.on('admin_cip_islem', (data) => {
-      let hedefIsim = (data.isim || "").trim().toUpperCase(); 
-      if (oyuncuCipleri[hedefIsim] !== undefined) {
-          if(isNaN(oyuncuCipleri[hedefIsim]) || oyuncuCipleri[hedefIsim] === null) { oyuncuCipleri[hedefIsim] = 0; }
-          let miktar = parseInt(String(data.miktar).replace(/[^0-9]/g, '')) || 0; 
-          if (data.islem === 'ekle') { oyuncuCipleri[hedefIsim] += miktar; } else if (data.islem === 'cikar') { oyuncuCipleri[hedefIsim] = Math.max(0, oyuncuCipleri[hedefIsim] - miktar); }
-          io.emit('cip_guncelle_ozel', { isim: hedefIsim, cip: oyuncuCipleri[hedefIsim] }); io.emit('admin_guncel_veri', oyuncuCipleri); socket.emit('admin_flash_mesaj', `Başarılı: ${hedefIsim} adlı oyuncunun çipleri güncellendi!`);
-      } else { socket.emit('admin_flash_mesaj', `⚠️ HATA: ${hedefIsim} şu an aktif değil! Çip gönderilemedi.`); }
-  });
-
-  socket.on('admin_duyuru', (mesaj) => { io.emit('admin_flash_mesaj', mesaj); });
-  socket.on('admin_oyuncu_kick', (isim) => { let hedefIsim = (isim || "").trim().toUpperCase(); kullaniciyiMasadanKaldir(hedefIsim); io.emit('admin_islem_uyarisi', { isim: hedefIsim, islem: 'kick' }); io.emit('sistem_mesaji', `🚨 Yönetici, ${hedefIsim} adlı oyuncuyu masadan uzaklaştırdı.`); });
-  socket.on('admin_oyuncu_ban', (isim) => { let hedefIsim = (isim || "").trim().toUpperCase(); banliKullanicilar.add(hedefIsim); kullaniciyiMasadanKaldir(hedefIsim); io.emit('admin_islem_uyarisi', { isim: hedefIsim, islem: 'ban' }); });
 });
 
 const PORT = process.env.PORT || 3000;
