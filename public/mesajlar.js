@@ -1,4 +1,4 @@
-// --- BEYCO ÖZEL SOHBET MODÜLÜ (GELİŞMİŞ BİLDİRİM) --- //
+// --- BEYCO ÖZEL SOHBET MODÜLÜ (GELİŞMİŞ SİLME & BİLDİRİM) --- //
 
 const msgStilleri = document.createElement('style');
 msgStilleri.innerHTML = `
@@ -41,7 +41,7 @@ function getKendiAdim() {
     return kutu ? kutu.innerText.replace('✔', '').replace('👑', '').trim() : "";
 }
 
-// BEYCO Özel WhatsApp Yeşili Toast Bildirimi!
+// BEYCO Özel WhatsApp Yeşili Toast Bildirimi
 document.body.insertAdjacentHTML('beforeend', `
     <div id="pmToast" style="position:fixed; top:-100px; left:50%; transform:translateX(-50%); background:linear-gradient(135deg, #128C7E, #25D366); color:#fff; padding:10px 20px; border-radius:30px; font-weight:bold; font-size:13px; z-index:999999999; box-shadow:0 5px 15px rgba(37, 211, 102, 0.4); transition:0.4s; border:2px solid #fff;">✉️ Yeni Özel Mesaj!</div>
     
@@ -108,7 +108,10 @@ window.kapatMesajEkrani = function(id) { document.getElementById(id).style.displ
 window.sohbetPenceresindenGeriDon = function() { document.getElementById('sohbetPenceresi').style.display = 'none'; aktifSohbetHedefi = ""; document.getElementById('sohbetListesiEkrani').style.display = 'flex'; };
 
 window.profilldenMesajAt = function() {
-    const bAd = getKendiAdim(); if(bAd.startsWith('MİSAFİR_')) { if(window.ozelUyariGoster) ozelUyariGoster("⚠️ Misafirler mesaj atamaz!"); return; }
+    const bAd = getKendiAdim(); 
+    if(bAd === "Bağlanıyor..." || bAd === "") { if(window.ozelUyariGoster) ozelUyariGoster("Sunucuya bağlanıyor, lütfen bekle..."); return; }
+    if(bAd.startsWith('MİSAFİR_')) { if(window.ozelUyariGoster) ozelUyariGoster("⚠️ Misafirler mesaj atamaz!"); return; }
+    
     const hBtn = document.getElementById('profilArkadasBtn'); if(!hBtn || !hBtn.dataset.hedef) return; const kime = hBtn.dataset.hedef;
     if(kime === bAd) return; if(kime.startsWith("MİSAFİR_")) { if(window.ozelUyariGoster) ozelUyariGoster("⚠️ Misafir hesaplara mesaj gönderilemez!"); return; }
     document.getElementById('profilEkrani').style.display = 'none'; window.sohbetiAc(kime);
@@ -118,7 +121,11 @@ window.sohbetGonderAksiyon = function() {
     try {
         const inputEl = document.getElementById('sohbetMesajInput'); const icerik = inputEl.value.trim();
         if(icerik === "" || !aktifSohbetHedefi || typeof firebase === 'undefined' || !firebase.auth().currentUser) return;
-        inputEl.value = ""; const gonderen = getKendiAdim(); const yeniMesaj = { kimden: gonderen, icerik: icerik, tarih: new Date().toISOString() };
+        
+        const gonderen = getKendiAdim(); 
+        if(gonderen === "Bağlanıyor..." || gonderen === "") { if(window.ozelUyariGoster) ozelUyariGoster("Sunucuya bağlanıyor, lütfen bekle..."); return; }
+        
+        inputEl.value = ""; const yeniMesaj = { kimden: gonderen, icerik: icerik, tarih: new Date().toISOString() };
         firebase.firestore().collection("kullanicilar").doc(firebase.auth().currentUser.uid).set({ sohbetler: { [aktifSohbetHedefi]: firebase.firestore.FieldValue.arrayUnion(yeniMesaj) } }, { merge: true });
         firebase.firestore().collection("kullanicilar").where("isim", "==", aktifSohbetHedefi).get().then(snap => {
             if(!snap.empty) {
@@ -133,7 +140,7 @@ window.sohbetiAc = function(kisiIsmi) {
     aktifSohbetHedefi = kisiIsmi; document.getElementById('sohbetListesiEkrani').style.display = 'none'; document.body.style.overflow = 'hidden';
     const ekran = document.getElementById('sohbetPenceresi'); document.getElementById('sohbetBaslikIsim').innerText = kisiIsmi; ekran.style.display = 'flex';
     
-    // ANINDA OKUNDU TEPKİSİ: Kullanıcı tıkladığı an kırmızı bildirimleri ekrandan sertçe siliyoruz!
+    // ANINDA OKUNDU TEPKİSİ
     const lobiB = document.getElementById('yeniMesajBildirim'); const masaB = document.getElementById('masaYeniMesajBildirim');
     if(lobiB) lobiB.style.display = 'none'; if(masaB) masaB.style.display = 'none';
 
@@ -154,10 +161,28 @@ function ekranaBalonlariCiz() {
     setTimeout(() => { balonAlani.scrollTop = balonAlani.scrollHeight; }, 50);
 }
 
+// İŞTE NOKTA BUG'INI KÖKÜNDEN ÇÖZEN YOK EDİCİ SİLME MOTORU
 window.sohbetiKompleSil = function(hedefIsim) {
     if(event) event.stopPropagation(); const onay = confirm(`⚠️ DİKKAT!\n${hedefIsim} ile olan tüm sohbet geçmişini silmek istediğinize emin misiniz?`); if(!onay) return;
     if(typeof firebase === 'undefined' || !firebase.auth().currentUser) return;
-    firebase.firestore().collection("kullanicilar").doc(firebase.auth().currentUser.uid).update({ [`sohbetler.${hedefIsim}`]: firebase.firestore.FieldValue.delete() }).then(() => { if(window.ozelUyariGoster) ozelUyariGoster(`🗑️ ${hedefIsim} ile olan sohbet kalıcı olarak silindi.`); });
+    
+    const uid = firebase.auth().currentUser.uid;
+    
+    // Veritabanını tamamen çek, içinden hatalı olanı cımbızla alıp geri kaydet
+    firebase.firestore().collection("kullanicilar").doc(uid).get().then(doc => {
+        if(doc.exists) {
+            let data = doc.data();
+            if(data.sohbetler && data.sohbetler[hedefIsim]) {
+                delete data.sohbetler[hedefIsim]; // İstenmeyen sohbeti uçur
+                
+                firebase.firestore().collection("kullanicilar").doc(uid).update({
+                    sohbetler: data.sohbetler
+                }).then(() => {
+                    if(window.ozelUyariGoster) ozelUyariGoster(`🗑️ Sohbet kalıcı olarak silindi.`);
+                });
+            }
+        }
+    });
 };
 
 function canliSohbetiBaslat() {
