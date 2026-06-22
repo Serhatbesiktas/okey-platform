@@ -89,12 +89,13 @@ setTimeout(() => {
         let solGrup = document.getElementById('solButonGrubu');
         if(!solGrup) {
             solGrup = document.createElement('div'); solGrup.id = 'solButonGrubu';
-            solGrup.style.cssText = 'position:absolute; top:20px; left:20px; display:flex; flex-direction:column; gap:12px; z-index:99999;';
             masaEkrani.appendChild(solGrup);
-            const gsBtn = document.getElementById('sohbetAcBtn');
-            if(gsBtn) { gsBtn.style.position = 'static'; gsBtn.className = 'masa-sol-btn'; gsBtn.style.order = '2'; solGrup.appendChild(gsBtn); }
         }
-        solGrup.insertAdjacentHTML('beforeend', `<button id="masaIciOzelMesajBtn" class="masa-sol-btn" style="order:3; position:relative;" onclick="document.body.style.overflow='hidden'; document.getElementById('sohbetListesiEkrani').style.display='flex';" title="Özel Mesajlar">✉️<span id="masaYeniMesajBildirim" class="pulse-anim" style="display:none; position:absolute; top:-3px; right:-3px; background:#e74c3c; color:#fff; border-radius:50%; width:18px; height:18px; font-size:11px; line-height:18px; text-align:center; font-weight:bold;">!</span></button>`);
+        
+        // 3. Özel Mesaj Zarfı (En Altta)
+        if(!document.getElementById('masaIciOzelMesajBtn')) {
+            solGrup.insertAdjacentHTML('beforeend', `<button id="masaIciOzelMesajBtn" class="masa-sol-btn" style="order:3;" onclick="document.body.style.overflow='hidden'; document.getElementById('sohbetListesiEkrani').style.display='flex';" title="Özel Mesajlar">✉️<span id="masaYeniMesajBildirim" class="pulse-anim" style="display:none; position:absolute; top:-3px; right:-3px; background:#e74c3c; color:#fff; border-radius:50%; width:18px; height:18px; font-size:11px; line-height:18px; text-align:center; font-weight:bold;">!</span></button>`);
+        }
     }
 }, 1200);
 
@@ -113,13 +114,13 @@ window.profilldenMesajAt = function() {
 window.sohbetGonderAksiyon = function() {
     try {
         const inputEl = document.getElementById('sohbetMesajInput'); const icerik = inputEl.value.trim();
-        if(icerik === "" || !aktifSohbetHedefi || typeof auth === 'undefined' || !auth.currentUser) return;
+        if(icerik === "" || !aktifSohbetHedefi || typeof firebase === 'undefined' || !firebase.auth().currentUser) return;
         inputEl.value = ""; const gonderen = getKendiAdim(); const yeniMesaj = { kimden: gonderen, icerik: icerik, tarih: new Date().toISOString() };
-        db.collection("kullanicilar").doc(auth.currentUser.uid).set({ sohbetler: { [aktifSohbetHedefi]: firebase.firestore.FieldValue.arrayUnion(yeniMesaj) } }, { merge: true });
-        db.collection("kullanicilar").where("isim", "==", aktifSohbetHedefi).get().then(snap => {
+        firebase.firestore().collection("kullanicilar").doc(firebase.auth().currentUser.uid).set({ sohbetler: { [aktifSohbetHedefi]: firebase.firestore.FieldValue.arrayUnion(yeniMesaj) } }, { merge: true });
+        firebase.firestore().collection("kullanicilar").where("isim", "==", aktifSohbetHedefi).get().then(snap => {
             if(!snap.empty) {
                 const hDoc = snap.docs[0]; const engeller = hDoc.data().engellenenler || [];
-                if(!engeller.includes(gonderen)) { db.collection("kullanicilar").doc(hDoc.id).set({ sohbetler: { [gonderen]: firebase.firestore.FieldValue.arrayUnion(yeniMesaj) }, okunmamisSohbetler: firebase.firestore.FieldValue.arrayUnion(gonderen) }, { merge: true }); }
+                if(!engeller.includes(gonderen)) { firebase.firestore().collection("kullanicilar").doc(hDoc.id).set({ sohbetler: { [gonderen]: firebase.firestore.FieldValue.arrayUnion(yeniMesaj) }, okunmamisSohbetler: firebase.firestore.FieldValue.arrayUnion(gonderen) }, { merge: true }); }
             }
         });
     } catch(err) { console.log(err); }
@@ -128,7 +129,7 @@ window.sohbetGonderAksiyon = function() {
 window.sohbetiAc = function(kisiIsmi) {
     aktifSohbetHedefi = kisiIsmi; document.getElementById('sohbetListesiEkrani').style.display = 'none'; document.body.style.overflow = 'hidden';
     const ekran = document.getElementById('sohbetPenceresi'); document.getElementById('sohbetBaslikIsim').innerText = kisiIsmi; ekran.style.display = 'flex';
-    if(typeof auth !== 'undefined' && auth.currentUser) { db.collection("kullanicilar").doc(auth.currentUser.uid).update({ okunmamisSohbetler: firebase.firestore.FieldValue.arrayRemove(kisiIsmi) }).catch(e=>{}); }
+    if(typeof firebase !== 'undefined' && firebase.auth().currentUser) { firebase.firestore().collection("kullanicilar").doc(firebase.auth().currentUser.uid).update({ okunmamisSohbetler: firebase.firestore.FieldValue.arrayRemove(kisiIsmi) }).catch(e=>{}); }
     ekranaBalonlariCiz();
 };
 
@@ -145,14 +146,14 @@ function ekranaBalonlariCiz() {
 
 window.sohbetiKompleSil = function(hedefIsim) {
     if(event) event.stopPropagation(); const onay = confirm(`⚠️ DİKKAT!\n${hedefIsim} ile olan tüm sohbet geçmişini silmek istediğinize emin misiniz?`); if(!onay) return;
-    if(typeof auth === 'undefined' || !auth.currentUser) return;
-    db.collection("kullanicilar").doc(auth.currentUser.uid).update({ [`sohbetler.${hedefIsim}`]: firebase.firestore.FieldValue.delete() }).then(() => { if(window.ozelUyariGoster) ozelUyariGoster(`🗑️ ${hedefIsim} ile olan sohbet kalıcı olarak silindi.`); });
+    if(typeof firebase === 'undefined' || !firebase.auth().currentUser) return;
+    firebase.firestore().collection("kullanicilar").doc(firebase.auth().currentUser.uid).update({ [`sohbetler.${hedefIsim}`]: firebase.firestore.FieldValue.delete() }).then(() => { if(window.ozelUyariGoster) ozelUyariGoster(`🗑️ ${hedefIsim} ile olan sohbet kalıcı olarak silindi.`); });
 };
 
 function canliSohbetiBaslat() {
-    if(!auth || !auth.currentUser || getKendiAdim().startsWith("MİSAFİR_")) return;
+    if(typeof firebase === 'undefined' || !firebase.auth().currentUser || getKendiAdim().startsWith("MİSAFİR_")) return;
     if(canliYayinAboneligi) canliYayinAboneligi();
-    canliYayinAboneligi = db.collection("kullanicilar").doc(auth.currentUser.uid).onSnapshot(doc => {
+    canliYayinAboneligi = firebase.firestore().collection("kullanicilar").doc(firebase.auth().currentUser.uid).onSnapshot(doc => {
         if(!doc.exists) return; const data = doc.data(); tumSohbetVerisi = data.sohbetler || {}; engellenenKullanicilar = data.engellenenler || []; const okunmamisListesi = data.okunmamisSohbetler || [];
         const listDiv = document.getElementById('sohbetKisilerListesi');
         if(listDiv) {
@@ -169,7 +170,7 @@ function canliSohbetiBaslat() {
             });
             if(sohbetSayisi === 0) listDiv.innerHTML = '<p style="text-align:center; color:#777; font-size:12px; margin-top:50px;">Henüz hiç sohbetin yok.</p>';
         }
-        if(aktifSohbetHedefi && document.getElementById('sohbetPenceresi').style.display !== 'none') { ekranaBalonlariCiz(); if(okunmamisListesi.includes(aktifSohbetHedefi)) { db.collection("kullanicilar").doc(auth.currentUser.uid).update({ okunmamisSohbetler: firebase.firestore.FieldValue.arrayRemove(aktifSohbetHedefi) }).catch(e=>{}); } }
+        if(aktifSohbetHedefi && document.getElementById('sohbetPenceresi').style.display !== 'none') { ekranaBalonlariCiz(); if(okunmamisListesi.includes(aktifSohbetHedefi)) { firebase.firestore().collection("kullanicilar").doc(firebase.auth().currentUser.uid).update({ okunmamisSohbetler: firebase.firestore.FieldValue.arrayRemove(aktifSohbetHedefi) }).catch(e=>{}); } }
         const gercekOkunmamis = okunmamisListesi.filter(k => !engellenenKullanicilar.includes(k));
         const lobiB = document.getElementById('yeniMesajBildirim'); const masaB = document.getElementById('masaYeniMesajBildirim');
         if(gercekOkunmamis.length > 0) {
@@ -185,9 +186,9 @@ function canliSohbetiBaslat() {
 
 window.aktifKisiyiEngelle = function() {
     if(!aktifSohbetHedefi) return; const onay = confirm(`⚠️ DİKKAT!\n${aktifSohbetHedefi} adlı oyuncuyu engellemek istediğinize emin misiniz?\nSohbet geçmişi silinecek ve size bir daha mesaj atamayacak.`); if(!onay) return;
-    if(typeof auth === 'undefined' || !auth.currentUser) return;
+    if(typeof firebase === 'undefined' || !firebase.auth().currentUser) return;
     if(!engellenenKullanicilar.includes(aktifSohbetHedefi)) engellenenKullanicilar.push(aktifSohbetHedefi);
-    db.collection("kullanicilar").doc(auth.currentUser.uid).update({ engellenenler: engellenenKullanicilar, [`sohbetler.${aktifSohbetHedefi}`]: firebase.firestore.FieldValue.delete() }).then(() => { if(window.ozelUyariGoster) ozelUyariGoster(`🚫 ${aktifSohbetHedefi} engellendi!`); sohbetPenceresindenGeriDon(); });
+    firebase.firestore().collection("kullanicilar").doc(firebase.auth().currentUser.uid).update({ engellenenler: engellenenKullanicilar, [`sohbetler.${aktifSohbetHedefi}`]: firebase.firestore.FieldValue.delete() }).then(() => { if(window.ozelUyariGoster) ozelUyariGoster(`🚫 ${aktifSohbetHedefi} engellendi!`); sohbetPenceresindenGeriDon(); });
 };
 
-let sohbetBaslatici = setInterval(() => { if(typeof auth !== 'undefined' && auth.currentUser) { clearInterval(sohbetBaslatici); canliSohbetiBaslat(); } }, 1000);
+let sohbetBaslatici = setInterval(() => { if(typeof firebase !== 'undefined' && firebase.auth().currentUser) { clearInterval(sohbetBaslatici); canliSohbetiBaslat(); } }, 1000);
