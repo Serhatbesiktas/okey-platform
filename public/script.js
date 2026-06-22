@@ -24,13 +24,18 @@ let suAnkiMasaGizliMi = false;
 
 let benimGorevler = { kazanma: 0, mesaj: 0, gosterge: 0, tarih: "", alinanlar: {} };
 
+// İŞTE YENİ SES ANA ŞALTERİ!
+window.oyunSesiAcik = true; 
+
 window.sesTasCek = new Audio('sounds/tas_cek.mp3');
 window.sesTasKoy = new Audio('sounds/tas_koy.mp3');
 window.sesSiraSende = new Audio('sounds/sira_sende.mp3');
 
 window.sesTasCek.preload = 'auto'; window.sesTasKoy.preload = 'auto'; window.sesSiraSende.preload = 'auto';
+
 window.sesCal = function(sesObje) { 
     try { 
+        if(!window.oyunSesiAcik) return; // Şalter kapalıysa bıçak gibi keser!
         let yeniSes = sesObje.cloneNode(); 
         yeniSes.volume = 0.5; 
         yeniSes.play().catch(e => console.log(e)); 
@@ -323,21 +328,31 @@ window.masayaDavetEt = function(arkadasIsmi) {
     document.getElementById('arkadaslarEkrani').style.display = 'none'; 
 }
 
+// İŞTE DÜZELTİLMİŞ ÇIKIŞ FONKSİYONU! (Sonsuz Döngü Bitti)
 function masadanAyrilmaIslemi(cezaUygulansinMi = false) {
     if (suAnkiMasam) {
         if (cezaUygulansinMi && masaOyunBasladiMi) {
             let cezaMiktari = 0;
             if (suAnkiMasam.includes('20K')) cezaMiktari = 20000; else if (suAnkiMasam.includes('50K')) cezaMiktari = 50000; else if (suAnkiMasam.includes('10K')) cezaMiktari = 10000;
             if (cezaMiktari > 0) {
-                benimAnlikCipim -= cezaMiktari; if (benimAnlikCipim < 0) benimAnlikCipim = 0; const cipKutu = document.getElementById('benimCipim'); if(cipKutu) { cipKutu.innerText = benimAnlikCipim.toLocaleString('tr-TR'); cipKutu.style.color = "#e74c3c"; setTimeout(() => cipKutu.style.color = "", 2000); }
+                benimAnlikCipim -= cezaMiktari; if (benimAnlikCipim < 0) benimAnlikCipim = 0; 
+                const cipKutu = document.getElementById('benimCipim'); 
+                if(cipKutu) { cipKutu.innerText = benimAnlikCipim.toLocaleString('tr-TR'); cipKutu.style.color = "#e74c3c"; setTimeout(() => cipKutu.style.color = "", 2000); }
                 if (auth.currentUser && !isMisafir) { db.collection("kullanicilar").doc(auth.currentUser.uid).update({ cip: benimAnlikCipim }); }
-                socket.emit('kullanici_girisi', { isim: aktifKullaniciAdi, cip: benimAnlikCipim, kozmetikler: aktifKozmetikler }); document.getElementById('cezaMiktarMetni').innerText = cezaMiktari.toLocaleString('tr-TR') + " ÇİP"; document.getElementById('cezaBildirimEkrani').style.display = 'flex';
+                
+                // ESKİDEN BURADA YANLIŞ BİR SİNYAL VARDI, SİLDİM. 
+                // Artık sadece arka kapıdan çipi güncelliyor, masaya geri çekmiyor!
+                socket.emit('magaza_harcamasi', { isim: aktifKullaniciAdi, yeniCip: benimAnlikCipim }); 
             }
         }
         socket.emit('masadan_kalk', { isim: aktifKullaniciAdi, masaAdi: suAnkiMasam }); 
     }
+    
     suAnkiMasam = null; suAnkiMasaVIPMi = false; suAnkiMasaSahibi = ""; suAnkiMasaGizliMi = false; if(btnVipGizlilikTetikle) btnVipGizlilikTetikle.style.display = "none";
-    masayiTemizle(); document.getElementById('seatTop').innerText = "Bekleniyor..."; document.getElementById('seatLeft').innerText = "Bekleniyor..."; document.getElementById('seatRight').innerText = "Bekleniyor..."; document.getElementById('seatTop').dataset.isim = ""; document.getElementById('seatLeft').dataset.isim = ""; document.getElementById('seatRight').dataset.isim = ""; masaEkrani.style.display = 'none'; lobiEkrani.style.display = 'flex';
+    masayiTemizle(); 
+    document.getElementById('seatTop').innerText = "Bekleniyor..."; document.getElementById('seatLeft').innerText = "Bekleniyor..."; document.getElementById('seatRight').innerText = "Bekleniyor..."; 
+    document.getElementById('seatTop').dataset.isim = ""; document.getElementById('seatLeft').dataset.isim = ""; document.getElementById('seatRight').dataset.isim = ""; 
+    masaEkrani.style.display = 'none'; lobiEkrani.style.display = 'flex';
 }
 
 window.cezaAnladimKapat = function() { document.getElementById('cezaBildirimEkrani').style.display = 'none'; if(cikisIcinBekleyenLogout) { tamamenCikisYap(); } }
@@ -370,7 +385,7 @@ document.getElementById('btnKayitTamamla').addEventListener('click', () => {
 function oyunaGirisYap(isim) { aktifKullaniciAdi = isim; document.getElementById('benimCipim').innerText = benimAnlikCipim.toLocaleString('tr-TR'); authEkrani.style.display = 'none'; vipHeader.style.display = 'flex'; lobiEkrani.style.display = 'flex'; socket.emit('kullanici_girisi', { isim: aktifKullaniciAdi, cip: benimAnlikCipim, kozmetikler: aktifKozmetikler }); }
 
 socket.on('sen_masadasin', (data) => {
-    masayiTemizle(); // Hayalet ekran sileceği
+    masayiTemizle(); 
     suAnkiMasam = data.masaAdi || data; suAnkiMasaVIPMi = data.isVIP || false; suAnkiMasaSahibi = data.sahibi || ""; suAnkiMasaGizliMi = data.gizli || false; lobiEkrani.style.display = 'none'; masaEkrani.style.display = 'flex'; document.getElementById('masaOrtasiYazi').innerText = suAnkiMasam.toUpperCase();
     if(suAnkiMasaVIPMi && suAnkiMasaSahibi === aktifKullaniciAdi) { if(btnVipGizlilikTetikle) { btnVipGizlilikTetikle.style.display = "block"; btnVipGizlilikTetikle.innerText = suAnkiMasaGizliMi ? "🔓 MASAYI HERKESE AÇ" : "🔒 MASAYI KİLİTLE"; btnVipGizlilikTetikle.style.background = suAnkiMasaGizliMi ? "#2ecc71" : "#ff33aa"; } } else { if(btnVipGizlilikTetikle) btnVipGizlilikTetikle.style.display = "none"; }
     socket.emit('masaya_geri_don', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi });
@@ -403,19 +418,6 @@ socket.on('online_oyuncular', (liste) => {
 });
 
 window.arkadasEkle = function(isim) { if(isMisafir) return; if(!benimArkadaslarim.includes(isim)) { benimArkadaslarim.push(isim); if(auth.currentUser) { db.collection("kullanicilar").doc(auth.currentUser.uid).update({ arkadaslar: benimArkadaslarim }).then(() => { ozelUyariGoster(`✅ ${isim} arkadaş listene eklendi!`); }); } } }
-
-socket.on('davet_geldi', (data) => {
-    if(data.kime === aktifKullaniciAdi) { 
-        const metinEl = document.getElementById('davetMetni');
-        if(metinEl) metinEl.innerHTML = `<strong style="color:#ff33aa;">${data.kimden}</strong> seni janjanlı VIP masaya çağırıyor patron!`;
-        document.getElementById('davetGeldiEkrani').style.display = 'flex';
-        document.getElementById('btnDavetKabul').onclick = function() { 
-            document.getElementById('davetGeldiEkrani').style.display = 'none'; 
-            if(suAnkiMasam) { socket.emit('masadan_kalk', { isim: aktifKullaniciAdi, masaAdi: suAnkiMasam }); suAnkiMasam = null; }
-            setTimeout(() => { masayaOtur(data.masaAdi); }, 300);
-        };
-    }
-});
 
 const btnHemenOynalar = document.querySelectorAll('.btn-hemen-oyna');
 btnHemenOynalar.forEach(btn => {
