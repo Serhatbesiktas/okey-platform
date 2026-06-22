@@ -1,25 +1,17 @@
-// --- VIP CASINO OYUN SESLERİ KONTROL MODÜLÜ --- //
-
 const sesStilleri = document.createElement('style');
 sesStilleri.innerHTML = `
     .masa-sol-btn {
-        background: rgba(10, 15, 12, 0.85); 
-        backdrop-filter: blur(5px);
-        border: 2px solid #2ecc71; 
-        border-radius: 50%; 
-        width: 45px; height: 45px;
-        display: flex; justify-content: center; align-items: center;
-        box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3); 
-        cursor: pointer; transition: 0.3s;
-        color: #fff; font-size: 20px;
-        padding: 0; margin: 0;
+        background: rgba(10, 15, 12, 0.85); backdrop-filter: blur(5px);
+        border: 2px solid #2ecc71; border-radius: 50%; 
+        width: 45px; height: 45px; display: flex; justify-content: center; align-items: center;
+        box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3); cursor: pointer; transition: 0.3s;
+        color: #fff; font-size: 20px; padding: 0; margin: 0;
     }
     .masa-sol-btn:active { transform: scale(0.9); }
     .masa-sol-btn.sessiz { border-color: #e74c3c; box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3); }
 `;
 document.head.appendChild(sesStilleri);
 
-// Sadece Masa Açıldığında Sol Üste Eklenen Grup Sistemi
 setTimeout(() => {
     const masaEkrani = document.getElementById('masaEkrani');
     if(masaEkrani) {
@@ -27,10 +19,9 @@ setTimeout(() => {
         if(!solGrup) {
             solGrup = document.createElement('div');
             solGrup.id = 'solButonGrubu';
-            solGrup.style.cssText = 'position:absolute; top:20px; left:20px; display:flex; flex-direction:column; gap:12px; z-index:999;';
+            solGrup.style.cssText = 'position:absolute; top:20px; left:20px; display:flex; flex-direction:column; gap:12px; z-index:99999;';
             masaEkrani.appendChild(solGrup);
             
-            // HTML'deki Genel Sohbet Butonunu al ve gruba taşı (Ortaya)
             const genelSohbetBtn = document.getElementById('sohbetAcBtn');
             if(genelSohbetBtn) {
                 genelSohbetBtn.style.position = 'static';
@@ -40,14 +31,9 @@ setTimeout(() => {
             }
         }
 
-        // Ses Butonunu Gruba Ekle (En Üste)
-        solGrup.insertAdjacentHTML('beforeend', `
-            <button id="btnOyunSesiToggle" class="masa-sol-btn" style="order:1;" title="Oyun Sesleri Aç/Kapat">
-                <span id="sesToggleIkon">🔊</span>
-            </button>
-        `);
+        const sesKontrolHtml = `<button id="btnOyunSesiToggle" class="masa-sol-btn" style="order:1;" title="Oyun Sesleri Aç/Kapat"><span id="sesToggleIkon">🔊</span></button>`;
+        solGrup.insertAdjacentHTML('beforeend', sesKontrolHtml);
 
-        // Ses Şalteri Bağlantısı
         window.oyunSesiAcik = true; 
         const orijinalSesCal = window.sesCal;
         window.sesCal = function(sesObje) { 
