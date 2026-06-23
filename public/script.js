@@ -35,7 +35,7 @@ window.sesTasCek.preload = 'auto'; window.sesTasKoy.preload = 'auto'; window.ses
 
 window.sesCal = function(sesObje) { 
     try { 
-        if(!window.oyunSesiAcik) return; // Şalter kapalıysa bıçak gibi keser!
+        if(!window.oyunSesiAcik) return; 
         let yeniSes = sesObje.cloneNode(); 
         yeniSes.volume = 0.5; 
         yeniSes.play().catch(e => console.log(e)); 
@@ -328,7 +328,6 @@ window.masayaDavetEt = function(arkadasIsmi) {
     document.getElementById('arkadaslarEkrani').style.display = 'none'; 
 }
 
-// İŞTE DÜZELTİLMİŞ ÇIKIŞ FONKSİYONU! (Sonsuz Döngü Bitti)
 function masadanAyrilmaIslemi(cezaUygulansinMi = false) {
     if (suAnkiMasam) {
         if (cezaUygulansinMi && masaOyunBasladiMi) {
@@ -339,9 +338,6 @@ function masadanAyrilmaIslemi(cezaUygulansinMi = false) {
                 const cipKutu = document.getElementById('benimCipim'); 
                 if(cipKutu) { cipKutu.innerText = benimAnlikCipim.toLocaleString('tr-TR'); cipKutu.style.color = "#e74c3c"; setTimeout(() => cipKutu.style.color = "", 2000); }
                 if (auth.currentUser && !isMisafir) { db.collection("kullanicilar").doc(auth.currentUser.uid).update({ cip: benimAnlikCipim }); }
-                
-                // ESKİDEN BURADA YANLIŞ BİR SİNYAL VARDI, SİLDİM. 
-                // Artık sadece arka kapıdan çipi güncelliyor, masaya geri çekmiyor!
                 socket.emit('magaza_harcamasi', { isim: aktifKullaniciAdi, yeniCip: benimAnlikCipim }); 
             }
         }
@@ -496,6 +492,25 @@ socket.on('admin_islem_uyarisi', (data) => { if(data.isim === aktifKullaniciAdi)
 
 socket.on('gosterge_basarili', (data) => { if (data.isim === aktifKullaniciAdi) { benimGorevler.gosterge++; gorevleriKaydet(); } });
 
+// İŞTE BURAYA HATALI BİTİŞ YAKALAYICISINI (LISTENER) EKLEDİM!
+socket.on('hata_mesaji', (mesaj) => { ozelUyariGoster(mesaj); if (suAnkiMasam && !masaOyunBasladiMi) { suAnkiMasam = null; suAnkiMasaVIPMi = false; suAnkiMasaSahibi = ""; suAnkiMasaGizliMi = false; if(btnVipGizlilikTetikle) btnVipGizlilikTetikle.style.display = "none"; masaEkrani.style.display = 'none'; lobiEkrani.style.display = 'flex'; } });
+
+socket.on('hatali_bitis', (mesaj) => {
+    ozelUyariGoster(mesaj);
+    const bitisKutusu = document.getElementById('bitisAlani');
+    if(bitisKutusu) {
+        Array.from(bitisKutusu.children).forEach(child => {
+            if(child.classList.contains('okey-tasi')) {
+                child.style.position = ''; child.style.top = ''; child.style.left = ''; child.style.transform = ''; child.style.margin = '';
+                for(let i=0; i<24; i++) {
+                    let yuva = document.getElementById('y'+i);
+                    if(yuva.children.length === 0) { yuva.appendChild(child); break; }
+                }
+            }
+        });
+    }
+});
+
 socket.on('oyun_bitti', (data) => { 
     if(suAnkiMasam === data.masaAdi) { 
         const sonucEkrani = document.getElementById('sonucEkrani'); const baslik = document.getElementById('sonucBaslik'); const metin = document.getElementById('sonucMetin'); const odul = document.getElementById('sonucOdul'); 
@@ -565,3 +580,4 @@ for(let i=0; i<12; i++) { const yUst = document.createElement('div'); yUst.class
 new Sortable(document.getElementById('benimIskartam'), { group: { name: 'istaka', put: function (to) { return benimSiramMi && elimdekiTasSayisi() === 15; }, pull: false }, animation: 150, forceFallback: true, fallbackOnBody: true, emptyInsertThreshold: 100, onAdd: function (evt) { gostergeHakki = false; gostergeBtn.style.display = 'none'; document.getElementById('iskartaYazi').style.display = 'none'; const atilanTas = evt.item; atilanTas.style.position = 'absolute'; atilanTas.style.top = '50%'; atilanTas.style.left = '50%'; atilanTas.style.transform = 'translate(-50%, -50%)'; atilanTas.style.margin = '0'; let renkSinifi = Array.from(atilanTas.classList).find(c=>c.startsWith('tas-')); let renk = renkSinifi ? renkSinifi.split('-')[1] : 'siyah'; socket.emit('tas_atildi', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi, tas: { id: atilanTas.id, renk: renk, sayi: atilanTas.innerText } }); if(window.sesCal) window.sesCal(window.sesTasKoy); } });
 new Sortable(bitisAlani, { group: { name: 'istaka', put: function (to) { return benimSiramMi && elimdekiTasSayisi() === 15; }, pull: false }, animation: 150, forceFallback: true, fallbackOnBody: true, emptyInsertThreshold: 100, onAdd: function (evt) { gostergeHakki = false; gostergeBtn.style.display = 'none'; const atilanTas = evt.item; atilanTas.style.position = 'absolute'; atilanTas.style.top = '50%'; atilanTas.style.left = '50%'; atilanTas.style.transform = 'translate(-50%, -50%)'; atilanTas.style.margin = '0'; let gruplar = getIstakaGruplari(); let renkSinifi = Array.from(atilanTas.classList).find(c=>c.startsWith('tas-')); let renk = renkSinifi ? renkSinifi.split('-')[1] : 'siyah'; const bitisTasi = { id: atilanTas.id, renk: renk, sayi: atilanTas.innerText }; socket.emit('oyunu_bitir', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi, gruplar: gruplar, bitisTasi: bitisTasi }); if(window.sesCal) window.sesCal(window.sesTasKoy); } });
 function otomatikTasAt(tasElementi) { if (!benimSiramMi || elimdekiTasSayisi() !== 15) return; gostergeHakki = false; gostergeBtn.style.display = 'none'; const iskartaKutusu = document.getElementById('benimIskartam'); if (iskartaKutusu) { iskartaKutusu.appendChild(tasElementi); tasElementi.style.position = 'absolute'; tasElementi.style.top = '50%'; tasElementi.style.left = '50%'; tasElementi.style.transform = 'translate(-50%, -50%)'; tasElementi.style.margin = '0'; document.getElementById('iskartaYazi').style.display = 'none'; let renkSinifi = Array.from(tasElementi.classList).find(c=>c.startsWith('tas-')); let renk = renkSinifi ? renkSinifi.split('-')[1] : 'siyah'; socket.emit('tas_atildi', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi, tas: { id: tasElementi.id, renk: renk, sayi: tasElementi.innerText } }); if(window.sesCal) window.sesCal(window.sesTasKoy); } }
+
