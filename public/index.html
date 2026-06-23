@@ -3,26 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BEYCO | Seri Okey</title>
+    <title>Seri Okey - Sosyal Okey Kulübü</title>
     <link rel="stylesheet" href="style.css">
-    
-    <style>
-        .beyco-login-brand { text-align: center; margin-bottom: 15px; }
-        .beyco-logo { font-size: 46px; font-weight: 900; font-family: 'Arial Black', sans-serif; background: linear-gradient(to bottom, #f2c94c, #e67e22); -webkit-background-clip: text; color: transparent; text-shadow: 0px 5px 15px rgba(242,201,76,0.4); letter-spacing: 4px; line-height: 1.1; }
-        .beyco-sub { color: #a3c4bc; font-size: 13px; letter-spacing: 8px; text-transform: uppercase; border-top: 1px solid rgba(242,201,76,0.3); padding-top: 5px; display: inline-block; margin-top: 5px; }
-        .beyco-footer { margin-top: 25px; font-size: 10px; color: #7f8c8d; letter-spacing: 2px; text-transform: uppercase; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px; }
-        .beyco-footer span { color: #f2c94c; font-weight: bold; }
-        .beyco-lobi-logo { font-weight: 900; font-size: 22px; font-family: 'Arial Black', sans-serif; background: linear-gradient(to right, #f2c94c, #f2994a); -webkit-background-clip: text; color: transparent; margin: 0 auto; text-shadow: 0px 0px 10px rgba(242,201,76,0.3); letter-spacing: 2px; }
-        .beyco-watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 60px; font-weight: 900; font-family: 'Arial Black', sans-serif; color: rgba(255,255,255,0.03); white-space: nowrap; pointer-events: none; z-index: 0; user-select: none; letter-spacing: 15px; }
-        
-        /* Zar ikonunu gizliyoruz ama HTML'de bırakıyoruz ki sistem hata vermesin */
-        .zar-ikon { display: none !important; }
-        
-        /* Orijinal başlıkların stilini markaya uyumlu hale getiriyoruz */
-        #authBaslik { color: #fff; font-size: 15px; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
-        #authAltYazi { color: #7f8c8d; font-size: 12px; margin-bottom: 20px; }
-    </style>
-
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
@@ -30,6 +12,10 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 </head>
 <body>
+
+    <div style="position: fixed; top: 15px; width: 100%; text-align: center; font-size: 28px; font-weight: bold; color: #f2c94c; text-shadow: 2px 2px 5px rgba(0,0,0,0.8); z-index: 9999999; pointer-events: none; font-family: sans-serif; letter-spacing: 2px;">
+        Seri Okey
+    </div>
 
     <div id="uyariModalEkrani" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999999; flex-direction:column; justify-content:center; align-items:center;">
         <div class="magaza-kutu" style="text-align:center; border: 2px solid #f2c94c; max-width: 300px; padding: 25px;">
@@ -42,8 +28,8 @@
 
     <div id="vipMasaKurPanel" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:9999999; flex-direction:column; justify-content:center; align-items:center;">
         <div class="magaza-kutu" style="max-width: 320px; text-align:center; border:2px solid #ff33aa; box-shadow: 0 0 25px #ff33aa;">
-            <h2 style="color:#ff33aa; font-size:22px; margin-bottom:15px; text-shadow:0 0 10px #ff33aa;">👑 ÖZEL MASA AYARLARI</h2>
-            <p style="color:#a3c4bc; font-size:12px; margin-bottom:20px;">Sadece davet ettiğin arkadaşlarınla oyna!</p>
+            <h2 style="color:#ff33aa; font-size:22px; margin-bottom:15px; text-shadow:0 0 10px #ff33aa;">👑 VIP MASA AYARLARI</h2>
+            <p style="color:#a3c4bc; font-size:12px; margin-bottom:20px;">Odanın gizlilik ve bahis rütbesini belirle patron!</p>
             <label style="color:#fff; font-size:11px; font-weight:bold; display:block; text-align:left; margin-bottom:5px;">MASA BAHİS MİKTARI:</label>
             <select id="vipMasaBahis" class="auth-input" style="display:block; width:100%; background:#111; color:#fff; border:1px solid #ff33aa; margin-bottom:15px; padding:10px; border-radius:8px;">
                 <option value="10000">10.000 ÇİP</option>
@@ -153,7 +139,7 @@
     <div id="liderlikEkrani" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:99999; flex-direction:column; justify-content:center; align-items:center;">
         <div class="magaza-kutu" style="max-height: 85vh; display: flex; flex-direction: column; width: 95%; max-width: 500px;">
             <div class="magaza-header">
-                <h2>🏆 EN İYİ OYUNCULAR</h2>
+                <h2>🏆 EN ZENGİNLER (TOP 5)</h2>
                 <button onclick="document.getElementById('liderlikEkrani').style.display='none'" style="background:none;border:none;color:#e74c3c;font-size:24px;cursor:pointer;font-weight:bold;">X</button>
             </div>
             <div id="liderlikListesi" style="overflow-y:auto; padding-right:5px; flex:1; display:flex; flex-direction:column; gap:10px;"></div>
@@ -162,7 +148,7 @@
 
     <div id="gunlukBonusEkrani" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.92); z-index:999999; flex-direction:column; justify-content:center; align-items:center;">
         <div class="bonus-kutu">
-            <h2>🎁 GÜNLÜK GİRİŞ ÖDÜLÜ</h2>
+            <h2>🎁 GÜNLÜK VIP ÖDÜLÜ</h2>
             <div class="dijital-gosterge" id="dijitalGosterge">000.000</div>
             <button class="bonus-btn" id="btnBonusCevir" onclick="gunlukKasaCevir()">🔒 KASAYI AÇ</button>
         </div>
@@ -171,7 +157,7 @@
     <div id="magazaEkrani" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:99999; flex-direction:column; justify-content:center; align-items:center;">
         <div class="magaza-kutu">
             <div class="magaza-header">
-                <h2>🛒 OYUNCU MARKETİ</h2>
+                <h2>🛒 VIP MAĞAZA</h2>
                 <button onclick="document.getElementById('magazaEkrani').style.display='none'" style="background:none;border:none;color:#e74c3c;font-size:24px;cursor:pointer;">X</button>
             </div>
             <div class="magaza-icerik">
@@ -196,15 +182,8 @@
 
     <div id="authEkrani">
         <div class="auth-kutu">
-            <div class="beyco-login-brand">
-                <div class="beyco-logo">BEYCO</div>
-                <div class="beyco-sub">SERİ OKEY</div>
-            </div>
-
-            <div class="zar-ikon">🎲</div>
+            <div class="zar-ikon">👥</div>
             <h2 id="authBaslik">SERİ OKEY GİRİŞİ</h2>
-            <p id="authAltYazi">Sisteme Bağlanılıyor...</p>
-            
             <input type="text" id="authKullaniciAdi" class="auth-input" placeholder="Oyuncu Nickiniz (Örn: KRAL_34)" style="display:none;">
             <input type="email" id="authEmail" class="auth-input" placeholder="E-Posta Adresi">
             <input type="password" id="authSifre" class="auth-input" placeholder="Şifre">
@@ -217,8 +196,6 @@
                 <button id="btnKayitTamamla" class="auth-btn btn-yesil">KAYDI TAMAMLA</button>
                 <button id="btnGecisGiris" class="auth-btn btn-gri" style="margin-top:10px;">⬅ GİRİŞ EKRANINA DÖN</button>
             </div>
-            
-            <div class="beyco-footer">MADE BY <span>BEYCO GAMES</span></div>
         </div>
     </div>
 
@@ -227,19 +204,17 @@
             <div class="profil-avatar" id="vipAvatar">😎</div>
             <div class="profil-isim-kutu">
                 <p class="profil-isim" id="benimAdimKutusu">Bağlanıyor...</p>
-                <span class="vip-badge" id="benimVipRozetim" style="background: linear-gradient(180deg, #34495e 0%, #2c3e50 100%);">OYUNCU</span>
+                <span class="vip-badge" id="benimVipRozetim">VIP GOLD</span>
             </div>
+            <button id="btnCikisYap" class="cikis-btn">🚪 ÇIKIŞ</button>
         </div>
-        
-        <div class="beyco-lobi-logo">BEYCO</div>
-        
         <div class="cip-kutu">
             <div class="cip-ikon">C</div> <span id="benimCipim">Bağlanıyor...</span>
         </div>
     </div>
 
     <div id="lobiEkrani">
-        <div class="sistem-mesaji">Sistem: BEYCO Seri Okey'e Hoş Geldiniz! Arkadaşlarınızla sohbet edin ve oyuna katılın.</div>
+        <div class="sistem-mesaji">Sistem: Okey Kulübüne Hoş Geldiniz!</div>
         <div id="misafirUyariBanner" class="guest-warning-banner" style="display:none;">
             ⚠️ Misafir Hesabı! Çiplerin silinmemesi için Kayıt Olun!
         </div>
@@ -248,12 +223,12 @@
         <div class="tables-panel" id="masalarAlani"></div>
 
         <div class="players-panel">
-            <div class="panel-title" style="color:#f2c94c; font-size:14px; margin-bottom:10px;">👥 Çevrimiçi Oyuncular</div>
+            <div class="panel-title" style="color:#f2c94c; font-size:14px; margin-bottom:10px;">👥 Lobideki Oyuncular</div>
             <div id="lobidekilerListesi" style="display:flex; flex-direction:column; gap:5px;"></div>
         </div>
 
         <button onclick="document.getElementById('vipMasaKurPanel').style.display='flex'" class="btn-hemen-oyna" style="bottom: 140px !important; background: linear-gradient(135deg, #ff33aa 0%, #aa33ff 100%) !important; box-shadow: 0 0 15px #ff33aa !important; z-index: 9999;">
-            👑 Özel Masa Kur <span>Sadece Arkadaşlarınla</span>
+            👑 VIP Masa Kur <span>Özel janjanlı alan</span>
         </button>
 
         <button class="btn-hemen-oyna" id="btnRastgeleOyna" style="z-index: 9998;">
@@ -265,7 +240,7 @@
             <div class="alt-menu-item" onclick="arkadaslarMenusuAc()" style="cursor:pointer;"><div class="alt-menu-ikon">👥</div><span>Arkadaşlar</span></div>
             <div class="alt-menu-item" onclick="gorevleriAc()" style="cursor:pointer;"><div class="alt-menu-ikon">📜</div><span style="color:#2ecc71; font-weight:bold;">Görevler</span></div>
             <div class="alt-menu-item" onclick="liderlikTablosunuAc()" style="cursor:pointer;"><div class="alt-menu-ikon">🏆</div><span>En İyiler</span></div>
-            <div class="alt-menu-item" onclick="document.getElementById('magazaEkrani').style.display='flex'" style="cursor:pointer;"><div class="alt-menu-ikon">🛒</div><span style="color:#f2c94c;">Market</span></div>
+            <div class="alt-menu-item" onclick="document.getElementById('magazaEkrani').style.display='flex'" style="cursor:pointer;"><div class="alt-menu-ikon">🛒</div><span style="color:#f2c94c;">Mağaza</span></div>
         </div>
     </div>
 
@@ -274,7 +249,7 @@
         <div id="anlikMesajAlani" class="anlik-mesaj-alani"></div>
 
         <div id="sohbetCekmecesi" class="sohbet-cekmecesi">
-            <div class="cekmence-header"><span>Oda Sohbeti</span><button id="sohbetKapatBtn">X</button></div>
+            <div class="cekmence-header"><span>Sohbet</span><button id="sohbetKapatBtn">X</button></div>
             <div id="sohbetMesajlari" class="cekmence-mesajlar"></div>
             <div class="cekmence-emojiler">
                 <button onclick="vipEmojiGonder('☕')">☕</button>
@@ -307,8 +282,6 @@
             <div class="player-seat seat-right" id="seatRight" data-isim="" onclick="profiliGoster(this.dataset.isim)" style="cursor:pointer;">Bekleniyor...</div>
             
             <div class="masa-ortasi">
-                <div class="beyco-watermark">BEYCO</div>
-                
                 <div class="masa-isim-ortasi" id="masaOrtasiYazi">MASA</div>
                 <div class="masa-kasa-bilgisi" id="masaKasaBilgisi">KASA: 0 ÇİP</div>
                 <div style="display:flex; flex-direction:column; gap:8px; align-items:center; justify-content:center;">
@@ -342,9 +315,13 @@
         </div>
     </div>
 
+    <div style="position: fixed; bottom: 10px; width: 100%; text-align: center; font-size: 13px; font-weight: bold; color: rgba(255,255,255,0.4); z-index: 9999999; pointer-events: none; font-family: sans-serif;">
+        made by beyco games
+    </div>
+
     <script src="script.js"></script>
     <script src="mesajlar.js"></script>
     <script src="muzik.js"></script>
-    <script src="seyirci.js"></script>
+    <script src="seyirci.js"></script> 
 </body>
 </html>
