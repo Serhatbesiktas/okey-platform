@@ -163,10 +163,6 @@ body { background-color: #050d08; color: #fff; font-family: 'Segoe UI', Tahoma, 
 .online-nokta { display: inline-block; width: 8px; height: 8px; background-color: #2ecc71; border-radius: 50%; box-shadow: 0 0 5px #2ecc71; margin-right: 5px; }
 .offline-nokta { display: inline-block; width: 8px; height: 8px; background-color: #e74c3c; border-radius: 50%; margin-right: 5px; opacity: 0.5; }
 
-
-/* --- JİLET GİBİ İLETİŞİM BUTONLARI (Kusursuz Boyut ve Hizalama) --- */
-
-/* 1. Bütün Butonlara Ortak Şekil ve Boyut (HTML'e dokunmadan ID/Class üzerinden) */
 #sound-toggle-btn,
 .pro-sohbet-tetikleyici, #sohbetAcBtn,
 #mesajlarBtn, #mesaj-btn, .genel-mesaj-btn,
@@ -188,109 +184,79 @@ body { background-color: #050d08; color: #fff; font-family: 'Segoe UI', Tahoma, 
     box-shadow: 0 0 10px rgba(0,0,0,0.5) !important;
 }
 
-/* 2. Tek Tek Yerleşimleri ve Çerçeve Renkleri */
+#sound-toggle-btn { top: 85px !important; left: 15px !important; border: 2px solid #2ecc71 !important; }
+#sound-toggle-btn.ses-kapali { border-color: #e74c3c !important; }
 
-/* SES BUTONU (Sol Üst) */
-#sound-toggle-btn {
-    top: 85px !important;
-    left: 15px !important;
-    border: 2px solid #2ecc71 !important; 
-}
-#sound-toggle-btn.ses-kapali {
-    border-color: #e74c3c !important; 
-}
+.pro-sohbet-tetikleyici, #sohbetAcBtn { top: 140px !important; left: 15px !important; border: 2px solid #2ecc71 !important; }
 
-/* SOHBET BUTONU (Sesin hemen altı) */
-.pro-sohbet-tetikleyici, #sohbetAcBtn {
-    top: 140px !important;   
-    left: 15px !important;   
-    border: 2px solid #2ecc71 !important; 
-}
+#mesajlarBtn, #mesaj-btn, .genel-mesaj-btn { top: 195px !important; left: 15px !important; border: 2px solid #3498db !important; }
 
-/* GENEL MESAJ BUTONU (Sohbetin altı) */
-#mesajlarBtn, #mesaj-btn, .genel-mesaj-btn {
-    top: 195px !important;   
-    left: 15px !important;   
-    border: 2px solid #3498db !important; 
-}
-
-/* ZARF / ÖZEL MESAJ BUTONU (Sağda kalsın demiştin, yerini bozmadan şeklini düzelttik) */
 #ozelMesajBtn, .ozel-mesaj-btn, [id*="ozel"], [class*="ozel-mesaj"], [id*="zarf"], .zarf-btn, .pm-btn, .mesaj-kutusu-btn {
     top: 85px !important;
     right: 15px !important;
-    left: auto !important; /* Sol hizalamasını iptal et ki sağa yapışsın */
+    left: auto !important; 
     border: 2px solid #e74c3c !important; 
-} 
+}
+
 /* ==================================================================== */
-/* 👑 BEYCO GAMES - PRO ARAYÜZ VE MARKA YÖNETİMİ (SADECE CSS) 👑 */
+/* 👑 BEYCO GAMES - PRO ARAYÜZ VE MARKA YÖNETİMİ (KUSURSUZ GÜVENLİ) 👑 */
 /* ==================================================================== */
 
-/* 1. TÜM EKRANLARIN ALTINA İNCE YAPIMCI İMZASI */
+/* GİRİŞ EKRANI LOGO VE İSİM DÜZENLEMESİ */
+.zar-ikon { font-size: 0 !important; display: flex; justify-content: center; align-items: center; }
+.zar-ikon::after { content: "🎴"; font-size: 45px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5)); display: block; }
+
+#authBaslik { font-size: 0 !important; margin-bottom: 5px; }
+#authBaslik::after { 
+    content: "SERİ OKEY"; 
+    font-size: 26px; 
+    font-weight: 900; 
+    color: #f2c94c; 
+    letter-spacing: 1px; 
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5); 
+    display: block;
+}
+
+/* OYUN MASASI HAYALET FİLİGRAN (Sadece masanın merkezinde, taşların arkasında durur) */
+.okey-table-ui::before {
+    content: "SERİ OKEY";
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 28px;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.05);
+    letter-spacing: 5px;
+    pointer-events: none;
+    z-index: 1;
+}
+.okey-table-ui::after {
+    content: "made by beyco games";
+    position: absolute;
+    top: 55%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 12px;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.05);
+    letter-spacing: 2px;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* EN ALT BİLGİ İMZASI (Sayfa düzenini ASLA bozmaz) */
 body::after {
-    content: "PRODUCED BY BEYCO GAMES";
+    content: "made by beyco games";
     position: fixed;
-    bottom: 6px;
+    bottom: 5px;
     left: 0;
     width: 100%;
     text-align: center;
-    font-size: 10px;
-    font-weight: 800;
-    color: rgba(255, 255, 255, 0.15); /* Göz yormayan şeffaf beyaz */
-    letter-spacing: 3px;
-    z-index: 9999999;
-    pointer-events: none; /* Tıklamaları asla engellemez */
-    font-family: 'Segoe UI', Tahoma, sans-serif;
-}
-
-/* 2. GİRİŞ EKRANI: ZAR İKONUNU ŞIK BİR LOGO/İKON İLE DEĞİŞTİRME */
-.zar-ikon {
-    visibility: hidden; 
-    position: relative;
-}
-.zar-ikon::after {
-    content: "🎴"; /* Casino yerine oyun/sosyal ikonu */
-    visibility: visible;
-    position: absolute;
-    top: 0; left: 0; width: 100%;
-    font-size: 45px;
-    text-shadow: 0 0 20px rgba(242, 201, 76, 0.4);
-}
-
-/* 3. GİRİŞ EKRANI: VIP CASINO YAZISINI "SERİ OKEY" YAPMA (ALTIN EFEKTLİ) */
-#authBaslik {
-    visibility: hidden; 
-    position: relative;
-}
-#authBaslik::after {
-    content: "SERİ OKEY";
-    visibility: visible;
-    position: absolute;
-    top: 0; left: 0; width: 100%;
-    font-size: 26px;
-    font-weight: 900;
-    letter-spacing: 2px;
-    /* Profesyonel altın rengi parlaması */
-    background: linear-gradient(180deg, #ffe066 0%, #d4af37 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.8));
-}
-
-/* 4. OYUN MASASININ TAM ORTASINA DEVASA, ŞIK "HAYALET" FİLİGRAN */
-.okey-table-ui::before {
-    content: "SERİ OKEY \A made by beyco games";
-    white-space: pre; /* Alt satıra geçmeyi sağlar */
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 22px;
-    font-weight: 900;
-    color: rgba(255, 255, 255, 0.025); /* %2.5 görünürlük - Tam bir PRO filigranı */
-    text-align: center;
-    line-height: 1.8;
-    letter-spacing: 6px;
-    text-transform: uppercase;
-    pointer-events: none; /* Taşlara tıklamayı %100 engellemez */
-    z-index: 1; /* Kasanın ve taşların hep arkasında kalır */
+    font-size: 11px;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.15);
+    pointer-events: none;
+    z-index: 999999;
+    letter-spacing: 1px;
 }
