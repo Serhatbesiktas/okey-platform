@@ -16,7 +16,6 @@ const masalar = {
     'Hızlı Oyun (10K Bahis)': { bahis: 10000, kasa: 0, koltuklar: [null, null, null, null], deste: [], gosterge: null, oyunBasladi: false, siradakiOyuncu: null, eller: {}, gostergeGosterildi: false }
 };
 
-// 🔥 75 KİŞİLİK GERÇEKÇİ BOT ORDUSU 🔥
 const aktifBotlar = [];
 const botOnekleri = ["Usta_", "Kral_", "Reis_", "Okeyci_"];
 const botIsimleri = ["Ahmet", "Ayse", "Kemal", "Meryem", "Hasan", "Zeynep", "Yigit", "Elif", "Can", "Burak", "Kadir", "Derya"];
@@ -156,6 +155,7 @@ function eliKontrolEt(gruplar, gosterge) {
     } return true;
 }
 
+// 🔥 TAŞ TAKILI KALMA (48) HATASI ÇÖZÜMÜ 🔥
 function botHamlesiYap(masaAdi) {
     const masa = masalar[masaAdi];
     if(!masa || !masa.oyunBasladi) return;
@@ -164,10 +164,13 @@ function botHamlesiYap(masaAdi) {
     if(siradaki && aktifBotlar.includes(siradaki)) {
         setTimeout(() => {
             if(!masa.oyunBasladi) return;
-            if(masa.deste.length === 0) { oyunuSifirla(masaAdi, null, 0, "Ortadaki taşlar bitti, oyun berabere!"); return; }
-
-            const cekilenTas = masa.deste.shift(); masa.eller[siradaki].push(cekilenTas); 
-            io.emit('masa_ortasi_guncelle', { masaAdi: masaAdi, kalanTas: masa.deste.length, gosterge: masa.gosterge });
+            
+            // Eğer botun elinde zaten 15 taş varsa GİDİP ORTADAN TAŞ ÇEKMEYECEK, sadece atacak!
+            if (masa.eller[siradaki].length < 15) {
+                if(masa.deste.length === 0) { oyunuSifirla(masaAdi, null, 0, "Ortadaki taşlar bitti, oyun berabere!"); return; }
+                const cekilenTas = masa.deste.shift(); masa.eller[siradaki].push(cekilenTas); 
+                io.emit('masa_ortasi_guncelle', { masaAdi: masaAdi, kalanTas: masa.deste.length, gosterge: masa.gosterge });
+            }
             
             setTimeout(() => {
                 if(!masa.oyunBasladi) return;
@@ -185,8 +188,8 @@ function botHamlesiYap(masaAdi) {
                 
                 io.emit('sira_guncelle', { masaAdi: masaAdi, kimde: masa.siradakiOyuncu });
                 if(masa.siradakiOyuncu && aktifBotlar.includes(masa.siradakiOyuncu)) { botHamlesiYap(masaAdi); }
-            }, 1500); 
-        }, 1200); 
+            }, 1200); 
+        }, 800); 
     }
 }
 
@@ -303,7 +306,6 @@ io.on('connection', (socket) => {
       socket.emit('liderlik_tablosu_guncelle', siraliList); 
   });
   
-  // 🔥 BOT DAVET KABUL ZEKASI 🔥
   socket.on('masaya_davet_et', (data) => { 
       const masa = masalar[data.masaAdi]; 
       if (masa && masa.isVIP && !masa.davetliler.includes(data.kime)) { masa.davetliler.push(data.kime); } 
