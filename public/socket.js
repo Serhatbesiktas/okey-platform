@@ -1,5 +1,3 @@
-// public/socket.js
-
 socket.on('masalari_guncelle', (lobidekiMasalar) => {
     guncelMasalar = lobidekiMasalar; if(!masalarAlani) return; masalarAlani.innerHTML = '';
     Object.entries(lobidekiMasalar).forEach(([masaAdi, koltuklar]) => {
@@ -60,6 +58,21 @@ socket.on('masa_oyun_basladi', (data) => {
         if(data.gosterge) { document.getElementById('gostergeTasi').innerText = data.gosterge.sayi; document.getElementById('gostergeTasi').className = `gosterge-tasi tas-${data.gosterge.renk}`; window.checkGosterge(); } 
         window.gelişmişKoltukHizala(data.koltuklar); 
     } 
+});
+
+// 🔥 TAŞ SAYACININ 48'DEN AŞAĞI İNMESİ İÇİN EKSİK OLAN KOD BURADA 🔥
+socket.on('masa_ortasi_guncelle', (data) => {
+    if(suAnkiMasam === data.masaAdi) {
+        const kalanTasKutusu = document.getElementById('kalanTasBilgi');
+        if(kalanTasKutusu) kalanTasKutusu.innerText = data.kalanTas;
+        if(data.gosterge) {
+            const gostergeTasi = document.getElementById('gostergeTasi');
+            if(gostergeTasi) {
+                gostergeTasi.innerText = data.gosterge.sayi;
+                gostergeTasi.className = `gosterge-tasi tas-${data.gosterge.renk}`;
+            }
+        }
+    }
 });
 
 socket.on('taslari_al', (data) => { if (data.kime === aktifKullaniciAdi && !izleyiciModu) { gostergeHakki = true; data.taslar.forEach((t, i) => window.tasEkle(t, 'y'+i)); window.checkGosterge(); } });
