@@ -1,4 +1,7 @@
-// public/game.js
+// 🔥 BOT KONTROL RADARI 🔥
+window.isBotIsmi = function(isim) {
+    return isim && (isim.startsWith("Usta_") || isim.startsWith("Kral_") || isim.startsWith("Reis_") || isim.startsWith("Okeyci_"));
+};
 
 window.masayaOtur = function(m) { 
     let bahis = 0; if(m.includes('20K')) bahis = 20000; else if(m.includes('50K')) bahis = 50000; else if(m.includes('10K')) bahis = 10000;
@@ -28,17 +31,30 @@ window.masayiTemizle = function() {
     benimSiramMi = false; 
 };
 
+// 🔥 İZLEYİCİ İÇİN HİZALAMA TAMİRİ ("Bekleniyor..." hatası çözüldü) 🔥
 window.gelişmişKoltukHizala = function(koltuklar) {
-    let idx = koltuklar.indexOf(aktifKullaniciAdi); if(idx === -1) idx = 0;
-    document.getElementById('benimAdimKutusu').innerText = koltuklar[idx] || "Boş";
-    document.getElementById('seatRight').dataset.isim = koltuklar[(idx+1)%4] || ""; document.getElementById('seatRight').innerText = koltuklar[(idx+1)%4] || "➕ DAVET";
-    document.getElementById('seatTop').dataset.isim = koltuklar[(idx+2)%4] || ""; document.getElementById('seatTop').innerText = koltuklar[(idx+2)%4] || "➕ DAVET";
-    document.getElementById('seatLeft').dataset.isim = koltuklar[(idx+3)%4] || ""; document.getElementById('seatLeft').innerText = koltuklar[(idx+3)%4] || "➕ DAVET";
+    let idx = koltuklar.indexOf(aktifKullaniciAdi); 
+    if(idx === -1) idx = 0; // İzleyiciyse 0'dan başla
+
+    document.getElementById('benimAdimKutusu').innerText = koltuklar[idx] || (izleyiciModu ? "Boş" : "Bekleniyor...");
+    let sr = koltuklar[(idx+1)%4]; document.getElementById('seatRight').dataset.isim = sr || ""; document.getElementById('seatRight').innerText = sr || (izleyiciModu ? "Boş" : "➕ DAVET");
+    let st = koltuklar[(idx+2)%4]; document.getElementById('seatTop').dataset.isim = st || ""; document.getElementById('seatTop').innerText = st || (izleyiciModu ? "Boş" : "➕ DAVET");
+    let sl = koltuklar[(idx+3)%4]; document.getElementById('seatLeft').dataset.isim = sl || ""; document.getElementById('seatLeft').innerText = sl || (izleyiciModu ? "Boş" : "➕ DAVET");
 };
 
+// 🔥 MOBİL ÇİFT TIKLAMA (DOUBLE-TAP) TAMİRİ 🔥
 window.tasEkle = function(tasData, yuvaId) { 
     const div = document.createElement('div'); div.className = `okey-tasi tas-${tasData.renk}`; div.innerText = tasData.sayi; div.id = tasData.id; 
-    div.ondblclick = function() { window.otomatikTasAt(this); }; document.getElementById(yuvaId).appendChild(div); 
+    
+    let sonDokunma = 0;
+    div.addEventListener('touchend', function(e) {
+        let suAn = new Date().getTime();
+        let fark = suAn - sonDokunma;
+        if (fark > 0 && fark < 300) { window.otomatikTasAt(this); e.preventDefault(); }
+        sonDokunma = suAn;
+    });
+    div.ondblclick = function() { window.otomatikTasAt(this); }; 
+    document.getElementById(yuvaId).appendChild(div); 
 };
 
 window.checkGosterge = function() { 
@@ -117,8 +133,6 @@ window.otomatikTasAt = function(tasElementi) {
         sesCal(sesTasKoy); 
     } 
 };
-
-window.kurtarmaSinyaliGonder = function() { if (document.getElementById('oyunuBaslatBtn').style.display !== 'none' && suAnkiMasam && !izleyiciModu) { socket.emit('taslarimi_ver', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi }); } };
 
 if(oyunuBaslatBtn) oyunuBaslatBtn.addEventListener('click', () => { socket.emit('oyunu_baslat', suAnkiMasam); });
 kalanTasBilgi?.addEventListener('click', () => { 
