@@ -1,8 +1,3 @@
-// 🔥 BOT KONTROL RADARI 🔥
-window.isBotIsmi = function(isim) {
-    return isim && (isim.startsWith("Usta_") || isim.startsWith("Kral_") || isim.startsWith("Reis_") || isim.startsWith("Okeyci_"));
-};
-
 window.masayaOtur = function(m) { 
     let bahis = 0; if(m.includes('20K')) bahis = 20000; else if(m.includes('50K')) bahis = 50000; else if(m.includes('10K')) bahis = 10000;
     let safCip = parseInt(String(benimAnlikCipim).replace(/[^0-9]/g, '')) || 0;
@@ -31,25 +26,24 @@ window.masayiTemizle = function() {
     benimSiramMi = false; 
 };
 
-// 🔥 İZLEYİCİ İÇİN HİZALAMA TAMİRİ ("Bekleniyor..." hatası çözüldü) 🔥
+// 🔥 İZLEYİCİ İÇİN TAŞ KAYBOLMA HATASI BURADA ÇÖZÜLDÜ (dataset eklendi) 🔥
 window.gelişmişKoltukHizala = function(koltuklar) {
-    let idx = koltuklar.indexOf(aktifKullaniciAdi); 
-    if(idx === -1) idx = 0; // İzleyiciyse 0'dan başla
+    let idx = koltuklar.indexOf(aktifKullaniciAdi); if(idx === -1) idx = 0;
+    
+    const benimKutu = document.getElementById('benimAdimKutusu');
+    benimKutu.innerText = koltuklar[idx] || (izleyiciModu ? "Boş" : "Bekleniyor...");
+    benimKutu.dataset.isim = koltuklar[idx] || ""; // Hata buradaydı, eklendi!
 
-    document.getElementById('benimAdimKutusu').innerText = koltuklar[idx] || (izleyiciModu ? "Boş" : "Bekleniyor...");
     let sr = koltuklar[(idx+1)%4]; document.getElementById('seatRight').dataset.isim = sr || ""; document.getElementById('seatRight').innerText = sr || (izleyiciModu ? "Boş" : "➕ DAVET");
     let st = koltuklar[(idx+2)%4]; document.getElementById('seatTop').dataset.isim = st || ""; document.getElementById('seatTop').innerText = st || (izleyiciModu ? "Boş" : "➕ DAVET");
     let sl = koltuklar[(idx+3)%4]; document.getElementById('seatLeft').dataset.isim = sl || ""; document.getElementById('seatLeft').innerText = sl || (izleyiciModu ? "Boş" : "➕ DAVET");
 };
 
-// 🔥 MOBİL ÇİFT TIKLAMA (DOUBLE-TAP) TAMİRİ 🔥
 window.tasEkle = function(tasData, yuvaId) { 
     const div = document.createElement('div'); div.className = `okey-tasi tas-${tasData.renk}`; div.innerText = tasData.sayi; div.id = tasData.id; 
-    
     let sonDokunma = 0;
     div.addEventListener('touchend', function(e) {
-        let suAn = new Date().getTime();
-        let fark = suAn - sonDokunma;
+        let suAn = new Date().getTime(); let fark = suAn - sonDokunma;
         if (fark > 0 && fark < 300) { window.otomatikTasAt(this); e.preventDefault(); }
         sonDokunma = suAn;
     });
