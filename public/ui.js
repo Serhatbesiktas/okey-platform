@@ -1,4 +1,18 @@
 // public/ui.js
+// 🔥 HAYALET BİLDİRİM TEMİZLEYİCİ (ASKIDA KALAN MESAJLARI YOK EDER) 🔥
+setInterval(() => {
+    document.querySelectorAll('.bildirim-badge, .mesaj-badge, [id*="badge"], [class*="badge"]').forEach(badge => {
+        if(badge.innerText.trim() === '0' || badge.innerText.trim() === '') {
+            badge.style.display = 'none';
+        }
+    });
+}, 1000);
+
+document.querySelectorAll('#ozelMesajBtn, .ozel-mesaj-btn, #mesajlarBtn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.bildirim-badge, .mesaj-badge').forEach(b => b.style.display = 'none');
+    });
+});
 
 // 🔥 HAYALET BİLDİRİM TEMİZLEYİCİ 🔥
 setInterval(() => {
