@@ -1,5 +1,12 @@
 // public/ui.js
 
+// 🔥 HAYALET BİLDİRİM TEMİZLEYİCİ 🔥
+setInterval(() => {
+    document.querySelectorAll('.bildirim-badge, .mesaj-badge').forEach(badge => {
+        if(badge.innerText === '0' || badge.innerText === '') badge.style.display = 'none';
+    });
+}, 2000);
+
 window.arayuzGuncelle = function() {
     const avatar = document.getElementById('vipAvatar'); const isimKutu = document.getElementById('benimAdimKutusu'); const rozetim = document.getElementById('benimVipRozetim');
     if(avatar) { avatar.style.border = '2px solid #52796f'; avatar.style.boxShadow = 'none'; } 
@@ -75,7 +82,7 @@ window.davetMenusuAc = function() {
     listeDiv.innerHTML = '<p style="color:#a3c4bc; font-size:11px; text-align:center;">Aktif oyuncu seçin</p>';
     let onSay = 0;
     onlineOyuncularListesi.forEach(o => {
-        if(o === aktifKullaniciAdi || o.startsWith('Bot_') || o.startsWith('Misafir_')) return; onSay++;
+        if(o === aktifKullaniciAdi || (window.isBotIsmi && window.isBotIsmi(o)) || o.startsWith('Misafir_')) return; onSay++;
         let koz = globalKozmetikler[o] || []; let iR = koz.includes('atesli_isim') ? '#ff4d4d' : '#fff'; let t = koz.includes('neon_tac') ? '👑 ' : '';
         listeDiv.innerHTML += `<div class="lider-satir"><div style="color:${iR};"><span class="online-nokta"></span> ${t}${o}</div><button class="btn-davet-et" onclick="masayaDavetEt('${o}')">Davet Et</button></div>`;
     });
