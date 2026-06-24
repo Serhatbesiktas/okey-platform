@@ -19,58 +19,25 @@ socket.on('liderlik_tablosu_guncelle', (list) => {
     list.forEach((o, i) => { div.innerHTML += `<div class="lider-satir" onclick="profiliGoster('${o.isim}')"><div class="lider-sira">${i+1}.</div><div class="lider-isim">${o.isim}</div><div class="lider-cip">${Number(o.cip).toLocaleString()} ÇİP</div></div>`; });
 });
 
-socket.on('sen_masadasin', (data) => { 
-    window.masayiTemizle(); suAnkiMasam = data.masaAdi || data; 
-    lobiEkrani.style.display = 'none'; masaEkrani.style.display = 'flex'; 
-    document.getElementById('masaOrtasiYazi').innerHTML = suAnkiMasam.toUpperCase() + "<br><span style='font-size:9px; color:rgba(255,255,255,0.3);'>BEYCO GAMES</span>"; 
-    socket.emit('masaya_geri_don', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi }); 
-});
-
-socket.on('izleyici_olarak_katildin', (data) => {
-    window.masayiTemizle(); suAnkiMasam = data.masaAdi; izleyiciModu = true; 
-    lobiEkrani.style.display = 'none'; masaEkrani.style.display = 'flex';
-    document.getElementById('masaOrtasiYazi').innerHTML = data.masaAdi.toUpperCase() + "<br><span style='font-size:9px; color:rgba(255,255,255,0.3);'>BEYCO GAMES</span>";
-    document.querySelector('.istaka-container').style.display = 'none'; document.querySelector('.okey-istaka-tuslar-area').style.display = 'none'; oyunuBaslatBtn.style.display = 'none';
-    if(data.oyunBasladi) { 
-        masaOyunBasladiMi = true; oyunAlanObjeleri.style.display = 'flex'; kalanTasBilgi.innerText = data.kalanTas; 
-        if(data.gosterge) { document.getElementById('gostergeTasi').innerText = data.gosterge.sayi; document.getElementById('gostergeTasi').className = `gosterge-tasi tas-${data.gosterge.renk}`; } 
-    }
-    window.gelişmişKoltukHizala(data.koltuklar);
-});
-
-socket.on('vip_durum_guncelle', (data) => {
-    if(suAnkiMasam === data.masaAdi) {
-        suAnkiMasaGizliMi = data.gizli;
-        if(btnVipGizlilikTetikle) {
-            btnVipGizlilikTetikle.innerText = suAnkiMasaGizliMi ? "🔓 MASAYI HERKESE AÇ" : "🔒 MASAYI KİLİTLE";
-            btnVipGizlilikTetikle.style.background = suAnkiMasaGizliMi ? "#2ecc71" : "#ff33aa";
-        }
-    }
-});
-
+socket.on('sen_masadasin', (data) => { window.masayiTemizle(); suAnkiMasam = data.masaAdi || data; lobiEkrani.style.display = 'none'; masaEkrani.style.display = 'flex'; document.getElementById('masaOrtasiYazi').innerHTML = suAnkiMasam.toUpperCase() + "<br><span style='font-size:9px; color:rgba(255,255,255,0.3);'>BEYCO GAMES</span>"; socket.emit('masaya_geri_don', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi }); });
+socket.on('izleyici_olarak_katildin', (data) => { window.masayiTemizle(); suAnkiMasam = data.masaAdi; izleyiciModu = true; lobiEkrani.style.display = 'none'; masaEkrani.style.display = 'flex'; document.getElementById('masaOrtasiYazi').innerHTML = data.masaAdi.toUpperCase() + "<br><span style='font-size:9px; color:rgba(255,255,255,0.3);'>BEYCO GAMES</span>"; document.querySelector('.istaka-container').style.display = 'none'; document.querySelector('.okey-istaka-tuslar-area').style.display = 'none'; oyunuBaslatBtn.style.display = 'none'; if(data.oyunBasladi) { masaOyunBasladiMi = true; oyunAlanObjeleri.style.display = 'flex'; kalanTasBilgi.innerText = data.kalanTas; if(data.gosterge) { document.getElementById('gostergeTasi').innerText = data.gosterge.sayi; document.getElementById('gostergeTasi').className = `gosterge-tasi tas-${data.gosterge.renk}`; } } window.gelişmişKoltukHizala(data.koltuklar); });
+socket.on('vip_durum_guncelle', (data) => { if(suAnkiMasam === data.masaAdi) { suAnkiMasaGizliMi = data.gizli; if(btnVipGizlilikTetikle) { btnVipGizlilikTetikle.innerText = suAnkiMasaGizliMi ? "🔓 MASAYI HERKESE AÇ" : "🔒 MASAYI KİLİTLE"; btnVipGizlilikTetikle.style.background = suAnkiMasaGizliMi ? "#2ecc71" : "#ff33aa"; } } });
 socket.on('vip_masa_kapandi', (data) => { if(suAnkiMasam === data.masaAdi) { alert("🚨 VIP oda sahibi masadan ayrıldığı için oda kapatıldı!"); window.masadanAyrilmaIslemi(false); } });
 
 socket.on('masa_oyun_basladi', (data) => { 
     if(suAnkiMasam === data.masaAdi) { 
-        window.masayiTemizle(); masaOyunBasladiMi = true; 
-        oyunuBaslatBtn.style.display = 'none'; oyunAlanObjeleri.style.display = 'flex'; bitisAlani.style.display = 'flex'; 
-        kalanTasBilgi.innerText = data.kalanTas; 
-        if(data.gosterge) { document.getElementById('gostergeTasi').innerText = data.gosterge.sayi; document.getElementById('gostergeTasi').className = `gosterge-tasi tas-${data.gosterge.renk}`; window.checkGosterge(); } 
+        window.masayiTemizle(); masaOyunBasladiMi = true; oyunuBaslatBtn.style.display = 'none'; oyunAlanObjeleri.style.display = 'flex'; bitisAlani.style.display = 'flex'; kalanTasBilgi.innerText = data.kalanTas; 
+        if(data.gosterge) { document.getElementById('gostergeTasi').innerText = data.gosterge.sayi; document.getElementById('gostergeTasi').className = `gosterge-tasi tas-${data.gosterge.renk}`; } 
         window.gelişmişKoltukHizala(data.koltuklar); 
     } 
 });
 
-// 🔥 TAŞ SAYACININ 48'DEN AŞAĞI İNMESİ İÇİN EKSİK OLAN KOD BURADA 🔥
 socket.on('masa_ortasi_guncelle', (data) => {
     if(suAnkiMasam === data.masaAdi) {
-        const kalanTasKutusu = document.getElementById('kalanTasBilgi');
-        if(kalanTasKutusu) kalanTasKutusu.innerText = data.kalanTas;
-        if(data.gosterge) {
-            const gostergeTasi = document.getElementById('gostergeTasi');
-            if(gostergeTasi) {
-                gostergeTasi.innerText = data.gosterge.sayi;
-                gostergeTasi.className = `gosterge-tasi tas-${data.gosterge.renk}`;
-            }
+        if(kalanTasBilgi) kalanTasBilgi.innerText = data.kalanTas;
+        if(data.gosterge && document.getElementById('gostergeTasi')) {
+            document.getElementById('gostergeTasi').innerText = data.gosterge.sayi;
+            document.getElementById('gostergeTasi').className = `gosterge-tasi tas-${data.gosterge.renk}`;
         }
     }
 });
@@ -111,38 +78,13 @@ socket.on('yandan_alindi_guncelle', (data) => {
         else if(data.kimAldi === document.getElementById('seatTop').dataset.isim) source = 'iskartaSag'; 
         else if(data.kimAldi === document.getElementById('seatLeft').dataset.isim) source = 'iskartaUst'; 
         else if(data.kimAldi === document.getElementById('benimAdimKutusu').dataset.isim && izleyiciModu) source = 'iskartaSol'; 
-        if(source) { 
-            document.getElementById(source).innerHTML = ''; 
-            if(source === 'benimIskartam' && !izleyiciModu) document.getElementById('benimIskartam').innerHTML = '<div class="iskarta-yazi" id="iskartaYazi">TAŞ AT<br>⬇</div>'; 
-            sesCal(sesTasCek); 
-        } 
+        if(source) { document.getElementById(source).innerHTML = ''; if(source === 'benimIskartam' && !izleyiciModu) document.getElementById('benimIskartam').innerHTML = '<div class="iskarta-yazi" id="iskartaYazi">TAŞ AT<br>⬇</div>'; sesCal(sesTasCek); } 
     } 
 });
 
-socket.on('hatali_bitis', (data) => {
-    ozelUyariGoster(data.mesaj); 
-    const atilanTas = document.getElementById(data.tasId);
-    if(atilanTas && atilanTas.parentNode === bitisAlani) {
-        for(let i=0; i<24; i++) {
-            let yuva = document.getElementById('y'+i);
-            if(yuva.children.length === 0) {
-                atilanTas.style.position = 'relative'; atilanTas.style.top = 'auto'; atilanTas.style.left = 'auto'; atilanTas.style.transform = 'none';
-                yuva.appendChild(atilanTas); break;
-            }
-        }
-    }
-});
-
+socket.on('hatali_bitis', (data) => { ozelUyariGoster(data.mesaj); const atilanTas = document.getElementById(data.tasId); if(atilanTas && atilanTas.parentNode === bitisAlani) { for(let i=0; i<24; i++) { let yuva = document.getElementById('y'+i); if(yuva.children.length === 0) { atilanTas.style.position = 'relative'; atilanTas.style.top = 'auto'; atilanTas.style.left = 'auto'; atilanTas.style.transform = 'none'; yuva.appendChild(atilanTas); break; } } } });
 socket.on('hata_mesaji', (mesaj) => { ozelUyariGoster(mesaj); if (suAnkiMasam && !masaOyunBasladiMi) { suAnkiMasam = null; masaEkrani.style.display = 'none'; lobiEkrani.style.display = 'flex'; } });
-socket.on('esya_firlatildi', (data) => {
-    if(data.masaAdi !== suAnkiMasam) return; let senderEl = null; let receiverEl = null;
-    ['benimAdimKutusu', 'seatRight', 'seatTop', 'seatLeft'].forEach(id => { const el = document.getElementById(id); if(!el) return; let isim = id === 'benimAdimKutusu' ? (izleyiciModu ? el.dataset.isim : aktifKullaniciAdi) : el.dataset.isim; if(isim === data.kimden) senderEl = el; if(isim === data.kime) receiverEl = el; });
-    if(senderEl && receiverEl) {
-        const sRect = senderEl.getBoundingClientRect(); const rRect = receiverEl.getBoundingClientRect(); const uE = document.createElement('div'); uE.innerText = data.esya; uE.style = `position:fixed; left:${sRect.left}px; top:${sRect.top}px; font-size:45px; z-index:999999; transition:all 1s; pointer-events:none;`; document.body.appendChild(uE);
-        setTimeout(() => { uE.style.left = rRect.left + 'px'; uE.style.top = rRect.top + 'px'; }, 50); setTimeout(() => { uE.remove(); }, 1050);
-    }
-});
-
+socket.on('esya_firlatildi', (data) => { if(data.masaAdi !== suAnkiMasam) return; let senderEl = null; let receiverEl = null; ['benimAdimKutusu', 'seatRight', 'seatTop', 'seatLeft'].forEach(id => { const el = document.getElementById(id); if(!el) return; let isim = id === 'benimAdimKutusu' ? (izleyiciModu ? el.dataset.isim : aktifKullaniciAdi) : el.dataset.isim; if(isim === data.kimden) senderEl = el; if(isim === data.kime) receiverEl = el; }); if(senderEl && receiverEl) { const sRect = senderEl.getBoundingClientRect(); const rRect = receiverEl.getBoundingClientRect(); const uE = document.createElement('div'); uE.innerText = data.esya; uE.style = `position:fixed; left:${sRect.left}px; top:${sRect.top}px; font-size:45px; z-index:999999; transition:all 1s; pointer-events:none;`; document.body.appendChild(uE); setTimeout(() => { uE.style.left = rRect.left + 'px'; uE.style.top = rRect.top + 'px'; }, 50); setTimeout(() => { uE.remove(); }, 1050); } });
 socket.on('yeni_sohbet_mesaji', (data) => { if(data.masaAdi === suAnkiMasam) { let isimRenk = data.isim === "Sistem" ? "#2ecc71" : "#f2c94c"; let tacIcon = ""; if (data.kozmetikler) { if(data.kozmetikler.includes('atesli_isim')) { isimRenk = "#ff4d4d"; } if(data.kozmetikler.includes('neon_tac')) { tacIcon = "👑 "; } } const div = document.createElement('div'); div.className = 'pro-mesaj'; div.innerHTML = `<span class="pro-mesaj-isim" style="color:${isimRenk};">${tacIcon}${data.isim}</span>${data.mesaj}`; const mesajAlani = document.getElementById('sohbetMesajlari'); if(mesajAlani) { mesajAlani.appendChild(div); mesajAlani.scrollTop = mesajAlani.scrollHeight; } const anlikDiv = document.createElement('div'); anlikDiv.className = 'anlik-mesaj'; anlikDiv.innerHTML = `<strong style="color:${isimRenk};">${tacIcon}${data.isim}:</strong> ${data.mesaj}`; document.getElementById('anlikMesajAlani')?.appendChild(anlikDiv); setTimeout(() => { anlikDiv.remove(); }, 4000); } });
 socket.on('yeni_vip_emoji', (data) => { if(data.masaAdi === suAnkiMasam) { const div = document.createElement('div'); div.className = 'ucan-emoji'; div.innerText = data.emoji; document.getElementById('masaEkrani').appendChild(div); setTimeout(() => { div.remove(); }, 2500); } });
 socket.on('admin_flash_mesaj', (mesaj) => { const flash = document.getElementById('flashBildirim'); if (flash) { flash.innerHTML = `👑 PATRON DUYURUSU 👑<br><span style="font-size:18px; color:#fff; text-transform:none; margin-top:5px; display:block;">${mesaj}</span>`; flash.style.background = "linear-gradient(135deg, #c0392b, #8e44ad)"; flash.style.boxShadow = "0 15px 40px rgba(0,0,0,0.85), 0 0 25px rgba(192, 57, 43, 0.8)"; flash.style.borderColor = "#f2c94c"; flash.classList.remove('goster'); void flash.offsetWidth; flash.classList.add('goster'); setTimeout(() => { flash.style.background = ""; flash.style.boxShadow = ""; flash.style.borderColor = ""; }, 3500); } });
@@ -151,7 +93,7 @@ socket.on('admin_islem_uyarisi', (data) => { if(data.isim === aktifKullaniciAdi)
 socket.on('oyun_bitti', (data) => { 
     if(suAnkiMasam === data.masaAdi) { 
         const sonucEkrani = document.getElementById('sonucEkrani'); const baslik = document.getElementById('sonucBaslik'); const metin = document.getElementById('sonucMetin'); const odul = document.getElementById('sonucOdul'); 
-        if(auth.currentUser && !isMisafir && !izleyiciModu && data.kazanan && !data.kazanan.startsWith('Bot_') && !data.kazanan.startsWith('Misafir_')) {
+        if(auth.currentUser && !isMisafir && !izleyiciModu && data.kazanan && !data.kazanan.startsWith('Oyuncu_') && !data.kazanan.startsWith('Misafir_')) {
             const userRef = db.collection("kullanicilar").doc(auth.currentUser.uid);
             if(data.kazanan === aktifKullaniciAdi) { userRef.update({ oynananOyun: firebase.firestore.FieldValue.increment(1), kazanilanOyun: firebase.firestore.FieldValue.increment(1) }); benimKazanilanOyun++; benimGorevler.kazanma++; gorevleriKaydet(); window.arayuzGuncelle(); } 
             else { userRef.update({ oynananOyun: firebase.firestore.FieldValue.increment(1) }); }
@@ -160,8 +102,7 @@ socket.on('oyun_bitti', (data) => {
             if (data.kazanan === aktifKullaniciAdi) { baslik.innerText = data.okeyleBittiMi ? "🔥 OKEYLE BİTİRDİN! 🔥" : "🏆 TEBRİKLER, KAZANDIN! 🏆"; baslik.style.color = data.okeyleBittiMi ? "#ff3333" : "#f2c94c"; } else { baslik.innerText = data.okeyleBittiMi ? "🚨 RAKİP OKEY ATTI! 🚨" : "🎉 OYUN BİTTİ 🎉"; baslik.style.color = data.okeyleBittiMi ? "#ff3333" : "#f2c94c"; } 
             metin.innerText = `Kazanan: ${data.kazanan}\nSebep: ${data.sebep}`; odul.innerText = `+${data.odul.toLocaleString('tr-TR')} ÇİP`; sesCal(sesSiraSende); 
         } else { baslik.innerText = "🛑 OYUN BİTTİ 🛑"; baslik.style.color = "#dc3545"; metin.innerText = data.sebep || "Masadaki herkes ayrıldı."; odul.innerText = ""; } 
-        sonucEkrani.style.display = 'flex'; const flash = document.getElementById('flashBildirim'); if (flash) flash.classList.remove('goster'); oyunAlanObjeleri.style.display = 'none'; gostergeBtn.style.display = 'none'; gostergeHakki = false; 
-        
+        sonucEkrani.style.display = 'flex'; const flash = document.getElementById('flashBildirim'); if (flash) flash.classList.remove('goster'); oyunAlanObjeleri.style.display = 'none'; if(document.getElementById('gostergeBtn')) document.getElementById('gostergeBtn').style.display = 'none'; gostergeHakki = false; 
         if (!izleyiciModu) { oyunuBaslatBtn.innerText = "🔄 AYNI MASADA TEKRAR OYNA"; oyunuBaslatBtn.style.display = 'block'; }
         bitisAlani.style.display = 'none'; masaKasaBilgisi.style.display = 'none'; bitisAlani.innerHTML = 'BİTİR<br>🏆'; 
         for(let i=0; i<24; i++) document.getElementById('y'+i).innerHTML = ''; document.getElementById('benimIskartam').innerHTML = '<div class="iskarta-yazi" id="iskartaYazi">TAŞ AT<br>⬇</div>'; document.getElementById('iskartaSag').innerHTML = ''; document.getElementById('iskartaSol').innerHTML = ''; document.getElementById('iskartaUst').innerHTML = ''; benimSiramMi = false; masaOyunBasladiMi = false; 
