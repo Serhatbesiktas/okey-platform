@@ -27,7 +27,7 @@ socket.on('vip_masa_kapandi', (data) => { if(suAnkiMasam === data.masaAdi) { ale
 socket.on('masa_oyun_basladi', (data) => { 
     if(suAnkiMasam === data.masaAdi) { 
         window.masayiTemizle(); masaOyunBasladiMi = true; oyunuBaslatBtn.style.display = 'none'; oyunAlanObjeleri.style.display = 'flex'; bitisAlani.style.display = 'flex'; kalanTasBilgi.innerText = data.kalanTas; 
-        if(data.gosterge) { document.getElementById('gostergeTasi').innerText = data.gosterge.sayi; document.getElementById('gostergeTasi').className = `gosterge-tasi tas-${data.gosterge.renk}`; } 
+        if(data.gosterge) { document.getElementById('gostergeTasi').innerText = data.gosterge.sayi; document.getElementById('gostergeTasi').className = `gosterge-tasi tas-${data.gosterge.renk}`; window.checkGosterge(); } 
         window.gelişmişKoltukHizala(data.koltuklar); 
     } 
 });
@@ -54,19 +54,25 @@ socket.on('sira_guncelle', (data) => {
     }
 });
 
+// 🔥 İZLEYİCİLER İÇİN TAŞ GÖSTERME (DOM DATASET ODAKLI ÇÖZÜM) 🔥
 socket.on('ortaya_tas_atildi', (data) => { 
     if(suAnkiMasam === data.masaAdi) { 
-        let target = null; 
-        if(data.kimAtti === document.getElementById('seatRight').dataset.isim) target = 'iskartaSag'; 
-        else if(data.kimAtti === document.getElementById('seatTop').dataset.isim) target = 'iskartaUst'; 
-        else if(data.kimAtti === document.getElementById('seatLeft').dataset.isim) target = 'iskartaSol'; 
-        else if(data.kimAtti === document.getElementById('benimAdimKutusu').dataset.isim && izleyiciModu) target = 'benimIskartam'; 
+        let target = null;
+        const right = document.getElementById('seatRight'); const top = document.getElementById('seatTop'); const left = document.getElementById('seatLeft'); const me = document.getElementById('benimAdimKutusu');
+        if(right && data.kimAtti === right.dataset.isim) target = 'iskartaSag'; 
+        else if(top && data.kimAtti === top.dataset.isim) target = 'iskartaUst'; 
+        else if(left && data.kimAtti === left.dataset.isim) target = 'iskartaSol'; 
+        else if(me && data.kimAtti === me.dataset.isim) target = 'benimIskartam'; 
+        
         if(target) { 
-            const kutu = document.getElementById(target); kutu.innerHTML = ''; 
-            const div = document.createElement('div'); div.className = `okey-tasi tas-${data.tas.renk}`; div.innerText = data.tas.sayi; div.id = data.tas.id; 
-            div.style.position = 'absolute'; div.style.top = '50%'; div.style.left = '50%'; div.style.transform = 'translate(-50%, -50%)'; div.style.margin = '0'; div.style.pointerEvents = 'none'; 
-            if(target === 'iskartaSol') div.style.pointerEvents = 'auto'; 
-            kutu.appendChild(div); sesCal(sesTasKoy); 
+            const kutu = document.getElementById(target); 
+            if(kutu) {
+                kutu.innerHTML = ''; 
+                const div = document.createElement('div'); div.className = `okey-tasi tas-${data.tas.renk}`; div.innerText = data.tas.sayi; div.id = data.tas.id; 
+                div.style.position = 'absolute'; div.style.top = '50%'; div.style.left = '50%'; div.style.transform = 'translate(-50%, -50%)'; div.style.margin = '0'; 
+                div.style.pointerEvents = (target === 'iskartaSol' && !izleyiciModu) ? 'auto' : 'none'; 
+                kutu.appendChild(div); sesCal(sesTasKoy); 
+            }
         } 
     } 
 });
@@ -74,11 +80,17 @@ socket.on('ortaya_tas_atildi', (data) => {
 socket.on('yandan_alindi_guncelle', (data) => { 
     if(data.masaAdi === suAnkiMasam && data.kimAldi !== aktifKullaniciAdi) { 
         let source = null; 
-        if(data.kimAldi === document.getElementById('seatRight').dataset.isim) source = 'benimIskartam'; 
-        else if(data.kimAldi === document.getElementById('seatTop').dataset.isim) source = 'iskartaSag'; 
-        else if(data.kimAldi === document.getElementById('seatLeft').dataset.isim) source = 'iskartaUst'; 
-        else if(data.kimAldi === document.getElementById('benimAdimKutusu').dataset.isim && izleyiciModu) source = 'iskartaSol'; 
-        if(source) { document.getElementById(source).innerHTML = ''; if(source === 'benimIskartam' && !izleyiciModu) document.getElementById('benimIskartam').innerHTML = '<div class="iskarta-yazi" id="iskartaYazi">TAŞ AT<br>⬇</div>'; sesCal(sesTasCek); } 
+        const right = document.getElementById('seatRight'); const top = document.getElementById('seatTop'); const left = document.getElementById('seatLeft'); const me = document.getElementById('benimAdimKutusu');
+        if(right && data.kimAldi === right.dataset.isim) source = 'benimIskartam'; 
+        else if(top && data.kimAldi === top.dataset.isim) source = 'iskartaSag'; 
+        else if(left && data.kimAldi === left.dataset.isim) source = 'iskartaUst'; 
+        else if(me && data.kimAldi === me.dataset.isim) source = 'iskartaSol'; 
+        
+        if(source) { 
+            document.getElementById(source).innerHTML = ''; 
+            if(source === 'benimIskartam' && !izleyiciModu) document.getElementById('benimIskartam').innerHTML = '<div class="iskarta-yazi" id="iskartaYazi">TAŞ AT<br>⬇</div>'; 
+            sesCal(sesTasCek); 
+        } 
     } 
 });
 
@@ -93,7 +105,7 @@ socket.on('admin_islem_uyarisi', (data) => { if(data.isim === aktifKullaniciAdi)
 socket.on('oyun_bitti', (data) => { 
     if(suAnkiMasam === data.masaAdi) { 
         const sonucEkrani = document.getElementById('sonucEkrani'); const baslik = document.getElementById('sonucBaslik'); const metin = document.getElementById('sonucMetin'); const odul = document.getElementById('sonucOdul'); 
-        if(auth.currentUser && !isMisafir && !izleyiciModu && data.kazanan && !data.kazanan.startsWith('Oyuncu_') && !data.kazanan.startsWith('Misafir_')) {
+        if(auth.currentUser && !isMisafir && !izleyiciModu && data.kazanan && !aktifBotlar.includes(data.kazanan) && !data.kazanan.startsWith('Misafir_')) {
             const userRef = db.collection("kullanicilar").doc(auth.currentUser.uid);
             if(data.kazanan === aktifKullaniciAdi) { userRef.update({ oynananOyun: firebase.firestore.FieldValue.increment(1), kazanilanOyun: firebase.firestore.FieldValue.increment(1) }); benimKazanilanOyun++; benimGorevler.kazanma++; gorevleriKaydet(); window.arayuzGuncelle(); } 
             else { userRef.update({ oynananOyun: firebase.firestore.FieldValue.increment(1) }); }
