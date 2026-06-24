@@ -23,24 +23,38 @@ window.masayiTemizle = function() {
     benimSiramMi = false; 
 };
 
-// 🔥 İZLEYİCİ VE NORMAL MOD İÇİN KUSURSUZ İSİM VE TAŞ RADARI 🔥
 window.gelişmişKoltukHizala = function(koltuklar) {
     let idx = koltuklar.indexOf(aktifKullaniciAdi); if(idx === -1) idx = 0;
     const koltukIds = ['benimAdimKutusu', 'seatRight', 'seatTop', 'seatLeft'];
     for(let i=0; i<4; i++) {
         let el = document.getElementById(koltukIds[i]);
         let isim = koltuklar[(idx + i) % 4] || "";
-        el.dataset.isim = isim; // Animasyonların hedefi bulması için şart!
+        el.dataset.isim = isim; 
         el.innerText = isim || (izleyiciModu ? "Boş" : "➕ DAVET");
     }
 };
 
+// 🔥 PC VE MOBİL İÇİN KUSURSUZ ÇİFT TIKLAMA 🔥
 window.tasEkle = function(tasData, yuvaId) { 
     const div = document.createElement('div'); div.className = `okey-tasi tas-${tasData.renk}`; div.innerText = tasData.sayi; div.id = tasData.id; 
-    div.ondblclick = function() { window.otomatikTasAt(this); }; document.getElementById(yuvaId).appendChild(div); 
+    
+    let sonTiklama = 0;
+    const ciftTiklamaIsleyici = function(e) {
+        let suAn = new Date().getTime();
+        if (suAn - sonTiklama < 400) { // 400ms içinde çift tıklandıysa
+            window.otomatikTasAt(div);
+            if(e) e.preventDefault();
+        }
+        sonTiklama = suAn;
+    };
+
+    div.addEventListener('click', ciftTiklamaIsleyici);
+    div.addEventListener('touchstart', ciftTiklamaIsleyici, {passive: false});
+    div.ondblclick = function() { window.otomatikTasAt(this); }; // Garanti
+
+    document.getElementById(yuvaId).appendChild(div); 
 };
 
-// 🔥 GÖSTERGE KALKANI 🔥
 window.checkGosterge = function() { 
     const btn = document.getElementById('gostergeBtn'); if(!btn) return; btn.style.display = 'none'; 
     if(!benimSiramMi || !gostergeHakki) return; 
@@ -101,13 +115,15 @@ window.ciftDiz = function() {
 };
 
 window.otomatikTasAt = function(tasElementi) { 
-    if (!benimSiramMi || window.elimdekiTasSayisi() !== 15) return; 
+    if (!benimSiramMi) { ozelUyariGoster("Şu an sıra sizde değil!"); return; }
+    if (window.elimdekiTasSayisi() !== 15) { ozelUyariGoster("Sadece 15 taşınız varken ortaya taş atabilirsiniz!"); return; }
+
     gostergeHakki = false; if(document.getElementById('gostergeBtn')) document.getElementById('gostergeBtn').style.display = 'none'; 
     const iskartaKutusu = document.getElementById('benimIskartam'); 
     if (iskartaKutusu) { 
         iskartaKutusu.appendChild(tasElementi); 
         tasElementi.style.position = 'absolute'; tasElementi.style.top = '50%'; tasElementi.style.left = '50%'; tasElementi.style.transform = 'translate(-50%, -50%)'; tasElementi.style.margin = '0'; 
-        document.getElementById('iskartaYazi').style.display = 'none'; 
+        if(document.getElementById('iskartaYazi')) document.getElementById('iskartaYazi').style.display = 'none'; 
         let renkSinifi = Array.from(tasElementi.classList).find(c=>c.startsWith('tas-')); let renk = renkSinifi ? renkSinifi.split('-')[1] : 'siyah'; 
         socket.emit('tas_atildi', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi, tas: { id: tasElementi.id, renk: renk, sayi: tasElementi.innerText } }); sesCal(sesTasKoy); 
     } 
@@ -142,7 +158,7 @@ if(document.getElementById('benimIskartam')) {
         group: { name: 'istaka', put: function (to) { return benimSiramMi && window.elimdekiTasSayisi() === 15; }, pull: false }, 
         animation: 150, forceFallback: true, fallbackOnBody: true, emptyInsertThreshold: 100, 
         onAdd: function (evt) { 
-            gostergeHakki = false; document.getElementById('iskartaYazi').style.display = 'none'; 
+            gostergeHakki = false; if(document.getElementById('iskartaYazi')) document.getElementById('iskartaYazi').style.display = 'none'; 
             const atilanTas = evt.item; atilanTas.style.position = 'absolute'; atilanTas.style.top = '50%'; atilanTas.style.left = '50%'; atilanTas.style.transform = 'translate(-50%, -50%)'; atilanTas.style.margin = '0'; 
             let renkSinifi = Array.from(atilanTas.classList).find(c=>c.startsWith('tas-')); let renk = renkSinifi ? renkSinifi.split('-')[1] : 'siyah'; 
             socket.emit('tas_atildi', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi, tas: { id: atilanTas.id, renk: renk, sayi: atilanTas.innerText } }); sesCal(sesTasKoy); 
