@@ -54,15 +54,21 @@ socket.on('sira_guncelle', (data) => {
     }
 });
 
-// 🔥 İZLEYİCİLER İÇİN TAŞ GÖSTERME (DOM DATASET ODAKLI ÇÖZÜM) 🔥
+// 🔥 İSKARTA GÖRÜNTÜLEME HATASI BURADA DÜZELTİLDİ 🔥
 socket.on('ortaya_tas_atildi', (data) => { 
     if(suAnkiMasam === data.masaAdi) { 
         let target = null;
-        const right = document.getElementById('seatRight'); const top = document.getElementById('seatTop'); const left = document.getElementById('seatLeft'); const me = document.getElementById('benimAdimKutusu');
-        if(right && data.kimAtti === right.dataset.isim) target = 'iskartaSag'; 
-        else if(top && data.kimAtti === top.dataset.isim) target = 'iskartaUst'; 
-        else if(left && data.kimAtti === left.dataset.isim) target = 'iskartaSol'; 
-        else if(me && data.kimAtti === me.dataset.isim) target = 'benimIskartam'; 
+        const players = [
+            { id: 'benimAdimKutusu', target: 'benimIskartam' }, 
+            { id: 'seatRight', target: 'iskartaSag' },
+            { id: 'seatTop', target: 'iskartaUst' },
+            { id: 'seatLeft', target: 'iskartaSol' }
+        ];
+
+        players.forEach(p => {
+            const el = document.getElementById(p.id);
+            if(el && el.dataset.isim === data.kimAtti) target = p.target;
+        });
         
         if(target) { 
             const kutu = document.getElementById(target); 
@@ -105,7 +111,7 @@ socket.on('admin_islem_uyarisi', (data) => { if(data.isim === aktifKullaniciAdi)
 socket.on('oyun_bitti', (data) => { 
     if(suAnkiMasam === data.masaAdi) { 
         const sonucEkrani = document.getElementById('sonucEkrani'); const baslik = document.getElementById('sonucBaslik'); const metin = document.getElementById('sonucMetin'); const odul = document.getElementById('sonucOdul'); 
-        if(auth.currentUser && !isMisafir && !izleyiciModu && data.kazanan && !aktifBotlar.includes(data.kazanan) && !data.kazanan.startsWith('Misafir_')) {
+        if(auth.currentUser && !isMisafir && !izleyiciModu && data.kazanan && !data.kazanan.startsWith('Oyuncu_') && !data.kazanan.startsWith('Misafir_')) {
             const userRef = db.collection("kullanicilar").doc(auth.currentUser.uid);
             if(data.kazanan === aktifKullaniciAdi) { userRef.update({ oynananOyun: firebase.firestore.FieldValue.increment(1), kazanilanOyun: firebase.firestore.FieldValue.increment(1) }); benimKazanilanOyun++; benimGorevler.kazanma++; gorevleriKaydet(); window.arayuzGuncelle(); } 
             else { userRef.update({ oynananOyun: firebase.firestore.FieldValue.increment(1) }); }
