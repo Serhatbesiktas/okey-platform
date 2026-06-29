@@ -166,11 +166,12 @@
     </div>
 
     <div id="magazaEkrani" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:99999; flex-direction:column; justify-content:center; align-items:center;">
-        <div class="magaza-kutu">
+        <div class="magaza-kutu" style="max-height:85vh; overflow-y:auto;">
             <div class="magaza-header">
                 <h2>🛒 VIP MAĞAZA</h2>
                 <button onclick="document.getElementById('magazaEkrani').style.display='none'" style="background:none;border:none;color:#e74c3c;font-size:24px;cursor:pointer;">X</button>
             </div>
+            
             <div class="magaza-icerik">
                 <div class="urun-kart">
                     <div class="urun-ikon" style="border: 3px solid #f2c94c; box-shadow: 0 0 15px #f2c94c;">😎</div>
@@ -187,9 +188,11 @@
                     <h3>Ateşli İsim</h3>
                     <button class="satin-al-btn" id="btn_atesli_isim" onclick="magazaIslem('atesli_isim', 3000000)">3M ÇİP</button>
                 </div>
+            </div>
 
-                <h3 style="color:#f2c94c; text-align:center; width:100%; margin-top:20px; border-bottom:1px solid #52796f; padding-bottom:5px; flex-basis: 100%;">👑 MİLYARDER TEMALARI</h3>
-                
+            <h3 style="color:#f2c94c; text-align:center; width:100%; margin-top:20px; border-bottom:1px solid #52796f; padding-bottom:5px;">👑 MİLYARDER TEMALARI</h3>
+            
+            <div class="magaza-icerik" style="margin-top: 15px;">
                 <div class="urun-kart" style="border-color:#ffd700;">
                     <div class="urun-ikon" style="font-size:30px; border:none; box-shadow:none; background:transparent;">👑</div>
                     <h3 style="font-size:14px;">Kraliyet Altını</h3>
@@ -210,7 +213,6 @@
                     <p style="font-size:10px; color:#aaa; margin-bottom: 10px; padding:0 5px;">Koyu bordo kadife masa ve ahşap detaylar.</p>
                     <button class="satin-al-btn" id="btn_tema_kizil">30 Milyon ÇİP</button>
                 </div>
-
             </div>
         </div>
     </div>
