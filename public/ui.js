@@ -22,7 +22,12 @@ window.arayuzGuncelle = function() {
     if(aktifKullaniciAdi && !izleyiciModu) { if(isimKutu) isimKutu.innerHTML = tacEki + aktifKullaniciAdi + ' <span style="color:#2ecc71;">✔</span>'; }
     if(aktifKozmetikler.includes('altin_cerceve') && avatar) { avatar.style.border = '3px solid #f2c94c'; avatar.style.boxShadow = '0 0 15px #f2c94c'; }
     if(aktifKozmetikler.includes('atesli_isim') && isimKutu && !izleyiciModu) { isimKutu.style.color = '#ff4d4d'; }
-    const esyalar = [ {id: 'altin_cerceve', fiyat: '500.000'}, {id: 'neon_tac', fiyat: '1.5M'}, {id: 'atesli_isim', fiyat: '3M'} ];
+    
+    // 🔥 MAĞAZA BUTONLARINI GÜNCELLEYEN RADAR (TEMALAR DA EKLENDİ) 🔥
+    const esyalar = [ 
+        {id: 'altin_cerceve', fiyat: '500.000'}, {id: 'neon_tac', fiyat: '1.5M'}, {id: 'atesli_isim', fiyat: '3M'},
+        {id: 'tema_royal', fiyat: '10 Milyon'}, {id: 'tema_neon', fiyat: '20 Milyon'}, {id: 'tema_kizil', fiyat: '30 Milyon'}
+    ];
     esyalar.forEach(esya => { 
         const btn = document.getElementById('btn_' + esya.id); 
         if(btn) { 
@@ -31,6 +36,43 @@ window.arayuzGuncelle = function() {
             else { btn.innerText = esya.fiyat + ' ÇİP'; btn.style.background = ''; btn.style.color = ''; } 
         } 
     });
+};
+
+// 🔥 SİLİNEN KOSKOCA MAĞAZA FONKSİYONU GERİ GELDİ 🔥
+window.magazaIslem = function(esyaId, fiyat) {
+    if(isMisafir) { ozelUyariGoster("⚠️ Misafir hesaplar mağazayı kullanamaz!"); return; }
+    
+    if(aktifKozmetikler.includes(esyaId)) {
+        // Çıkar
+        aktifKozmetikler = aktifKozmetikler.filter(k => k !== esyaId);
+    } else if(benimEnvanterim.includes(esyaId)) {
+        // Kullan
+        if(esyaId.startsWith('tema_')) { aktifKozmetikler = aktifKozmetikler.filter(k => !k.startsWith('tema_')); } // Eski temayı çıkar
+        aktifKozmetikler.push(esyaId);
+    } else {
+        // Satın Al
+        let safCip = parseInt(String(benimAnlikCipim).replace(/[^0-9]/g, '')) || 0;
+        if(safCip < fiyat) { ozelUyariGoster("⚠️ Yetersiz Çip!"); return; }
+        
+        benimAnlikCipim = safCip - fiyat;
+        document.getElementById('benimCipim').innerText = benimAnlikCipim.toLocaleString('tr-TR');
+        benimEnvanterim.push(esyaId);
+        
+        if(esyaId.startsWith('tema_')) { aktifKozmetikler = aktifKozmetikler.filter(k => !k.startsWith('tema_')); }
+        aktifKozmetikler.push(esyaId);
+        
+        socket.emit('magaza_harcamasi', { isim: aktifKullaniciAdi, yeniCip: benimAnlikCipim });
+        ozelUyariGoster("🎉 Başarıyla satın alındı!");
+    }
+
+    // Veritabanına kaydet ve sunucuya bildir
+    if(auth.currentUser && !isMisafir) {
+        db.collection("kullanicilar").doc(auth.currentUser.uid).update({
+            cip: benimAnlikCipim, envanter: benimEnvanterim, aktifKozmetikler: aktifKozmetikler
+        }).catch(e => console.log(e));
+    }
+    socket.emit('kozmetik_guncelle', { isim: aktifKullaniciAdi, kozmetikler: aktifKozmetikler });
+    window.arayuzGuncelle();
 };
 
 window.vipMasaKurAksiyon = function() {
@@ -130,7 +172,6 @@ window.profilDavetAksiyon = function() { const hedef = document.getElementById('
 window.liderlikTablosunuAc = function() { document.getElementById('liderlikEkrani').style.display = 'flex'; socket.emit('liderlik_tablosu_iste'); };
 window.masadanAyrilmaIslemi = function(cezaUygulansinMi = false) { if (suAnkiMasam) { socket.emit('masadan_kalk', { isim: aktifKullaniciAdi, masaAdi: suAnkiMasam }); } suAnkiMasam = null; izleyiciModu = false; window.masayiTemizle(); try { document.querySelector('.istaka-container').style.display = 'flex'; document.querySelector('.okey-istaka-tuslar-area').style.display = 'flex'; } catch(e) {} masaEkrani.style.display = 'none'; lobiEkrani.style.display = 'flex'; window.arayuzGuncelle(); };
 
-// 🔥 ÇIKIŞ YAPARKEN EKRANA CEZA MİKTARINI DİNAMİK YAZDIRMA 🔥
 const lobiyeDonBtn = document.getElementById('lobiyeDonBtn'); 
 if(lobiyeDonBtn) { 
     lobiyeDonBtn.addEventListener('click', () => { 
