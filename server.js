@@ -16,12 +16,20 @@ const masalar = {
     'Hızlı Oyun (10K Bahis)': { bahis: 10000, kasa: 0, koltuklar: [null, null, null, null], deste: [], gosterge: null, oyunBasladi: false, siradakiOyuncu: null, eller: {}, gostergeGosterildi: false, sonAtilanTas: null }
 };
 
-const aktifBotlar = [];
-const botOnekleri = ["Oyuncu_"];
-const botIsimleri = ["1001", "2024", "4532", "7781", "9002", "1123", "5564", "8839", "3321", "7645", "9982", "5431", "2213", "8876"];
+// 🔥 EFSANE VE GERÇEKÇİ BOT İSİMLERİ GERİ GELDİ 🔥
+const botIsimleri = [
+    "Ordulu_52", "Umraniyeli_Reis", "Pattik_Sever", "Geralt_34", "Sileli_Balikci", 
+    "Efsane_06", "Yalniz_Kurt", "Bursali_16", "Mavi_Ay", "Reis_55", "Atasehir_Beyi",
+    "Fluence_Kral", "Gecelerin_Yargici", "Okey_Uzmani", "Cilgin_Turk", "Tek_Atan", 
+    "Zalim_Kral", "Guzel_Gozlum", "Ahmet_K", "Kral_Ayhan", "Zehir_Hafiye", "Vefasiz_Alem", 
+    "Esmer_Kiz", "Tatli_Bela", "Oflu_Hoca", "Erzurumlu_25", "Asi_Mavi", "Ruzgar_Gibi", 
+    "Son_Vurus", "Kader_Mahkumu", "Kaptan_34", "Gezgin_Ruh", "Oyun_Kurucu", "Sari_Firtina", 
+    "Demir_Bilek", "Karadeniz_Firtinasi", "Izmirli_Guzel", "Adanali_01", "Deli_Yurek"
+];
 
+const aktifBotlar = [];
 for(let i=0; i<75; i++) {
-    const tamIsim = botOnekleri[0] + botIsimleri[Math.floor(Math.random() * botIsimleri.length)] + "_" + Math.floor(10 + Math.random() * 89);
+    const tamIsim = botIsimleri[i % botIsimleri.length] + "_" + Math.floor(10 + Math.random() * 89);
     aktifBotlar.push(tamIsim);
     oyuncuCipleri[tamIsim] = Math.floor(Math.random() * 9000000) + 1000000; 
     oyuncuKozmetikleri[tamIsim] = (Math.random() > 0.8) ? ['neon_tac'] : [];
@@ -126,7 +134,8 @@ function botHamlesiYap(masaAdi) {
         setTimeout(() => {
             if(!masa.oyunBasladi) return;
             
-            if (masa.deste.length > 100 && !masa.gostergeGosterildi) {
+            // Botların Gösterge Yapma Zekası (İlk turlarda)
+            if (masa.deste.length > 35 && !masa.gostergeGosterildi && masa.gosterge) {
                 let hasGosterge = masa.eller[siradaki].some(t => t.renk === masa.gosterge.renk && t.sayi === masa.gosterge.sayi);
                 if (hasGosterge) {
                     masa.gostergeGosterildi = true; 
@@ -135,13 +144,14 @@ function botHamlesiYap(masaAdi) {
             }
 
             let tasAldi = false;
+            // Botun işine yarayan taş var mı?
             if (masa.sonAtilanTas && masa.eller[siradaki].length < 15) {
                 let yandakiTas = masa.sonAtilanTas;
                 let isineYararMi = masa.eller[siradaki].filter(t => t.renk === yandakiTas.renk || t.sayi === yandakiTas.sayi).length >= 2;
                 
-                if (isineYararMi && Math.random() > 0.3) {
+                if (isineYararMi && Math.random() > 0.4) {
                     masa.eller[siradaki].push(yandakiTas);
-                    masa.sonAtilanTas = null; // YERDEN TAŞ ALINDI, ZEMİN TEMİZLENDİ!
+                    masa.sonAtilanTas = null;
                     tasAldi = true;
                     io.emit('yandan_alindi_guncelle', { masaAdi: masaAdi, kimAldi: siradaki, tas: yandakiTas });
                 }
@@ -156,26 +166,40 @@ function botHamlesiYap(masaAdi) {
             setTimeout(() => {
                 if(!masa.oyunBasladi) return;
                 
-                let bitmeSans = (80 - masa.deste.length) * 0.003; 
-                if (masa.deste.length < 65 && Math.random() < bitmeSans) {
+                const botunEli = masa.eller[siradaki];
+                let okeySayi = masa.gosterge ? (masa.gosterge.sayi === 13 ? 1 : parseInt(masa.gosterge.sayi) + 1) : null; 
+                let okeyRenk = masa.gosterge ? masa.gosterge.renk : null;
+                
+                // 🔥 OKEY VE SAHTE OKEY KALKANI 🔥
+                let guvenliTaslar = botunEli.filter(t => { 
+                    let isOkey = (t.renk === okeyRenk && parseInt(t.sayi) === okeySayi); 
+                    return !isOkey && t.renk !== 'sahte'; 
+                });
+                if(guvenliTaslar.length === 0) guvenliTaslar = botunEli; // Her şey okeyse yapacak bir şey yok
+
+                // 🔥 ANINDA BİTME BUG'I DÜZELTİLDİ: Sadece deste 25'in altına indiğinde (Oyun sonuna doğru) bitirebilirler!
+                if (masa.deste.length < 25 && Math.random() < 0.08) {
                     let kazanilanPara = Number(masa.kasa);
                     oyuncuCipleri[siradaki] += kazanilanPara;
                     io.emit('cip_guncelle_ozel', { isim: siradaki, cip: oyuncuCipleri[siradaki] });
-                    let bitisTasi = masa.eller[siradaki].pop();
+                    
+                    let atilacakIndex = Math.floor(Math.random() * guvenliTaslar.length);
+                    let bitisTasi = guvenliTaslar[atilacakIndex];
+                    let gercekIndex = botunEli.findIndex(t => t.id === bitisTasi.id); 
+                    botunEli.splice(gercekIndex, 1);
+                    
                     io.emit('ortaya_tas_atildi', { masaAdi: masaAdi, kimAtti: siradaki, tas: bitisTasi });
                     oyunuSifirla(masaAdi, siradaki, kazanilanPara, "Usta bir dizilimle elini bitirdi!", false);
                     return;
                 }
 
-                const botunEli = masa.eller[siradaki];
-                let okeySayi = masa.gosterge.sayi === 13 ? 1 : parseInt(masa.gosterge.sayi) + 1; let okeyRenk = masa.gosterge.renk;
-                let guvenliTaslar = botunEli.filter(t => { let isOkey = (t.renk === okeyRenk && parseInt(t.sayi) === okeySayi); return !isOkey && t.renk !== 'sahte'; });
-                if(guvenliTaslar.length === 0) guvenliTaslar = botunEli; 
+                // Normal Atış (Okey atmaz)
+                let atilacakIndex = Math.floor(Math.random() * guvenliTaslar.length); 
+                let atilanTas = guvenliTaslar[atilacakIndex];
+                let gercekIndex = botunEli.findIndex(t => t.id === atilanTas.id); 
+                botunEli.splice(gercekIndex, 1); 
 
-                const atilacakIndex = Math.floor(Math.random() * guvenliTaslar.length); const atilanTas = guvenliTaslar[atilacakIndex];
-                const gercekIndex = botunEli.findIndex(t => t.id === atilanTas.id); botunEli.splice(gercekIndex, 1); 
-
-                masa.sonAtilanTas = atilanTas; // 🔥 HAFIZAYA AL (ISKARTA GÜNCELLEMESİ)
+                masa.sonAtilanTas = atilanTas; 
                 io.emit('ortaya_tas_atildi', { masaAdi: masaAdi, kimAtti: siradaki, tas: atilanTas });
                 
                 let currentIndex = masa.koltuklar.indexOf(siradaki); if(currentIndex === -1) return;
@@ -276,7 +300,7 @@ io.on('connection', (socket) => {
       
       let masaBulundu = null;
       for(let m in masalar) { if(masalar[m].koltuklar.includes(isim)) { masaBulundu = m; break; } }
-      if(masaBulundu) { socket.emit('sen_masadasin', { masaAdi: masaBulundu, isVIP: masalar[masalarBulundu].isVIP || false, sahibi: masalar[masaBulundu].sahibi || "", gizli: masalar[masaBulundu].gizli || false }); }
+      if(masaBulundu) { socket.emit('sen_masadasin', { masaAdi: masaBulundu, isVIP: masalar[masaBulundu].isVIP || false, sahibi: masalar[masaBulundu].sahibi || "", gizli: masalar[masaBulundu].gizli || false }); }
   });
 
   socket.on('arkadaslik_istegi_gonder', (data) => {
@@ -386,7 +410,7 @@ io.on('connection', (socket) => {
       const masa = masalar[data.masaAdi];
       if(masa && masa.siradakiOyuncu === data.isim) {
           if(masa.eller[data.isim]) { const tasIndex = masa.eller[data.isim].findIndex(t => t.id === data.tas.id); if(tasIndex !== -1) masa.eller[data.isim].splice(tasIndex, 1); }
-          masa.sonAtilanTas = data.tas; // 🔥 HAFIZA GÜNCELLENDİ 🔥
+          masa.sonAtilanTas = data.tas; 
           io.emit('ortaya_tas_atildi', { masaAdi: data.masaAdi, kimAtti: data.isim, tas: data.tas });
           let currentIndex = masa.koltuklar.indexOf(data.isim); let nextIndex = (currentIndex + 1) % 4; masa.siradakiOyuncu = masa.koltuklar[nextIndex];
           io.emit('sira_guncelle', { masaAdi: data.masaAdi, kimde: masa.siradakiOyuncu }); if(aktifBotlar.includes(masa.siradakiOyuncu)) { botHamlesiYap(data.masaAdi); }
