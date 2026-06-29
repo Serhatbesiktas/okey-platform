@@ -25,14 +25,32 @@ window.masayiTemizle = function() {
     benimSiramMi = false; 
 };
 
+// 🔥 SIRASI GELENİN IŞIĞINI YAKMAK İÇİN YENİ RADAR 🔥
 window.gelişmişKoltukHizala = function(koltuklar) {
-    let idx = koltuklar.indexOf(aktifKullaniciAdi); if(idx === -1) idx = 0;
-    const koltukIds = ['benimAdimKutusu', 'seatRight', 'seatTop', 'seatLeft'];
-    for(let i=0; i<4; i++) {
-        let el = document.getElementById(koltukIds[i]);
-        let isim = koltuklar[(idx + i) % 4] || "";
-        el.dataset.isim = isim; 
-        el.innerText = isim || (izleyiciModu ? "Boş" : "➕ DAVET");
+    let idx = koltuklar.indexOf(aktifKullaniciAdi); 
+    if(idx === -1) idx = 0; 
+    
+    window.masaKoltukMapping.bottom = koltuklar[idx] || "";
+    window.masaKoltukMapping.right = koltuklar[(idx+1)%4] || "";
+    window.masaKoltukMapping.top = koltuklar[(idx+2)%4] || "";
+    window.masaKoltukMapping.left = koltuklar[(idx+3)%4] || "";
+
+    const rightEl = document.getElementById('seatRight');
+    if(rightEl) { rightEl.innerText = window.masaKoltukMapping.right || (izleyiciModu ? "Boş" : "➕ DAVET"); rightEl.dataset.isim = window.masaKoltukMapping.right; }
+    
+    const topEl = document.getElementById('seatTop');
+    if(topEl) { topEl.innerText = window.masaKoltukMapping.top || (izleyiciModu ? "Boş" : "➕ DAVET"); topEl.dataset.isim = window.masaKoltukMapping.top; }
+    
+    const leftEl = document.getElementById('seatLeft');
+    if(leftEl) { leftEl.innerText = window.masaKoltukMapping.left || (izleyiciModu ? "Boş" : "➕ DAVET"); leftEl.dataset.isim = window.masaKoltukMapping.left; }
+
+    const benimKutu = document.getElementById('benimAdimKutusu');
+    if (benimKutu) {
+        benimKutu.dataset.isim = window.masaKoltukMapping.bottom;
+        if (izleyiciModu) {
+            const masaOrtasi = document.getElementById('masaOrtasiYazi');
+            if(masaOrtasi) masaOrtasi.innerHTML = `${suAnkiMasam.toUpperCase()}<br><span style='font-size:10px; color:#f2c94c;'>İzleyici Modu</span><br><span style='font-size:9px; color:#a3c4bc;'>Aşağıdaki Oyuncu: ${window.masaKoltukMapping.bottom || 'Boş'}</span>`;
+        }
     }
 };
 
@@ -137,14 +155,12 @@ document.getElementById('iskartaSol')?.addEventListener('click', function() {
     } else if(!benimSiramMi) ozelUyariGoster("Şu an sıra sizde değil!"); else if(window.elimdekiTasSayisi() === 15) ozelUyariGoster("Elinizde zaten 15 taş var!"); 
 });
 
-// 🔥 UNUTULAN GÖSTERGE BUTONU TIKLAMA KABLOSU BURAYA BAĞLANDI 🔥
 const btnGostergeDOM = document.getElementById('gostergeBtn');
 if(btnGostergeDOM) {
     btnGostergeDOM.addEventListener('click', () => {
         if(suAnkiMasam && aktifKullaniciAdi && gostergeHakki) {
             socket.emit('gosterge_goster', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi });
-            gostergeHakki = false; // Gösterge yaptıktan sonra hak biter
-            btnGostergeDOM.style.display = 'none'; // Buton kaybolur
+            gostergeHakki = false; btnGostergeDOM.style.display = 'none'; 
         }
     });
 }
