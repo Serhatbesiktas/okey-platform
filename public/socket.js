@@ -39,9 +39,7 @@ socket.on('tas_cekildi', (t) => { if(!izleyiciModu) { for(let i=0; i<24; i++) { 
 socket.on('sira_guncelle', (data) => {
     if(suAnkiMasam === data.masaAdi) {
         benimSiramMi = (!izleyiciModu && data.kimde === aktifKullaniciAdi); if(benimSiramMi) sesCal(sesSiraSende);
-        
         ['benimAdimKutusu', 'seatRight', 'seatTop', 'seatLeft'].forEach(id => { const el = document.getElementById(id); if(el) el.classList.remove('aktif-sira'); });
-
         if (data.kimde === window.masaKoltukMapping.bottom) document.getElementById('benimAdimKutusu')?.classList.add('aktif-sira');
         else if (data.kimde === window.masaKoltukMapping.right) document.getElementById('seatRight')?.classList.add('aktif-sira');
         else if (data.kimde === window.masaKoltukMapping.top) document.getElementById('seatTop')?.classList.add('aktif-sira');
@@ -49,9 +47,11 @@ socket.on('sira_guncelle', (data) => {
     }
 });
 
-// 🔥 İZLEYİCİLER İÇİN KUSURSUZ TAŞ SİSTEMİ (Yeni Hafıza İle) 🔥
+// 🔥 TAŞ BİRİKTİRME (ISKARTA HAFIZASI) BURADA ÇÖZÜLDÜ 🔥
 socket.on('ortaya_tas_atildi', (data) => { 
     if(suAnkiMasam === data.masaAdi) { 
+        if (!izleyiciModu && data.kimAtti === aktifKullaniciAdi) return; // Kendi attığımızı game.js zaten ekliyor
+
         let target = null;
         if (data.kimAtti === window.masaKoltukMapping.bottom) target = 'benimIskartam';
         else if (data.kimAtti === window.masaKoltukMapping.right) target = 'iskartaSag';
@@ -61,19 +61,27 @@ socket.on('ortaya_tas_atildi', (data) => {
         if(target) { 
             const kutu = document.getElementById(target); 
             if(kutu) {
-                kutu.innerHTML = ''; 
-                const div = document.createElement('div'); div.className = `okey-tasi tas-${data.tas.renk}`; div.innerText = data.tas.sayi; div.id = data.tas.id; 
+                if(target === 'benimIskartam' && document.getElementById('iskartaYazi')) {
+                    document.getElementById('iskartaYazi').style.display = 'none';
+                }
+                
+                const div = document.createElement('div'); 
+                div.className = `okey-tasi tas-${data.tas.renk}`; div.innerText = data.tas.sayi; div.id = data.tas.id; 
                 div.style.position = 'absolute'; div.style.top = '50%'; div.style.left = '50%'; div.style.transform = 'translate(-50%, -50%)'; div.style.margin = '0'; 
                 div.style.pointerEvents = (target === 'iskartaSol' && !izleyiciModu) ? 'auto' : 'none'; 
-                kutu.appendChild(div); sesCal(sesTasKoy); 
+                
+                // KUTUYU SİLME, ÜSTÜNE EKLE!
+                kutu.appendChild(div); 
+                sesCal(sesTasKoy); 
             }
         } 
     } 
 });
 
+// 🔥 ALINAN TAŞIN ALTINDAKİNİ GÖSTERME (ZEMİN) ÇÖZÜMÜ 🔥
 socket.on('yandan_alindi_guncelle', (data) => { 
     if(data.masaAdi === suAnkiMasam) { 
-        if (!izleyiciModu && data.kimAldi === aktifKullaniciAdi) return;
+        if (!izleyiciModu && data.kimAldi === aktifKullaniciAdi) return; // Kendi aldığımızı game.js halletti
 
         let source = null; 
         if (data.kimAldi === window.masaKoltukMapping.bottom) source = 'iskartaSol'; 
@@ -82,8 +90,18 @@ socket.on('yandan_alindi_guncelle', (data) => {
         else if (data.kimAldi === window.masaKoltukMapping.left) source = 'iskartaUst'; 
         
         if(source) { 
-            document.getElementById(source).innerHTML = ''; 
-            if(source === 'benimIskartam' && !izleyiciModu) document.getElementById('benimIskartam').innerHTML = '<div class="iskarta-yazi" id="iskartaYazi">TAŞ AT<br>⬇</div>'; 
+            const kutu = document.getElementById(source);
+            if (kutu) {
+                const taslar = kutu.querySelectorAll('.okey-tasi');
+                if (taslar.length > 0) {
+                    // Sadece en üsttekini (son atılanı) sil, alttaki taşlar kalsın!
+                    taslar[taslar.length - 1].remove(); 
+                }
+                
+                if(source === 'benimIskartam' && !izleyiciModu && kutu.querySelectorAll('.okey-tasi').length === 0) {
+                    kutu.innerHTML = '<div class="iskarta-yazi" id="iskartaYazi">TAŞ AT<br>⬇</div>';
+                }
+            }
             sesCal(sesTasCek); 
         } 
     } 
@@ -100,10 +118,12 @@ socket.on('admin_islem_uyarisi', (data) => { if(data.isim === aktifKullaniciAdi)
 socket.on('oyun_bitti', (data) => { 
     if(suAnkiMasam === data.masaAdi) { 
         const sonucEkrani = document.getElementById('sonucEkrani'); const baslik = document.getElementById('sonucBaslik'); const metin = document.getElementById('sonucMetin'); const odul = document.getElementById('sonucOdul'); 
-        if(auth.currentUser && !isMisafir && !izleyiciModu && data.kazanan && !data.kazanan.startsWith('Oyuncu_') && !data.kazanan.startsWith('Misafir_')) {
+        
+        let isHuman = data.kazanan && !data.kazanan.startsWith('MİSAFİR_') && window.aktifKullaniciAdi && data.kazanan === window.aktifKullaniciAdi;
+        
+        if(auth.currentUser && !isMisafir && !izleyiciModu && isHuman) {
             const userRef = db.collection("kullanicilar").doc(auth.currentUser.uid);
-            if(data.kazanan === aktifKullaniciAdi) { userRef.update({ oynananOyun: firebase.firestore.FieldValue.increment(1), kazanilanOyun: firebase.firestore.FieldValue.increment(1) }); benimKazanilanOyun++; benimGorevler.kazanma++; gorevleriKaydet(); window.arayuzGuncelle(); } 
-            else { userRef.update({ oynananOyun: firebase.firestore.FieldValue.increment(1) }); }
+            userRef.update({ oynananOyun: firebase.firestore.FieldValue.increment(1), kazanilanOyun: firebase.firestore.FieldValue.increment(1) }); benimKazanilanOyun++; benimGorevler.kazanma++; gorevleriKaydet(); window.arayuzGuncelle();
         }
         if (data.kazanan) { 
             if (data.kazanan === aktifKullaniciAdi) { baslik.innerText = data.okeyleBittiMi ? "🔥 OKEYLE BİTİRDİN! 🔥" : "🏆 TEBRİKLER, KAZANDIN! 🏆"; baslik.style.color = data.okeyleBittiMi ? "#ff3333" : "#f2c94c"; } else { baslik.innerText = data.okeyleBittiMi ? "🚨 RAKİP OKEY ATTI! 🚨" : "🎉 OYUN BİTTİ 🎉"; baslik.style.color = data.okeyleBittiMi ? "#ff3333" : "#f2c94c"; } 
