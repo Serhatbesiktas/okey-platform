@@ -1,4 +1,15 @@
-// 🔥 ÇİP GÜNCELLEME VE FİREBASE KAYIT MERKEZİ (Ceza, Kazanç, Gösterge) 🔥
+// 🔥 GÖSTERGE BAŞARILI SİNYALİ (GÖREV GÜNCELLEME VE SES) EKLENDİ 🔥
+socket.on('gosterge_basarili', (data) => {
+    if (data.isim === aktifKullaniciAdi && !izleyiciModu) {
+        if(typeof benimGorevler !== 'undefined') {
+            benimGorevler.gosterge++; // Gösterge görevini +1 yap
+            if(typeof gorevleriKaydet === 'function') gorevleriKaydet();
+            if(typeof window.renderGorevler === 'function') window.renderGorevler();
+        }
+    }
+    sesCal(sesSiraSende);
+});
+
 socket.on('cip_guncelle_ozel', (data) => {
     if(data.isim === aktifKullaniciAdi) {
         benimAnlikCipim = data.cip;
