@@ -1,3 +1,27 @@
+// 🔥 ÇİP GÜNCELLEME VE FİREBASE KAYIT MERKEZİ (Ceza, Kazanç, Gösterge) 🔥
+socket.on('cip_guncelle_ozel', (data) => {
+    if(data.isim === aktifKullaniciAdi) {
+        benimAnlikCipim = data.cip;
+        const cipKutu = document.getElementById('benimCipim');
+        if(cipKutu) {
+            cipKutu.innerText = benimAnlikCipim.toLocaleString('tr-TR');
+            cipKutu.style.color = "#f1c40f"; 
+            cipKutu.style.transform = "scale(1.1)";
+            setTimeout(() => { cipKutu.style.color = ""; cipKutu.style.transform = "scale(1)"; }, 1500);
+        }
+        if(typeof auth !== 'undefined' && auth.currentUser && !isMisafir) {
+            db.collection("kullanicilar").doc(auth.currentUser.uid).update({ cip: benimAnlikCipim }).catch(e => console.log("Cip kayit hatasi: ", e));
+        }
+    }
+});
+
+socket.on('cip_guncelle', (cip) => {
+    benimAnlikCipim = cip;
+    if(document.getElementById('benimCipim')) {
+        document.getElementById('benimCipim').innerText = benimAnlikCipim.toLocaleString('tr-TR');
+    }
+});
+
 socket.on('masalari_guncelle', (lobidekiMasalar) => {
     guncelMasalar = lobidekiMasalar; if(!masalarAlani) return; masalarAlani.innerHTML = '';
     Object.entries(lobidekiMasalar).forEach(([masaAdi, koltuklar]) => {
@@ -47,10 +71,9 @@ socket.on('sira_guncelle', (data) => {
     }
 });
 
-// 🔥 TAŞ BİRİKTİRME (ISKARTA HAFIZASI) BURADA ÇÖZÜLDÜ 🔥
 socket.on('ortaya_tas_atildi', (data) => { 
     if(suAnkiMasam === data.masaAdi) { 
-        if (!izleyiciModu && data.kimAtti === aktifKullaniciAdi) return; // Kendi attığımızı game.js zaten ekliyor
+        if (!izleyiciModu && data.kimAtti === aktifKullaniciAdi) return; 
 
         let target = null;
         if (data.kimAtti === window.masaKoltukMapping.bottom) target = 'benimIskartam';
@@ -64,13 +87,10 @@ socket.on('ortaya_tas_atildi', (data) => {
                 if(target === 'benimIskartam' && document.getElementById('iskartaYazi')) {
                     document.getElementById('iskartaYazi').style.display = 'none';
                 }
-                
                 const div = document.createElement('div'); 
                 div.className = `okey-tasi tas-${data.tas.renk}`; div.innerText = data.tas.sayi; div.id = data.tas.id; 
                 div.style.position = 'absolute'; div.style.top = '50%'; div.style.left = '50%'; div.style.transform = 'translate(-50%, -50%)'; div.style.margin = '0'; 
                 div.style.pointerEvents = (target === 'iskartaSol' && !izleyiciModu) ? 'auto' : 'none'; 
-                
-                // KUTUYU SİLME, ÜSTÜNE EKLE!
                 kutu.appendChild(div); 
                 sesCal(sesTasKoy); 
             }
@@ -78,11 +98,9 @@ socket.on('ortaya_tas_atildi', (data) => {
     } 
 });
 
-// 🔥 ALINAN TAŞIN ALTINDAKİNİ GÖSTERME (ZEMİN) ÇÖZÜMÜ 🔥
 socket.on('yandan_alindi_guncelle', (data) => { 
     if(data.masaAdi === suAnkiMasam) { 
-        if (!izleyiciModu && data.kimAldi === aktifKullaniciAdi) return; // Kendi aldığımızı game.js halletti
-
+        if (!izleyiciModu && data.kimAldi === aktifKullaniciAdi) return; 
         let source = null; 
         if (data.kimAldi === window.masaKoltukMapping.bottom) source = 'iskartaSol'; 
         else if (data.kimAldi === window.masaKoltukMapping.right) source = 'benimIskartam'; 
@@ -93,11 +111,7 @@ socket.on('yandan_alindi_guncelle', (data) => {
             const kutu = document.getElementById(source);
             if (kutu) {
                 const taslar = kutu.querySelectorAll('.okey-tasi');
-                if (taslar.length > 0) {
-                    // Sadece en üsttekini (son atılanı) sil, alttaki taşlar kalsın!
-                    taslar[taslar.length - 1].remove(); 
-                }
-                
+                if (taslar.length > 0) taslar[taslar.length - 1].remove(); 
                 if(source === 'benimIskartam' && !izleyiciModu && kutu.querySelectorAll('.okey-tasi').length === 0) {
                     kutu.innerHTML = '<div class="iskarta-yazi" id="iskartaYazi">TAŞ AT<br>⬇</div>';
                 }
@@ -121,7 +135,7 @@ socket.on('oyun_bitti', (data) => {
         
         let isHuman = data.kazanan && !data.kazanan.startsWith('MİSAFİR_') && window.aktifKullaniciAdi && data.kazanan === window.aktifKullaniciAdi;
         
-        if(auth.currentUser && !isMisafir && !izleyiciModu && isHuman) {
+        if(typeof auth !== 'undefined' && auth.currentUser && !isMisafir && !izleyiciModu && isHuman) {
             const userRef = db.collection("kullanicilar").doc(auth.currentUser.uid);
             userRef.update({ oynananOyun: firebase.firestore.FieldValue.increment(1), kazanilanOyun: firebase.firestore.FieldValue.increment(1) }); benimKazanilanOyun++; benimGorevler.kazanma++; gorevleriKaydet(); window.arayuzGuncelle();
         }
