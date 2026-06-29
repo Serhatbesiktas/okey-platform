@@ -1,3 +1,17 @@
+setInterval(() => {
+    document.querySelectorAll('.bildirim-badge, .mesaj-badge, [id*="badge"], [class*="badge"]').forEach(badge => {
+        if(badge.innerText.trim() === '0' || badge.innerText.trim() === '') {
+            badge.style.display = 'none';
+        }
+    });
+}, 1000);
+
+document.querySelectorAll('#ozelMesajBtn, .ozel-mesaj-btn, #mesajlarBtn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.bildirim-badge, .mesaj-badge').forEach(b => b.style.display = 'none');
+    });
+});
+
 window.arayuzGuncelle = function() {
     const avatar = document.getElementById('vipAvatar'); const isimKutu = document.getElementById('benimAdimKutusu'); const rozetim = document.getElementById('benimVipRozetim');
     if(avatar) { avatar.style.border = '2px solid #52796f'; avatar.style.boxShadow = 'none'; } 
@@ -49,7 +63,6 @@ window.gorevOduluAl = function(id, m) {
     socket.emit('kullanici_girisi', { isim: aktifKullaniciAdi, cip: benimAnlikCipim, kozmetikler: aktifKozmetikler }); ozelUyariGoster(`🎉 Görev bitti!`); window.renderGorevler(); 
 };
 
-// 🔥 SADECE ARKADAŞLARI GÖSTER 🔥
 window.arkadaslarMenusuAc = function() {
     if(isMisafir) { ozelUyariGoster("⚠️ Misafirler arkadaş kullanamaz."); return; } 
     document.getElementById('arkadaslarEkrani').style.display = 'flex'; 
@@ -64,7 +77,6 @@ window.arkadaslarMenusuAc = function() {
     if(onSay === 0) listeDiv.innerHTML += '<p style="text-align:center; color:#777; font-size:12px;">Aktif arkadaşın yok.</p>';
 };
 
-// 🔥 MASAYA DAVET İÇİN HERKESİ GÖSTER 🔥
 window.davetMenusuAc = function() {
     if(isMisafir) { ozelUyariGoster("⚠️ Misafirler davet edemez."); return; } 
     document.getElementById('arkadaslarEkrani').style.display = 'flex'; 
@@ -118,15 +130,35 @@ window.profilDavetAksiyon = function() { const hedef = document.getElementById('
 window.liderlikTablosunuAc = function() { document.getElementById('liderlikEkrani').style.display = 'flex'; socket.emit('liderlik_tablosu_iste'); };
 window.masadanAyrilmaIslemi = function(cezaUygulansinMi = false) { if (suAnkiMasam) { socket.emit('masadan_kalk', { isim: aktifKullaniciAdi, masaAdi: suAnkiMasam }); } suAnkiMasam = null; izleyiciModu = false; window.masayiTemizle(); try { document.querySelector('.istaka-container').style.display = 'flex'; document.querySelector('.okey-istaka-tuslar-area').style.display = 'flex'; } catch(e) {} masaEkrani.style.display = 'none'; lobiEkrani.style.display = 'flex'; window.arayuzGuncelle(); };
 
+// 🔥 ÇIKIŞ YAPARKEN EKRANA CEZA MİKTARINI DİNAMİK YAZDIRMA 🔥
 const lobiyeDonBtn = document.getElementById('lobiyeDonBtn'); 
-if(lobiyeDonBtn) { lobiyeDonBtn.addEventListener('click', () => { if (suAnkiMasam && !izleyiciModu) { document.getElementById('cikisUyariEkrani').style.display = 'flex'; } else { window.masadanAyrilmaIslemi(false); } }); }
+if(lobiyeDonBtn) { 
+    lobiyeDonBtn.addEventListener('click', () => { 
+        if (suAnkiMasam && !izleyiciModu) { 
+            let uyariMetni = "Çıkmak istediğine emin misin?";
+            if (masaOyunBasladiMi) {
+                let bahis = "20.000";
+                if(suAnkiMasam.includes('50K')) bahis = "50.000";
+                else if(suAnkiMasam.includes('10K')) bahis = "10.000";
+                uyariMetni = `Çıkmak istediğine emin misin?<br><br><span style='color:#e74c3c; font-weight:bold; font-size:13px;'>⚠️ DİKKAT: Oyunu terk edersen ${bahis} ÇİP ceza kesilir!</span>`;
+            }
+            const uyariEkrani = document.getElementById('cikisUyariEkrani');
+            const metinAlani = uyariEkrani.querySelector('p') || uyariEkrani.querySelector('div');
+            if(metinAlani) metinAlani.innerHTML = uyariMetni;
+            uyariEkrani.style.display = 'flex'; 
+        } else { 
+            window.masadanAyrilmaIslemi(false); 
+        } 
+    }); 
+}
+
 document.getElementById('btnCikisOnayla')?.addEventListener('click', () => { document.getElementById('cikisUyariEkrani').style.display = 'none'; window.masadanAyrilmaIslemi(true); });
 
 if(sohbetCekmecesi) {
     document.getElementById('sohbetAcBtn')?.addEventListener('click', () => { sohbetCekmecesi.classList.add('acik'); });
     document.getElementById('sohbetKapatBtn')?.addEventListener('click', () => { sohbetCekmecesi.classList.remove('acik'); });
     document.getElementById('sohbetGonderBtn')?.addEventListener('click', () => { 
-        if(isMisafir) { ozelUyariGoster("⚠️ MİSAFİR HESAPLAR SOHBETE YAZAMAZ!"); return; } 
+        if(isMisafir) { ozelUyariGoster("⚠️ MİSAFİR HESAPLAR SOHBETE MESAJ YAZAMAZ!"); return; } 
         const input = document.getElementById('sohbetInput'); 
         if(input.value.trim() !== '' && suAnkiMasam) { socket.emit('sohbet_mesaji', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi, mesaj: input.value, kozmetikler: aktifKozmetikler }); input.value = ''; benimGorevler.mesaj++; gorevleriKaydet(); } 
     });
