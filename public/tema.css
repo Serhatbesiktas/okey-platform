@@ -1,0 +1,69 @@
+/* =========================================
+   👑 VIP TEMA EKLENTİ PAKETİ 👑
+========================================= */
+
+/* 1. TEMA: KRALİYET ALTINI (ROYAL GOLD) */
+body.tema-royal {
+    background: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%) !important;
+}
+body.tema-royal #masaEkrani {
+    border: 2px solid #ffd700;
+    box-shadow: 0 0 40px rgba(255, 215, 0, 0.15), inset 0 0 50px rgba(255, 215, 0, 0.05);
+    background: url('https://www.transparenttextures.com/patterns/cubes.png'), linear-gradient(135deg, #0d0d0d, #1a1a1a);
+}
+body.tema-royal .istaka-container {
+    background: linear-gradient(to bottom, #3a2b1c, #1a0f0a);
+    border: 2px solid #ffd700;
+    box-shadow: 0 5px 15px rgba(255, 215, 0, 0.2);
+}
+body.tema-royal .okey-tasi {
+    background: linear-gradient(to bottom, #2c2c2c, #111);
+    border: 1px solid #ffd700;
+    color: #ffd700;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.8);
+}
+body.tema-royal #masaOrtasiYazi {
+    color: #ffd700 !important;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+/* 2. TEMA: SİBER PAVYON (NEON CYBERPUNK) */
+body.tema-neon {
+    background: radial-gradient(circle at center, #0b0c10 0%, #000000 100%) !important;
+}
+body.tema-neon #masaEkrani {
+    border: 2px solid #00f3ff;
+    box-shadow: 0 0 30px #00f3ff, inset 0 0 20px #00f3ff;
+    background: linear-gradient(135deg, #1f2833, #0b0c10);
+}
+body.tema-neon .istaka-container {
+    background: #1f2833;
+    border: 2px solid #bc13fe;
+    box-shadow: 0 0 15px #bc13fe;
+}
+body.tema-neon .okey-tasi {
+    background: #0b0c10;
+    border: 1px solid #00f3ff;
+    box-shadow: 0 0 5px #bc13fe;
+}
+body.tema-neon #masaOrtasiYazi {
+    color: #00f3ff !important;
+    text-shadow: 0 0 15px #bc13fe;
+}
+
+/* 3. TEMA: KIZIL BARON (VELVET CASINO) */
+body.tema-kizil {
+    background: radial-gradient(circle at center, #4a0e17 0%, #1a0508 100%) !important;
+}
+body.tema-kizil #masaEkrani {
+    border: 4px solid #8b5a2b;
+    box-shadow: inset 0 0 80px rgba(0,0,0,0.9);
+    background: radial-gradient(circle, #5c111c, #2b080d);
+}
+body.tema-kizil .istaka-container {
+    background: linear-gradient(to bottom, #5c111c, #2b080d);
+    border: 3px solid #8b5a2b;
+}
+body.tema-kizil #masaOrtasiYazi {
+    color: #f2c94c !important;
+}
