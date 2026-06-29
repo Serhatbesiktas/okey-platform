@@ -16,12 +16,20 @@ const masalar = {
     'Hızlı Oyun (10K Bahis)': { bahis: 10000, kasa: 0, koltuklar: [null, null, null, null], deste: [], gosterge: null, oyunBasladi: false, siradakiOyuncu: null, eller: {}, gostergeGosterildi: false, sonAtilanTas: null }
 };
 
-const aktifBotlar = [];
-const botOnekleri = ["Oyuncu_"];
-const botIsimleri = ["1001", "2024", "4532", "7781", "9002", "1123", "5564", "8839", "3321", "7645", "9982", "5431", "2213", "8876"];
+// 🔥 EFSANE VE GERÇEKÇİ BOT İSİMLERİ GERİ GELDİ 🔥
+const botIsimleri = [
+    "Ordulu_52", "Umraniyeli_Reis", "Pattik_Sever", "Geralt_34", "Sileli_Balikci", 
+    "Efsane_06", "Yalniz_Kurt", "Bursali_16", "Mavi_Ay", "Reis_55", "Atasehir_Beyi",
+    "Fluence_Kral", "Gecelerin_Yargici", "Okey_Uzmani", "Cilgin_Turk", "Tek_Atan", 
+    "Zalim_Kral", "Guzel_Gozlum", "Ahmet_K", "Kral_Ayhan", "Zehir_Hafiye", "Vefasiz_Alem", 
+    "Esmer_Kiz", "Tatli_Bela", "Oflu_Hoca", "Erzurumlu_25", "Asi_Mavi", "Ruzgar_Gibi", 
+    "Son_Vurus", "Kader_Mahkumu", "Kaptan_34", "Gezgin_Ruh", "Oyun_Kurucu", "Sari_Firtina", 
+    "Demir_Bilek", "Karadeniz_Firtinasi", "Izmirli_Guzel", "Adanali_01", "Deli_Yurek"
+];
 
+const aktifBotlar = [];
 for(let i=0; i<75; i++) {
-    const tamIsim = botOnekleri[0] + botIsimleri[Math.floor(Math.random() * botIsimleri.length)] + "_" + Math.floor(10 + Math.random() * 89);
+    const tamIsim = botIsimleri[i % botIsimleri.length] + "_" + Math.floor(10 + Math.random() * 89);
     aktifBotlar.push(tamIsim);
     oyuncuCipleri[tamIsim] = Math.floor(Math.random() * 9000000) + 1000000; 
     oyuncuKozmetikleri[tamIsim] = (Math.random() > 0.8) ? ['neon_tac'] : [];
@@ -39,7 +47,10 @@ function oyunuSifirla(masaAdi, kazanan = null, odul = 0, sebep = "", okeyleBitti
     if(masa) {
         masa.oyunBasladi = false; masa.deste = []; masa.gosterge = null; masa.siradakiOyuncu = null; masa.eller = {}; masa.kasa = 0; masa.gostergeGosterildi = false; masa.sonAtilanTas = null;
         io.emit('oyun_bitti', { masaAdi: masaAdi, kazanan: kazanan, odul: odul, sebep: sebep, okeyleBittiMi: okeyleBittiMi });
-        masa.koltuklar = [null, null, null, null];
+        
+        // 🔥 TEKRAR OYNA BUG'I ÇÖZÜMÜ: KOLTUKLARI SIFIRLAMIYORUZ, OYUNCULAR MASADA KALIYOR! 🔥
+        // masa.koltuklar = [null, null, null, null]; 
+        
         const guncelLobi = {}; for(let m in masalar) guncelLobi[m] = masalar[m].koltuklar;
         io.emit('masalari_guncelle', guncelLobi);
     }
@@ -72,7 +83,6 @@ function eliKontrolEt(gruplar, gosterge) {
     } return true;
 }
 
-// 🔥 TEKRAR OYNA (TAŞ DİZİLMEME) HATASI ÇÖZÜMÜ 🔥
 function masadaOyunuBaslat(masaAdi) {
     const masa = masalar[masaAdi];
     if (!masa || masa.oyunBasladi) return;
@@ -108,7 +118,6 @@ function masadaOyunuBaslat(masaAdi) {
     io.emit('masa_oyun_basladi', { masaAdi: masaAdi, gosterge: masa.gosterge, kalanTas: masa.deste.length, kasa: masa.kasa, koltuklar: masa.koltuklar });
     io.emit('sistem_mesaji', `🎰 ${masaAdi} masasında bahisler alındı! Oyun başladı.`);
 
-    // 🚀 DÜZELTME BURADA: İstemcinin eski ekranı temizlemesi için 800ms bekleyip taşları öyle yolluyoruz!
     setTimeout(() => {
         masa.koltuklar.forEach(oyuncuIsmi => {
             if(!aktifBotlar.includes(oyuncuIsmi)) { io.emit('taslari_al', { kime: oyuncuIsmi, taslar: masa.eller[oyuncuIsmi] }); }
