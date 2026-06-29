@@ -5,9 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>VIP Okey Sunucusu</title>
     <link rel="stylesheet" href="style.css">
-    
-    <!-- 👑 SENİN DIŞARIDAN ÇAĞIRDIĞIN TEMA CSS DOSYAN 👑 -->
-    <link rel="stylesheet" href="tema.css">
 
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
@@ -365,7 +362,68 @@
     <script src="muzik.js"></script>
     <script src="seyirci.js"></script> 
     
-    <!-- 👑 SENİN DIŞARIDAN ÇAĞIRDIĞIN TEMA JS DOSYAN 👑 -->
-    <script src="tema.js"></script>
+    <script>
+        const temaStilleri = document.createElement('style');
+        temaStilleri.innerHTML = `
+            /* ROYAL GOLD */
+            body.tema-royal, body.tema-royal #lobiEkrani { background: #000 !important; background-image: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%) !important; }
+            body.tema-royal #masaEkrani { background: #0d0a05 !important; background-image: radial-gradient(circle at center, #2a2010 0%, #0d0a05 100%) !important; border: 2px solid #ffd700 !important; box-shadow: inset 0 0 50px rgba(255,215,0,0.1) !important; }
+            body.tema-royal .istaka-container { background: #1a0f0a !important; background-image: linear-gradient(to bottom, #3a2b1c, #1a0f0a) !important; border: 2px solid #ffd700 !important; box-shadow: 0 5px 15px rgba(255,215,0,0.2) !important; }
+            body.tema-royal .okey-tasi { background: #222 !important; border: 1px solid #ffd700 !important; color: #ffd700 !important; box-shadow: 0 2px 5px #000 !important; }
+            body.tema-royal #masaOrtasiYazi { color: #ffd700 !important; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5) !important; }
+
+            /* NEON CYBERPUNK */
+            body.tema-neon, body.tema-neon #lobiEkrani { background: #000 !important; background-image: radial-gradient(circle at center, #0b0c10 0%, #000000 100%) !important; }
+            body.tema-neon #masaEkrani { background: #0b0c10 !important; background-image: linear-gradient(135deg, #1f2833, #0b0c10) !important; border: 2px solid #00f3ff !important; box-shadow: inset 0 0 30px rgba(0,243,255,0.3) !important; }
+            body.tema-neon .istaka-container { background: #1f2833 !important; border: 2px solid #bc13fe !important; box-shadow: 0 0 15px #bc13fe !important; }
+            body.tema-neon .okey-tasi { background: #0b0c10 !important; border: 1px solid #00f3ff !important; color: #fff !important; text-shadow: 0 0 5px #00f3ff !important; }
+            body.tema-neon #masaOrtasiYazi { color: #00f3ff !important; text-shadow: 0 0 15px #bc13fe !important; }
+
+            /* VELVET CASINO */
+            body.tema-kizil, body.tema-kizil #lobiEkrani { background: #1a0508 !important; background-image: radial-gradient(circle at center, #4a0e17 0%, #1a0508 100%) !important; }
+            body.tema-kizil #masaEkrani { background: #2b080d !important; background-image: radial-gradient(circle, #5c111c, #2b080d) !important; border: 4px solid #8b5a2b !important; box-shadow: inset 0 0 80px rgba(0,0,0,0.9) !important; }
+            body.tema-kizil .istaka-container { background: #2b080d !important; background-image: linear-gradient(to bottom, #5c111c, #2b080d) !important; border: 3px solid #8b5a2b !important; }
+            body.tema-kizil .okey-tasi { background: #fff !important; border: 1px solid #8b5a2b !important; color: #5c111c !important; font-weight: 900 !important; }
+            body.tema-kizil #masaOrtasiYazi { color: #f2c94c !important; }
+        `;
+        document.head.appendChild(temaStilleri);
+
+        if(typeof socket !== 'undefined') {
+            socket.on('kozmetikleri_guncelle', (data) => {
+                window.globalKozmetikler = data;
+            });
+        }
+
+        setInterval(() => {
+            try {
+                let uygulanacak = [];
+                if (typeof aktifKozmetikler !== 'undefined') uygulanacak = aktifKozmetikler;
+                else if (window.aktifKozmetikler) uygulanacak = window.aktifKozmetikler;
+
+                let masaAdi = null;
+                if (typeof suAnkiMasam !== 'undefined') masaAdi = suAnkiMasam;
+                else if (window.suAnkiMasam) masaAdi = window.suAnkiMasam;
+
+                let gKoz = null;
+                if (typeof globalKozmetikler !== 'undefined') gKoz = globalKozmetikler;
+                else if (window.globalKozmetikler) gKoz = window.globalKozmetikler;
+
+                if (masaAdi && masaAdi.includes('VIP:')) {
+                    let masaSahibi = masaAdi.split('VIP:')[1].split('Masası')[0].trim();
+                    if (gKoz && gKoz[masaSahibi]) {
+                        uygulanacak = gKoz[masaSahibi];
+                    }
+                }
+
+                document.body.classList.remove('tema-royal', 'tema-neon', 'tema-kizil');
+                
+                if (uygulanacak.includes('tema_royal')) document.body.classList.add('tema-royal');
+                else if (uygulanacak.includes('tema_neon')) document.body.classList.add('tema-neon');
+                else if (uygulanacak.includes('tema_kizil')) document.body.classList.add('tema-kizil');
+            } catch(e) {
+                console.log("Tema yükleme hatası:", e);
+            }
+        }, 500);
+    </script>
 </body>
 </html>
