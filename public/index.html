@@ -320,6 +320,14 @@
                     <button class="oyun-baslat-btn" id="oyunuBaslatBtn">🎲 OYUNU BAŞLAT</button>
                     <button id="btnVipGizlilikTetikle" onclick="vipGizlilikDurumuDegistir()" class="oyun-baslat-btn" style="display:none; background:#ff33aa; font-size:11px; padding:6px 15px; margin-top:0;">🔒 MASAYI HERKESE AÇ</button>
                 </div>
+                
+                <div id="zamanlayiciKutusu" style="display:none; width:80%; max-width:160px; margin: 10px auto 0; text-align:center; background:rgba(0,0,0,0.6); padding:5px; border-radius:8px; border:1px solid #555; z-index:100;">
+                    <div id="zamanlayiciIsim" style="font-size:11px; color:#fff; font-weight:bold; margin-bottom:4px; text-shadow:0 0 5px #000;">Sıra: ...</div>
+                    <div style="width:100%; height:6px; background:#111; border-radius:3px; overflow:hidden;">
+                        <div id="zamanlayiciBar" style="width:100%; height:100%; background:#2ecc71; transition: width 0.1s linear, background 0.3s;"></div>
+                    </div>
+                </div>
+
                 <div class="kalan-tas-bilgi-container" id="oyunAlanObjeleri">
                     <div style="display: flex; gap: 15px; align-items: center;">
                         <div class="gosterge-tasi" id="gostergeTasi" title="Gösterge"></div>
@@ -362,7 +370,21 @@
             @keyframes pulseGold { 0% { box-shadow: 0 0 15px #ffd700; transform: scale(1); } 50% { box-shadow: 0 0 30px #ffd700; transform: scale(1.02); } 100% { box-shadow: 0 0 15px #ffd700; transform: scale(1); } }
             @keyframes pulseNeon { 0% { box-shadow: 0 0 15px #bc13fe, inset 0 0 10px #00f3ff; } 50% { box-shadow: 0 0 30px #00f3ff, inset 0 0 20px #bc13fe; } 100% { box-shadow: 0 0 15px #bc13fe, inset 0 0 10px #00f3ff; } }
 
-            /* ROYAL GOLD */
+            .bot-speech-bubble {
+                position: absolute; bottom: 120%; left: 50%; transform: translateX(-50%);
+                background: linear-gradient(135deg, #f1c40f, #f39c12); color: #111;
+                padding: 8px 12px; border-radius: 12px; font-size: 11px; font-weight: 900;
+                white-space: nowrap; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+                animation: popBubble 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), fadeBubble 0.5s ease-in 4s forwards;
+                pointer-events: none; z-index: 1000;
+            }
+            .bot-speech-bubble::after {
+                content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+                border-width: 6px; border-style: solid; border-color: #f39c12 transparent transparent transparent;
+            }
+            @keyframes popBubble { 0% { opacity:0; transform: translateX(-50%) scale(0.5); } 100% { opacity:1; transform: translateX(-50%) scale(1); } }
+            @keyframes fadeBubble { 0% { opacity:1; } 100% { opacity:0; transform: translateX(-50%) translateY(-10px); } }
+
             body.tema-royal, body.tema-royal #lobiEkrani { background: #000 !important; background-image: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%) !important; }
             body.tema-royal #masaEkrani { background: #0d0a05 !important; background-image: radial-gradient(circle at center, #2a2010 0%, #0d0a05 100%) !important; border: 2px solid #ffd700 !important; box-shadow: inset 0 0 50px rgba(255,215,0,0.1) !important; }
             body.tema-royal .istaka-container { background: #1a0f0a !important; background-image: linear-gradient(to bottom, #3a2b1c, #1a0f0a) !important; border: 2px solid #ffd700 !important; box-shadow: 0 5px 15px rgba(255,215,0,0.2) !important; }
@@ -378,7 +400,6 @@
             body.tema-royal .masa-kart .kart-sol { color: #ffd700 !important; }
             body.tema-royal .alt-menu-container { background: #000 !important; border-top: 1px solid #ffd700 !important; }
 
-            /* NEON CYBERPUNK */
             body.tema-neon, body.tema-neon #lobiEkrani { background: #000 !important; background-image: radial-gradient(circle at center, #0b0c10 0%, #000000 100%) !important; }
             body.tema-neon #masaEkrani { background: #0b0c10 !important; background-image: linear-gradient(135deg, #1f2833, #0b0c10) !important; border: 2px solid #00f3ff !important; box-shadow: inset 0 0 30px rgba(0,243,255,0.3) !important; }
             body.tema-neon .istaka-container { background: #1f2833 !important; border: 2px solid #bc13fe !important; box-shadow: 0 0 15px #bc13fe !important; }
@@ -394,7 +415,6 @@
             body.tema-neon .masa-kart .kart-sol { color: #00f3ff !important; text-shadow: 0 0 5px #00f3ff !important; }
             body.tema-neon .alt-menu-container { background: #0b0c10 !important; border-top: 1px solid #00f3ff !important; box-shadow: 0 -5px 15px rgba(188, 19, 254, 0.2) !important; }
 
-            /* VELVET CASINO */
             body.tema-kizil, body.tema-kizil #lobiEkrani { background: #1a0508 !important; background-image: radial-gradient(circle at center, #4a0e17 0%, #1a0508 100%) !important; }
             body.tema-kizil #masaEkrani { background: #2b080d !important; background-image: radial-gradient(circle, #5c111c, #2b080d) !important; border: 4px solid #8b5a2b !important; box-shadow: inset 0 0 80px rgba(0,0,0,0.9) !important; }
             body.tema-kizil .istaka-container { background: #2b080d !important; background-image: linear-gradient(to bottom, #5c111c, #2b080d) !important; border: 3px solid #8b5a2b !important; }
@@ -414,6 +434,46 @@
 
         if(typeof socket !== 'undefined') {
             socket.on('kozmetikleri_guncelle', (data) => { window.globalKozmetikler = data; });
+
+            // 🔥 SÜRE BARININ DÜŞMESİ VE EKRANDA GÖSTERİLMESİ 🔥
+            socket.on('sira_guncelle', (data) => {
+                if(window.suAnkiMasam !== data.masaAdi) return;
+                window.aktifSira = data.kimde;
+                window.kalanSure = data.sure || 15;
+                window.maxSure = data.sure || 15;
+                window.sonZamanUpdate = Date.now();
+                
+                let zk = document.getElementById('zamanlayiciKutusu');
+                let zi = document.getElementById('zamanlayiciIsim');
+                if(zk && zi) {
+                    zk.style.display = 'block';
+                    zi.innerHTML = "Sıra: <span style='color:#f2c94c;'>" + data.kimde + "</span>";
+                }
+            });
+
+            socket.on('oyun_bitti', () => {
+                let zk = document.getElementById('zamanlayiciKutusu');
+                if(zk) zk.style.display = 'none';
+                window.aktifSira = null;
+            });
+
+            setInterval(() => {
+                if(window.aktifSira && window.kalanSure !== undefined) {
+                    let gecen = (Date.now() - window.sonZamanUpdate) / 1000;
+                    window.sonZamanUpdate = Date.now();
+                    window.kalanSure -= gecen;
+                    if(window.kalanSure < 0) window.kalanSure = 0;
+                    
+                    let bar = document.getElementById('zamanlayiciBar');
+                    if(bar) {
+                        let yuzde = (window.kalanSure / window.maxSure) * 100;
+                        bar.style.width = yuzde + '%';
+                        if(yuzde > 50) bar.style.background = '#2ecc71'; 
+                        else if(yuzde > 20) bar.style.background = '#f1c40f'; 
+                        else bar.style.background = '#e74c3c'; 
+                    }
+                }
+            }, 100);
 
             socket.on('izleyici_olarak_katildin', (data) => {
                 setTimeout(() => { 
@@ -457,7 +517,6 @@
                 }
             });
 
-            // 🔥 SOHBET BALONLARI İÇİN DİNAMİK YERLEŞTİRME 🔥
             socket.on('masa_sohbet_balonu', (data) => {
                 if(window.suAnkiMasam !== data.masaAdi) return;
                 
@@ -483,8 +542,6 @@
                     b.style.cssText = ozelStil + " position: absolute; background: linear-gradient(135deg, #f1c40f, #f39c12); color: #111; padding: 8px 12px; border-radius: 12px; font-size: 11px; font-weight: 900; white-space: nowrap; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 9999;";
                     target.parentElement.style.position = 'relative';
                     target.appendChild(b);
-                    
-                    // Şık bir şekilde yok olsun
                     setTimeout(() => { b.style.opacity = '0'; b.style.transition = 'all 0.5s'; }, 3500);
                     setTimeout(() => b.remove(), 4000);
                 }
