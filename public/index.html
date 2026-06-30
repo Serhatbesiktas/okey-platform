@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>VIP Okey Sunucusu</title>
     <link rel="stylesheet" href="style.css">
-    
     <link rel="stylesheet" href="tema.css">
-
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
@@ -315,7 +313,7 @@
             
             <div class="masa-ortasi">
                 <div class="masa-isim-ortasi" id="masaOrtasiYazi">MASA</div>
-                <div class="masa-kasa-bilgisi" id="masaKasaBilgisi">KASA: 0 ÇİP</div>
+                <div class="masa-kasa-bilgisi" id="masaKasaBilgisi" style="position:relative;">KASA: 0 ÇİP</div>
                 <div style="display:flex; flex-direction:column; gap:8px; align-items:center; justify-content:center;">
                     <button class="oyun-baslat-btn" id="oyunuBaslatBtn">🎲 OYUNU BAŞLAT</button>
                     <button id="btnVipGizlilikTetikle" onclick="vipGizlilikDurumuDegistir()" class="oyun-baslat-btn" style="display:none; background:#ff33aa; font-size:11px; padding:6px 15px; margin-top:0;">🔒 MASAYI HERKESE AÇ</button>
@@ -361,7 +359,7 @@
         temaStilleri.innerHTML = `
             @keyframes pulseGold { 0% { box-shadow: 0 0 15px #ffd700; transform: scale(1); } 50% { box-shadow: 0 0 30px #ffd700; transform: scale(1.02); } 100% { box-shadow: 0 0 15px #ffd700; transform: scale(1); } }
             @keyframes pulseNeon { 0% { box-shadow: 0 0 15px #bc13fe, inset 0 0 10px #00f3ff; } 50% { box-shadow: 0 0 30px #00f3ff, inset 0 0 20px #bc13fe; } 100% { box-shadow: 0 0 15px #bc13fe, inset 0 0 10px #00f3ff; } }
-            @keyframes shrinkBar { from { width: 100%; background:#2ecc71; } to { width: 0%; background:#e74c3c; } }
+            @keyframes shrinkBar { 0% { width: 100%; background:#2ecc71; } 50% { width: 50%; background:#f1c40f; } 100% { width: 0%; background:#e74c3c; } }
 
             .bot-speech-bubble {
                 position: absolute; bottom: 120%; left: 50%; transform: translateX(-50%);
@@ -431,37 +429,51 @@
         if(typeof socket !== 'undefined') {
             socket.on('kozmetikleri_guncelle', (data) => { window.globalKozmetikler = data; });
 
-            // 🔥 15 SANİYELİK AFK GERİ SAYIM BARI 🔥
+            // 🔥 SÜRE (AFK) BARI VE AKTİF OYUNCUYU PARLATMA 🔥
             socket.on('sira_guncelle', (data) => {
+                // Eski barları ve parlamaları temizle
                 document.querySelectorAll('.turn-timer-bar').forEach(e => e.remove());
+                ['seatTop', 'seatLeft', 'seatRight'].forEach(id => { let el = document.getElementById(id); if(el) { el.style.boxShadow = 'none'; el.style.border = 'none'; } });
+                let myRack = document.getElementById('benimIstakam');
+                if(myRack) myRack.style.boxShadow = '0 5px 15px rgba(0,0,0,0.5)'; // Varsayılana döndür
+
                 if (window.suAnkiMasam !== data.masaAdi) return;
-                
-                let elId = 'benimAdimKutusu';
-                if (window.masaKoltukMapping) {
+
+                let isMyTurn = (data.kimde === window.aktifKullaniciAdi);
+
+                // Sıra kimdeyse neon ile parlat!
+                if(isMyTurn && myRack) {
+                    myRack.style.boxShadow = '0 0 25px #2ecc71, inset 0 0 15px #2ecc71';
+                } else if (window.masaKoltukMapping) {
+                    let elId = null;
                     if(window.masaKoltukMapping.right === data.kimde) elId = 'seatRight';
                     else if(window.masaKoltukMapping.top === data.kimde) elId = 'seatTop';
                     else if(window.masaKoltukMapping.left === data.kimde) elId = 'seatLeft';
+                    if(elId) {
+                        let seat = document.getElementById(elId);
+                        if(seat) { seat.style.boxShadow = '0 0 20px #2ecc71'; seat.style.border = '2px solid #2ecc71'; }
+                    }
                 }
 
-                let target = document.getElementById(elId);
-                if (target) {
+                // Masanın ortasına (Kasa'nın hemen altına) 15 Saniyelik Şık Barı Koy
+                let centerDiv = document.getElementById('masaKasaBilgisi');
+                if(centerDiv) {
                     let container = document.createElement('div');
                     container.className = 'turn-timer-bar';
-                    container.style.cssText = "position:absolute; bottom:-8px; left:0; width:100%; height:6px; background:rgba(0,0,0,0.5); border-radius:3px; overflow:hidden; z-index:999;";
+                    container.style.cssText = "width: 100%; max-width: 150px; height: 8px; background: rgba(0,0,0,0.8); border-radius: 4px; margin: 10px auto 0; overflow: hidden; border: 1px solid #555; position: absolute; left: 50%; transform: translateX(-50%); top: 100%;";
                     let bar = document.createElement('div');
-                    bar.style.cssText = "height:100%; width:100%; background:#2ecc71; animation: shrinkBar 15s linear forwards;";
+                    bar.style.cssText = "height: 100%; width: 100%; background: #2ecc71; animation: shrinkBar 15s linear forwards;";
                     container.appendChild(bar);
-                    target.parentElement.style.position = 'relative';
-                    target.parentElement.appendChild(container);
+                    centerDiv.appendChild(container);
                 }
             });
 
-            // 🔥 OTO-HAMLE YAPILDIĞINDA TAŞLARIN SALAKLAŞMASINI ÖNLEYEN SIFIRLAMA 🔥
-            socket.on('oto_hamle_yapildi_ui_temizle', (data) => {
+            // 🔥 OTO-HAMLE YAPILDIĞINDA TAŞLARIN BOZULMASINI ÖNLEYEN KOD 🔥
+            socket.on('oto_tas_atildi_istemci', (data) => {
                 if(data.kim === window.aktifKullaniciAdi) {
-                    const u = document.getElementById('ustRaf'); if(u) u.innerHTML = '';
-                    const a = document.getElementById('altRaf'); if(a) a.innerHTML = '';
-                    if(window.seciliTas) window.seciliTas = null; 
+                    let tasEl = document.getElementById(data.tas.id);
+                    if(tasEl) tasEl.remove(); // Ekranı silmeden, atılan taşı cımbızla çeker
+                    if(window.seciliTas && window.seciliTas.id === data.tas.id) window.seciliTas = null; 
                 }
             });
 
