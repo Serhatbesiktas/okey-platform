@@ -97,7 +97,7 @@ function eliKontrolEt(gruplar, gosterge) {
     } return true;
 }
 
-// 🔥 İNSAN OYUNCULAR İÇİN 15 SANİYE AFK (SÜRE) SİSTEMİ 🔥
+// 🔥 KUSURSUZ İNSAN AFK MOTORU (Taşları Bozmadan Cımbızla Çeker) 🔥
 function insanHamlesiBaslat(masaAdi, isim) {
     const masa = masalar[masaAdi];
     if(!masa) return;
@@ -106,28 +106,32 @@ function insanHamlesiBaslat(masaAdi, isim) {
     masa.turnTimer = setTimeout(() => {
         if(!masa.oyunBasladi || masa.siradakiOyuncu !== isim) return;
         
-        // 1. Adam taş çekmemişse otomatik çek
+        let otomatikTasCekildiMi = false;
+        // 1. Taş Çekmemişse Çek
         if(masa.eller[isim] && masa.eller[isim].length === 14 && masa.deste.length > 0) {
-             masa.eller[isim].push(masa.deste.shift());
+             const cekilen = masa.deste.shift();
+             masa.eller[isim].push(cekilen);
              io.emit('masa_ortasi_guncelle', { masaAdi: masaAdi, kalanTas: masa.deste.length, gosterge: masa.gosterge });
+             otomatikTasCekildiMi = true;
         }
         
-        // 2. Otomatik taş at ve EKRANI SENKRONİZE ET
+        // 2. Taş At ve Ekranda Bozmadan Sil
         if(masa.eller[isim] && masa.eller[isim].length > 0) {
-             let atilan = masa.eller[isim].pop(); // En sağdakini atar
+             let atilan = masa.eller[isim].pop(); 
              masa.sonAtilanTas = atilan;
              masa.iskartalar[isim] = atilan;
              
-             // Taşların salaklaşmasını önleyen hayat kurtaran kod:
-             io.emit('oto_hamle_yapildi_ui_temizle', { kim: isim });
-             io.emit('ortaya_tas_atildi', { masaAdi: masaAdi, kimAtti: isim, tas: atilan });
+             // Eğer taşı kendi çekmiş olsaydı (yani 15 taşı varken süre bitseydi) ekrandan silmemiz lazım
+             // Eğer sunucu otomatik çektirdiyse ekranda o taş zaten yok, silmeye gerek yok.
+             if(!otomatikTasCekildiMi) {
+                 io.emit('oto_tas_atildi_istemci', { kim: isim, tas: atilan });
+             }
              
-             setTimeout(() => { io.emit('taslari_al', { kime: isim, taslar: masa.eller[isim] }); }, 150);
+             io.emit('ortaya_tas_atildi', { masaAdi: masaAdi, kimAtti: isim, tas: atilan });
         }
         
         masa.afkCount[isim] = (masa.afkCount[isim] || 0) + 1;
         
-        // 3 kere oynamayanı masadan at (AFK Kick)
         if(masa.afkCount[isim] >= 3) {
              io.emit('yeni_sohbet_mesaji', { masaAdi: masaAdi, isim: "Sistem", mesaj: `⏳ ${isim} hareketsiz kaldığı için atıldı.`, kozmetikler:[] });
              kullaniciyiMasadanKaldir(isim);
@@ -142,7 +146,7 @@ function insanHamlesiBaslat(masaAdi, isim) {
                  else insanHamlesiBaslat(masaAdi, masa.siradakiOyuncu);
              }
         }
-    }, 15000); // Tam 15 Saniye Mühlet
+    }, 15000); 
 }
 
 function masadaOyunuBaslat(masaAdi) {
@@ -227,12 +231,12 @@ function botHamlesiYap(masaAdi) {
                         let guvenliTaslar = botunEli.filter(t => { let isOkey = (t.renk === okeyRenk && parseInt(t.sayi) === okeySayi); return !isOkey && t.renk !== 'sahte'; });
                         if(guvenliTaslar.length === 0) guvenliTaslar = botunEli; 
 
-                        // 🔥 BOT TÖRPÜSÜ (NERF): Artık Erken Bitemezler 🔥
-                        let kazanmaSansi = 0.001; 
-                        if (masa.deste.length < 20) kazanmaSansi = 0.06; // Sadece sonlara doğru tehlikeliler
-                        else if (masa.deste.length < 40) kazanmaSansi = 0.01;
+                        // 🔥 BOT TÖRPÜSÜ: TAŞ SAYISI 35'İN ALTINA İNMEDEN BİTİREMEZLER 🔥
+                        let kazanmaSansi = 0; 
+                        if (masa.deste.length <= 15) kazanmaSansi = 0.10; 
+                        else if (masa.deste.length <= 35) kazanmaSansi = 0.02;
 
-                        if (Math.random() < kazanmaSansi || masa.deste.length <= 2) {
+                        if (Math.random() < kazanmaSansi) {
                             let kazanilanPara = Number(masa.kasa); oyuncuCipleri[siradaki] += kazanilanPara; io.emit('cip_guncelle_ozel', { isim: siradaki, cip: oyuncuCipleri[siradaki] });
                             let atilacakIndex = Math.floor(Math.random() * guvenliTaslar.length); let bitisTasi = guvenliTaslar[atilacakIndex];
                             let gercekIndex = botunEli.findIndex(t => t.id === bitisTasi.id); botunEli.splice(gercekIndex, 1);
@@ -381,7 +385,7 @@ io.on('connection', (socket) => {
         const masa = masalar[data.masaAdi];
         if(masa && masa.siradakiOyuncu === data.isim) {
             clearTimeout(masa.turnTimer); 
-            masa.afkCount[data.isim] = 0; // Adam elle oynadı, AFK sayacı sıfırlandı!
+            masa.afkCount[data.isim] = 0; 
             
             if(masa.eller[data.isim]) { const tasIndex = masa.eller[data.isim].findIndex(t => t.id === data.tas.id); if(tasIndex !== -1) masa.eller[data.isim].splice(tasIndex, 1); }
             masa.sonAtilanTas = data.tas; masa.iskartalar[data.isim] = data.tas; 
@@ -406,16 +410,7 @@ io.on('connection', (socket) => {
         } 
     });
     
-    socket.on('oyunu_bitir', (data) => { 
-        const masa = masalar[data.masaAdi]; 
-        if(masa && masa.siradakiOyuncu === data.isim) { 
-            clearTimeout(masa.turnTimer);
-            const elGecerliMi = eliKontrolEt(data.gruplar, masa.gosterge); 
-            if(elGecerliMi) { let kazanilanPara = Number(masa.kasa); let uCip = parseInt(String(oyuncuCipleri[data.isim]).replace(/[^0-9]/g, '')) || 0; oyuncuCipleri[data.isim] = uCip + kazanilanPara; io.emit('cip_guncelle_ozel', { isim: data.isim, cip: oyuncuCipleri[data.isim] }); oyunuSifirla(data.masaAdi, data.isim, kazanilanPara, "Nizami dizilimle el bitti."); } 
-            else { socket.emit('hatali_bitis', { mesaj: "Dizilim hatalı!", tasId: data.tasHtmlId }); } 
-        } 
-    });
-    
+    socket.on('oyunu_bitir', (data) => { const masa = masalar[data.masaAdi]; if(masa && masa.siradakiOyuncu === data.isim) { clearTimeout(masa.turnTimer); const elGecerliMi = eliKontrolEt(data.gruplar, masa.gosterge); if(elGecerliMi) { let kazanilanPara = Number(masa.kasa); let uCip = parseInt(String(oyuncuCipleri[data.isim]).replace(/[^0-9]/g, '')) || 0; oyuncuCipleri[data.isim] = uCip + kazanilanPara; io.emit('cip_guncelle_ozel', { isim: data.isim, cip: oyuncuCipleri[data.isim] }); oyunuSifirla(data.masaAdi, data.isim, kazanilanPara, "Nizami dizilimle el bitti."); } else { socket.emit('hatali_bitis', { mesaj: "Dizilim hatalı!", tasId: data.tasHtmlId }); } } });
     socket.on('masaya_geri_don', (data) => { const masa = masalar[data.masaAdi]; if (masa && masa.oyunBasladi && masa.koltuklar.includes(data.isim)) { socket.emit('masa_oyun_basladi', { masaAdi: data.masaAdi, gosterge: masa.gosterge, kalanTas: masa.deste.length, kasa: masa.kasa, koltuklar: masa.koltuklar }); if(masa.eller[data.isim]) { socket.emit('taslari_al', { kime: data.isim, taslar: masa.eller[data.isim] }); } socket.emit('sira_guncelle', { masaAdi: data.masaAdi, kimde: masa.siradakiOyuncu }); } });
     socket.on('masadan_kalk', (data) => { kullaniciyiMasadanKaldir(data.isim); });
     socket.on('disconnect', () => { const kopanIsim = socket.kullaniciAdi; if(kopanIsim) { baglantiKopanlar[kopanIsim] = setTimeout(() => { kullaniciyiMasadanKaldir(kopanIsim); delete oyuncuCipleri[kopanIsim]; io.emit('online_oyuncular', Object.keys(oyuncuCipleri)); delete baglantiKopanlar[kopanIsim]; }, 20000); } });
