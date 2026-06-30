@@ -356,28 +356,11 @@
     <script src="muzik.js"></script>
     <script src="seyirci.js"></script> 
     
-    <!-- 🔥 GÖMÜLÜ TEMA RADARI, CSS ENJEKTÖRÜ VE SOHBET BALONU MOTORU 🔥 -->
     <script>
         const temaStilleri = document.createElement('style');
         temaStilleri.innerHTML = `
             @keyframes pulseGold { 0% { box-shadow: 0 0 15px #ffd700; transform: scale(1); } 50% { box-shadow: 0 0 30px #ffd700; transform: scale(1.02); } 100% { box-shadow: 0 0 15px #ffd700; transform: scale(1); } }
             @keyframes pulseNeon { 0% { box-shadow: 0 0 15px #bc13fe, inset 0 0 10px #00f3ff; } 50% { box-shadow: 0 0 30px #00f3ff, inset 0 0 20px #bc13fe; } 100% { box-shadow: 0 0 15px #bc13fe, inset 0 0 10px #00f3ff; } }
-
-            /* 🔥 YENİ: BOT SOHBET BALONCUKLARI 🔥 */
-            .bot-speech-bubble {
-                position: absolute; bottom: 120%; left: 50%; transform: translateX(-50%);
-                background: linear-gradient(135deg, #f1c40f, #f39c12); color: #111;
-                padding: 8px 12px; border-radius: 12px; font-size: 11px; font-weight: 900;
-                white-space: nowrap; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-                animation: popBubble 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), fadeBubble 0.5s ease-in 4s forwards;
-                pointer-events: none; z-index: 1000;
-            }
-            .bot-speech-bubble::after {
-                content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
-                border-width: 6px; border-style: solid; border-color: #f39c12 transparent transparent transparent;
-            }
-            @keyframes popBubble { 0% { opacity:0; transform: translateX(-50%) scale(0.5); } 100% { opacity:1; transform: translateX(-50%) scale(1); } }
-            @keyframes fadeBubble { 0% { opacity:1; } 100% { opacity:0; transform: translateX(-50%) translateY(-10px); } }
 
             /* ROYAL GOLD */
             body.tema-royal, body.tema-royal #lobiEkrani { background: #000 !important; background-image: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%) !important; }
@@ -432,12 +415,10 @@
         if(typeof socket !== 'undefined') {
             socket.on('kozmetikleri_guncelle', (data) => { window.globalKozmetikler = data; });
 
-            // 🔥 İZLEYİCİ İÇİN TAŞ DİZME MOTORU 🔥
             socket.on('izleyici_olarak_katildin', (data) => {
                 setTimeout(() => { 
                     if(window.gelişmişKoltukHizala) window.gelişmişKoltukHizala(data.koltuklar);
                     ['iskartaUst', 'iskartaSag', 'iskartaSol', 'benimIskartam'].forEach(id => { let el = document.getElementById(id); if(el) el.innerHTML = ''; });
-
                     if(data.iskartalar) {
                         for(let bot in data.iskartalar) {
                             let tas = data.iskartalar[bot]; if(!tas) continue;
@@ -445,7 +426,6 @@
                             if(window.masaKoltukMapping && window.masaKoltukMapping.right === bot) tDiv = 'iskartaSag';
                             else if(window.masaKoltukMapping && window.masaKoltukMapping.top === bot) tDiv = 'iskartaUst';
                             else if(window.masaKoltukMapping && window.masaKoltukMapping.left === bot) tDiv = 'iskartaSol';
-                            
                             let k = document.getElementById(tDiv);
                             if(k) k.innerHTML = `<div class="okey-tasi tas-${tas.renk}" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); box-shadow:0 2px 5px rgba(0,0,0,0.8); margin:0;">${tas.sayi}</div>`;
                         }
@@ -453,20 +433,17 @@
                 }, 150);
             });
 
-            // 🔥 İZLEYİCİ TAŞ ATILDIĞINDA ANINDA GÖRSÜN 🔥
             socket.on('ortaya_tas_atildi', (data) => {
                 if(window.suAnkiMasam === data.masaAdi && window.izleyiciModu) {
                     let tDiv = 'benimIskartam';
                     if(window.masaKoltukMapping && window.masaKoltukMapping.right === data.kimAtti) tDiv = 'iskartaSag';
                     else if(window.masaKoltukMapping && window.masaKoltukMapping.top === data.kimAtti) tDiv = 'iskartaUst';
                     else if(window.masaKoltukMapping && window.masaKoltukMapping.left === data.kimAtti) tDiv = 'iskartaSol';
-                    
                     let k = document.getElementById(tDiv);
                     if(k) k.innerHTML = `<div class="okey-tasi tas-${data.tas.renk}" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); box-shadow:0 2px 5px rgba(0,0,0,0.8); margin:0;">${data.tas.sayi}</div>`;
                 }
             });
 
-            // 🔥 İZLEYİCİ BİRİ TAŞ ÇEKTİĞİNDE MASADAN SİLİNDİĞİNİ GÖRSÜN 🔥
             socket.on('yandan_alindi_guncelle', (data) => {
                 if(window.suAnkiMasam === data.masaAdi && window.izleyiciModu && data.atanKisi) {
                     let tDiv = 'benimIskartam';
@@ -480,23 +457,36 @@
                 }
             });
 
-            // 🔥 BOT KONUŞMA BALONLARI 🔥
+            // 🔥 SOHBET BALONLARI İÇİN DİNAMİK YERLEŞTİRME 🔥
             socket.on('masa_sohbet_balonu', (data) => {
                 if(window.suAnkiMasam !== data.masaAdi) return;
+                
                 let elId = 'benimAdimKutusu';
+                let ozelStil = 'top: -50px; left: 50%; transform: translateX(-50%);'; 
+                
                 if(window.masaKoltukMapping) {
-                    if(window.masaKoltukMapping.right === data.isim) elId = 'seatRight';
-                    else if(window.masaKoltukMapping.top === data.isim) elId = 'seatTop';
-                    else if(window.masaKoltukMapping.left === data.isim) elId = 'seatLeft';
+                    if(window.masaKoltukMapping.right === data.isim) {
+                        elId = 'seatRight'; ozelStil = 'top: 50%; right: 110%; transform: translateY(-50%);';
+                    }
+                    else if(window.masaKoltukMapping.top === data.isim) {
+                        elId = 'seatTop'; ozelStil = 'top: 110%; left: 50%; transform: translateX(-50%);';
+                    }
+                    else if(window.masaKoltukMapping.left === data.isim) {
+                        elId = 'seatLeft'; ozelStil = 'top: 50%; left: 110%; transform: translateY(-50%);';
+                    }
                 }
+                
                 let target = document.getElementById(elId);
                 if(target) {
                     let b = document.createElement('div');
-                    b.className = 'bot-speech-bubble';
                     b.innerText = data.mesaj;
+                    b.style.cssText = ozelStil + " position: absolute; background: linear-gradient(135deg, #f1c40f, #f39c12); color: #111; padding: 8px 12px; border-radius: 12px; font-size: 11px; font-weight: 900; white-space: nowrap; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 9999;";
                     target.parentElement.style.position = 'relative';
                     target.appendChild(b);
-                    setTimeout(() => b.remove(), 4500);
+                    
+                    // Şık bir şekilde yok olsun
+                    setTimeout(() => { b.style.opacity = '0'; b.style.transition = 'all 0.5s'; }, 3500);
+                    setTimeout(() => b.remove(), 4000);
                 }
             });
         }
