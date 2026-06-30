@@ -70,44 +70,51 @@
         </div>
     </div>
 
+    <!-- 🔥 PROFİL EKRANI: VİP TASARIM 🔥 -->
     <div id="profilEkrani" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999999; flex-direction:column; justify-content:center; align-items:center;">
         <div class="magaza-kutu" style="max-width: 340px; width:90%; border: 2px solid #f2c94c; text-align: center; padding: 25px 20px; position:relative; box-shadow: 0 0 20px rgba(242, 201, 76, 0.2);">
             <button onclick="document.getElementById('profilEkrani').style.display='none'" style="position:absolute; top:15px; right:20px; background:none; border:none; color:#e74c3c; font-size:24px; cursor:pointer; font-weight:bold;">X</button>
 
+            <!-- Avatar -->
             <div id="profilAvatarAlan" style="width:70px; height:70px; margin: 0 auto 10px; background: radial-gradient(circle, #1e3f28 0%, #0d1f14 100%); border-radius:50%; border:3px solid #52796f; display:flex; justify-content:center; align-items:center; font-size:35px; box-shadow: 0 0 15px rgba(46, 204, 113, 0.3);">😎</div>
 
-            <h2 id="profilIsim" style="color:#ff4d4d; margin-bottom:5px; font-size:24px; text-shadow: 0 0 10px rgba(255, 77, 77, 0.5);">👑 OYUNCU</h2>
+            <!-- İsim ve Online Durumu -->
+            <h2 id="profilIsim" style="color:#ff4d4d; margin-bottom:5px; font-size:24px; text-shadow: 0 0 10px rgba(255, 77, 77, 0.5);">Yükleniyor...</h2>
             <div id="profilDurumBadge" style="font-size:12px; font-weight:bold; margin-bottom:15px; color:#2ecc71;">🟢 Çevrimiçi</div>
 
+            <!-- Lig ve Ünvan Rozetleri -->
             <div style="display:flex; justify-content:center; gap:10px; margin-bottom: 20px;">
                 <div id="profilLigBadge" style="background: linear-gradient(180deg, #3498db 0%, #2980b9 100%); color: #fff; font-size: 12px; padding: 6px 15px; border-radius: 8px; font-weight:bold; box-shadow: 0 2px 5px rgba(0,0,0,0.5);">💎 ELMAS LİG</div>
                 <div id="profilUnvanBadge" style="background: linear-gradient(180deg, #f1c40f 0%, #f39c12 100%); color: #111; font-size: 12px; padding: 6px 15px; border-radius: 8px; font-weight:bold; box-shadow: 0 2px 5px rgba(0,0,0,0.5);">👑 OKEY KRALI</div>
             </div>
 
+            <!-- İstatistikler -->
             <div style="display:flex; justify-content:space-between; background:#111; border: 1px solid #333; padding:15px; border-radius:12px; margin-bottom:20px;">
                 <div style="text-align:center; flex:1; border-right:1px solid #333;">
                     <div style="font-size:10px; color:#a3c4bc; margin-bottom:5px; font-weight:bold;">OYNANAN</div>
-                    <div id="profilOynanan" style="font-size:18px; font-weight:900; color:#fff;">348</div>
+                    <div id="profilOynanan" style="font-size:18px; font-weight:900; color:#fff;">...</div>
                 </div>
                 <div style="text-align:center; flex:1; border-right:1px solid #333;">
                     <div style="font-size:10px; color:#a3c4bc; margin-bottom:5px; font-weight:bold;">KAZANILAN</div>
-                    <div id="profilKazanilan" style="font-size:18px; font-weight:900; color:#2ecc71;">212 / <span style="color:#e74c3c; font-size:14px;">136</span></div>
+                    <div id="profilKazanilan" style="font-size:18px; font-weight:900; color:#2ecc71;">...</div>
                 </div>
                 <div style="text-align:center; flex:1;">
                     <div style="font-size:10px; color:#a3c4bc; margin-bottom:5px; font-weight:bold;">ORAN</div>
-                    <div id="profilKazanmaOrani" style="font-size:18px; font-weight:900; color:#f1c40f;">%61</div>
+                    <div id="profilKazanmaOrani" style="font-size:18px; font-weight:900; color:#f1c40f;">...</div>
                 </div>
             </div>
 
+            <!-- Güncel Çip -->
             <div style="border: 1px dashed #2ecc71; border-radius: 12px; padding: 15px; margin-bottom: 20px; background: rgba(46, 204, 113, 0.05);">
                 <div style="font-size:11px; color:#2ecc71; font-weight:bold; margin-bottom:5px;">GÜNCEL ÇİP</div>
-                <div id="profilCipMiktari" style="font-size:26px; font-weight:900; color:#fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">6.044.873</div>
+                <div id="profilCipMiktari" style="font-size:26px; font-weight:900; color:#fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">...</div>
             </div>
 
+            <!-- Aksiyon Butonları 🔥 GERÇEK SOHBET AÇAN BUTON EKLENDİ 🔥 -->
             <div style="display:flex; flex-direction:column; gap:10px;">
                 <button id="profilArkadasBtn" onclick="profilArkadasAksiyon()" class="satin-al-btn" style="background: linear-gradient(180deg, #f1c40f 0%, #f39c12 100%); color:#111; font-weight:bold; border:none;">➕ Arkadaş Ekle</button>
                 <button id="profilDavetBtn" onclick="profilDavetAksiyon()" class="satin-al-btn" style="background: linear-gradient(180deg, #2ecc71 0%, #27ae60 100%); color:#fff; font-weight:bold; border:none;">🎲 Masaya Davet Et</button>
-                <button class="satin-al-btn" style="background: linear-gradient(180deg, #3498db 0%, #2980b9 100%); color:#fff; font-weight:bold; border:none;" onclick="document.getElementById('profilEkrani').style.display='none'; if(typeof ozelUyariGoster === 'function') ozelUyariGoster('Mesaj gönderildi!')">💬 ÖZEL MESAJ GÖNDER</button>
+                <button class="satin-al-btn" style="background: linear-gradient(180deg, #3498db 0%, #2980b9 100%); color:#fff; font-weight:bold; border:none;" onclick="document.getElementById('profilEkrani').style.display='none'; document.getElementById('sohbetCekmecesi').classList.add('acik'); let inp = document.getElementById('sohbetInput'); inp.value = '@' + document.getElementById('profilArkadasBtn').dataset.hedef + ' '; inp.focus();">💬 ÖZEL MESAJ GÖNDER</button>
             </div>
         </div>
     </div>
@@ -362,6 +369,7 @@
     <script src="muzik.js"></script>
     <script src="seyirci.js"></script> 
     
+    <!-- 🔥 GÖMÜLÜ TEMA RADARI, CSS ENJEKTÖRÜ VE YENİLENMİŞ BOT KİMLİK MOTORU 🔥 -->
     <script>
         const temaStilleri = document.createElement('style');
         temaStilleri.innerHTML = `
@@ -455,7 +463,7 @@
             }
         }, 500);
 
-        // 🔥 BOTLARA GERÇEKÇİ KİMLİK KAZANDIRAN PROFİL MOTORU 🔥
+        // 🔥 YENİLENMİŞ VE ANINDA AÇILAN BOT KİMLİK MOTORU 🔥
         window.profiliGoster = function(hedefIsim) {
             if(!hedefIsim || hedefIsim === "" || hedefIsim === "Bekleniyor..." || hedefIsim === "➕ DAVET" || hedefIsim === "Boş") { 
                 if(window.suAnkiMasam && !window.izleyiciModu) window.davetMenusuAc(); 
@@ -510,7 +518,24 @@
                 }
             }
             
-            // İsme göre sabit rastgele istatistik (aynı bota hep aynı statlar çıksın diye)
+            // "YÜKLENİYOR" GECİKMESİ İPTAL EDİLDİ - İSİM ANINDA YAZILIR!
+            pIsim.innerHTML = tacIcon + hedefIsim;
+            pIsim.style.color = ismRengi; 
+            pIsim.style.textShadow = textGlow;
+            
+            pCip.innerText = "...";
+            pOynanan.innerText = "...";
+            pKazanilan.innerHTML = "...";
+            pOran.innerText = "...";
+            
+            if(hedefIsim.startsWith("MİSAFİR_")) { 
+                pCip.innerText = "20.000"; 
+                pOynanan.innerText = "0"; pKazanilan.innerHTML = "0 <span style='color:#777;'>/</span> <span style='color:#e74c3c;'>0</span>"; pOran.innerText = "%0";
+                pLig.innerText = "🥉 BRONZ LİG"; pLig.style.background = "linear-gradient(180deg, #cd7f32 0%, #8b4513 100%)";
+                pUnvan.innerText = "MİSAFİR";
+                return; 
+            }
+
             let hash = 0;
             for (let i = 0; i < hedefIsim.length; i++) { hash = hedefIsim.charCodeAt(i) + ((hash << 5) - hash); }
             hash = Math.abs(hash);
@@ -531,15 +556,14 @@
             else if(fakeOynanan > 500) unvan = "⚔️ USTA";
             else if(fakeKazanilan > 200) unvan = "🔥 ATEŞ USTASI";
 
-            if(hedefIsim.startsWith("MİSAFİR_")) { 
-                pIsim.innerHTML = hedefIsim; pCip.innerText = "20.000"; 
-                pOynanan.innerText = "0"; pKazanilan.innerHTML = "0 <span style='color:#777;'>/</span> <span style='color:#e74c3c;'>0</span>"; pOran.innerText = "%0";
-                pLig.innerText = "🥉 BRONZ LİG"; pLig.style.background = "linear-gradient(180deg, #cd7f32 0%, #8b4513 100%)";
-                pUnvan.innerText = "MİSAFİR";
-                return; 
-            }
-            
-            pIsim.innerText = "Yükleniyor..."; 
+            const sahteStatlariBas = () => {
+                pCip.innerText = fakeCip.toLocaleString('tr-TR');
+                pOynanan.innerText = fakeOynanan;
+                pKazanilan.innerHTML = fakeKazanilan + ' <span style="color:#777; font-size:14px;">/</span> <span style="color:#e74c3c; font-size:14px;">' + fakeKaybedilen + '</span>';
+                pOran.innerText = '%' + fakeOran;
+                pLig.innerText = lig; pLig.style.background = ligBg;
+                pUnvan.innerText = unvan;
+            };
             
             if(window.db) {
                 window.db.collection("kullanicilar").where("isim", "==", hedefIsim).get().then((q) => {
@@ -561,25 +585,20 @@
                         else if(gOynanan > 500) gercekUnvan = "⚔️ USTA";
                         else if(gKazanilan > 200) gercekUnvan = "🔥 ATEŞ USTASI";
 
-                        pIsim.innerHTML = tacIcon + data.isim;
-                        pIsim.style.color = ismRengi; pIsim.style.textShadow = textGlow;
                         pCip.innerText = gCip.toLocaleString('tr-TR');
                         pOynanan.innerText = gOynanan;
-                        pKazanilan.innerHTML = `${gKazanilan} <span style="color:#777; font-size:14px;">/</span> <span style="color:#e74c3c; font-size:14px;">${gKaybedilen}</span>`;
-                        pOran.innerText = `%${gOran}`;
+                        pKazanilan.innerHTML = gKazanilan + ' <span style="color:#777; font-size:14px;">/</span> <span style="color:#e74c3c; font-size:14px;">' + gKaybedilen + '</span>';
+                        pOran.innerText = '%' + gOran;
                         pLig.innerText = gercekLig; pLig.style.background = gercekLigBg;
                         pUnvan.innerText = gercekUnvan;
                     } else {
-                        pIsim.innerHTML = tacIcon + hedefIsim;
-                        pIsim.style.color = ismRengi; pIsim.style.textShadow = textGlow;
-                        pCip.innerText = fakeCip.toLocaleString('tr-TR');
-                        pOynanan.innerText = fakeOynanan;
-                        pKazanilan.innerHTML = `${fakeKazanilan} <span style="color:#777; font-size:14px;">/</span> <span style="color:#e74c3c; font-size:14px;">${fakeKaybedilen}</span>`;
-                        pOran.innerText = `%${fakeOran}`;
-                        pLig.innerText = lig; pLig.style.background = ligBg;
-                        pUnvan.innerText = unvan;
+                        sahteStatlariBas();
                     }
-                }).catch(err => { console.log(err); });
+                }).catch(err => { 
+                    sahteStatlariBas(); 
+                });
+            } else {
+                sahteStatlariBas();
             }
         };
     </script>
