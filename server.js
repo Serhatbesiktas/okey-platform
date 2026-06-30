@@ -10,10 +10,11 @@ const oyuncuKozmetikleri = {};
 const banliKullanicilar = new Set(); 
 const baglantiKopanlar = {}; 
 
+// 🔥 İZLEYİCİLER İÇİN YERDEKİ TAŞLARI HAFIZADA TUTAN YENİ MASA YAPISI 🔥
 const masalar = {
-    'Acemiler (20K Bahis)': { bahis: 20000, kasa: 0, koltuklar: [null, null, null, null], deste: [], gosterge: null, oyunBasladi: false, siradakiOyuncu: null, eller: {}, gostergeGosterildi: false, sonAtilanTas: null },
-    'Usta Masası (50K Bahis)': { bahis: 50000, kasa: 0, koltuklar: [null, null, null, null], deste: [], gosterge: null, oyunBasladi: false, siradakiOyuncu: null, eller: {}, gostergeGosterildi: false, sonAtilanTas: null },
-    'Hızlı Oyun (10K Bahis)': { bahis: 10000, kasa: 0, koltuklar: [null, null, null, null], deste: [], gosterge: null, oyunBasladi: false, siradakiOyuncu: null, eller: {}, gostergeGosterildi: false, sonAtilanTas: null }
+    'Acemiler (20K Bahis)': { bahis: 20000, kasa: 0, koltuklar: [null, null, null, null], deste: [], gosterge: null, oyunBasladi: false, siradakiOyuncu: null, eller: {}, gostergeGosterildi: false, sonAtilanTas: null, iskartalar: {} },
+    'Usta Masası (50K Bahis)': { bahis: 50000, kasa: 0, koltuklar: [null, null, null, null], deste: [], gosterge: null, oyunBasladi: false, siradakiOyuncu: null, eller: {}, gostergeGosterildi: false, sonAtilanTas: null, iskartalar: {} },
+    'Hızlı Oyun (10K Bahis)': { bahis: 10000, kasa: 0, koltuklar: [null, null, null, null], deste: [], gosterge: null, oyunBasladi: false, siradakiOyuncu: null, eller: {}, gostergeGosterildi: false, sonAtilanTas: null, iskartalar: {} }
 };
 
 const aktifBotlar = [];
@@ -34,20 +35,13 @@ for(let i=0; i<75; i++) {
     oyuncuKozmetikleri[tamIsim] = (Math.random() > 0.8) ? ['neon_tac'] : [];
 }
 
-// 🔥 KLON BOTLARI ENGELLEYEN KUSURSUZ RADAR 🔥
 function getAvailableBot() {
     const usedBots = new Set();
-    for(let m in masalar) {
-        masalar[m].koltuklar.forEach(k => { if(k && aktifBotlar.includes(k)) usedBots.add(k); });
-    }
+    for(let m in masalar) { masalar[m].koltuklar.forEach(k => { if(k && aktifBotlar.includes(k)) usedBots.add(k); }); }
     const available = aktifBotlar.filter(b => !usedBots.has(b));
     if (available.length > 0) return available[Math.floor(Math.random() * available.length)];
-    
-    // Failsafe (Acil durum yedeği)
     const tamIsim = "Yedek_Bot_" + Math.floor(100 + Math.random() * 899);
-    aktifBotlar.push(tamIsim);
-    oyuncuCipleri[tamIsim] = 5000000; oyuncuKozmetikleri[tamIsim] = [];
-    return tamIsim;
+    aktifBotlar.push(tamIsim); oyuncuCipleri[tamIsim] = 5000000; oyuncuKozmetikleri[tamIsim] = []; return tamIsim;
 }
 
 function desteYaratVeKaristir() {
@@ -60,16 +54,9 @@ function desteYaratVeKaristir() {
 function oyunuSifirla(masaAdi, kazanan = null, odul = 0, sebep = "", okeyleBittiMi = false) {
     const masa = masalar[masaAdi];
     if(masa) {
-        masa.oyunBasladi = false; masa.deste = []; masa.gosterge = null; masa.siradakiOyuncu = null; masa.eller = {}; masa.kasa = 0; masa.gostergeGosterildi = false; masa.sonAtilanTas = null;
+        masa.oyunBasladi = false; masa.deste = []; masa.gosterge = null; masa.siradakiOyuncu = null; masa.eller = {}; masa.kasa = 0; masa.gostergeGosterildi = false; masa.sonAtilanTas = null; masa.iskartalar = {};
         io.emit('oyun_bitti', { masaAdi: masaAdi, kazanan: kazanan, odul: odul, sebep: sebep, okeyleBittiMi: okeyleBittiMi });
-        
-        // 🔥 MASA KİLİTLENME BUG'I ÇÖZÜLDÜ: SADECE BOTLARI MASADAN KOV 🔥
-        for(let i=0; i<4; i++) {
-            if (masa.koltuklar[i] && aktifBotlar.includes(masa.koltuklar[i])) {
-                masa.koltuklar[i] = null;
-            }
-        }
-        
+        for(let i=0; i<4; i++) { if (masa.koltuklar[i] && aktifBotlar.includes(masa.koltuklar[i])) { masa.koltuklar[i] = null; } }
         const guncelLobi = {}; for(let m in masalar) guncelLobi[m] = masalar[m].koltuklar;
         io.emit('masalari_guncelle', guncelLobi);
     }
@@ -105,15 +92,10 @@ function eliKontrolEt(gruplar, gosterge) {
 function masadaOyunuBaslat(masaAdi) {
     const masa = masalar[masaAdi];
     if (!masa || masa.oyunBasladi) return;
-    
-    for(let i=0; i<4; i++) { 
-        if(masa.koltuklar[i] === null) masa.koltuklar[i] = getAvailableBot(); 
-    }
-    
-    masa.oyunBasladi = true; masa.gostergeGosterildi = false; masa.kasa = 0; masa.sonAtilanTas = null;
+    for(let i=0; i<4; i++) { if(masa.koltuklar[i] === null) masa.koltuklar[i] = getAvailableBot(); }
+    masa.oyunBasladi = true; masa.gostergeGosterildi = false; masa.kasa = 0; masa.sonAtilanTas = null; masa.iskartalar = {};
     const guncelLobi = {}; for(let m in masalar) guncelLobi[m] = masalar[m].koltuklar;
     io.emit('masalari_guncelle', guncelLobi);
-
     masa.koltuklar.forEach(isim => {
         masa.kasa += masa.bahis;
         if(!aktifBotlar.includes(isim)) {
@@ -122,32 +104,22 @@ function masadaOyunuBaslat(masaAdi) {
             io.emit('cip_guncelle_ozel', { isim: isim, cip: oyuncuCipleri[isim] });
         }
     });
-
     masa.deste = desteYaratVeKaristir();
     let secilenGosterge = masa.deste.pop();
     while (secilenGosterge.renk === 'sahte') { masa.deste.unshift(secilenGosterge); secilenGosterge = masa.deste.pop(); }
     masa.gosterge = secilenGosterge;
-    
     const baslayacakOyuncu = masa.koltuklar[Math.floor(Math.random() * 4)]; 
-    masa.siradakiOyuncu = baslayacakOyuncu; 
-    masa.eller = {};
-
+    masa.siradakiOyuncu = baslayacakOyuncu; masa.eller = {};
     masa.koltuklar.forEach(oyuncuIsmi => {
         const kacTasAlacak = (oyuncuIsmi === baslayacakOyuncu) ? 15 : 14;
         masa.eller[oyuncuIsmi] = masa.deste.splice(0, kacTasAlacak);
     });
-
     io.emit('masa_oyun_basladi', { masaAdi: masaAdi, gosterge: masa.gosterge, kalanTas: masa.deste.length, kasa: masa.kasa, koltuklar: masa.koltuklar });
     io.emit('sistem_mesaji', `🎰 ${masaAdi} masasında bahisler alındı! Oyun başladı.`);
-
     setTimeout(() => {
-        masa.koltuklar.forEach(oyuncuIsmi => {
-            if(!aktifBotlar.includes(oyuncuIsmi)) { io.emit('taslari_al', { kime: oyuncuIsmi, taslar: masa.eller[oyuncuIsmi] }); }
-        });
-
+        masa.koltuklar.forEach(oyuncuIsmi => { if(!aktifBotlar.includes(oyuncuIsmi)) { io.emit('taslari_al', { kime: oyuncuIsmi, taslar: masa.eller[oyuncuIsmi] }); } });
         io.emit('masa_ortasi_guncelle', { masaAdi: masaAdi, kalanTas: masa.deste.length, gosterge: masa.gosterge });
         io.emit('sira_guncelle', { masaAdi: masaAdi, kimde: masa.siradakiOyuncu });
-
         if(aktifBotlar.includes(masa.siradakiOyuncu)) { botHamlesiYap(masaAdi); }
     }, 800);
 }
@@ -155,13 +127,20 @@ function masadaOyunuBaslat(masaAdi) {
 function botHamlesiYap(masaAdi) {
     const masa = masalar[masaAdi];
     if(!masa || !masa.oyunBasladi) return;
-
     const siradaki = masa.siradakiOyuncu;
+    
     if(siradaki && aktifBotlar.includes(siradaki)) {
+        
+        // 🔥 BOTLARDAN GERÇEKÇİ KONUŞMA BALONLARI 🔥
+        if (Math.random() < 0.15) { 
+            const sohbetler = ["Okeye dönüyorum beyler kimse atmasın!", "Çay yok mu çay :D", "Şanssızlık diz boyu", "Hadi at da oynayalım", "Böyle el mi gelir be!", "Usta bu ne hız", "Biterim bak!", "Zar zor per yaptım"];
+            const msj = sohbetler[Math.floor(Math.random() * sohbetler.length)];
+            io.emit('masa_sohbet_balonu', { masaAdi: masaAdi, isim: siradaki, mesaj: msj });
+        }
+
         setTimeout(() => {
             try {
                 if(!masa.oyunBasladi) return;
-                
                 if (masa.deste.length > 35 && !masa.gostergeGosterildi && masa.gosterge) {
                     let hasGosterge = masa.eller[siradaki] && masa.eller[siradaki].some(t => t.renk === masa.gosterge.renk && t.sayi === masa.gosterge.sayi);
                     if (hasGosterge) {
@@ -174,11 +153,9 @@ function botHamlesiYap(masaAdi) {
                 if (masa.sonAtilanTas && masa.eller[siradaki] && masa.eller[siradaki].length < 15) {
                     let yandakiTas = masa.sonAtilanTas;
                     let isineYararMi = masa.eller[siradaki].filter(t => t.renk === yandakiTas.renk || t.sayi === yandakiTas.sayi).length >= 2;
-                    
                     if (isineYararMi && Math.random() > 0.4) {
                         masa.eller[siradaki].push(yandakiTas);
-                        masa.sonAtilanTas = null;
-                        tasAldi = true;
+                        masa.sonAtilanTas = null; tasAldi = true;
                         io.emit('yandan_alindi_guncelle', { masaAdi: masaAdi, kimAldi: siradaki, tas: yandakiTas });
                     }
                 }
@@ -192,40 +169,32 @@ function botHamlesiYap(masaAdi) {
                 setTimeout(() => {
                     try {
                         if(!masa.oyunBasladi) return;
-                        
                         const botunEli = masa.eller[siradaki];
-                        if(!botunEli || botunEli.length === 0) return; // Çökme Engellendi
+                        if(!botunEli || botunEli.length === 0) return; 
                         
                         let okeySayi = masa.gosterge ? (masa.gosterge.sayi === 13 ? 1 : parseInt(masa.gosterge.sayi) + 1) : null; 
                         let okeyRenk = masa.gosterge ? masa.gosterge.renk : null;
                         
-                        let guvenliTaslar = botunEli.filter(t => { 
-                            let isOkey = (t.renk === okeyRenk && parseInt(t.sayi) === okeySayi); 
-                            return !isOkey && t.renk !== 'sahte'; 
-                        });
+                        let guvenliTaslar = botunEli.filter(t => { let isOkey = (t.renk === okeyRenk && parseInt(t.sayi) === okeySayi); return !isOkey && t.renk !== 'sahte'; });
                         if(guvenliTaslar.length === 0) guvenliTaslar = botunEli; 
 
                         if (masa.deste.length < 25 && Math.random() < 0.08) {
-                            let kazanilanPara = Number(masa.kasa);
-                            oyuncuCipleri[siradaki] += kazanilanPara;
+                            let kazanilanPara = Number(masa.kasa); oyuncuCipleri[siradaki] += kazanilanPara;
                             io.emit('cip_guncelle_ozel', { isim: siradaki, cip: oyuncuCipleri[siradaki] });
-                            
-                            let atilacakIndex = Math.floor(Math.random() * guvenliTaslar.length);
-                            let bitisTasi = guvenliTaslar[atilacakIndex];
-                            let gercekIndex = botunEli.findIndex(t => t.id === bitisTasi.id); 
-                            botunEli.splice(gercekIndex, 1);
+                            let atilacakIndex = Math.floor(Math.random() * guvenliTaslar.length); let bitisTasi = guvenliTaslar[atilacakIndex];
+                            let gercekIndex = botunEli.findIndex(t => t.id === bitisTasi.id); botunEli.splice(gercekIndex, 1);
                             
                             io.emit('ortaya_tas_atildi', { masaAdi: masaAdi, kimAtti: siradaki, tas: bitisTasi });
-                            oyunuSifirla(masaAdi, siradaki, kazanilanPara, "Usta bir dizilimle elini bitirdi!", false);
-                            return;
+                            oyunuSifirla(masaAdi, siradaki, kazanilanPara, "Usta bir dizilimle elini bitirdi!", false); return;
                         }
 
                         let atilacakIndex = Math.floor(Math.random() * guvenliTaslar.length); 
                         let atilanTas = guvenliTaslar[atilacakIndex];
-                        let gercekIndex = botunEli.findIndex(t => t.id === atilanTas.id); 
-                        botunEli.splice(gercekIndex, 1); 
+                        let gercekIndex = botunEli.findIndex(t => t.id === atilanTas.id); botunEli.splice(gercekIndex, 1); 
 
                         masa.sonAtilanTas = atilanTas; 
+                        masa.iskartalar[siradaki] = atilanTas; // İzleyici için hafızaya yaz
+                        
                         io.emit('ortaya_tas_atildi', { masaAdi: masaAdi, kimAtti: siradaki, tas: atilanTas });
                         
                         let currentIndex = masa.koltuklar.indexOf(siradaki); if(currentIndex === -1) return;
@@ -248,9 +217,7 @@ function kullaniciyiMasadanKaldir(isim) {
             if (masalar[m].oyunBasladi) {
                 let ceza = masalar[m].bahis;
                 if(oyuncuCipleri[isim] !== undefined) {
-                    let c = parseInt(String(oyuncuCipleri[isim]).replace(/[^0-9]/g, '')) || 0; 
-                    oyuncuCipleri[isim] = Math.max(0, c - ceza);
-                    io.emit('cip_guncelle_ozel', { isim: isim, cip: oyuncuCipleri[isim] });
+                    let c = parseInt(String(oyuncuCipleri[isim]).replace(/[^0-9]/g, '')) || 0; oyuncuCipleri[isim] = Math.max(0, c - ceza); io.emit('cip_guncelle_ozel', { isim: isim, cip: oyuncuCipleri[isim] });
                 }
                 const yeniBot = getAvailableBot();
                 masalar[m].koltuklar[index] = yeniBot;
@@ -262,9 +229,7 @@ function kullaniciyiMasadanKaldir(isim) {
             if (masalar[m].isVIP) { 
                 if (masalar[m].sahibi === isim) { io.emit('vip_masa_kapandi', { masaAdi: m }); silinecekMasalar.push(m); } 
                 else { let humanCount = masalar[m].koltuklar.filter(k => k !== null && !aktifBotlar.includes(k)).length; if (humanCount === 0) silinecekMasalar.push(m); } 
-            } else { 
-                if(masalar[m].koltuklar.every(k => k === null || aktifBotlar.includes(k))) { oyunuSifirla(m, null, 0, "Masada kimse kalmadı."); } 
-            }
+            } else { if(masalar[m].koltuklar.every(k => k === null || aktifBotlar.includes(k))) { oyunuSifirla(m, null, 0, "Masada kimse kalmadı."); } }
             degisiklikOldu = true; break; 
         }
     }
@@ -273,17 +238,13 @@ function kullaniciyiMasadanKaldir(isim) {
 }
 
 setInterval(() => {
-    const masalarArr = Object.keys(masalar);
-    const randomMasa = masalarArr[Math.floor(Math.random() * masalarArr.length)];
-    const m = masalar[randomMasa];
+    const masalarArr = Object.keys(masalar); const randomMasa = masalarArr[Math.floor(Math.random() * masalarArr.length)]; const m = masalar[randomMasa];
     if(m && !m.isVIP && !m.oyunBasladi) {
         const bosKoltukIndex = m.koltuklar.indexOf(null);
         if(bosKoltukIndex !== -1 && Math.random() > 0.4) { 
             const bot = getAvailableBot();
             if(bot) {
-                m.koltuklar[bosKoltukIndex] = bot;
-                const guncelLobi = {}; for(let table in masalar) guncelLobi[table] = masalar[table].koltuklar;
-                io.emit('masalari_guncelle', guncelLobi);
+                m.koltuklar[bosKoltukIndex] = bot; const guncelLobi = {}; for(let table in masalar) guncelLobi[table] = masalar[table].koltuklar; io.emit('masalari_guncelle', guncelLobi);
                 if (!m.koltuklar.includes(null)) { masadaOyunuBaslat(randomMasa); }
             }
         }
@@ -291,114 +252,65 @@ setInterval(() => {
 }, 4000); 
 
 setInterval(() => {
-    const masalarArr = Object.keys(masalar);
-    const randomMasa = masalarArr[Math.floor(Math.random() * masalarArr.length)];
-    const m = masalar[randomMasa];
+    const masalarArr = Object.keys(masalar); const randomMasa = masalarArr[Math.floor(Math.random() * masalarArr.length)]; const m = masalar[randomMasa];
     if(m && m.oyunBasladi) {
         const botKoltuklar = m.koltuklar.filter(k => k && aktifBotlar.includes(k));
         if(botKoltuklar.length > 0 && Math.random() > 0.6) { 
             const konusanBot = botKoltuklar[Math.floor(Math.random() * botKoltuklar.length)];
-            const mesajlar = ["Okeye dönüyorum kimse atmasın :)", "Çay yok mu çay :D", "Şanssızlık diz boyu", "Hadi bitir artık", "Taş gelmiyor ki", "Seri atın beyler", "Zar zor per yaptım"];
-            io.emit('yeni_sohbet_mesaji', { masaAdi: randomMasa, isim: konusanBot, mesaj: mesajlar[Math.floor(Math.random()*mesajlar.length)], kozmetikler: oyuncuKozmetikleri[konusanBot] });
+            const mesajlar = ["Taş gelmiyor ki", "Seri atın beyler", "Zar zor per yaptım", "Hadi at da oynayalım", "Çay yok mu çay :D"];
+            io.emit('masa_sohbet_balonu', { masaAdi: randomMasa, isim: konusanBot, mesaj: mesajlar[Math.floor(Math.random()*mesajlar.length)] });
         }
     }
 }, 15000); 
 
 io.on('connection', (socket) => {
-    const lobiVerisi = {};
-    for(let m in masalar) lobiVerisi[m] = masalar[m].koltuklar;
-    socket.emit('masalari_guncelle', lobiVerisi);
+    const lobiVerisi = {}; for(let m in masalar) lobiVerisi[m] = masalar[m].koltuklar; socket.emit('masalari_guncelle', lobiVerisi);
 
     socket.on('kullanici_girisi', (data) => {
-        let isim = typeof data === 'object' ? data.isim : data;
-        let dbCip = typeof data === 'object' ? data.cip : 250000;
-        let dbKozmetikler = typeof data === 'object' && data.kozmetikler ? data.kozmetikler : []; 
-        
+        let isim = typeof data === 'object' ? data.isim : data; let dbCip = typeof data === 'object' ? data.cip : 250000; let dbKozmetikler = typeof data === 'object' && data.kozmetikler ? data.kozmetikler : []; 
         if(banliKullanicilar.has(isim)) { socket.emit('admin_islem_uyarisi', { isim: isim, islem: 'ban' }); return; }
         if(baglantiKopanlar[isim]) { clearTimeout(baglantiKopanlar[isim]); delete baglantiKopanlar[isim]; }
-
-        socket.kullaniciAdi = isim;
-        oyuncuCipleri[isim] = parseInt(String(dbCip).replace(/[^0-9]/g, '')) || 0; 
-        oyuncuKozmetikleri[isim] = dbKozmetikler; 
-
-        socket.emit('cip_guncelle', oyuncuCipleri[isim]);
-        io.emit('admin_guncel_veri', oyuncuCipleri);
-        io.emit('kozmetikleri_guncelle', oyuncuKozmetikleri); 
-        io.emit('online_oyuncular', Object.keys(oyuncuCipleri));
-        
-        let masaBulundu = null;
-        for(let m in masalar) { if(masalar[m].koltuklar.includes(isim)) { masaBulundu = m; break; } }
+        socket.kullaniciAdi = isim; oyuncuCipleri[isim] = parseInt(String(dbCip).replace(/[^0-9]/g, '')) || 0; oyuncuKozmetikleri[isim] = dbKozmetikler; 
+        socket.emit('cip_guncelle', oyuncuCipleri[isim]); io.emit('admin_guncel_veri', oyuncuCipleri); io.emit('kozmetikleri_guncelle', oyuncuKozmetikleri); io.emit('online_oyuncular', Object.keys(oyuncuCipleri));
+        let masaBulundu = null; for(let m in masalar) { if(masalar[m].koltuklar.includes(isim)) { masaBulundu = m; break; } }
         if(masaBulundu) { socket.emit('sen_masadasin', { masaAdi: masaBulundu, isVIP: masalar[masaBulundu].isVIP || false, sahibi: masalar[masaBulundu].sahibi || "", gizli: masalar[masaBulundu].gizli || false }); }
     });
 
-    socket.on('arkadaslik_istegi_gonder', (data) => {
-        if(data.kime && aktifBotlar.includes(data.kime)) { setTimeout(() => { socket.emit('canli_arkadaslik_onay', { kimden: data.kime }); }, 1500); } 
-        else { io.emit('canli_arkadaslik_talebi', data); }
-    });
-
+    socket.on('arkadaslik_istegi_gonder', (data) => { if(data.kime && aktifBotlar.includes(data.kime)) { setTimeout(() => { socket.emit('canli_arkadaslik_onay', { kimden: data.kime }); }, 1500); } else { io.emit('canli_arkadaslik_talebi', data); } });
     socket.on('arkadaslik_cevabi_ver', (data) => { io.emit('canli_arkadaslik_sonuc', data); });
 
     socket.on('masayi_izle', (data) => {
         const masa = masalar[data.masaAdi];
-        if(masa) { socket.emit('izleyici_olarak_katildin', { masaAdi: data.masaAdi, oyunBasladi: masa.oyunBasladi, kalanTas: masa.deste.length, gosterge: masa.gosterge, kasa: masa.kasa, koltuklar: masa.koltuklar, siradaki: masa.siradakiOyuncu }); }
-    });
-
-    socket.on('esya_firlat', (data) => {
-        const masa = masalar[data.masaAdi];
-        let kimdenCip = parseInt(String(oyuncuCipleri[data.kimden]).replace(/[^0-9]/g, '')) || 0;
-        if(masa && kimdenCip >= 5000) {
-            oyuncuCipleri[data.kimden] = Math.max(0, kimdenCip - 5000);
-            io.emit('cip_guncelle_ozel', { isim: data.kimden, cip: oyuncuCipleri[data.kimden] });
-            io.emit('esya_firlatildi', data);
-        } else { socket.emit('hata_mesaji', "Bu eşyayı fırlatmak için en az 5.000 ÇİP'e ihtiyacın var!"); }
-    });
-
-    socket.on('vip_masa_kur', (data) => {
-        kullaniciyiMasadanKaldir(data.sahibi); 
-        let miktar = parseInt(String(data.bahis).replace(/[^0-9]/g, '')) || 0;
-        let pCip = parseInt(String(oyuncuCipleri[data.sahibi]).replace(/[^0-9]/g, '')) || 0;
-        if(pCip < miktar) { socket.emit('hata_mesaji', "Yetersiz Bakiye! VIP masa kurmak için çipiniz yetersiz."); return; }
-        const vMasaAdi = `👑 VIP: ${data.sahibi} Masası`;
-        masalar[vMasaAdi] = { bahis: miktar, kasa: 0, koltuklar: [data.sahibi, null, null, null], deste: [], gosterge: null, oyunBasladi: false, siradakiOyuncu: null, eller: {}, gostergeGosterildi: false, isVIP: true, sahibi: data.sahibi, gizli: data.gizli, davetliler: [], sonAtilanTas: null };
-        socket.emit('sen_masadasin', { masaAdi: vMasaAdi, isVIP: true, sahibi: data.sahibi, gizli: data.gizli });
-        const guncelLobi = {}; for(let m in masalar) guncelLobi[m] = masalar[m].koltuklar; io.emit('masalari_guncelle', guncelLobi);
-    });
-
-    socket.on('vip_masa_gizlilik_degis', (data) => {
-        const masa = masalar[data.masaAdi];
-        if (masa && masa.sahibi === data.isim) {
-            masa.gizli = !masa.gizli;
-            io.emit('yeni_sohbet_mesaji', { masaAdi: data.masaAdi, isim: "Sistem", mesaj: `🔒 Oda durumu güncellendi: ${masa.gizli ? 'SADECE DAVETLİLER' : 'HERKESE AÇIK'}`, kozmetikler: [] });
-            io.emit('vip_durum_guncelle', { masaAdi: data.masaAdi, gizli: masa.gizli });
+        if(masa) { 
+            socket.emit('izleyici_olarak_katildin', { 
+                masaAdi: data.masaAdi, oyunBasladi: masa.oyunBasladi, kalanTas: masa.deste.length, gosterge: masa.gosterge, kasa: masa.kasa, koltuklar: masa.koltuklar, siradaki: masa.siradakiOyuncu, 
+                iskartalar: masa.iskartalar // 🔥 İZLEYİCİYE YERDEKİ TAŞLARI GÖNDER 🔥
+            }); 
         }
     });
 
+    socket.on('esya_firlat', (data) => { const masa = masalar[data.masaAdi]; let kimdenCip = parseInt(String(oyuncuCipleri[data.kimden]).replace(/[^0-9]/g, '')) || 0; if(masa && kimdenCip >= 5000) { oyuncuCipleri[data.kimden] = Math.max(0, kimdenCip - 5000); io.emit('cip_guncelle_ozel', { isim: data.kimden, cip: oyuncuCipleri[data.kimden] }); io.emit('esya_firlatildi', data); } else { socket.emit('hata_mesaji', "Yetersiz Bakiye!"); } });
+
+    socket.on('vip_masa_kur', (data) => {
+        kullaniciyiMasadanKaldir(data.sahibi); let miktar = parseInt(String(data.bahis).replace(/[^0-9]/g, '')) || 0; let pCip = parseInt(String(oyuncuCipleri[data.sahibi]).replace(/[^0-9]/g, '')) || 0;
+        if(pCip < miktar) { socket.emit('hata_mesaji', "Yetersiz Bakiye!"); return; }
+        const vMasaAdi = `👑 VIP: ${data.sahibi} Masası`;
+        masalar[vMasaAdi] = { bahis: miktar, kasa: 0, koltuklar: [data.sahibi, null, null, null], deste: [], gosterge: null, oyunBasladi: false, siradakiOyuncu: null, eller: {}, gostergeGosterildi: false, isVIP: true, sahibi: data.sahibi, gizli: data.gizli, davetliler: [], sonAtilanTas: null, iskartalar: {} };
+        socket.emit('sen_masadasin', { masaAdi: vMasaAdi, isVIP: true, sahibi: data.sahibi, gizli: data.gizli }); const guncelLobi = {}; for(let m in masalar) guncelLobi[m] = masalar[m].koltuklar; io.emit('masalari_guncelle', guncelLobi);
+    });
+
+    socket.on('vip_masa_gizlilik_degis', (data) => { const masa = masalar[data.masaAdi]; if (masa && masa.sahibi === data.isim) { masa.gizli = !masa.gizli; io.emit('yeni_sohbet_mesaji', { masaAdi: data.masaAdi, isim: "Sistem", mesaj: `🔒 Oda durumu: ${masa.gizli ? 'SADECE DAVETLİLER' : 'HERKESE AÇIK'}`, kozmetikler: [] }); io.emit('vip_durum_guncelle', { masaAdi: data.masaAdi, gizli: masa.gizli }); } });
     socket.on('magaza_harcamasi', (data) => { if (oyuncuCipleri[data.isim] !== undefined) { oyuncuCipleri[data.isim] = parseInt(String(data.yeniCip).replace(/[^0-9]/g, '')) || 0; io.emit('admin_guncel_veri', oyuncuCipleri); } });
     socket.on('kozmetik_guncelle', (data) => { oyuncuKozmetikleri[data.isim] = data.kozmetikler; io.emit('kozmetikleri_guncelle', oyuncuKozmetikleri); });
-    
-    socket.on('liderlik_tablosu_iste', () => { 
-        const siraliList = Object.entries(oyuncuCipleri)
-            .map(entry => ({ isim: entry[0], cip: entry[1] }))
-            .filter(k => !aktifBotlar.includes(k.isim) && !k.isim.startsWith('MİSAFİR_'))
-            .sort((a, b) => b.cip - a.cip)
-            .slice(0, 10); 
-        socket.emit('liderlik_tablosu_guncelle', siraliList); 
-    });
+    socket.on('liderlik_tablosu_iste', () => { const siraliList = Object.entries(oyuncuCipleri).map(entry => ({ isim: entry[0], cip: entry[1] })).filter(k => !aktifBotlar.includes(k.isim) && !k.isim.startsWith('MİSAFİR_')).sort((a, b) => b.cip - a.cip).slice(0, 10); socket.emit('liderlik_tablosu_guncelle', siraliList); });
     
     socket.on('masaya_davet_et', (data) => { 
-        const masa = masalar[data.masaAdi]; 
-        if (masa && masa.isVIP && !masa.davetliler.includes(data.kime)) { masa.davetliler.push(data.kime); } 
-        
+        const masa = masalar[data.masaAdi]; if (masa && masa.isVIP && !masa.davetliler.includes(data.kime)) { masa.davetliler.push(data.kime); } 
         if(aktifBotlar.includes(data.kime)) {
             setTimeout(() => {
-                kullaniciyiMasadanKaldir(data.kime);
-                const bMasa = masalar[data.masaAdi];
+                kullaniciyiMasadanKaldir(data.kime); const bMasa = masalar[data.masaAdi];
                 if(bMasa && !bMasa.oyunBasladi && bMasa.koltuklar.includes(null)) {
-                    const bosKoltukIndex = bMasa.koltuklar.indexOf(null);
-                    bMasa.koltuklar[bosKoltukIndex] = data.kime;
-                    const guncelLobi = {}; for(let m in masalar) guncelLobi[m] = masalar[m].koltuklar; 
-                    io.emit('masalari_guncelle', guncelLobi);
-                    io.emit('yeni_sohbet_mesaji', { masaAdi: data.masaAdi, isim: "Sistem", mesaj: `🤖 ${data.kime}, davetini kabul etti ve masaya oturdu!`, kozmetikler: [] });
+                    const bosKoltukIndex = bMasa.koltuklar.indexOf(null); bMasa.koltuklar[bosKoltukIndex] = data.kime; const guncelLobi = {}; for(let m in masalar) guncelLobi[m] = masalar[m].koltuklar; io.emit('masalari_guncelle', guncelLobi); io.emit('yeni_sohbet_mesaji', { masaAdi: data.masaAdi, isim: "Sistem", mesaj: `🤖 ${data.kime} masaya oturdu!`, kozmetikler: [] });
                     if (!bMasa.koltuklar.includes(null)) { masadaOyunuBaslat(data.masaAdi); }
                 }
             }, 2000);
@@ -406,93 +318,43 @@ io.on('connection', (socket) => {
     });
 
     socket.on('masaya_otur', (data) => {
-        kullaniciyiMasadanKaldir(data.isim); 
-        const masa = masalar[data.masaAdi];
+        kullaniciyiMasadanKaldir(data.isim); const masa = masalar[data.masaAdi];
         if (masa && !masa.koltuklar.includes(data.isim)) {
-            let uCip = parseInt(String(oyuncuCipleri[data.isim]).replace(/[^0-9]/g, '')) || 0;
-            if(uCip < masa.bahis) { socket.emit('hata_mesaji', `Yeterli çipiniz yok! Bu masanın bahsi: ${masa.bahis.toLocaleString()} ÇİP.`); return; }
-            if (masa.isVIP && masa.gizli && masa.sahibi !== data.isim) { if (!masa.davetliler || !masa.davetliler.includes(data.isim)) { socket.emit('hata_mesaji', "🚫 Bu VIP masa kilitlidir! Sadece oda sahibinin davet ettiği kişiler girebilir."); return; } }
+            let uCip = parseInt(String(oyuncuCipleri[data.isim]).replace(/[^0-9]/g, '')) || 0; if(uCip < masa.bahis) { socket.emit('hata_mesaji', `Yeterli çipiniz yok!`); return; }
+            if (masa.isVIP && masa.gizli && masa.sahibi !== data.isim) { if (!masa.davetliler || !masa.davetliler.includes(data.isim)) { socket.emit('hata_mesaji', "🚫 Bu VIP masa kilitlidir!"); return; } }
             const bosKoltukIndex = masa.koltuklar.indexOf(null);
-            if (bosKoltukIndex !== -1) {
-                masa.koltuklar[bosKoltukIndex] = data.isim;
-                const guncelLobi = {}; for(let m in masalar) guncelLobi[m] = masalar[m].koltuklar; io.emit('masalari_guncelle', guncelLobi);
-                if (!masa.koltuklar.includes(null)) { masadaOyunuBaslat(data.masaAdi); }
-            }
+            if (bosKoltukIndex !== -1) { masa.koltuklar[bosKoltukIndex] = data.isim; const guncelLobi = {}; for(let m in masalar) guncelLobi[m] = masalar[m].koltuklar; io.emit('masalari_guncelle', guncelLobi); if (!masa.koltuklar.includes(null)) { masadaOyunuBaslat(data.masaAdi); } }
         }
     });
 
     socket.on('oyunu_baslat', (masaAdi) => { masadaOyunuBaslat(masaAdi); });
-
-    socket.on('gosterge_goster', (data) => {
-        const masa = masalar[data.masaAdi];
-        if(masa && masa.oyunBasladi && !masa.gostergeGosterildi) {
-            const hasTile = masa.eller[data.isim].some(t => t.renk === masa.gosterge.renk && t.sayi === masa.gosterge.sayi);
-            if(hasTile) {
-                masa.gostergeGosterildi = true; const odul = masa.bahis; let uCip = parseInt(String(oyuncuCipleri[data.isim]).replace(/[^0-9]/g, '')) || 0; oyuncuCipleri[data.isim] = uCip + Number(odul);
-                io.emit('cip_guncelle_ozel', { isim: data.isim, cip: oyuncuCipleri[data.isim] }); io.emit('gosterge_basarili', { masaAdi: data.masaAdi, isim: data.isim, odul: odul }); io.emit('yeni_sohbet_mesaji', { masaAdi: data.masaAdi, isim: "Sistem", mesaj: `⭐ ${data.isim} gösterge yaptı ve ${odul.toLocaleString('tr-TR')} ÇİP kazandı!`, kozmetikler: [] });
-            }
-        }
-    });
-
+    socket.on('gosterge_goster', (data) => { const masa = masalar[data.masaAdi]; if(masa && masa.oyunBasladi && !masa.gostergeGosterildi) { const hasTile = masa.eller[data.isim].some(t => t.renk === masa.gosterge.renk && t.sayi === masa.gosterge.sayi); if(hasTile) { masa.gostergeGosterildi = true; const odul = masa.bahis; let uCip = parseInt(String(oyuncuCipleri[data.isim]).replace(/[^0-9]/g, '')) || 0; oyuncuCipleri[data.isim] = uCip + Number(odul); io.emit('cip_guncelle_ozel', { isim: data.isim, cip: oyuncuCipleri[data.isim] }); io.emit('gosterge_basarili', { masaAdi: data.masaAdi, isim: data.isim, odul: odul }); io.emit('yeni_sohbet_mesaji', { masaAdi: data.masaAdi, isim: "Sistem", mesaj: `⭐ ${data.isim} gösterge yaptı!`, kozmetikler: [] }); } } });
+    
     socket.on('tas_atildi', (data) => {
         const masa = masalar[data.masaAdi];
         if(masa && masa.siradakiOyuncu === data.isim) {
             if(masa.eller[data.isim]) { const tasIndex = masa.eller[data.isim].findIndex(t => t.id === data.tas.id); if(tasIndex !== -1) masa.eller[data.isim].splice(tasIndex, 1); }
             masa.sonAtilanTas = data.tas; 
+            masa.iskartalar[data.isim] = data.tas; // İzleyici için hafızaya yaz
             io.emit('ortaya_tas_atildi', { masaAdi: data.masaAdi, kimAtti: data.isim, tas: data.tas });
             let currentIndex = masa.koltuklar.indexOf(data.isim); let nextIndex = (currentIndex + 1) % 4; masa.siradakiOyuncu = masa.koltuklar[nextIndex];
             io.emit('sira_guncelle', { masaAdi: data.masaAdi, kimde: masa.siradakiOyuncu }); if(aktifBotlar.includes(masa.siradakiOyuncu)) { botHamlesiYap(data.masaAdi); }
         }
     });
 
-    socket.on('ortadan_tas_cek', (data) => {
-        const masa = masalar[data.masaAdi];
-        if(masa && masa.siradakiOyuncu === data.isim && masa.deste.length > 0) {
-            masa.sonAtilanTas = null;
-            const cekilenTas = masa.deste.shift(); masa.eller[data.isim].push(cekilenTas);
-            socket.emit('tas_cekildi', cekilenTas); io.emit('masa_ortasi_guncelle', { masaAdi: data.masaAdi, kalanTas: masa.deste.length, gosterge: masa.gosterge });
-        }
-    });
-
+    socket.on('ortadan_tas_cek', (data) => { const masa = masalar[data.masaAdi]; if(masa && masa.siradakiOyuncu === data.isim && masa.deste.length > 0) { masa.sonAtilanTas = null; const cekilenTas = masa.deste.shift(); masa.eller[data.isim].push(cekilenTas); socket.emit('tas_cekildi', cekilenTas); io.emit('masa_ortasi_guncelle', { masaAdi: data.masaAdi, kalanTas: masa.deste.length, gosterge: masa.gosterge }); } });
     socket.on('yandan_tas_alindi', (data) => { const masa = masalar[data.masaAdi]; if(masa && masa.eller[data.kimAldi]) { masa.eller[data.kimAldi].push(data.tas); masa.sonAtilanTas = null; } io.emit('yandan_alindi_guncelle', data); });
-
-    socket.on('oyunu_bitir', (data) => {
-        const masa = masalar[data.masaAdi];
-        if(masa && masa.siradakiOyuncu === data.isim) {
-            const elGecerliMi = eliKontrolEt(data.gruplar, masa.gosterge);
-            if(elGecerliMi) {
-                let kazanilanPara = Number(masa.kasa); 
-                let uCip = parseInt(String(oyuncuCipleri[data.isim]).replace(/[^0-9]/g, '')) || 0;
-                oyuncuCipleri[data.isim] = uCip + kazanilanPara;
-                io.emit('cip_guncelle_ozel', { isim: data.isim, cip: oyuncuCipleri[data.isim] }); 
-                oyunuSifirla(data.masaAdi, data.isim, kazanilanPara, "Nizami dizilimle el bitti.");
-            } else { 
-                socket.emit('hatali_bitis', { mesaj: "Dizilim hatalı veya taşlar arasında boşluk bıraktınız!", tasId: data.tasHtmlId }); 
-            }
-        }
-    });
-
+    socket.on('oyunu_bitir', (data) => { const masa = masalar[data.masaAdi]; if(masa && masa.siradakiOyuncu === data.isim) { const elGecerliMi = eliKontrolEt(data.gruplar, masa.gosterge); if(elGecerliMi) { let kazanilanPara = Number(masa.kasa); let uCip = parseInt(String(oyuncuCipleri[data.isim]).replace(/[^0-9]/g, '')) || 0; oyuncuCipleri[data.isim] = uCip + kazanilanPara; io.emit('cip_guncelle_ozel', { isim: data.isim, cip: oyuncuCipleri[data.isim] }); oyunuSifirla(data.masaAdi, data.isim, kazanilanPara, "Nizami dizilimle el bitti."); } else { socket.emit('hatali_bitis', { mesaj: "Dizilim hatalı!", tasId: data.tasHtmlId }); } } });
     socket.on('masaya_geri_don', (data) => { const masa = masalar[data.masaAdi]; if (masa && masa.oyunBasladi && masa.koltuklar.includes(data.isim)) { socket.emit('masa_oyun_basladi', { masaAdi: data.masaAdi, gosterge: masa.gosterge, kalanTas: masa.deste.length, kasa: masa.kasa, koltuklar: masa.koltuklar }); if(masa.eller[data.isim]) { socket.emit('taslari_al', { kime: data.isim, taslar: masa.eller[data.isim] }); } socket.emit('sira_guncelle', { masaAdi: data.masaAdi, kimde: masa.siradakiOyuncu }); } });
     socket.on('masadan_kalk', (data) => { kullaniciyiMasadanKaldir(data.isim); });
     socket.on('disconnect', () => { const kopanIsim = socket.kullaniciAdi; if(kopanIsim) { baglantiKopanlar[kopanIsim] = setTimeout(() => { kullaniciyiMasadanKaldir(kopanIsim); delete oyuncuCipleri[kopanIsim]; io.emit('online_oyuncular', Object.keys(oyuncuCipleri)); delete baglantiKopanlar[kopanIsim]; }, 20000); } });
 
     socket.on('admin_giris', (sifre) => { if(sifre === "BJK1903") { socket.emit('admin_onay', { basarili: true }); socket.emit('admin_guncel_veri', oyuncuCipleri); } else { socket.emit('admin_onay', { basarili: false }); } });
     socket.on('admin_veri_iste', () => { socket.emit('admin_guncel_veri', oyuncuCipleri); });
-    
-    socket.on('admin_cip_islem', (data) => {
-        let hedefIsim = (data.isim || "").trim().toUpperCase(); 
-        if (oyuncuCipleri[hedefIsim] !== undefined) {
-            let gercekCip = parseInt(String(oyuncuCipleri[hedefIsim]).replace(/[^0-9]/g, '')) || 0;
-            let miktar = parseInt(String(data.miktar).replace(/[^0-9]/g, '')) || 0; 
-            if (data.islem === 'ekle') { oyuncuCipleri[hedefIsim] = gercekCip + miktar; } else if (data.islem === 'cikar') { oyuncuCipleri[hedefIsim] = Math.max(0, gercekCip - miktar); }
-            io.emit('cip_guncelle_ozel', { isim: hedefIsim, cip: oyuncuCipleri[hedefIsim] }); io.emit('admin_guncel_veri', oyuncuCipleri); socket.emit('admin_flash_mesaj', `Başarılı: ${hedefIsim} adlı oyuncunun çipleri güncellendi!`);
-        } else { socket.emit('admin_flash_mesaj', `⚠️ HATA: ${hedefIsim} şu an aktif değil! Çip gönderilemedi.`); }
-    });
-
+    socket.on('admin_cip_islem', (data) => { let hedefIsim = (data.isim || "").trim().toUpperCase(); if (oyuncuCipleri[hedefIsim] !== undefined) { let gercekCip = parseInt(String(oyuncuCipleri[hedefIsim]).replace(/[^0-9]/g, '')) || 0; let miktar = parseInt(String(data.miktar).replace(/[^0-9]/g, '')) || 0; if (data.islem === 'ekle') { oyuncuCipleri[hedefIsim] = gercekCip + miktar; } else if (data.islem === 'cikar') { oyuncuCipleri[hedefIsim] = Math.max(0, gercekCip - miktar); } io.emit('cip_guncelle_ozel', { isim: hedefIsim, cip: oyuncuCipleri[hedefIsim] }); io.emit('admin_guncel_veri', oyuncuCipleri); socket.emit('admin_flash_mesaj', `Başarılı: ${hedefIsim} güncellendi!`); } else { socket.emit('admin_flash_mesaj', `⚠️ HATA: ${hedefIsim} bulunamadı.`); } });
     socket.on('admin_duyuru', (mesaj) => { io.emit('admin_flash_mesaj', mesaj); });
-    socket.on('admin_oyuncu_kick', (isim) => { let hedefIsim = (isim || "").trim().toUpperCase(); kullaniciyiMasadanKaldir(hedefIsim); io.emit('admin_islem_uyarisi', { isim: hedefIsim, islem: 'kick' }); io.emit('sistem_mesaji', `🚨 Yönetici, ${hedefIsim} adlı oyuncuyu masadan uzaklaştırdı.`); });
+    socket.on('admin_oyuncu_kick', (isim) => { let hedefIsim = (isim || "").trim().toUpperCase(); kullaniciyiMasadanKaldir(hedefIsim); io.emit('admin_islem_uyarisi', { isim: hedefIsim, islem: 'kick' }); });
     socket.on('admin_oyuncu_ban', (isim) => { let hedefIsim = (isim || "").trim().toUpperCase(); banliKullanicilar.add(hedefIsim); kullaniciyiMasadanKaldir(hedefIsim); io.emit('admin_islem_uyarisi', { isim: hedefIsim, islem: 'ban' }); });
 });
 
-const PORT = process.env.PORT || 3000;
-http.listen(PORT, () => { console.log(`Sunucu ${PORT} portunda aktif...`); });
+const PORT = process.env.PORT || 3000; http.listen(PORT, () => { console.log(`Sunucu ${PORT} portunda aktif...`); });
