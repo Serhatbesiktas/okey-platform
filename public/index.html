@@ -73,17 +73,13 @@
     <div id="profilEkrani" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999999; flex-direction:column; justify-content:center; align-items:center;">
         <div class="magaza-kutu" style="max-width: 340px; width:90%; border: 2px solid #f2c94c; text-align: center; padding: 25px 20px; position:relative; box-shadow: 0 0 20px rgba(242, 201, 76, 0.2);">
             <button onclick="document.getElementById('profilEkrani').style.display='none'" style="position:absolute; top:15px; right:20px; background:none; border:none; color:#e74c3c; font-size:24px; cursor:pointer; font-weight:bold;">X</button>
-
             <div id="profilAvatarAlan" style="width:70px; height:70px; margin: 0 auto 10px; background: radial-gradient(circle, #1e3f28 0%, #0d1f14 100%); border-radius:50%; border:3px solid #52796f; display:flex; justify-content:center; align-items:center; font-size:35px; box-shadow: 0 0 15px rgba(46, 204, 113, 0.3);">😎</div>
-
             <h2 id="profilIsim" style="color:#ff4d4d; margin-bottom:5px; font-size:24px; text-shadow: 0 0 10px rgba(255, 77, 77, 0.5);">Yükleniyor...</h2>
             <div id="profilDurumBadge" style="font-size:12px; font-weight:bold; margin-bottom:15px; color:#2ecc71;">🟢 Çevrimiçi</div>
-
             <div style="display:flex; justify-content:center; gap:10px; margin-bottom: 20px;">
                 <div id="profilLigBadge" style="background: linear-gradient(180deg, #3498db 0%, #2980b9 100%); color: #fff; font-size: 12px; padding: 6px 15px; border-radius: 8px; font-weight:bold; box-shadow: 0 2px 5px rgba(0,0,0,0.5);">💎 ELMAS LİG</div>
                 <div id="profilUnvanBadge" style="background: linear-gradient(180deg, #f1c40f 0%, #f39c12 100%); color: #111; font-size: 12px; padding: 6px 15px; border-radius: 8px; font-weight:bold; box-shadow: 0 2px 5px rgba(0,0,0,0.5);">👑 OKEY KRALI</div>
             </div>
-
             <div style="display:flex; justify-content:space-between; background:#111; border: 1px solid #333; padding:15px; border-radius:12px; margin-bottom:20px;">
                 <div style="text-align:center; flex:1; border-right:1px solid #333;">
                     <div style="font-size:10px; color:#a3c4bc; margin-bottom:5px; font-weight:bold;">OYNANAN</div>
@@ -98,12 +94,10 @@
                     <div id="profilKazanmaOrani" style="font-size:18px; font-weight:900; color:#f1c40f;">...</div>
                 </div>
             </div>
-
             <div style="border: 1px dashed #2ecc71; border-radius: 12px; padding: 15px; margin-bottom: 20px; background: rgba(46, 204, 113, 0.05);">
                 <div style="font-size:11px; color:#2ecc71; font-weight:bold; margin-bottom:5px;">GÜNCEL ÇİP</div>
                 <div id="profilCipMiktari" style="font-size:26px; font-weight:900; color:#fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">...</div>
             </div>
-
             <div style="display:flex; flex-direction:column; gap:10px;">
                 <button id="profilArkadasBtn" onclick="profilArkadasAksiyon()" class="satin-al-btn" style="background: linear-gradient(180deg, #f1c40f 0%, #f39c12 100%); color:#111; font-weight:bold; border:none;">➕ Arkadaş Ekle</button>
                 <button id="profilDavetBtn" onclick="profilDavetAksiyon()" class="satin-al-btn" style="background: linear-gradient(180deg, #2ecc71 0%, #27ae60 100%); color:#fff; font-weight:bold; border:none;">🎲 Masaya Davet Et</button>
@@ -362,11 +356,28 @@
     <script src="muzik.js"></script>
     <script src="seyirci.js"></script> 
     
+    <!-- 🔥 GÖMÜLÜ TEMA RADARI, CSS ENJEKTÖRÜ VE SOHBET BALONU MOTORU 🔥 -->
     <script>
         const temaStilleri = document.createElement('style');
         temaStilleri.innerHTML = `
             @keyframes pulseGold { 0% { box-shadow: 0 0 15px #ffd700; transform: scale(1); } 50% { box-shadow: 0 0 30px #ffd700; transform: scale(1.02); } 100% { box-shadow: 0 0 15px #ffd700; transform: scale(1); } }
             @keyframes pulseNeon { 0% { box-shadow: 0 0 15px #bc13fe, inset 0 0 10px #00f3ff; } 50% { box-shadow: 0 0 30px #00f3ff, inset 0 0 20px #bc13fe; } 100% { box-shadow: 0 0 15px #bc13fe, inset 0 0 10px #00f3ff; } }
+
+            /* 🔥 YENİ: BOT SOHBET BALONCUKLARI 🔥 */
+            .bot-speech-bubble {
+                position: absolute; bottom: 120%; left: 50%; transform: translateX(-50%);
+                background: linear-gradient(135deg, #f1c40f, #f39c12); color: #111;
+                padding: 8px 12px; border-radius: 12px; font-size: 11px; font-weight: 900;
+                white-space: nowrap; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+                animation: popBubble 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), fadeBubble 0.5s ease-in 4s forwards;
+                pointer-events: none; z-index: 1000;
+            }
+            .bot-speech-bubble::after {
+                content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+                border-width: 6px; border-style: solid; border-color: #f39c12 transparent transparent transparent;
+            }
+            @keyframes popBubble { 0% { opacity:0; transform: translateX(-50%) scale(0.5); } 100% { opacity:1; transform: translateX(-50%) scale(1); } }
+            @keyframes fadeBubble { 0% { opacity:1; } 100% { opacity:0; transform: translateX(-50%) translateY(-10px); } }
 
             /* ROYAL GOLD */
             body.tema-royal, body.tema-royal #lobiEkrani { background: #000 !important; background-image: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%) !important; }
@@ -419,8 +430,60 @@
         document.head.appendChild(temaStilleri);
 
         if(typeof socket !== 'undefined') {
-            socket.on('kozmetikleri_guncelle', (data) => {
-                window.globalKozmetikler = data;
+            socket.on('kozmetikleri_guncelle', (data) => { window.globalKozmetikler = data; });
+
+            // 🔥 İZLEYİCİ İÇİN TAŞ DİZME MOTORU 🔥
+            socket.on('izleyici_olarak_katildin', (data) => {
+                setTimeout(() => { 
+                    if(window.gelişmişKoltukHizala) window.gelişmişKoltukHizala(data.koltuklar);
+                    ['iskartaUst', 'iskartaSag', 'iskartaSol', 'benimIskartam'].forEach(id => { let el = document.getElementById(id); if(el) el.innerHTML = ''; });
+
+                    if(data.iskartalar) {
+                        for(let bot in data.iskartalar) {
+                            let tas = data.iskartalar[bot]; if(!tas) continue;
+                            let tDiv = 'benimIskartam';
+                            if(window.masaKoltukMapping && window.masaKoltukMapping.right === bot) tDiv = 'iskartaSag';
+                            else if(window.masaKoltukMapping && window.masaKoltukMapping.top === bot) tDiv = 'iskartaUst';
+                            else if(window.masaKoltukMapping && window.masaKoltukMapping.left === bot) tDiv = 'iskartaSol';
+                            
+                            let k = document.getElementById(tDiv);
+                            if(k) k.innerHTML = `<div class="okey-tasi tas-${tas.renk}" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); box-shadow:0 2px 5px rgba(0,0,0,0.8); margin:0;">${tas.sayi}</div>`;
+                        }
+                    }
+                }, 150);
+            });
+
+            // 🔥 İZLEYİCİ TAŞ ATILDIĞINDA ANINDA GÖRSÜN 🔥
+            socket.on('ortaya_tas_atildi', (data) => {
+                if(window.suAnkiMasam === data.masaAdi && window.izleyiciModu) {
+                    let tDiv = 'benimIskartam';
+                    if(window.masaKoltukMapping && window.masaKoltukMapping.right === data.kimAtti) tDiv = 'iskartaSag';
+                    else if(window.masaKoltukMapping && window.masaKoltukMapping.top === data.kimAtti) tDiv = 'iskartaUst';
+                    else if(window.masaKoltukMapping && window.masaKoltukMapping.left === data.kimAtti) tDiv = 'iskartaSol';
+                    
+                    let k = document.getElementById(tDiv);
+                    if(k) k.innerHTML = `<div class="okey-tasi tas-${data.tas.renk}" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); box-shadow:0 2px 5px rgba(0,0,0,0.8); margin:0;">${data.tas.sayi}</div>`;
+                }
+            });
+
+            // 🔥 BOT KONUŞMA BALONLARI 🔥
+            socket.on('masa_sohbet_balonu', (data) => {
+                if(window.suAnkiMasam !== data.masaAdi) return;
+                let elId = 'benimAdimKutusu';
+                if(window.masaKoltukMapping) {
+                    if(window.masaKoltukMapping.right === data.isim) elId = 'seatRight';
+                    else if(window.masaKoltukMapping.top === data.isim) elId = 'seatTop';
+                    else if(window.masaKoltukMapping.left === data.isim) elId = 'seatLeft';
+                }
+                let target = document.getElementById(elId);
+                if(target) {
+                    let b = document.createElement('div');
+                    b.className = 'bot-speech-bubble';
+                    b.innerText = data.mesaj;
+                    target.parentElement.style.position = 'relative';
+                    target.appendChild(b);
+                    setTimeout(() => b.remove(), 4500);
+                }
             });
         }
 
@@ -429,173 +492,73 @@
                 let uygulanacak = [];
                 if (typeof aktifKozmetikler !== 'undefined') uygulanacak = aktifKozmetikler;
                 else if (window.aktifKozmetikler) uygulanacak = window.aktifKozmetikler;
-
                 let masaAdi = null;
                 if (typeof suAnkiMasam !== 'undefined') masaAdi = suAnkiMasam;
                 else if (window.suAnkiMasam) masaAdi = window.suAnkiMasam;
-
                 let gKoz = null;
                 if (typeof globalKozmetikler !== 'undefined') gKoz = globalKozmetikler;
                 else if (window.globalKozmetikler) gKoz = window.globalKozmetikler;
 
                 if (masaAdi && masaAdi.includes('VIP:')) {
                     let masaSahibi = masaAdi.split('VIP:')[1].split('Masası')[0].trim();
-                    if (gKoz && gKoz[masaSahibi]) {
-                        uygulanacak = gKoz[masaSahibi];
-                    }
+                    if (gKoz && gKoz[masaSahibi]) { uygulanacak = gKoz[masaSahibi]; }
                 }
 
                 document.body.classList.remove('tema-royal', 'tema-neon', 'tema-kizil');
-                
                 if (uygulanacak.includes('tema_royal')) document.body.classList.add('tema-royal');
                 else if (uygulanacak.includes('tema_neon')) document.body.classList.add('tema-neon');
                 else if (uygulanacak.includes('tema_kizil')) document.body.classList.add('tema-kizil');
-            } catch(e) {
-                console.log("Tema yükleme hatası:", e);
-            }
+            } catch(e) { }
         }, 500);
 
-        // 🔥 YENİLENMİŞ VE ANINDA AÇILAN BOT KİMLİK MOTORU 🔥
         window.profiliGoster = function(hedefIsim) {
             if(!hedefIsim || hedefIsim === "" || hedefIsim === "Bekleniyor..." || hedefIsim === "➕ DAVET" || hedefIsim === "Boş") { 
-                if(window.suAnkiMasam && !window.izleyiciModu) window.davetMenusuAc(); 
-                return; 
+                if(window.suAnkiMasam && !window.izleyiciModu) window.davetMenusuAc(); return; 
             }
             
-            const pEkrani = document.getElementById('profilEkrani');
-            const pIsim = document.getElementById('profilIsim'); 
-            const pCip = document.getElementById('profilCipMiktari'); 
-            const pDurum = document.getElementById('profilDurumBadge'); 
-            const pOynanan = document.getElementById('profilOynanan');
-            const pKazanilan = document.getElementById('profilKazanilan');
-            const pOran = document.getElementById('profilKazanmaOrani');
-            const pLig = document.getElementById('profilLigBadge');
-            const pUnvan = document.getElementById('profilUnvanBadge');
-            const pArkadasBtn = document.getElementById('profilArkadasBtn'); 
-            const pDavetBtn = document.getElementById('profilDavetBtn');
-            
-            pEkrani.style.display = 'flex'; 
-            pArkadasBtn.dataset.hedef = hedefIsim; 
-            pDavetBtn.dataset.hedef = hedefIsim;
-            
+            const pEkrani = document.getElementById('profilEkrani'); const pIsim = document.getElementById('profilIsim'); const pCip = document.getElementById('profilCipMiktari'); const pDurum = document.getElementById('profilDurumBadge'); const pOynanan = document.getElementById('profilOynanan'); const pKazanilan = document.getElementById('profilKazanilan'); const pOran = document.getElementById('profilKazanmaOrani'); const pLig = document.getElementById('profilLigBadge'); const pUnvan = document.getElementById('profilUnvanBadge'); const pArkadasBtn = document.getElementById('profilArkadasBtn'); const pDavetBtn = document.getElementById('profilDavetBtn');
+            pEkrani.style.display = 'flex'; pArkadasBtn.dataset.hedef = hedefIsim; pDavetBtn.dataset.hedef = hedefIsim;
             let isOnline = (window.onlineOyuncularListesi && window.onlineOyuncularListesi.includes(hedefIsim)) || hedefIsim === window.aktifKullaniciAdi;
-            pDurum.innerHTML = isOnline ? "🟢 Çevrimiçi" : "🔴 Çevrimdışı"; 
-            pDurum.style.color = isOnline ? "#2ecc71" : "#e74c3c";
+            pDurum.innerHTML = "🟢 Çevrimiçi"; pDurum.style.color = "#2ecc71";
             
             if (hedefIsim !== window.aktifKullaniciAdi) {
                 pArkadasBtn.style.display = 'block';
-                if (window.benimArkadaslarim && window.benimArkadaslarim.includes(hedefIsim)) { 
-                    pArkadasBtn.innerHTML = "❌ Arkadaştan Çıkar"; 
-                    pArkadasBtn.style.background = "linear-gradient(180deg, #e74c3c 0%, #c0392b 100%)"; 
-                    pArkadasBtn.style.color = "#fff";
-                } else { 
-                    pArkadasBtn.innerHTML = "➕ Arkadaş Ekle"; 
-                    pArkadasBtn.style.background = "linear-gradient(180deg, #f1c40f 0%, #f39c12 100%)";
-                    pArkadasBtn.style.color = "#111";
-                }
+                if (window.benimArkadaslarim && window.benimArkadaslarim.includes(hedefIsim)) { pArkadasBtn.innerHTML = "❌ Arkadaştan Çıkar"; pArkadasBtn.style.background = "linear-gradient(180deg, #e74c3c 0%, #c0392b 100%)"; pArkadasBtn.style.color = "#fff"; } 
+                else { pArkadasBtn.innerHTML = "➕ Arkadaş Ekle"; pArkadasBtn.style.background = "linear-gradient(180deg, #f1c40f 0%, #f39c12 100%)"; pArkadasBtn.style.color = "#111"; }
                 pDavetBtn.style.display = isOnline ? 'block' : 'none'; 
-            } else { 
-                pArkadasBtn.style.display = 'none'; 
-                pDavetBtn.style.display = 'none'; 
-            }
+            } else { pArkadasBtn.style.display = 'none'; pDavetBtn.style.display = 'none'; }
 
-            let tacIcon = "";
-            let ismRengi = "#fff";
-            let textGlow = "none";
-            
+            let tacIcon = ""; let ismRengi = "#fff"; let textGlow = "none";
             if(window.globalKozmetikler && window.globalKozmetikler[hedefIsim]) {
                 if(window.globalKozmetikler[hedefIsim].includes('neon_tac')) tacIcon = "👑 ";
-                if(window.globalKozmetikler[hedefIsim].includes('atesli_isim')) {
-                    ismRengi = "#ff4d4d"; textGlow = "0 0 10px rgba(255, 77, 77, 0.8)";
-                }
+                if(window.globalKozmetikler[hedefIsim].includes('atesli_isim')) { ismRengi = "#ff4d4d"; textGlow = "0 0 10px rgba(255, 77, 77, 0.8)"; }
             }
-            
-            // "YÜKLENİYOR" GECİKMESİ İPTAL EDİLDİ - İSİM ANINDA YAZILIR!
-            pIsim.innerHTML = tacIcon + hedefIsim;
-            pIsim.style.color = ismRengi; 
-            pIsim.style.textShadow = textGlow;
-            
-            pCip.innerText = "...";
-            pOynanan.innerText = "...";
-            pKazanilan.innerHTML = "...";
-            pOran.innerText = "...";
+            pIsim.innerHTML = tacIcon + hedefIsim; pIsim.style.color = ismRengi; pIsim.style.textShadow = textGlow;
+            pCip.innerText = "..."; pOynanan.innerText = "..."; pKazanilan.innerHTML = "..."; pOran.innerText = "...";
             
             if(hedefIsim.startsWith("MİSAFİR_")) { 
-                pCip.innerText = "20.000"; 
-                pOynanan.innerText = "0"; pKazanilan.innerHTML = "0 <span style='color:#777;'>/</span> <span style='color:#e74c3c;'>0</span>"; pOran.innerText = "%0";
-                pLig.innerText = "🥉 BRONZ LİG"; pLig.style.background = "linear-gradient(180deg, #cd7f32 0%, #8b4513 100%)";
-                pUnvan.innerText = "MİSAFİR";
-                return; 
+                pCip.innerText = "20.000"; pOynanan.innerText = "0"; pKazanilan.innerHTML = "0 <span style='color:#777;'>/</span> <span style='color:#e74c3c;'>0</span>"; pOran.innerText = "%0"; pLig.innerText = "🥉 BRONZ LİG"; pLig.style.background = "linear-gradient(180deg, #cd7f32 0%, #8b4513 100%)"; pUnvan.innerText = "MİSAFİR"; return; 
             }
 
-            let hash = 0;
-            for (let i = 0; i < hedefIsim.length; i++) { hash = hedefIsim.charCodeAt(i) + ((hash << 5) - hash); }
-            hash = Math.abs(hash);
-
-            let fakeCip = (hash % 15000000) + 500000; 
-            let fakeOynanan = (hash % 800) + 50; 
-            let fakeKazanilan = Math.floor(fakeOynanan * ((hash % 30 + 40) / 100)); 
-            let fakeKaybedilen = fakeOynanan - fakeKazanilan;
-            let fakeOran = Math.floor((fakeKazanilan / fakeOynanan) * 100);
+            let hash = 0; for (let i = 0; i < hedefIsim.length; i++) { hash = hedefIsim.charCodeAt(i) + ((hash << 5) - hash); } hash = Math.abs(hash);
+            let fakeCip = (hash % 15000000) + 500000; let fakeOynanan = (hash % 800) + 50; let fakeKazanilan = Math.floor(fakeOynanan * ((hash % 30 + 40) / 100)); let fakeKaybedilen = fakeOynanan - fakeKazanilan; let fakeOran = Math.floor((fakeKazanilan / fakeOynanan) * 100);
             
             let lig = "🥉 BRONZ LİG"; let ligBg = "linear-gradient(180deg, #cd7f32 0%, #8b4513 100%)";
-            if(fakeCip > 10000000) { lig = "💎 ELMAS LİG"; ligBg = "linear-gradient(180deg, #3498db 0%, #2980b9 100%)"; }
-            else if(fakeCip > 5000000) { lig = "🥇 ALTIN LİG"; ligBg = "linear-gradient(180deg, #f1c40f 0%, #f39c12 100%)"; }
-            else if(fakeCip > 2000000) { lig = "🥈 GÜMÜŞ LİG"; ligBg = "linear-gradient(180deg, #bdc3c7 0%, #95a5a6 100%)"; }
+            if(fakeCip > 10000000) { lig = "💎 ELMAS LİG"; ligBg = "linear-gradient(180deg, #3498db 0%, #2980b9 100%)"; } else if(fakeCip > 5000000) { lig = "🥇 ALTIN LİG"; ligBg = "linear-gradient(180deg, #f1c40f 0%, #f39c12 100%)"; } else if(fakeCip > 2000000) { lig = "🥈 GÜMÜŞ LİG"; ligBg = "linear-gradient(180deg, #bdc3c7 0%, #95a5a6 100%)"; }
+            let unvan = "🃏 OYUNCU"; if(fakeOran > 60) unvan = "👑 OKEY KRALI"; else if(fakeOynanan > 500) unvan = "⚔️ USTA"; else if(fakeKazanilan > 200) unvan = "🔥 ATEŞ USTASI";
 
-            let unvan = "🃏 OYUNCU";
-            if(fakeOran > 60) unvan = "👑 OKEY KRALI";
-            else if(fakeOynanan > 500) unvan = "⚔️ USTA";
-            else if(fakeKazanilan > 200) unvan = "🔥 ATEŞ USTASI";
-
-            const sahteStatlariBas = () => {
-                // 🔥 İŞTE KESİN ÇÖZÜM: EĞER BOT İSE KESİNLİKLE ÇEVRİMİÇİDİR! 🔥
-                pDurum.innerHTML = "🟢 Çevrimiçi";
-                pDurum.style.color = "#2ecc71";
-                
-                pCip.innerText = fakeCip.toLocaleString('tr-TR');
-                pOynanan.innerText = fakeOynanan;
-                pKazanilan.innerHTML = fakeKazanilan + ' <span style="color:#777; font-size:14px;">/</span> <span style="color:#e74c3c; font-size:14px;">' + fakeKaybedilen + '</span>';
-                pOran.innerText = '%' + fakeOran;
-                pLig.innerText = lig; pLig.style.background = ligBg;
-                pUnvan.innerText = unvan;
-            };
-            
+            const sahteStatlariBas = () => { pDurum.innerHTML = "🟢 Çevrimiçi"; pDurum.style.color = "#2ecc71"; pCip.innerText = fakeCip.toLocaleString('tr-TR'); pOynanan.innerText = fakeOynanan; pKazanilan.innerHTML = fakeKazanilan + ' <span style="color:#777; font-size:14px;">/</span> <span style="color:#e74c3c; font-size:14px;">' + fakeKaybedilen + '</span>'; pOran.innerText = '%' + fakeOran; pLig.innerText = lig; pLig.style.background = ligBg; pUnvan.innerText = unvan; };
             if(window.db) {
                 window.db.collection("kullanicilar").where("isim", "==", hedefIsim).get().then((q) => {
                     if(!q.empty) { 
-                        const data = q.docs[0].data(); 
-                        let gCip = parseInt(String(data.cip).replace(/[^0-9]/g, '')) || 0;
-                        let gOynanan = data.oynananOyun || 0;
-                        let gKazanilan = data.kazanilanOyun || 0;
-                        let gKaybedilen = gOynanan - gKazanilan;
-                        let gOran = gOynanan > 0 ? Math.floor((gKazanilan / gOynanan) * 100) : 0;
-                        
+                        const data = q.docs[0].data(); let gCip = parseInt(String(data.cip).replace(/[^0-9]/g, '')) || 0; let gOynanan = data.oynananOyun || 0; let gKazanilan = data.kazanilanOyun || 0; let gKaybedilen = gOynanan - gKazanilan; let gOran = gOynanan > 0 ? Math.floor((gKazanilan / gOynanan) * 100) : 0;
                         let gercekLig = "🥉 BRONZ LİG"; let gercekLigBg = "linear-gradient(180deg, #cd7f32 0%, #8b4513 100%)";
-                        if(gCip > 10000000) { gercekLig = "💎 ELMAS LİG"; gercekLigBg = "linear-gradient(180deg, #3498db 0%, #2980b9 100%)"; }
-                        else if(gCip > 5000000) { gercekLig = "🥇 ALTIN LİG"; gercekLigBg = "linear-gradient(180deg, #f1c40f 0%, #f39c12 100%)"; }
-                        else if(gCip > 2000000) { gercekLig = "🥈 GÜMÜŞ LİG"; gercekLigBg = "linear-gradient(180deg, #bdc3c7 0%, #95a5a6 100%)"; }
-
-                        let gercekUnvan = "🃏 OYUNCU";
-                        if(gOran > 60 && gOynanan > 50) gercekUnvan = "👑 OKEY KRALI";
-                        else if(gOynanan > 500) gercekUnvan = "⚔️ USTA";
-                        else if(gKazanilan > 200) gercekUnvan = "🔥 ATEŞ USTASI";
-
-                        pCip.innerText = gCip.toLocaleString('tr-TR');
-                        pOynanan.innerText = gOynanan;
-                        pKazanilan.innerHTML = gKazanilan + ' <span style="color:#777; font-size:14px;">/</span> <span style="color:#e74c3c; font-size:14px;">' + gKaybedilen + '</span>';
-                        pOran.innerText = '%' + gOran;
-                        pLig.innerText = gercekLig; pLig.style.background = gercekLigBg;
-                        pUnvan.innerText = gercekUnvan;
-                    } else {
-                        sahteStatlariBas();
-                    }
-                }).catch(err => { 
-                    sahteStatlariBas(); 
-                });
-            } else {
-                sahteStatlariBas();
-            }
+                        if(gCip > 10000000) { gercekLig = "💎 ELMAS LİG"; gercekLigBg = "linear-gradient(180deg, #3498db 0%, #2980b9 100%)"; } else if(gCip > 5000000) { gercekLig = "🥇 ALTIN LİG"; gercekLigBg = "linear-gradient(180deg, #f1c40f 0%, #f39c12 100%)"; } else if(gCip > 2000000) { gercekLig = "🥈 GÜMÜŞ LİG"; gercekLigBg = "linear-gradient(180deg, #bdc3c7 0%, #95a5a6 100%)"; }
+                        let gercekUnvan = "🃏 OYUNCU"; if(gOran > 60 && gOynanan > 50) gercekUnvan = "👑 OKEY KRALI"; else if(gOynanan > 500) gercekUnvan = "⚔️ USTA"; else if(gKazanilan > 200) gercekUnvan = "🔥 ATEŞ USTASI";
+                        pCip.innerText = gCip.toLocaleString('tr-TR'); pOynanan.innerText = gOynanan; pKazanilan.innerHTML = gKazanilan + ' <span style="color:#777; font-size:14px;">/</span> <span style="color:#e74c3c; font-size:14px;">' + gKaybedilen + '</span>'; pOran.innerText = '%' + gOran; pLig.innerText = gercekLig; pLig.style.background = gercekLigBg; pUnvan.innerText = gercekUnvan;
+                    } else { sahteStatlariBas(); }
+                }).catch(err => { sahteStatlariBas(); });
+            } else { sahteStatlariBas(); }
         };
     </script>
 </body>
