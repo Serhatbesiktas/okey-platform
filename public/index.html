@@ -466,6 +466,20 @@
                 }
             });
 
+            // 🔥 İZLEYİCİ BİRİ TAŞ ÇEKTİĞİNDE MASADAN SİLİNDİĞİNİ GÖRSÜN 🔥
+            socket.on('yandan_alindi_guncelle', (data) => {
+                if(window.suAnkiMasam === data.masaAdi && window.izleyiciModu && data.atanKisi) {
+                    let tDiv = 'benimIskartam';
+                    if(window.masaKoltukMapping) {
+                        if(window.masaKoltukMapping.right === data.atanKisi) tDiv = 'iskartaSag';
+                        else if(window.masaKoltukMapping.top === data.atanKisi) tDiv = 'iskartaUst';
+                        else if(window.masaKoltukMapping.left === data.atanKisi) tDiv = 'iskartaSol';
+                    }
+                    let k = document.getElementById(tDiv);
+                    if(k) k.innerHTML = ''; 
+                }
+            });
+
             // 🔥 BOT KONUŞMA BALONLARI 🔥
             socket.on('masa_sohbet_balonu', (data) => {
                 if(window.suAnkiMasam !== data.masaAdi) return;
