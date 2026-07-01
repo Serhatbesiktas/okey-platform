@@ -463,7 +463,7 @@
                 }
             });
 
-            // 🔥 %100 GARANTİLİ, BEMBEYAZ VE SIRALI KAZANAN TAŞLARI 🔥
+            // 🔥 %100 ÇÖKME KORUMALI, BEMBEYAZ KUSURSUZ TAŞ DİZİCİ 🔥
             socket.on('oyun_bitti', (data) => {
                 if (window.suAnkiMasam !== data.masaAdi) return;
                 let elAlani = document.getElementById('kazananEliAlani');
@@ -483,27 +483,42 @@
                     
                     if (elAlani) {
                         elAlani.innerHTML = '';
-                        if (data.bitisEli && data.bitisEli.length > 0) {
-                            
-                            // Botun elini rakamlarına göre dizelim (Per gibi şık görünsün)
-                            let siraliEl = data.bitisEli.sort((a, b) => {
-                                let valA = a.sayi === 'S' ? 14 : parseInt(a.sayi);
-                                let valB = b.sayi === 'S' ? 14 : parseInt(b.sayi);
-                                if(valA === valB) return a.renk.localeCompare(b.renk);
-                                return valA - valB;
-                            });
+                        if (data.bitisEli && Array.isArray(data.bitisEli) && data.bitisEli.length > 0) {
+                            try {
+                                // Gelen veriyi her ihtimale karşı düzleştiriyoruz (İnsansa içiçe, botsa düz dizi gelir)
+                                let duzEl = [];
+                                data.bitisEli.forEach(item => {
+                                    if (Array.isArray(item)) item.forEach(altItem => duzEl.push(altItem));
+                                    else duzEl.push(item);
+                                });
 
-                            siraliEl.forEach(tas => {
-                                // Tema ne olursa olsun simsiyah ekranda taşın parlaması için sabit inline stiller
-                                let textColor = '#111'; // Siyah ve sahte okey için
-                                if(tas.renk === 'kirmizi') textColor = '#cc0000';
-                                else if(tas.renk === 'mavi') textColor = '#0000cc';
-                                else if(tas.renk === 'sari') textColor = '#d4af37';
-                                
-                                let displaySayi = tas.sayi === 'S' ? '☻' : tas.sayi;
+                                // Güvenli sıralama motoru (Çökmeyi tamamen engeller)
+                                let siraliEl = duzEl.sort((a, b) => {
+                                    if(!a || !b) return 0;
+                                    let valA = a.sayi === 'S' ? 14 : parseInt(a.sayi || 0);
+                                    let valB = b.sayi === 'S' ? 14 : parseInt(b.sayi || 0);
+                                    if(valA === valB) return (a.renk || '').localeCompare(b.renk || '');
+                                    return valA - valB;
+                                });
 
-                                elAlani.innerHTML += `<div style="position:relative; width:28px; height:42px; font-size:18px; font-weight:900; color:${textColor}; background:#fdfbf7; border-radius:6px; display:flex; justify-content:center; align-items:center; margin:2px; box-shadow:0 2px 5px rgba(0,0,0,0.8); border:1px solid #d1ccc0;">${displaySayi}</div>`;
-                            });
+                                siraliEl.forEach(tas => {
+                                    if(!tas || !tas.sayi) return; 
+                                    let textColor = '#111';
+                                    if(tas.renk === 'kirmizi') textColor = '#cc0000';
+                                    else if(tas.renk === 'mavi') textColor = '#0000cc';
+                                    else if(tas.renk === 'sari') textColor = '#d4af37';
+                                    
+                                    let displaySayi = tas.sayi === 'S' ? '☻' : tas.sayi;
+                                    
+                                    // Taşların bembeyaz ve pırıl pırıl görünmesi için inline stil garantisi
+                                    elAlani.innerHTML += `<div style="position:relative; width:28px; height:42px; font-size:18px; font-weight:900; color:${textColor}; background:#fdfbf7; border-radius:6px; display:flex; justify-content:center; align-items:center; margin:2px; box-shadow:0 2px 5px rgba(0,0,0,0.8); border:1px solid #d1ccc0;">${displaySayi}</div>`;
+                                });
+                            } catch(err) {
+                                console.log("Taş render hatası:", err);
+                                elAlani.innerHTML = '<span style="color:#aaa; font-size:12px;">Taşlar dizilemedi.</span>';
+                            }
+                        } else {
+                            elAlani.innerHTML = '<span style="color:#aaa; font-size:12px;">Kazananın eli gizli.</span>';
                         }
                     }
                 } else {
