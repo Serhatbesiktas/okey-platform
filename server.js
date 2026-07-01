@@ -200,9 +200,13 @@ function botHamlesiYap(masaAdi) {
         setTimeout(() => {
             try {
                 if(!masa.oyunBasladi) return;
+                
                 if (masa.deste.length > 35 && !masa.gostergeGosterildi && masa.gosterge) {
                     let hasGosterge = masa.eller[siradaki] && masa.eller[siradaki].some(t => t.renk === masa.gosterge.renk && t.sayi === masa.gosterge.sayi);
-                    if (hasGosterge) { masa.gostergeGosterildi = true; io.emit('yeni_sohbet_mesaji', { masaAdi: masaAdi, isim: "Sistem", mesaj: `⭐ ${siradaki} gösterge yaptı!`, kozmetikler: [] }); }
+                    if (hasGosterge && Math.random() > 0.5) { 
+                        masa.gostergeGosterildi = true; 
+                        io.emit('yeni_sohbet_mesaji', { masaAdi: masaAdi, isim: "Sistem", mesaj: `⭐ ${siradaki} gösterge yaptı!`, kozmetikler: [] }); 
+                    }
                 }
 
                 let tasAldi = false;
@@ -229,6 +233,7 @@ function botHamlesiYap(masaAdi) {
                         let guvenliTaslar = botunEli.filter(t => { let isOkey = (t.renk === okeyRenk && parseInt(t.sayi) === okeySayi); return !isOkey && t.renk !== 'sahte'; });
                         if(guvenliTaslar.length === 0) guvenliTaslar = botunEli; 
 
+                        // 🔥 BOTUN KAZANMA İHTİMALİ KİLİDİ (Artık erken bitemez) 🔥
                         let kazanmaSansi = 0; 
                         if (masa.deste.length <= 15) kazanmaSansi = 0.10; 
                         else if (masa.deste.length <= 35) kazanmaSansi = 0.02;
@@ -378,7 +383,23 @@ io.on('connection', (socket) => {
     });
 
     socket.on('oyunu_baslat', (masaAdi) => { masadaOyunuBaslat(masaAdi); });
-    socket.on('gosterge_goster', (data) => { const masa = masalar[data.masaAdi]; if(masa && masa.oyunBasladi && !masa.gostergeGosterildi) { const hasTile = masa.eller[data.isim].some(t => t.renk === masa.gosterge.renk && t.sayi === masa.gosterge.sayi); if(hasTile) { masa.gostergeGosterildi = true; const odul = masa.bahis; let uCip = parseInt(String(oyuncuCipleri[data.isim]).replace(/[^0-9]/g, '')) || 0; oyuncuCipleri[data.isim] = uCip + Number(odul); io.emit('cip_guncelle_ozel', { isim: data.isim, cip: oyuncuCipleri[data.isim] }); io.emit('gosterge_basarili', { masaAdi: data.masaAdi, isim: data.isim, odul: odul }); io.emit('yeni_sohbet_mesaji', { masaAdi: data.masaAdi, isim: "Sistem", mesaj: `⭐ ${data.isim} gösterge yaptı!`, kozmetikler: [] }); } } });
+    
+    // 🔥 GÖSTERGE MOTORU (Yenilenmiş Kilit) 🔥 
+    socket.on('gosterge_goster', (data) => { 
+        const masa = masalar[data.masaAdi]; 
+        if(masa && masa.oyunBasladi && !masa.gostergeGosterildi && masa.eller[data.isim]) { 
+            const hasTile = masa.eller[data.isim].some(t => t.renk === masa.gosterge.renk && t.sayi === masa.gosterge.sayi); 
+            if(hasTile) { 
+                masa.gostergeGosterildi = true; 
+                const odul = masa.bahis; 
+                let uCip = parseInt(String(oyuncuCipleri[data.isim]).replace(/[^0-9]/g, '')) || 0; 
+                oyuncuCipleri[data.isim] = uCip + Number(odul); 
+                io.emit('cip_guncelle_ozel', { isim: data.isim, cip: oyuncuCipleri[data.isim] }); 
+                io.emit('gosterge_basarili', { masaAdi: data.masaAdi, isim: data.isim, odul: odul }); 
+                io.emit('yeni_sohbet_mesaji', { masaAdi: data.masaAdi, isim: "Sistem", mesaj: `⭐ ${data.isim} gösterge yaptı!`, kozmetikler: [] }); 
+            } 
+        } 
+    });
     
     socket.on('tas_atildi', (data) => {
         const masa = masalar[data.masaAdi];
@@ -409,7 +430,6 @@ io.on('connection', (socket) => {
         } 
     });
     
-    // 🔥 TELEFONDAN GELEN EKSİK VERİYE GÜVENMİYORUZ. SUNUCU HAFIZASINI DİREKT EKRANA BASIYORUZ 🔥
     socket.on('oyunu_bitir', (data) => { 
         const masa = masalar[data.masaAdi]; 
         if(masa && masa.siradakiOyuncu === data.isim) { 
