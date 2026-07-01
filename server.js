@@ -42,16 +42,19 @@ function desteYaratVeKaristir() {
     for (let i = yeniDeste.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [yeniDeste[i], yeniDeste[j]] = [yeniDeste[j], yeniDeste[i]]; } return yeniDeste;
 }
 
-// 🔥 KAZANANIN ELİNİ İSTEMCİYE YOLLAYAN VE TEMİZLEYEN FONKSİYON 🔥
-function oyunuSifirla(masaAdi, kazanan = null, odul = 0, sebep = "", okeyleBittiMi = false, ozelBitisEli = null) {
+function oyunuSifirla(masaAdi, kazanan = null, odul = 0, sebep = "", okeyleBittiMi = false) {
     const masa = masalar[masaAdi];
     if(masa) {
         clearTimeout(masa.turnTimer);
         masa.oyunBasladi = false; masa.oyunBittiBeklemede = true; 
         
-        let bitisEli = ozelBitisEli || (kazanan ? masa.eller[kazanan] : null) || [];
+        // 🔥 Telefondan gelen eksik veriyi iptal ettik! Sadece sunucunun net hafızasındaki eli alıyoruz 🔥
+        let sunucuEli = [];
+        if(kazanan && masa.eller[kazanan]) {
+            sunucuEli = [...masa.eller[kazanan]];
+        }
 
-        io.emit('oyun_bitti', { masaAdi: masaAdi, kazanan: kazanan, odul: odul, sebep: sebep, okeyleBittiMi: okeyleBittiMi, bitisEli: bitisEli });
+        io.emit('oyun_bitti', { masaAdi: masaAdi, kazanan: kazanan, odul: odul, sebep: sebep, okeyleBittiMi: okeyleBittiMi, bitisEli: sunucuEli });
         
         if (kazanan) {
             masa.koltuklar.forEach(k => {
@@ -236,14 +239,7 @@ function botHamlesiYap(masaAdi) {
                             let gercekIndex = botunEli.findIndex(t => t.id === bitisTasi.id); botunEli.splice(gercekIndex, 1);
                             io.emit('ortaya_tas_atildi', { masaAdi: masaAdi, kimAtti: siradaki, tas: bitisTasi });
                             
-                            // 🔥 BOTUN ELİNİ HATASIZ SIRALAYIP GÖNDERİYORUZ 🔥
-                            let siraliBotEli = [...botunEli].sort((a, b) => {
-                                let valA = a.sayi === 'S' ? 14 : parseInt(a.sayi); let valB = b.sayi === 'S' ? 14 : parseInt(b.sayi);
-                                if(valA === valB) return (a.renk || '').localeCompare(b.renk || '');
-                                return valA - valB;
-                            });
-
-                            oyunuSifirla(masaAdi, siradaki, kazanilanPara, "Usta bir dizilimle elini bitirdi!", false, siraliBotEli); 
+                            oyunuSifirla(masaAdi, siradaki, kazanilanPara, "Usta bir dizilimle elini bitirdi!"); 
                             return;
                         }
 
@@ -413,7 +409,7 @@ io.on('connection', (socket) => {
         } 
     });
     
-    // 🔥 OYUNCU BİTİRDİĞİNDE ORİJİNAL DİZİLİMİ GÖNDER 🔥
+    // 🔥 TELEFONDAN GELEN EKSİK VERİYE GÜVENMİYORUZ. SUNUCU HAFIZASINI DİREKT EKRANA BASIYORUZ 🔥
     socket.on('oyunu_bitir', (data) => { 
         const masa = masalar[data.masaAdi]; 
         if(masa && masa.siradakiOyuncu === data.isim) { 
@@ -425,13 +421,7 @@ io.on('connection', (socket) => {
                 oyuncuCipleri[data.isim] = uCip + kazanilanPara; 
                 io.emit('cip_guncelle_ozel', { isim: data.isim, cip: oyuncuCipleri[data.isim] }); 
                 
-                // Oyuncunun kendi eliyle kurduğu grupları listeye çevir (Dizilimi bozmamak için)
-                let oyuncununOrijinalEli = [];
-                if (data.gruplar && Array.isArray(data.gruplar)) {
-                    data.gruplar.forEach(grup => oyuncununOrijinalEli.push(...grup));
-                }
-
-                oyunuSifirla(data.masaAdi, data.isim, kazanilanPara, "Nizami dizilimle el bitti.", false, oyuncununOrijinalEli); 
+                oyunuSifirla(data.masaAdi, data.isim, kazanilanPara, "Nizami dizilimle el bitti."); 
             } else { 
                 socket.emit('hatali_bitis', { mesaj: "Dizilim hatalı!", tasId: data.tasHtmlId }); 
             } 
