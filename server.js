@@ -48,10 +48,10 @@ function oyunuSifirla(masaAdi, kazanan = null, odul = 0, sebep = "", okeyleBitti
         clearTimeout(masa.turnTimer);
         masa.oyunBasladi = false; masa.oyunBittiBeklemede = true; 
         
+        // 🔥 Sunucu, kazananın taşlarını güvenle paketliyor 🔥
         let sunucuEli = ozelBitisEli || [];
         if(!ozelBitisEli && kazanan && masa.eller[kazanan]) {
             sunucuEli = [...masa.eller[kazanan]];
-            sunucuEli.sort((a,b) => (a.sayi==='S'?14:parseInt(a.sayi)) - (b.sayi==='S'?14:parseInt(b.sayi)));
         }
 
         io.emit('oyun_bitti', { masaAdi: masaAdi, kazanan: kazanan, odul: odul, sebep: sebep, okeyleBittiMi: okeyleBittiMi, bitisEli: sunucuEli });
@@ -124,6 +124,7 @@ function insanHamlesiBaslat(masaAdi, isim) {
              let atilan = masa.eller[isim].pop(); 
              masa.sonAtilanTas = atilan;
              
+             // 🔥 Oyuncu taş attığında ıskarta destesine ekle
              if(!masa.iskartalar[isim]) masa.iskartalar[isim] = [];
              masa.iskartalar[isim].push(atilan);
              
@@ -222,6 +223,7 @@ function botHamlesiYap(masaAdi) {
                         masa.sonAtilanTas = null; 
                         tasAldi = true;
                         
+                        // 🔥 Alttaki Taşı Hafızadan Çıkarma 🔥
                         let atanKisi = null; 
                         let yeniUstTas = null;
                         for(let p in masa.iskartalar) { 
@@ -380,7 +382,6 @@ io.on('connection', (socket) => {
             let topIskartalar = {};
             for(let p in masa.iskartalar) {
                 if(Array.isArray(masa.iskartalar[p]) && masa.iskartalar[p].length > 0) { topIskartalar[p] = masa.iskartalar[p][masa.iskartalar[p].length - 1]; }
-                else if (masa.iskartalar[p]) { topIskartalar[p] = masa.iskartalar[p]; }
             }
             socket.emit('izleyici_olarak_katildin', { masaAdi: data.masaAdi, oyunBasladi: masa.oyunBasladi, kalanTas: masa.deste.length, gosterge: masa.gosterge, kasa: masa.kasa, koltuklar: masa.koltuklar, siradaki: masa.siradakiOyuncu, iskartalar: topIskartalar }); 
         }
@@ -488,6 +489,7 @@ io.on('connection', (socket) => {
         } 
     });
     
+    // 🔥 Oyuncu elini bitirdiğinde, oyuncunun o anki dizilimini paketle 🔥
     socket.on('oyunu_bitir', (data) => { 
         const masa = masalar[data.masaAdi]; 
         if(masa && masa.siradakiOyuncu === data.isim) { 
