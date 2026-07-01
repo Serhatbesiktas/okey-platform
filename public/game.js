@@ -13,35 +13,43 @@ window.masayaGeriDon = function(m) { suAnkiMasam = m; lobiEkrani.style.display =
 window.masayiIzle = function(m) { socket.emit('masayi_izle', { isim: aktifKullaniciAdi, masaAdi: m }); };
 window.masayaDavetEt = function(n) { socket.emit('masaya_davet_et', { kimden: aktifKullaniciAdi, kime: n, masaAdi: suAnkiMasam }); document.getElementById('arkadaslarEkrani').style.display = 'none'; };
 
-// 🔥 KUSURSUZ MASA TEMİZLEME MOTORU (Silgi Hatasını Çözer) 🔥
+// 🔥 ONARILMIŞ MASA TEMİZLEME MOTORU (Hafıza Çakışmasını Çözer) 🔥
 window.masayiTemizle = function() { 
     masaOyunBasladiMi = false; 
     document.getElementById('sonucEkrani').style.display = 'none'; 
-    
-    // Bitiş alanını (taşları) sil (Bir sonraki ele temiz başlasın diye)
-    let kazananElAlani = document.getElementById('kazananEliAlani');
-    if (kazananElAlani) kazananElAlani.innerHTML = '';
-    
     oyunAlanObjeleri.style.display = 'none'; 
     if(document.getElementById('gostergeBtn')) document.getElementById('gostergeBtn').style.display = 'none'; 
     gostergeHakki = false; 
     oyunuBaslatBtn.innerText = "🎲 OYUNU BAŞLAT"; 
     
-    // 🔥 TEKRAR OYNA ÇÖKME KİLİDİ 🔥
-    // Masa temizlendiği an Butonu aktif ediyoruz ama sunucu hala temizlik yapıyorsa diye 1 saniye gecikme ekliyoruz
+    // 🔥 "Tekrar Oyna" çökmesini engelleyen Zırhlı Kilit 🔥
     oyunuBaslatBtn.style.display = 'block'; 
     oyunuBaslatBtn.disabled = false;
     oyunuBaslatBtn.style.opacity = '1';
 
-    bitisAlani.style.display = 'none'; masaKasaBilgisi.style.display = 'none'; bitisAlani.innerHTML = 'BİTİR<br>🏆'; 
+    bitisAlani.style.display = 'none'; 
+    masaKasaBilgisi.style.display = 'none'; 
+    bitisAlani.innerHTML = 'BİTİR<br>🏆'; 
+    
+    // Senin orijinal ıstaka temizleme mantığın
     for(let i=0; i<24; i++) document.getElementById('y'+i).innerHTML = ''; 
+    
+    // Senin orijinal ıskarta temizleme mantığın (Zırhlı hafızaya dokunmaz)
     document.getElementById('benimIskartam').innerHTML = '<div class="iskarta-yazi" id="iskartaYazi">TAŞ AT<br>⬇</div>'; 
-    document.getElementById('iskartaSag').innerHTML = ''; document.getElementById('iskartaSol').innerHTML = ''; document.getElementById('iskartaUst').innerHTML = ''; 
-    document.getElementById('benimAdimKutusu')?.classList.remove('aktif-sira'); document.getElementById('seatRight')?.classList.remove('aktif-sira'); document.getElementById('seatTop')?.classList.remove('aktif-sira'); document.getElementById('seatLeft')?.classList.remove('aktif-sira'); 
+    document.getElementById('iskartaSag').innerHTML = ''; 
+    document.getElementById('iskartaSol').innerHTML = ''; 
+    document.getElementById('iskartaUst').innerHTML = ''; 
+    
+    // Işık efektlerini temizle
+    document.getElementById('benimAdimKutusu')?.classList.remove('aktif-sira'); 
+    document.getElementById('seatRight')?.classList.remove('aktif-sira'); 
+    document.getElementById('seatTop')?.classList.remove('aktif-sira'); 
+    document.getElementById('seatLeft')?.classList.remove('aktif-sira'); 
+    
     benimSiramMi = false; 
 };
 
-// 🔥 SIRASI GELENİN IŞIĞINI YAKMAK VE KATMAN (Z-INDEX) HATASINI ÇÖZMEK İÇİN YENİ RADAR 🔥
+// KOLTUK HİZALAMA VE IŞIK MOTORU
 window.gelişmişKoltukHizala = function(koltuklar) {
     let idx = koltuklar.indexOf(aktifKullaniciAdi); 
     if(idx === -1) idx = 0; 
@@ -80,6 +88,7 @@ window.tasEkle = function(tasData, yuvaId) {
     document.getElementById(yuvaId).appendChild(div); 
 };
 
+// Senin orijinal gösterge kontrolün
 window.checkGosterge = function() { 
     const btn = document.getElementById('gostergeBtn'); if(!btn) return; btn.style.display = 'none'; 
     if(!benimSiramMi || !gostergeHakki) return; 
@@ -99,6 +108,8 @@ window.checkGosterge = function() {
 };
 
 window.elimdekiTasSayisi = function() { let sayi = 0; for(let i=0; i<24; i++) { if(document.getElementById('y'+i).children.length > 0) sayi++; } return sayi; };
+
+// Senin orijinal dizilim gruplarını alan fonksiyon
 window.getIstakaGruplari = function() { 
     let gruplar = []; let currentGrup = []; 
     for(let i=0; i<24; i++) { 
@@ -112,6 +123,7 @@ window.getIstakaGruplari = function() {
     if(currentGrup.length > 0) gruplar.push(currentGrup); return gruplar; 
 };
 
+// Senin orijinal dizme fonksiyonların
 window.seriDiz = function() { 
     let taslar = []; 
     for(let i=0; i<24; i++) { 
@@ -139,6 +151,7 @@ window.ciftDiz = function() {
     taslar.forEach((tasObj, index) => { document.getElementById('y'+index).appendChild(tasObj.el); }); sesCal(sesTasCek); 
 };
 
+// Senin orijinal otomatik taş atma fonksiyonun
 window.otomatikTasAt = function(tasElementi) { 
     if (!benimSiramMi) { ozelUyariGoster("Şu an sıra sizde değil!"); return; }
     if (window.elimdekiTasSayisi() !== 15) { ozelUyariGoster("Sadece 15 taşınız varken ortaya taş atabilirsiniz!"); return; }
@@ -154,15 +167,16 @@ window.otomatikTasAt = function(tasElementi) {
     } 
 };
 
+// BUTON OLAYLARI VE SOKET ETKİLEŞİMLERİ
 if(oyunuBaslatBtn) {
     oyunuBaslatBtn.addEventListener('click', () => { 
-        // 🔥 BUTON ÇÖKME KİLİDİ (Anti-Spam) 🔥
+        // 🔥 "Tekrar Oyna" çökmesini engelleyen Anti-Spam Kilidi 🔥
         oyunuBaslatBtn.disabled = true;
         oyunuBaslatBtn.innerText = "⏳ BAŞLIYOR...";
         oyunuBaslatBtn.style.opacity = '0.5';
         socket.emit('oyunu_baslat', suAnkiMasam); 
         
-        // Eğer sunucu cevap vermezse 5 saniye sonra butonu tekrar aktif et (Açık kalmasın diye)
+        // Eğer sunucu cevap vermezse 5 saniye sonra butonu aç
         setTimeout(() => {
             if(oyunuBaslatBtn) {
                 oyunuBaslatBtn.disabled = false;
@@ -173,29 +187,49 @@ if(oyunuBaslatBtn) {
     });
 }
 
+// Senin orijinal deste tıklama olayın
 kalanTasBilgi?.addEventListener('click', () => { 
     if (benimSiramMi && window.elimdekiTasSayisi() === 14) { 
         gostergeHakki = false; socket.emit('ortadan_tas_cek', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi }); sesCal(sesTasCek); 
     } else if(!benimSiramMi) ozelUyariGoster("Şu an sıra sizde değil!"); else ozelUyariGoster("Önce taşı atmalısınız!"); 
 });
 
+// Senin orijinal yanda taş alma olayın
 document.getElementById('iskartaSol')?.addEventListener('click', function() { 
     if (benimSiramMi && window.elimdekiTasSayisi() === 14 && this.children.length > 0) { 
         gostergeHakki = false; const tasEl = this.lastElementChild; 
         let renkSinifi = Array.from(tasEl.classList).find(c=>c.startsWith('tas-')); let renk = renkSinifi ? renkSinifi.split('-')[1] : 'siyah'; 
-        const tasObj = { id: tasEl.id, sayi: tasEl.innerText, renk: renk }; this.innerHTML = ''; 
+        const tasObj = { id: tasEl.id, sayi: tasEl.innerText, renk: renk }; 
+        // Kutuyu temizle, taş eklenecek
+        this.innerHTML = ''; 
         for(let i=0; i<24; i++) { if(document.getElementById('y'+i).children.length === 0) { window.tasEkle(tasObj, 'y'+i); break; } } 
         socket.emit('yandan_tas_alindi', { masaAdi: suAnkiMasam, kimAldi: aktifKullaniciAdi, tas: tasObj }); sesCal(sesTasCek); 
     } else if(!benimSiramMi) ozelUyariGoster("Şu an sıra sizde değil!"); else if(window.elimdekiTasSayisi() === 15) ozelUyariGoster("Elinizde zaten 15 taş var!"); 
 });
 
+// Senin orijinal gösterge butonu olayın
+const btnGostergeDOM = document.getElementById('gostergeBtn');
+if(btnGostergeDOM) {
+    btnGostergeDOM.addEventListener('click', () => {
+        if(suAnkiMasam && aktifKullaniciAdi && gostergeHakki) {
+            socket.emit('gosterge_goster', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi });
+            gostergeHakki = false; btnGostergeDOM.style.display = 'none'; 
+        }
+    });
+}
+
+// SORTABLEJS SÜRÜKLE-BIRAK AYARLARI
 const sortableOptions = { group: { name: 'istaka', put: (to) => to.el.children.length === 0 }, animation: 100, delay: 0, forceFallback: true, fallbackOnBody: true, fallbackTolerance: 3, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag', easing: "cubic-bezier(0.25, 1, 0.5, 1)", onEnd: function() { sesCal(sesTasKoy); } };
+
+// Istaka yuvalarını sortable yap (Orijinal mantığın)
 if(ustRaf && altRaf) {
     for(let i=0; i<12; i++) { 
         const yUst = document.createElement('div'); yUst.className = 'yuva'; yUst.id = 'y'+i; ustRaf.appendChild(yUst); new Sortable(yUst, sortableOptions); 
         const yAlt = document.createElement('div'); yAlt.className = 'yuva'; yAlt.id = 'y'+(i+12); altRaf.appendChild(yAlt); new Sortable(yAlt, sortableOptions); 
     }
 }
+
+// Iskarta kutusunu sortable yap (Orijinal mantığın)
 if(document.getElementById('benimIskartam')) {
     new Sortable(document.getElementById('benimIskartam'), { 
         group: { name: 'istaka', put: function (to) { return benimSiramMi && window.elimdekiTasSayisi() === 15; }, pull: false }, 
@@ -208,6 +242,8 @@ if(document.getElementById('benimIskartam')) {
         } 
     });
 }
+
+// Bitiş alanını sortable yap (Orijinal mantığın)
 if(bitisAlani) {
     new Sortable(bitisAlani, { 
         group: { name: 'istaka', put: function (to) { return benimSiramMi && window.elimdekiTasSayisi() === 15; }, pull: false }, 
@@ -218,6 +254,7 @@ if(bitisAlani) {
             let gruplar = window.getIstakaGruplari(); 
             let renkSinifi = Array.from(atilanTas.classList).find(c=>c.startsWith('tas-')); let renk = renkSinifi ? renkSinifi.split('-')[1] : 'siyah'; 
             const bitisTasi = { id: atilanTas.id, renk: renk, sayi: atilanTas.innerText }; 
+            // Senin orijinal bitişi sunucuya gönderen kodun
             socket.emit('oyunu_bitir', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi, gruplar: gruplar, bitisTasi: bitisTasi, tasHtmlId: atilanTas.id }); sesCal(sesTasKoy); 
         } 
     });
