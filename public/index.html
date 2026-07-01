@@ -334,7 +334,7 @@
                 <p id="sonucMetin">Kazanan: ...</p>
                 <div id="kazananEliAlani" style="display:flex; justify-content:center; flex-wrap:wrap; gap:2px; margin: 15px 0; padding:10px; background:rgba(0,0,0,0.6); border-radius:10px; border: 1px solid #f2c94c; min-height: 50px;"></div>
                 <p id="sonucOdul"></p>
-                <button class="sonuc-btn" onclick="document.getElementById('sonucEkrani').style.display='none'">GİZLE</button>
+                <button class="sonuc-btn" onclick="document.getElementById('sonucEkrani').style.display='none'">MASAYA DÖN</button>
             </div>
         </div>
 
@@ -532,31 +532,30 @@
                 }
             });
 
-            // 🔥 ZORLA YAZDIRMA (SİLGİ KORUMASI) MOTORU 🔥
+            // 🔥 ZORLA YAZDIRMA (SİLGİ KORUMASI) VE RENKLİ DİZİLİM MOTORU 🔥
             socket.on('oyun_bitti', (data) => {
                 if (window.suAnkiMasam !== data.masaAdi) return;
 
                 let htmlIcerik = "";
+                // Sunucudan gelen bitiş elini (dizilimi) gruplar halinde işle
                 if (data.bitisEli && Array.isArray(data.bitisEli) && data.bitisEli.length > 0) {
                     
-                    // Sunucudan gelen taşı sayılarına göre diz
-                    let siraliEl = [...data.bitisEli].sort((a, b) => {
-                        let vA = (a.sayi === 'S') ? 14 : parseInt(a.sayi || 0);
-                        let vB = (b.sayi === 'S') ? 14 : parseInt(b.sayi || 0);
-                        if(vA === vB) return (a.renk || '').localeCompare(b.renk || '');
-                        return vA - vB;
-                    });
-
-                    // Tasarımsal olarak Html kodunu hazırla
-                    siraliEl.forEach(tas => {
-                        if(!tas) return; 
-                        let textColor = '#111';
-                        if(tas.renk === 'kirmizi') textColor = '#cc0000';
-                        else if(tas.renk === 'mavi') textColor = '#0000cc';
-                        else if(tas.renk === 'sari') textColor = '#d4af37';
-                        
-                        let displaySayi = tas.sayi === 'S' ? '☻' : tas.sayi;
-                        htmlIcerik += `<div class="okey-tasi-bitis" style="position:relative; width:26px; height:38px; font-size:16px; font-weight:900; color:${textColor}; border-radius:4px; display:flex; justify-content:center; align-items:center; margin:2px;">${displaySayi}</div>`;
+                    // El kontrolünde Sahte Okey'in Sahte Okey olarak kalmasını sağlamıştık.
+                    // Şimdi burada taşları sunucudan geldiği gibi (gruplara göre) diz.
+                    data.gruplar.forEach((grup, groupIdx) => {
+                        grup.forEach(tas => {
+                            if(!tas) return; 
+                            let textColor = '#111';
+                            if(tas.renk === 'kirmizi') textColor = '#cc0000';
+                            else if(tas.renk === 'mavi') textColor = '#0000cc';
+                            else if(tas.renk === 'sari') textColor = '#d4af37';
+                            
+                            // Sunucudan gelen taşı (rengi ve sayısı ile) Html'e dök
+                            let displaySayi = tas.sayi === 'S' ? '☻' : tas.sayi;
+                            htmlIcerik += `<div class="okey-tasi-bitis" style="position:relative; width:26px; height:38px; font-size:16px; font-weight:900; color:${textColor}; border-radius:4px; display:flex; justify-content:center; align-items:center; margin:2px;">${displaySayi}</div>`;
+                        });
+                        // Her per arasına bir boşluk ekle
+                        htmlIcerik += `<div style="width:10px; height:38px;"></div>`; 
                     });
                 } else {
                     htmlIcerik = '<span style="color:#aaa; font-size:12px;">Sunucudan taş bilgisi alınamadı.</span>';
@@ -583,14 +582,14 @@
                         if (elAlani) {
                             elAlani.innerHTML = htmlIcerik; // İlk vuruş
                             
-                            // game.js silsin diye 1 saniye boyunca aralıksız çekiçliyoruz
+                            // game.js silsin diye 2 saniye boyunca aralıksız çekiçliyoruz (10 vuruş)
                             let vurusSayisi = 0;
                             let civiMotoru = setInterval(() => {
                                 if(document.getElementById('kazananEliAlani')) {
                                     document.getElementById('kazananEliAlani').innerHTML = htmlIcerik;
                                 }
                                 vurusSayisi++;
-                                if(vurusSayisi > 5) clearInterval(civiMotoru); 
+                                if(vurusSayisi > 10) clearInterval(civiMotoru); 
                             }, 200);
                         }
                     } else {
@@ -601,6 +600,13 @@
                         if(elAlani) elAlani.innerHTML = '';
                     }
                 }, 150); 
+            });
+
+            // Masa Temizlendiğinde Ekranı Kapatır
+            socket.on('masa_temizlendi', (data) => {
+                if(window.suAnkiMasam === data.masaAdi) {
+                    if (typeof window.masayiTemizle === 'function') window.masayiTemizle();
+                }
             });
 
             // İzleyiciye ve oyunculara iskartayı göster (Katman sorunu çözüldü)
