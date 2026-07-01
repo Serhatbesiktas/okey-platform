@@ -47,7 +47,14 @@ function oyunuSifirla(masaAdi, kazanan = null, odul = 0, sebep = "", okeyleBitti
     if(masa) {
         clearTimeout(masa.turnTimer);
         masa.oyunBasladi = false; masa.oyunBittiBeklemede = true; 
-        io.emit('oyun_bitti', { masaAdi: masaAdi, kazanan: kazanan, odul: odul, sebep: sebep, okeyleBittiMi: okeyleBittiMi });
+        
+        // 🔥 KAZANANIN ELİNİ İSTEMCİYE GÖNDERME MANTIĞI EKLENDİ 🔥
+        let bitisEli = null;
+        if(kazanan && masa.eller[kazanan]) {
+            bitisEli = masa.eller[kazanan];
+        }
+
+        io.emit('oyun_bitti', { masaAdi: masaAdi, kazanan: kazanan, odul: odul, sebep: sebep, okeyleBittiMi: okeyleBittiMi, bitisEli: bitisEli });
         
         if (kazanan) {
             masa.koltuklar.forEach(k => {
@@ -97,7 +104,6 @@ function eliKontrolEt(gruplar, gosterge) {
     } return true;
 }
 
-// 🔥 KUSURSUZ İNSAN AFK MOTORU (Taşları Bozmadan Cımbızla Çeker) 🔥
 function insanHamlesiBaslat(masaAdi, isim) {
     const masa = masalar[masaAdi];
     if(!masa) return;
@@ -107,7 +113,6 @@ function insanHamlesiBaslat(masaAdi, isim) {
         if(!masa.oyunBasladi || masa.siradakiOyuncu !== isim) return;
         
         let otomatikTasCekildiMi = false;
-        // 1. Taş Çekmemişse Çek
         if(masa.eller[isim] && masa.eller[isim].length === 14 && masa.deste.length > 0) {
              const cekilen = masa.deste.shift();
              masa.eller[isim].push(cekilen);
@@ -115,18 +120,11 @@ function insanHamlesiBaslat(masaAdi, isim) {
              otomatikTasCekildiMi = true;
         }
         
-        // 2. Taş At ve Ekranda Bozmadan Sil
         if(masa.eller[isim] && masa.eller[isim].length > 0) {
              let atilan = masa.eller[isim].pop(); 
              masa.sonAtilanTas = atilan;
              masa.iskartalar[isim] = atilan;
-             
-             // Eğer taşı kendi çekmiş olsaydı (yani 15 taşı varken süre bitseydi) ekrandan silmemiz lazım
-             // Eğer sunucu otomatik çektirdiyse ekranda o taş zaten yok, silmeye gerek yok.
-             if(!otomatikTasCekildiMi) {
-                 io.emit('oto_tas_atildi_istemci', { kim: isim, tas: atilan });
-             }
-             
+             if(!otomatikTasCekildiMi) { io.emit('oto_tas_atildi_istemci', { kim: isim, tas: atilan }); }
              io.emit('ortaya_tas_atildi', { masaAdi: masaAdi, kimAtti: isim, tas: atilan });
         }
         
@@ -231,7 +229,6 @@ function botHamlesiYap(masaAdi) {
                         let guvenliTaslar = botunEli.filter(t => { let isOkey = (t.renk === okeyRenk && parseInt(t.sayi) === okeySayi); return !isOkey && t.renk !== 'sahte'; });
                         if(guvenliTaslar.length === 0) guvenliTaslar = botunEli; 
 
-                        // 🔥 BOT TÖRPÜSÜ: TAŞ SAYISI 35'İN ALTINA İNMEDEN BİTİREMEZLER 🔥
                         let kazanmaSansi = 0; 
                         if (masa.deste.length <= 15) kazanmaSansi = 0.10; 
                         else if (masa.deste.length <= 35) kazanmaSansi = 0.02;
