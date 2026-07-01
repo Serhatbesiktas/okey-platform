@@ -463,70 +463,63 @@
                 }
             });
 
-            // 🔥 %100 ÇÖKME KORUMALI, BEMBEYAZ KUSURSUZ TAŞ DİZİCİ 🔥
+            // 🔥 SİLGİ KORUMALI, GECİKMELİ RENDER MOTORU 🔥
             socket.on('oyun_bitti', (data) => {
                 if (window.suAnkiMasam !== data.masaAdi) return;
-                let elAlani = document.getElementById('kazananEliAlani');
-                let sBaslik = document.getElementById('sonucBaslik');
-                let sMetin = document.getElementById('sonucMetin');
-                let sOdul = document.getElementById('sonucOdul');
-                let sEkrani = document.getElementById('sonucEkrani');
+                
+                // game.js kendi işini bitirip ekranı silsin diye 150 milisaniye bilerek bekliyoruz.
+                setTimeout(() => {
+                    let elAlani = document.getElementById('kazananEliAlani');
+                    if(!elAlani) return; // Kutu HTML'de yoksa hiç yorma
 
-                if (sEkrani) sEkrani.style.display = 'flex';
+                    let sBaslik = document.getElementById('sonucBaslik');
+                    let sMetin = document.getElementById('sonucMetin');
+                    let sOdul = document.getElementById('sonucOdul');
+                    let sEkrani = document.getElementById('sonucEkrani');
 
-                if (data.kazanan) {
-                    if(data.kazanan === window.aktifKullaniciAdi) sBaslik.innerHTML = '🏆 TEBRİKLER, KAZANDIN! 🏆';
-                    else sBaslik.innerHTML = '😢 OYUN BİTTİ!';
-                    
-                    sMetin.innerHTML = 'Kazanan: ' + data.kazanan + '<br>Sebep: ' + data.sebep;
-                    sOdul.innerHTML = '+' + data.odul.toLocaleString('tr-TR') + ' ÇİP';
-                    
-                    if (elAlani) {
-                        elAlani.innerHTML = '';
+                    if (sEkrani) sEkrani.style.display = 'flex';
+
+                    if (data.kazanan) {
+                        if(sBaslik) sBaslik.innerHTML = (data.kazanan === window.aktifKullaniciAdi) ? '🏆 TEBRİKLER, KAZANDIN! 🏆' : '😢 OYUN BİTTİ!';
+                        if(sMetin) sMetin.innerHTML = 'Kazanan: ' + data.kazanan + '<br>Sebep: ' + data.sebep;
+                        if(sOdul) sOdul.innerHTML = '+' + (data.odul || 0).toLocaleString('tr-TR') + ' ÇİP';
+                        
+                        let htmlIcerik = "";
                         if (data.bitisEli && Array.isArray(data.bitisEli) && data.bitisEli.length > 0) {
-                            try {
-                                // Gelen veriyi her ihtimale karşı düzleştiriyoruz (İnsansa içiçe, botsa düz dizi gelir)
-                                let duzEl = [];
-                                data.bitisEli.forEach(item => {
-                                    if (Array.isArray(item)) item.forEach(altItem => duzEl.push(altItem));
-                                    else duzEl.push(item);
-                                });
+                            
+                            // Taşları hatasız sırala
+                            let siraliEl = [...data.bitisEli].sort((a, b) => {
+                                let vA = (a.sayi === 'S') ? 14 : parseInt(a.sayi || 0);
+                                let vB = (b.sayi === 'S') ? 14 : parseInt(b.sayi || 0);
+                                if(vA === vB) return (a.renk || '').localeCompare(b.renk || '');
+                                return vA - vB;
+                            });
 
-                                // Güvenli sıralama motoru (Çökmeyi tamamen engeller)
-                                let siraliEl = duzEl.sort((a, b) => {
-                                    if(!a || !b) return 0;
-                                    let valA = a.sayi === 'S' ? 14 : parseInt(a.sayi || 0);
-                                    let valB = b.sayi === 'S' ? 14 : parseInt(b.sayi || 0);
-                                    if(valA === valB) return (a.renk || '').localeCompare(b.renk || '');
-                                    return valA - valB;
-                                });
-
-                                siraliEl.forEach(tas => {
-                                    if(!tas || !tas.sayi) return; 
-                                    let textColor = '#111';
-                                    if(tas.renk === 'kirmizi') textColor = '#cc0000';
-                                    else if(tas.renk === 'mavi') textColor = '#0000cc';
-                                    else if(tas.renk === 'sari') textColor = '#d4af37';
-                                    
-                                    let displaySayi = tas.sayi === 'S' ? '☻' : tas.sayi;
-                                    
-                                    // Taşların bembeyaz ve pırıl pırıl görünmesi için inline stil garantisi
-                                    elAlani.innerHTML += `<div style="position:relative; width:28px; height:42px; font-size:18px; font-weight:900; color:${textColor}; background:#fdfbf7; border-radius:6px; display:flex; justify-content:center; align-items:center; margin:2px; box-shadow:0 2px 5px rgba(0,0,0,0.8); border:1px solid #d1ccc0;">${displaySayi}</div>`;
-                                });
-                            } catch(err) {
-                                console.log("Taş render hatası:", err);
-                                elAlani.innerHTML = '<span style="color:#aaa; font-size:12px;">Taşlar dizilemedi.</span>';
-                            }
+                            // Her bir taşı bembeyaz arka planla htmlIcerik içine ekle
+                            siraliEl.forEach(tas => {
+                                if(!tas) return; 
+                                let textColor = '#111';
+                                if(tas.renk === 'kirmizi') textColor = '#cc0000';
+                                else if(tas.renk === 'mavi') textColor = '#0000cc';
+                                else if(tas.renk === 'sari') textColor = '#d4af37';
+                                
+                                let displaySayi = tas.sayi === 'S' ? '☻' : tas.sayi;
+                                htmlIcerik += `<div style="position:relative; width:26px; height:38px; font-size:16px; font-weight:900; color:${textColor}; background:#fdfbf7; border-radius:4px; display:flex; justify-content:center; align-items:center; margin:2px; box-shadow:0 2px 4px rgba(0,0,0,0.8); border:1px solid #d1ccc0;">${displaySayi}</div>`;
+                            });
                         } else {
-                            elAlani.innerHTML = '<span style="color:#aaa; font-size:12px;">Kazananın eli gizli.</span>';
+                            htmlIcerik = '<span style="color:#aaa; font-size:12px;">Sunucudan taş bilgisi alınamadı.</span>';
                         }
+                        
+                        // En son, hazırladığımız pırıl pırıl içeriği zorla kutunun içine çakıyoruz
+                        elAlani.innerHTML = htmlIcerik;
+                        
+                    } else {
+                        if(sBaslik) sBaslik.innerHTML = '⚖️ BERABERE!';
+                        if(sMetin) sMetin.innerHTML = data.sebep;
+                        if(sOdul) sOdul.innerHTML = '';
+                        elAlani.innerHTML = '';
                     }
-                } else {
-                    sBaslik.innerHTML = '⚖️ BERABERE!';
-                    sMetin.innerHTML = data.sebep;
-                    sOdul.innerHTML = '';
-                    if (elAlani) elAlani.innerHTML = '';
-                }
+                }, 150); // Zamanlayıcı kalkanı
             });
 
             socket.on('izleyici_olarak_katildin', (data) => {
