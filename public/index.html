@@ -295,10 +295,12 @@
 
         <div id="flashBildirim" class="flash-bildirim"></div>
 
+        <!-- 🔥 YENİLENMİŞ KAZANAN EKRANI 🔥 -->
         <div id="sonucEkrani">
-            <div class="sonuc-kutu">
+            <div class="sonuc-kutu" style="max-width: 450px; width: 95%;">
                 <h1 id="sonucBaslik">Oyun Bitti!</h1>
                 <p id="sonucMetin">Kazanan: ...</p>
+                <div id="kazananEliAlani" style="display:flex; justify-content:center; flex-wrap:wrap; gap:2px; margin: 15px 0; padding:10px; background:rgba(0,0,0,0.6); border-radius:10px; border: 1px solid #f2c94c; min-height: 50px;"></div>
                 <p id="sonucOdul"></p>
                 <button class="sonuc-btn" onclick="document.getElementById('sonucEkrani').style.display='none'">MASAYA DÖN</button>
             </div>
@@ -354,6 +356,7 @@
     <script src="muzik.js"></script>
     <script src="seyirci.js"></script> 
     
+    <!-- 🔥 GÖMÜLÜ TEMA RADARI VE GÜNCELLENMİŞ SOCKET DİNLEYİCİLERİ 🔥 -->
     <script>
         const temaStilleri = document.createElement('style');
         temaStilleri.innerHTML = `
@@ -429,19 +432,15 @@
         if(typeof socket !== 'undefined') {
             socket.on('kozmetikleri_guncelle', (data) => { window.globalKozmetikler = data; });
 
-            // 🔥 SÜRE (AFK) BARI VE AKTİF OYUNCUYU PARLATMA 🔥
             socket.on('sira_guncelle', (data) => {
-                // Eski barları ve parlamaları temizle
                 document.querySelectorAll('.turn-timer-bar').forEach(e => e.remove());
                 ['seatTop', 'seatLeft', 'seatRight'].forEach(id => { let el = document.getElementById(id); if(el) { el.style.boxShadow = 'none'; el.style.border = 'none'; } });
                 let myRack = document.getElementById('benimIstakam');
-                if(myRack) myRack.style.boxShadow = '0 5px 15px rgba(0,0,0,0.5)'; // Varsayılana döndür
+                if(myRack) myRack.style.boxShadow = '0 5px 15px rgba(0,0,0,0.5)'; 
 
                 if (window.suAnkiMasam !== data.masaAdi) return;
 
                 let isMyTurn = (data.kimde === window.aktifKullaniciAdi);
-
-                // Sıra kimdeyse neon ile parlat!
                 if(isMyTurn && myRack) {
                     myRack.style.boxShadow = '0 0 25px #2ecc71, inset 0 0 15px #2ecc71';
                 } else if (window.masaKoltukMapping) {
@@ -449,31 +448,57 @@
                     if(window.masaKoltukMapping.right === data.kimde) elId = 'seatRight';
                     else if(window.masaKoltukMapping.top === data.kimde) elId = 'seatTop';
                     else if(window.masaKoltukMapping.left === data.kimde) elId = 'seatLeft';
-                    if(elId) {
-                        let seat = document.getElementById(elId);
-                        if(seat) { seat.style.boxShadow = '0 0 20px #2ecc71'; seat.style.border = '2px solid #2ecc71'; }
-                    }
+                    if(elId) { let seat = document.getElementById(elId); if(seat) { seat.style.boxShadow = '0 0 20px #2ecc71'; seat.style.border = '2px solid #2ecc71'; } }
                 }
 
-                // Masanın ortasına (Kasa'nın hemen altına) 15 Saniyelik Şık Barı Koy
                 let centerDiv = document.getElementById('masaKasaBilgisi');
                 if(centerDiv) {
-                    let container = document.createElement('div');
-                    container.className = 'turn-timer-bar';
+                    let container = document.createElement('div'); container.className = 'turn-timer-bar';
                     container.style.cssText = "width: 100%; max-width: 150px; height: 8px; background: rgba(0,0,0,0.8); border-radius: 4px; margin: 10px auto 0; overflow: hidden; border: 1px solid #555; position: absolute; left: 50%; transform: translateX(-50%); top: 100%;";
-                    let bar = document.createElement('div');
-                    bar.style.cssText = "height: 100%; width: 100%; background: #2ecc71; animation: shrinkBar 15s linear forwards;";
-                    container.appendChild(bar);
-                    centerDiv.appendChild(container);
+                    let bar = document.createElement('div'); bar.style.cssText = "height: 100%; width: 100%; background: #2ecc71; animation: shrinkBar 15s linear forwards;";
+                    container.appendChild(bar); centerDiv.appendChild(container);
                 }
             });
 
-            // 🔥 OTO-HAMLE YAPILDIĞINDA TAŞLARIN BOZULMASINI ÖNLEYEN KOD 🔥
             socket.on('oto_tas_atildi_istemci', (data) => {
                 if(data.kim === window.aktifKullaniciAdi) {
                     let tasEl = document.getElementById(data.tas.id);
-                    if(tasEl) tasEl.remove(); // Ekranı silmeden, atılan taşı cımbızla çeker
+                    if(tasEl) tasEl.remove(); 
                     if(window.seciliTas && window.seciliTas.id === data.tas.id) window.seciliTas = null; 
+                }
+            });
+
+            // 🔥 KAZANANIN ELİNİ GÖSTERME (EFSANE MODAL) 🔥
+            socket.on('oyun_bitti', (data) => {
+                if (window.suAnkiMasam !== data.masaAdi) return;
+                let elAlani = document.getElementById('kazananEliAlani');
+                let sBaslik = document.getElementById('sonucBaslik');
+                let sMetin = document.getElementById('sonucMetin');
+                let sOdul = document.getElementById('sonucOdul');
+                let sEkrani = document.getElementById('sonucEkrani');
+
+                if (sEkrani) sEkrani.style.display = 'flex';
+
+                if (data.kazanan) {
+                    if(data.kazanan === window.aktifKullaniciAdi) sBaslik.innerHTML = '🏆 TEBRİKLER, KAZANDIN! 🏆';
+                    else sBaslik.innerHTML = '😢 OYUN BİTTİ!';
+                    
+                    sMetin.innerHTML = 'Kazanan: ' + data.kazanan + '<br>Sebep: ' + data.sebep;
+                    sOdul.innerHTML = '+' + data.odul.toLocaleString('tr-TR') + ' ÇİP';
+                    
+                    if (elAlani) {
+                        elAlani.innerHTML = '';
+                        if (data.bitisEli && data.bitisEli.length > 0) {
+                            data.bitisEli.forEach(tas => {
+                                elAlani.innerHTML += `<div class="okey-tasi tas-${tas.renk}" style="position:relative; width:30px; height:45px; font-size:18px; display:flex; justify-content:center; align-items:center; margin:2px; box-shadow:0 2px 4px rgba(0,0,0,0.8); border:1px solid #444;">${tas.sayi}</div>`;
+                            });
+                        }
+                    }
+                } else {
+                    sBaslik.innerHTML = '⚖️ BERABERE!';
+                    sMetin.innerHTML = data.sebep;
+                    sOdul.innerHTML = '';
+                    if (elAlani) elAlani.innerHTML = '';
                 }
             });
 
