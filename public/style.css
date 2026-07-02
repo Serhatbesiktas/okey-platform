@@ -172,7 +172,7 @@ body { background-color: #050d08; color: #fff; font-family: 'Segoe UI', Tahoma, 
 .raf-alt { background: linear-gradient(to bottom, #603416, #4b230b); box-shadow: inset 0 3px 6px rgba(0,0,0,0.6); border-top: 2px solid rgba(255,255,255,0.04); }
 .yuva { flex: 1; height: 100%; background: rgba(0, 0, 0, 0.38); border-radius: 4px; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: inset 0 3px 5px rgba(0,0,0,0.8);}
 
-.okey-tasi { width: 100%; height: 96%; background: linear-gradient(135deg, #fffff9 0%, #f6f0de 100%); border-radius: 50%; border-radius: 5px; border: 1px solid #dcd3c1; border-bottom: 4px solid #baa891; box-shadow: 0 3px 6px rgba(0,0,0,0.6), inset 0 1px 1px #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 900; font-size: 16px; font-family: 'Arial Black', Arial, sans-serif; cursor: grab; touch-action: manipulation; user-select: none; z-index: 30; transition: transform 0.1s;}
+.okey-tasi { width: 100%; height: 96%; background: linear-gradient(135deg, #fffff9 0%, #f6f0de 100%); border-radius: 5px; border: 1px solid #dcd3c1; border-bottom: 4px solid #baa891; box-shadow: 0 3px 6px rgba(0,0,0,0.6), inset 0 1px 1px #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 900; font-size: 16px; font-family: 'Arial Black', Arial, sans-serif; cursor: grab; touch-action: manipulation; user-select: none; z-index: 30; transition: transform 0.1s;}
 .okey-tasi.okey-tasi-bitis { border-radius: 4px !important; }
 .okey-tasi:active { cursor: grabbing; border-bottom-width: 2px; transform: translateY(3px); box-shadow: 0 2px 4px rgba(0,0,0,0.4); }
 .okey-tasi::after { content: ''; position: absolute; top: 1px; left: 1px; right: 1px; bottom: 1px; border: 1px solid rgba(0,0,0,0.02); border-radius: 4px; }
@@ -268,52 +268,51 @@ body { background-color: #050d08; color: #fff; font-family: 'Segoe UI', Tahoma, 
 .okey-table-ui::before { content: "101 BEYCO GAMES"; position: absolute; top: 32%; left: 50%; transform: translate(-50%, -50%); font-size: 22px; font-weight: 900; color: rgba(255, 255, 255, 0.03); letter-spacing: 4px; pointer-events: none; z-index: 1; }
 body::after { content: "made by beyco games"; position: fixed; bottom: 5px; left: 0; width: 100%; text-align: center; font-size: 11px; font-weight: bold; color: rgba(255, 255, 255, 0.15); pointer-events: none; z-index: 999999; letter-spacing: 1px; }
 
-/* 🔥 SAFARİ YATAY EKRAN DÜZELTMELERİ (DARALMAYI ÖNLER) 🔥 */
-@media screen and (orientation: landscape) and (max-height: 450px) {
-    /* Üst barı ve alt menüyü gizleyip/küçültüp oyun alanına yer açıyoruz */
-    .vip-header { display: none !important; }
-    .alt-menu-container { display: none !important; } /* Lobi alt menüsü yan ekranda gizlensin */
+/* 🔥 KUSURSUZ MOBİL YATAY (LANDSCAPE) EKRAN OPTİMİZASYONU 🔥 */
+@media screen and (orientation: landscape) and (max-height: 500px) {
+    .vip-header, .alt-menu-container { display: none !important; }
     #lobiEkrani { padding-bottom: 0 !important; }
+    #masaEkrani { padding: 2px !important; justify-content: flex-end; }
     
-    /* Masayı Sıkıştırma Ayarları */
-    #masaEkrani { padding: 2px !important; }
-    .okey-table-ui { border-width: 2px !important; border-radius: 8px !important; margin-bottom: 0 !important; }
+    /* Sol Menü İkonları (Küçült ve Sola Yanaştır) */
+    #sound-toggle-btn { top: 5px !important; left: 5px !important; width: 30px !important; height: 30px !important; font-size: 14px !important; }
+    .pro-sohbet-tetikleyici, #sohbetAcBtn { top: 40px !important; left: 5px !important; width: 30px !important; height: 30px !important; font-size: 14px !important; }
+    #mesajlarBtn, #mesaj-btn, .genel-mesaj-btn { top: 75px !important; left: 5px !important; width: 30px !important; height: 30px !important; font-size: 14px !important; }
+    #ozelMesajBtn, .ozel-mesaj-btn, [id*="ozel"], [class*="ozel-mesaj"], [id*="zarf"], .zarf-btn, .pm-btn, .mesaj-kutusu-btn { top: 5px !important; right: 5px !important; width: 30px !important; height: 30px !important; font-size: 14px !important; left: auto !important;}
     
-    /* Orta Masayı Küçült */
-    .masa-ortasi { transform: translateX(-50%) scale(0.7) !important; bottom: 0 !important; padding: 5px 15px !important;}
-    .yere-acilan-perler-alani { top: 20px !important; height: 110px !important; left: 55px !important; right: 55px !important; }
-    
-    /* Istakayı Küçült */
-    .istaka-container { height: 100px !important; padding: 2px !important;}
-    .okey-tasi { font-size: 12px !important; border-bottom-width: 2px !important;}
-    .pro-tus { height: 26px !important; font-size: 9px !important; padding: 0 6px !important; }
-    .okey-istaka-tuslar-area { margin-top: -5px !important; }
-    
-    /* Istakalar ve Kutular */
-    #benimIskartam { width: 45px !important; height: 60px !important; bottom: 5px !important; right: 5px !important; }
-    #iskartaSol { width: 35px !important; height: 50px !important; bottom: 30% !important; left: 5px !important; }
-    #iskartaSag { width: 35px !important; height: 50px !important; top: 30% !important; right: 5px !important; }
-    #iskartaUst { width: 35px !important; height: 50px !important; top: 5px !important; left: 15% !important; }
-    .player-seat { padding: 4px 8px !important; font-size: 10px !important; }
-    .seat-top { top: 2px !important; }
-    .seat-right { right: -30px !important; }
-    .seat-left { left: -30px !important; }
-}
+    /* Lobiye Dön Butonu */
+    .return-lobby-btn { top: 5px !important; right: 40px !important; padding: 4px 8px !important; font-size: 9px !important; }
 
-/* YENİ: YATAY EKRAN ZORLAMASI (PORTRAIT KİLİDİ) */
-.orientation-warning { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 13, 8, 0.98); z-index: 999999999; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); }
-.orientation-warning h2 { color: #f2c94c; margin-bottom: 15px; font-size: 22px; font-weight: 900; letter-spacing: 1px; text-shadow: 0 0 20px rgba(242, 201, 76, 0.6); }
-.orientation-warning p { color: #a3c4bc; font-size: 14px; line-height: 1.6; max-width: 300px; }
-.telefon-ikon { font-size: 80px; margin-bottom: 25px; animation: yanCevirAnim 2s infinite ease-in-out; filter: drop-shadow(0 0 15px rgba(46, 204, 113, 0.5)); }
+    /* Koltuklar (Döndürmeyi iptal edip kenarlara yapıştıralım) */
+    .player-seat { font-size: 9px !important; padding: 4px 8px !important; max-width: 70px !important; z-index: 50; border-radius: 6px !important; }
+    .seat-top { top: 2px !important; left: 50% !important; transform: translateX(-50%) !important; }
+    .seat-left { left: 40px !important; top: 40px !important; transform: none !important; bottom: auto !important; }
+    .seat-right { right: 40px !important; top: 40px !important; transform: none !important; bottom: auto !important; }
 
-@keyframes yanCevirAnim {
-    0% { transform: rotate(0deg); }
-    40% { transform: rotate(-90deg); }
-    60% { transform: rotate(-90deg); }
-    100% { transform: rotate(0deg); }
-}
+    /* Yere Açılan Perler (Ortayı daralt ve üste al) */
+    .yere-acilan-perler-alani { top: 20px !important; left: 120px !important; right: 120px !important; height: 80px !important; padding: 4px !important; }
+    .yere-acilan-baslik { font-size: 8px !important; margin-bottom: 2px !important; }
+    .tek-per-grubu { padding: 1px !important; }
+    .yere-acilan-perler-alani .okey-tasi { width: 18px !important; height: 26px !important; font-size: 10px !important; border-bottom-width: 1px !important; }
 
-@media screen and (orientation: portrait) and (max-width: 768px) {
-    .orientation-warning { display: flex; }
-    .vip-header, #lobiEkrani, #masaEkrani, #authEkrani { display: none !important; }
+    /* Masa Ortası (Göstegeler, Kasa, Bitiş) */
+    .masa-ortasi { bottom: 110px !important; left: 50% !important; transform: translateX(-50%) scale(0.75) !important; padding: 5px 15px !important; flex-direction: row !important; white-space: nowrap; }
+    
+    /* İstaka ve Tuşlar (En alta sabitle) */
+    .okey-istaka-tuslar-area { position: absolute !important; bottom: 2px !important; left: 2px !important; right: 2px !important; }
+    .pro-tus-takimi { padding: 0 !important; gap: 4px !important; margin-bottom: 2px !important; }
+    .pro-tus { height: 24px !important; font-size: 9px !important; padding: 0 8px !important; }
+    #anlikPuanSayaci { padding: 2px 8px !important; font-size: 10px !important; height: 24px !important; display: flex; align-items: center; }
+    .istaka-container { height: 85px !important; border-width: 2px !important; padding: 2px !important; gap: 2px !important; }
+    
+    /* İstaka içi taşlar */
+    .istaka-container .okey-tasi { font-size: 13px !important; border-bottom-width: 2px !important; border-radius: 4px !important; }
+
+    /* Iskartalar (Sağ, Sol, Üst ve Benim) */
+    #benimIskartam { right: 5px !important; bottom: 105px !important; width: 45px !important; height: 60px !important; }
+    #iskartaSol { left: 40px !important; bottom: 105px !important; width: 35px !important; height: 50px !important; }
+    #iskartaSag { right: 40px !important; top: 70px !important; width: 35px !important; height: 50px !important; }
+    #iskartaUst { left: 50% !important; top: 2px !important; transform: translateX(-50%) !important; width: 35px !important; height: 50px !important; }
+    .iskarta-alani .okey-tasi { width: 30px !important; height: 42px !important; font-size: 14px !important; }
+    .iskarta-yazi { font-size: 9px !important; }
 }
