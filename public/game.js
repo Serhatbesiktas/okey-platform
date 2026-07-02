@@ -1,3 +1,4 @@
+// 🔥 101 OKEY CANLI PUAN HESAPLAMA MOTORU (OKEY DESTEĞİ İLE BİRLİKTE) 🔥
 window.masaKoltukMapping = { bottom: '', right: '', top: '', left: '' };
 
 window.masayaOtur = function(m) { 
@@ -105,41 +106,122 @@ window.getIstakaGruplari = function() {
     if(currentGrup.length > 0) gruplar.push(currentGrup); return gruplar; 
 };
 
-// 🔥 101 CANLI ANLIK PUAN HESAPLAMA MOTORU (Açık Perleri Sayar) 🔥
+// 🔥 YENİ: OKEY TAŞINI ALGILAYAN GELİŞMİŞ PUAN MOTORU 🔥
 window.canli101PuanHesapla = function() {
     let gruplar = window.getIstakaGruplari();
     let toplamPuan = 0;
-    
+
+    // 1. Adım: Okey taşını bul
+    let gostergeEl = document.getElementById('gostergeTasi');
+    let okeyRenk = null;
+    let okeySayi = null;
+
+    if (gostergeEl && gostergeEl.innerText) {
+        let gSayi = parseInt(gostergeEl.innerText);
+        let renkClass = Array.from(gostergeEl.classList).find(c => c.startsWith('tas-'));
+        if (renkClass) {
+            okeyRenk = renkClass.replace('tas-', '');
+            okeySayi = gSayi === 13 ? 1 : gSayi + 1;
+        }
+    }
+
+    // Taşı analiz et (Gerçek okey mi, sahte okey mi?)
+    function getEffectiveTile(t) {
+        if (okeyRenk && t.renk === okeyRenk && parseInt(t.sayi) === okeySayi) return { isOkey: true };
+        if (t.renk === 'sahte') return { renk: okeyRenk, sayi: okeySayi, isOkey: false };
+        return { renk: t.renk, sayi: parseInt(t.sayi), isOkey: false };
+    }
+
+    // 2. Adım: Grupları Puanla
     gruplar.forEach(grup => {
-        if(grup.length >= 3) {
-            let isAyniSayi = true;
-            let baseSayi = parseInt(grup[0].sayi) || 0;
-            let setRenkler = new Set();
-            let grupSeriToplami = 0;
-            
+        if (grup.length >= 3) {
+            let normalTiles = [];
+            let okeyCount = 0;
+
             grup.forEach(t => {
-                let sVal = parseInt(t.sayi) || 0;
-                if(sVal !== baseSayi) isAyniSayi = false;
-                setRenkler.add(t.renk);
-                grupSeriToplami += sVal;
+                let eff = getEffectiveTile(t);
+                if (eff.isOkey) okeyCount++;
+                else normalTiles.push(eff);
             });
-            
-            if(isAyniSayi && setRenkler.size === grup.length) {
-                toplamPuan += grupSeriToplami; 
-            } else {
-                let isArdışık = true;
-                let cRenk = grup[0].renk;
-                for(let i=1; i<grup.length; i++) {
-                    let prevVal = parseInt(grup[i-1].sayi) || 0;
-                    let currVal = parseInt(grup[i].sayi) || 0;
-                    if(grup[i].renk !== cRenk || currVal !== prevVal + 1) {
-                        if(!(prevVal === 13 && currVal === 1)) { 
-                            isArdışık = false;
+
+            let isValid = false;
+            let perPuan = 0;
+
+            if (normalTiles.length > 0) {
+                // AYNI SAYI KONTROLÜ (Farklı Renkler)
+                let isAyniSayi = true;
+                let baseSayi = normalTiles[0].sayi;
+                let colors = new Set();
+                for (let t of normalTiles) {
+                    if (t.sayi !== baseSayi) isAyniSayi = false;
+                    colors.add(t.renk);
+                }
+                if (isAyniSayi && colors.size === normalTiles.length && (colors.size + okeyCount === grup.length)) {
+                    isValid = true;
+                    perPuan = baseSayi * grup.length; // Okey, yerine geçtiği sayının puanını alır
+                }
+
+                // SERİ KONTROLÜ (Aynı Renk, Ardışık)
+                if (!isValid) {
+                    let isSeri = true;
+                    let baseRenk = normalTiles[0].renk;
+                    for (let t of normalTiles) {
+                        if (t.renk !== baseRenk) { isSeri = false; break; }
+                    }
+                    if (isSeri) {
+                        let firstNormalIdx = grup.findIndex(t => !getEffectiveTile(t).isOkey);
+                        let cSayi = getEffectiveTile(grup[firstNormalIdx]).sayi;
+                        
+                        // İleri doğru artan kontrolü
+                        let isArtan = true;
+                        let artanPuan = cSayi;
+                        let expFwd = cSayi;
+                        for (let i = firstNormalIdx + 1; i < grup.length; i++) {
+                            expFwd = (expFwd === 13) ? 1 : expFwd + 1;
+                            let eff = getEffectiveTile(grup[i]);
+                            if (!eff.isOkey && eff.sayi !== expFwd) { isArtan = false; break; }
+                            artanPuan += expFwd;
+                        }
+                        // Geriye doğru artan kontrolü (Okeyleri doldurma)
+                        let expBwd = cSayi;
+                        for (let i = firstNormalIdx - 1; i >= 0; i--) {
+                            expBwd = (expBwd === 1) ? 13 : expBwd - 1;
+                            let eff = getEffectiveTile(grup[i]);
+                            if (!eff.isOkey && eff.sayi !== expBwd) { isArtan = false; break; }
+                            artanPuan += expBwd;
+                        }
+
+                        if (isArtan) {
+                            isValid = true;
+                            perPuan = artanPuan;
+                        } else {
+                            // Azalan dizilim ihtimali
+                            let isAzalan = true;
+                            let azalanPuan = cSayi;
+                            let expFwdAzalan = cSayi;
+                            for (let i = firstNormalIdx + 1; i < grup.length; i++) {
+                                expFwdAzalan = (expFwdAzalan === 1) ? 13 : expFwdAzalan - 1;
+                                let eff = getEffectiveTile(grup[i]);
+                                if (!eff.isOkey && eff.sayi !== expFwdAzalan) { isAzalan = false; break; }
+                                azalanPuan += expFwdAzalan;
+                            }
+                            let expBwdAzalan = cSayi;
+                            for (let i = firstNormalIdx - 1; i >= 0; i--) {
+                                expBwdAzalan = (expBwdAzalan === 13) ? 1 : expBwdAzalan + 1;
+                                let eff = getEffectiveTile(grup[i]);
+                                if (!eff.isOkey && eff.sayi !== expBwdAzalan) { isAzalan = false; break; }
+                                azalanPuan += expBwdAzalan;
+                            }
+
+                            if(isAzalan) {
+                                isValid = true;
+                                perPuan = azalanPuan;
+                            }
                         }
                     }
                 }
-                if(isArdışık) toplamPuan += grupSeriToplami;
             }
+            if (isValid) toplamPuan += perPuan;
         }
     });
     
@@ -213,7 +295,33 @@ window.yereElAcAksiyon = function(tip) {
     } else if(tip === 'cift') {
         let gruplar = window.getIstakaGruplari();
         let ciftCount = 0;
-        gruplar.forEach(g => { if(g.length === 2 && g[0].sayi === g[1].sayi && g[0].renk !== g[1].renk) ciftCount++; });
+        
+        let gostergeEl = document.getElementById('gostergeTasi');
+        let okeyRenk = null; let okeySayi = null;
+        if (gostergeEl && gostergeEl.innerText) {
+            let gSayi = parseInt(gostergeEl.innerText);
+            let renkClass = Array.from(gostergeEl.classList).find(c => c.startsWith('tas-'));
+            if (renkClass) { okeyRenk = renkClass.replace('tas-', ''); okeySayi = gSayi === 13 ? 1 : gSayi + 1; }
+        }
+
+        function getEffectiveTile(t) {
+            if (okeyRenk && t.renk === okeyRenk && parseInt(t.sayi) === okeySayi) return { isOkey: true };
+            if (t.renk === 'sahte') return { renk: okeyRenk, sayi: okeySayi, isOkey: false };
+            return { renk: t.renk, sayi: parseInt(t.sayi), isOkey: false };
+        }
+
+        gruplar.forEach(g => { 
+            if(g.length === 2) {
+                let t1 = getEffectiveTile(g[0]);
+                let t2 = getEffectiveTile(g[1]);
+                if (t1.isOkey || t2.isOkey) {
+                    ciftCount++;
+                } else if (t1.sayi === t2.sayi && t1.renk === t2.renk) {
+                    ciftCount++;
+                }
+            } 
+        });
+        
         if(ciftCount < 5) {
             window.ozelUyariGoster(`⚠️ ÇİFT AÇAMAZSINIZ!\nIstakanızda şu an sadece ${ciftCount} geçerli çift var. En az 5 çift olmalıdır!`);
             return;
