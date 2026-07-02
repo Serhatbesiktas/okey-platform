@@ -58,67 +58,13 @@ body { background-color: #050d08; color: #fff; font-family: 'Segoe UI', Tahoma, 
 .seat-right { top: 40%; right: -25px; transform: translateY(-50%) rotate(-90deg); border-color: rgba(13, 202, 240, 0.5); color: #0dcaf0; }
 .seat-left { bottom: 40%; left: -25px; transform: translateY(-50%) rotate(90deg); border-color: rgba(13, 202, 240, 0.5); color: #0dcaf0; }
 
-.yere-acilan-perler-alani {
-    position: absolute;
-    top: 55px;
-    left: 105px;
-    right: 105px;
-    height: 165px;
-    background: rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(242, 201, 76, 0.2);
-    border-radius: 12px;
-    padding: 8px;
-    z-index: 10;
-    display: flex;
-    flex-direction: column;
-}
-.yere-acilan-baslik {
-    font-size: 10px;
-    font-weight: 900;
-    color: #f2c94c;
-    letter-spacing: 1.5px;
-    text-align: center;
-    margin-bottom: 5px;
-    opacity: 0.7;
-}
-.perler-scroll-kutusu {
-    flex: 1;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    padding-right: 2px;
-}
-.yere-acilan-per-satiri {
-    background: rgba(255,255,255,0.03);
-    border-radius: 6px;
-    padding: 4px 6px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-.per-satir-isim {
-    font-size: 10px;
-    font-weight: bold;
-    color: #0dcaf0;
-    min-width: 65px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.per-blok-konteyner {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-}
-.tek-per-grubu {
-    display: flex;
-    gap: 1px;
-    background: rgba(0,0,0,0.5);
-    padding: 2px;
-    border-radius: 4px;
-    border: 1px solid rgba(255,255,255,0.05);
-}
+.yere-acilan-perler-alani { position: absolute; top: 55px; left: 105px; right: 105px; height: 165px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(242, 201, 76, 0.2); border-radius: 12px; padding: 8px; z-index: 10; display: flex; flex-direction: column; }
+.yere-acilan-baslik { font-size: 10px; font-weight: 900; color: #f2c94c; letter-spacing: 1.5px; text-align: center; margin-bottom: 5px; opacity: 0.7; }
+.perler-scroll-kutusu { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding-right: 2px; }
+.yere-acilan-per-satiri { background: rgba(255,255,255,0.03); border-radius: 6px; padding: 4px 6px; display: flex; align-items: center; gap: 8px; }
+.per-satir-isim { font-size: 10px; font-weight: bold; color: #0dcaf0; min-width: 65px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.per-blok-konteyner { display: flex; gap: 12px; flex-wrap: wrap; }
+.tek-per-grubu { display: flex; gap: 1px; background: rgba(0,0,0,0.5); padding: 2px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05); }
 
 @keyframes pulse-glow { 0% { box-shadow: 0 0 10px #2ecc71, inset 0 0 5px #2ecc71; border-color: #2ecc71; background: rgba(46, 204, 113, 0.15); } 50% { box-shadow: 0 0 30px #2ecc71, inset 0 0 15px #2ecc71; border-color: #ffffff; background: rgba(46, 204, 113, 0.35); } 100% { box-shadow: 0 0 10px #2ecc71, inset 0 0 5px #2ecc71; border-color: #2ecc71; background: rgba(46, 204, 113, 0.15); } }
 .aktif-sira { animation: pulse-glow 1.4s infinite alternate !important; color: #ffffff !important; text-shadow: 0 0 4px #fff; z-index: 10; }
@@ -136,17 +82,14 @@ body { background-color: #050d08; color: #fff; font-family: 'Segoe UI', Tahoma, 
 
 .masa-ortasi { position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: row; align-items: center; gap: 15px; background: rgba(8, 20, 13, 0.7); backdrop-filter: blur(12px); padding: 10px 20px; border-radius: 14px; border: 1px solid rgba(242, 201, 76, 0.15); z-index: 4; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255,255,255,0.1); }
 .masa-isim-ortasi { color: rgba(255,255,255,0.35); font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-
 .masa-kasa-bilgisi { display: none; color: #2ecc71; font-weight: bold; font-size: 12px; text-shadow: 0 0 8px rgba(46, 204, 113, 0.6); border: 1px dashed #2ecc71; padding: 4px 10px; border-radius: 10px; background-color: rgba(0,0,0,0.6); letter-spacing: 0.3px; }
 
 .oyun-baslat-btn { background: linear-gradient(180deg, #ffe266 0%, #d49a00 100%); color: #050d08; border: none; padding: 10px 22px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.4); transition: transform 0.1s; z-index: 50; position: relative;}
 .oyun-baslat-btn:active { transform: scale(0.95); }
 
 .kalan-tas-bilgi-container { display: none; flex-direction: column; align-items: center; gap: 8px; }
-
 .kapali-deste { width: 40px; height: 54px; background: linear-gradient(135deg, #ffffff 0%, #eae3d2 100%); border: 1px solid #c8bfae; border-bottom: 4px solid #ab9f8a; border-radius: 6px; box-shadow: -4px 5px 10px rgba(0,0,0,0.65), inset 0 1px 0 #fff; display: flex; align-items: center; justify-content: center; color: #111111; font-weight: 900; font-size: 16px; cursor: pointer; transition: transform 0.1s;}
 .kapali-deste:active { transform: translateY(2px); border-bottom-width: 2px; }
-
 .gosterge-tasi { width: 40px; height: 54px; background: linear-gradient(135deg, #fffff5 0%, #f4ebd9 100%); border: 1px solid #c8bfae; border-bottom: 4px solid #ab9f8a; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 16px; box-shadow: 0 5px 8px rgba(0,0,0,0.5), inset 0 1px 0 #fff; font-family: Arial, sans-serif; pointer-events: none; }
 
 #bitisAlani { position: relative; display: none; width: 44px; height: 54px; background-color: rgba(220, 53, 69, 0.15); border: 2px dashed #dc3545; border-radius: 8px; align-items: center; justify-content: center; color: #ff99a2; font-weight: bold; font-size: 10px; text-align: center; transition: all 0.2s ease;}
@@ -268,51 +211,61 @@ body { background-color: #050d08; color: #fff; font-family: 'Segoe UI', Tahoma, 
 .okey-table-ui::before { content: "101 BEYCO GAMES"; position: absolute; top: 32%; left: 50%; transform: translate(-50%, -50%); font-size: 22px; font-weight: 900; color: rgba(255, 255, 255, 0.03); letter-spacing: 4px; pointer-events: none; z-index: 1; }
 body::after { content: "made by beyco games"; position: fixed; bottom: 5px; left: 0; width: 100%; text-align: center; font-size: 11px; font-weight: bold; color: rgba(255, 255, 255, 0.15); pointer-events: none; z-index: 999999; letter-spacing: 1px; }
 
-/* 🔥 KUSURSUZ MOBİL YATAY (LANDSCAPE) EKRAN OPTİMİZASYONU 🔥 */
+/* 🔥 SAFARİ YATAY EKRAN DÜZELTMELERİ (DARALMAYI ÖNLER) 🔥 */
 @media screen and (orientation: landscape) and (max-height: 500px) {
     .vip-header, .alt-menu-container { display: none !important; }
     #lobiEkrani { padding-bottom: 0 !important; }
     #masaEkrani { padding: 2px !important; justify-content: flex-end; }
     
-    /* Sol Menü İkonları (Küçült ve Sola Yanaştır) */
     #sound-toggle-btn { top: 5px !important; left: 5px !important; width: 30px !important; height: 30px !important; font-size: 14px !important; }
     .pro-sohbet-tetikleyici, #sohbetAcBtn { top: 40px !important; left: 5px !important; width: 30px !important; height: 30px !important; font-size: 14px !important; }
     #mesajlarBtn, #mesaj-btn, .genel-mesaj-btn { top: 75px !important; left: 5px !important; width: 30px !important; height: 30px !important; font-size: 14px !important; }
     #ozelMesajBtn, .ozel-mesaj-btn, [id*="ozel"], [class*="ozel-mesaj"], [id*="zarf"], .zarf-btn, .pm-btn, .mesaj-kutusu-btn { top: 5px !important; right: 5px !important; width: 30px !important; height: 30px !important; font-size: 14px !important; left: auto !important;}
     
-    /* Lobiye Dön Butonu */
     .return-lobby-btn { top: 5px !important; right: 40px !important; padding: 4px 8px !important; font-size: 9px !important; }
 
-    /* Koltuklar (Döndürmeyi iptal edip kenarlara yapıştıralım) */
     .player-seat { font-size: 9px !important; padding: 4px 8px !important; max-width: 70px !important; z-index: 50; border-radius: 6px !important; }
     .seat-top { top: 2px !important; left: 50% !important; transform: translateX(-50%) !important; }
     .seat-left { left: 40px !important; top: 40px !important; transform: none !important; bottom: auto !important; }
     .seat-right { right: 40px !important; top: 40px !important; transform: none !important; bottom: auto !important; }
 
-    /* Yere Açılan Perler (Ortayı daralt ve üste al) */
     .yere-acilan-perler-alani { top: 20px !important; left: 120px !important; right: 120px !important; height: 80px !important; padding: 4px !important; }
     .yere-acilan-baslik { font-size: 8px !important; margin-bottom: 2px !important; }
     .tek-per-grubu { padding: 1px !important; }
     .yere-acilan-perler-alani .okey-tasi { width: 18px !important; height: 26px !important; font-size: 10px !important; border-bottom-width: 1px !important; }
 
-    /* Masa Ortası (Göstegeler, Kasa, Bitiş) */
     .masa-ortasi { bottom: 110px !important; left: 50% !important; transform: translateX(-50%) scale(0.75) !important; padding: 5px 15px !important; flex-direction: row !important; white-space: nowrap; }
     
-    /* İstaka ve Tuşlar (En alta sabitle) */
     .okey-istaka-tuslar-area { position: absolute !important; bottom: 2px !important; left: 2px !important; right: 2px !important; }
     .pro-tus-takimi { padding: 0 !important; gap: 4px !important; margin-bottom: 2px !important; }
     .pro-tus { height: 24px !important; font-size: 9px !important; padding: 0 8px !important; }
     #anlikPuanSayaci { padding: 2px 8px !important; font-size: 10px !important; height: 24px !important; display: flex; align-items: center; }
     .istaka-container { height: 85px !important; border-width: 2px !important; padding: 2px !important; gap: 2px !important; }
     
-    /* İstaka içi taşlar */
     .istaka-container .okey-tasi { font-size: 13px !important; border-bottom-width: 2px !important; border-radius: 4px !important; }
 
-    /* Iskartalar (Sağ, Sol, Üst ve Benim) */
     #benimIskartam { right: 5px !important; bottom: 105px !important; width: 45px !important; height: 60px !important; }
     #iskartaSol { left: 40px !important; bottom: 105px !important; width: 35px !important; height: 50px !important; }
     #iskartaSag { right: 40px !important; top: 70px !important; width: 35px !important; height: 50px !important; }
     #iskartaUst { left: 50% !important; top: 2px !important; transform: translateX(-50%) !important; width: 35px !important; height: 50px !important; }
     .iskarta-alani .okey-tasi { width: 30px !important; height: 42px !important; font-size: 14px !important; }
     .iskarta-yazi { font-size: 9px !important; }
+}
+
+/* 🔥 YENİ: YATAY EKRAN ZORLAMASI (PORTRAIT KİLİDİ) 🔥 */
+.orientation-warning { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 13, 8, 0.98); z-index: 999999999; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); }
+.orientation-warning h2 { color: #f2c94c; margin-bottom: 15px; font-size: 22px; font-weight: 900; letter-spacing: 1px; text-shadow: 0 0 20px rgba(242, 201, 76, 0.6); }
+.orientation-warning p { color: #a3c4bc; font-size: 14px; line-height: 1.6; max-width: 300px; }
+.telefon-ikon { font-size: 80px; margin-bottom: 25px; animation: yanCevirAnim 2s infinite ease-in-out; filter: drop-shadow(0 0 15px rgba(46, 204, 113, 0.5)); }
+
+@keyframes yanCevirAnim {
+    0% { transform: rotate(0deg); }
+    40% { transform: rotate(-90deg); }
+    60% { transform: rotate(-90deg); }
+    100% { transform: rotate(0deg); }
+}
+
+@media screen and (orientation: portrait) and (max-width: 768px) {
+    .orientation-warning { display: flex !important; }
+    .vip-header, #lobiEkrani, #masaEkrani, #authEkrani { display: none !important; }
 }
