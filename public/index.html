@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VIP Okey Sunucusu</title>
+    <title>Beyco Games - 101 Okey Sunucusu</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="tema.css">
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
@@ -12,7 +12,7 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <style>
-        /* 🔥 ZIRHLI CSS KİLİTLERİ 🔥 */
+        /* ZIRHLI CSS KİLİTLERİ */
         body #kazananEliAlani .okey-tasi-bitis {
             background: #fdfbf7 !important;
             box-shadow: 0 4px 10px rgba(0,0,0,0.8) !important;
@@ -21,18 +21,27 @@
 
         #iskartaSol { z-index: 100 !important; }
         #iskartaSol .okey-tasi {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) !important;
+            position: absolute;
+            top: 50%; left: 50%; transform: translate(-50%, -50%) !important;
             margin: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.8);
         }
 
         .pro-gosterge-btn {
             background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%) !important;
             color: #111 !important; font-weight: 900 !important; border: 2px solid #fff !important;
-            box-shadow: 0 0 15px rgba(241, 196, 15, 0.5) !important; animation: pulseGold 1.5s infinite;
+            box-shadow: 0 0 15px rgba(241, 196, 15, 0.5) !important;
+            animation: pulseGold 1.5s infinite;
         }
     </style>
 </head>
 <body>
+
+    <!-- 🔥 YENİ: YATAY EKRAN ZORLAMASI UYARISI 🔥 -->
+    <div id="orientationWarning" class="orientation-warning">
+        <div class="telefon-ikon">📱</div>
+        <h2>LÜTFEN TELEFONU YAN ÇEVİRİN</h2>
+        <p>101 Okey'in devasa masası dik ekrana sığmaz patron! <br>En iyi deneyim için cihazını yatay konuma getir.</p>
+    </div>
 
     <div id="reklamEkrani" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:9999999; flex-direction:column; justify-content:center; align-items:center;">
         <div class="magaza-kutu" style="text-align:center; border: 2px solid #2ecc71; max-width: 320px; padding: 25px;">
@@ -88,7 +97,6 @@
         </div>
     </div>
 
-    <!-- 🔥 YENİLENMİŞ PRO PROFİL EKRANI 🔥 -->
     <div id="profilEkrani" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999999; flex-direction:column; justify-content:center; align-items:center;">
         <div class="magaza-kutu" style="max-width: 340px; width:90%; border: 2px solid #f2c94c; text-align: center; padding: 25px 20px; position:relative; box-shadow: 0 0 20px rgba(242, 201, 76, 0.2);">
             <button onclick="document.getElementById('profilEkrani').style.display='none'" style="position:absolute; top:15px; right:20px; background:none; border:none; color:#e74c3c; font-size:24px; cursor:pointer; font-weight:bold;">X</button>
@@ -226,7 +234,7 @@
                 <div class="urun-kart" style="border-color:#8b5a2b;">
                     <div class="urun-ikon" style="font-size:30px; border:none; box-shadow:none; background:transparent;">🍷</div>
                     <h3 style="font-size:14px;">Kızıl Baron</h3>
-                    <p style="font-size:10px; color:#aaa; margin-bottom: 10px; padding:0 5px;">Koyu bordo kadife masa ve ahşap detaylar.</p>
+                    <p style="font-size:10px; color:#aaa; margin-bottom: 10px; padding:0 5px;">Koyu bordo kadife masa and ahşap detaylar.</p>
                     <button class="satin-al-btn" id="btn_tema_kizil" onclick="magazaIslem('tema_kizil', 30000000)">30 Milyon ÇİP</button>
                 </div>
             </div>
@@ -320,7 +328,6 @@
 
         <div id="flashBildirim" class="flash-bildirim"></div>
 
-        <!-- 🔥 ZORLA YAZILAN BİTİŞ KUTUSU 🔥 -->
         <div id="sonucEkrani">
             <div class="sonuc-kutu" style="max-width: 450px; width: 95%;">
                 <h1 id="sonucBaslik">Oyun Bitti!</h1>
@@ -338,12 +345,20 @@
             <div class="player-seat seat-left" id="seatLeft" data-isim="" onclick="profiliGoster(this.dataset.isim)" style="cursor:pointer;">Bekleniyor...</div>
             <div class="player-seat seat-right" id="seatRight" data-isim="" onclick="profiliGoster(this.dataset.isim)" style="cursor:pointer;">Bekleniyor...</div>
             
+            <!-- 🔥 101 OKEY YERE AÇILAN PERLER ALANI 🔥 -->
+            <div id="yereAcilanPerlerAlani" class="yere-acilan-perler-alani">
+                <div class="yere-acilan-baslik">YERE AÇILAN PERLER</div>
+                <div id="perlerScrollKutusu" class="perler-scroll-kutusu">
+                    <!-- Dinamik per blokları buraya gelecek -->
+                    <div style="color:rgba(255,255,255,0.2); font-size:11px; text-align:center; margin-top:20px; width:100%;">Henüz yere el açan olmadı.</div>
+                </div>
+            </div>
+
             <div class="masa-ortasi">
                 <div class="masa-isim-ortasi" id="masaOrtasiYazi">MASA</div>
                 <div class="masa-kasa-bilgisi" id="masaKasaBilgisi" style="position:relative;">KASA: 0 ÇİP</div>
                 <div style="display:flex; flex-direction:column; gap:8px; align-items:center; justify-content:center;">
                     <button class="oyun-baslat-btn" id="oyunuBaslatBtn">🎲 OYUNU BAŞLAT</button>
-                    <!-- 🔥 GÖSTERGE YAP BUTONU 🔥 -->
                     <button class="oyun-baslat-btn pro-gosterge-btn" id="proGostergeBtn" style="display:none; margin-top:0;" onclick="if(window.suAnkiMasam && window.aktifKullaniciAdi) socket.emit('gosterge_goster', {masaAdi: window.suAnkiMasam, isim: window.aktifKullaniciAdi})">⭐ GÖSTERGE YAP (+Bahis)</button>
                     <button id="btnVipGizlilikTetikle" onclick="vipGizlilikDurumuDegistir()" class="oyun-baslat-btn" style="display:none; background:#ff33aa; font-size:11px; padding:6px 15px; margin-top:0;">🔒 MASAYI HERKESE AÇ</button>
                 </div>
@@ -366,6 +381,10 @@
             <div class="pro-tus-takimi">
                 <button class="pro-tus" onclick="seriDiz()">SERİ DİZ</button>
                 <button class="pro-tus" onclick="ciftDiz()">ÇİFT DİZ</button>
+                <!-- 🔥 101 OKEY YERE EL AÇMA BUTONLARI VE CANLI ANLIK PUAN SAYACI 🔥 -->
+                <button class="pro-tus" style="background:#27ae60; color:#fff;" onclick="yereElAcAksiyon('seri')">SERİ AÇ</button>
+                <button class="pro-tus" style="background:#2980b9; color:#fff;" onclick="yereElAcAksiyon('cift')">ÇİFT AÇ</button>
+                <div id="anlikPuanSayaci" style="margin-left:auto; background:rgba(0,0,0,0.6); padding:5px 12px; border-radius:6px; border:1px solid #f2c94c; color:#f2c94c; font-size:12px; font-weight:900;">EL TOPLAMI: <span id="anlikPuanDegeri">0</span></div>
             </div>
             <div class="istaka-container" id="benimIstakam">
                 <div class="istaka-raf raf-ust" id="ustRaf"></div>
@@ -374,7 +393,6 @@
         </div>
     </div>
 
-    <!-- Eski Dosyaların -->
     <script src="globals.js"></script>
     <script src="auth.js"></script>
     <script src="ui.js"></script>
@@ -384,7 +402,6 @@
     <script src="muzik.js"></script>
     <script src="seyirci.js"></script> 
     
-    <!-- 🔥 PRO ARAYÜZ (ZORLA YAZDIRMA) MOTORU 🔥 -->
     <script>
         const temaStilleri = document.createElement('style');
         temaStilleri.innerHTML = `
@@ -441,19 +458,15 @@
 
         if(typeof socket !== 'undefined') {
             socket.on('kozmetikleri_guncelle', (data) => { window.globalKozmetikler = data; });
-
-            // 🔥 Yeni El Başladığında Gösterge Butonunu Gizle
             socket.on('masa_oyun_basladi', () => {
                 window.gostergeGosterildi = false;
                 const gBtn = document.getElementById('proGostergeBtn');
                 if(gBtn) gBtn.style.display = 'none';
             });
-
-            // SIRA KONTROLÜ
             socket.on('sira_guncelle', (data) => {
                 document.querySelectorAll('.turn-timer-bar').forEach(e => e.remove());
-                
                 ['seatTop', 'seatLeft', 'seatRight'].forEach(id => { let el = document.getElementById(id); if(el) { el.style.boxShadow = 'none'; el.style.border = 'none'; } });
+               
                 let myRack = document.getElementById('benimIstakam');
                 if(myRack) myRack.style.boxShadow = '0 5px 15px rgba(0,0,0,0.5)'; 
 
@@ -466,23 +479,22 @@
                 if(isMyTurn) {
                     if(myRack) myRack.style.boxShadow = '0 0 25px #2ecc71, inset 0 0 15px #2ecc71';
                     
-                    // Gösterge Taşı Elindeyse Butonu Çıkar
-                    let gostergeDiv = document.getElementById('gostergeTasi'); 
+                    let gostergeDiv = document.getElementById('gostergeTasi');
                     if(gostergeDiv && gostergeDiv.innerText && window.gostergeGosterildi === false) { 
-                        let gSayi = gostergeDiv.innerText; 
+                        let gSayi = gostergeDiv.innerText;
                         let renkClass = Array.from(gostergeDiv.classList).find(c => c.startsWith('tas-')); 
                         if(renkClass) {
-                            let gRenk = renkClass.replace('tas-', ''); 
+                            let gRenk = renkClass.replace('tas-', '');
                             let varMi = false; 
-                            for(let i=0; i<24; i++) { 
-                                let yuva = document.getElementById('y'+i); 
-                                if(yuva.children.length > 0) { 
-                                    let t = yuva.children[0]; 
+                            for(let i=0; i<34; i++) { 
+                                let yuva = document.getElementById('y'+i);
+                                if(yuva && yuva.children.length > 0) { 
+                                    let t = yuva.children[0];
                                     let tRenkClass = Array.from(t.classList).find(c => c.startsWith('tas-')); 
-                                    if(tRenkClass && tRenkClass.replace('tas-', '') === gRenk && t.innerText === gSayi) varMi = true; 
+                                    if(tRenkClass && tRenkClass.replace('tas-', '') === gRenk && t.innerText === gSayi) varMi = true;
                                 } 
                             } 
-                            if (varMi && gBtn) gBtn.style.display = 'block'; 
+                            if (varMi && gBtn) gBtn.style.display = 'block';
                         }
                     }
 
@@ -491,29 +503,26 @@
                     if(window.masaKoltukMapping.right === data.kimde) elId = 'seatRight';
                     else if(window.masaKoltukMapping.top === data.kimde) elId = 'seatTop';
                     else if(window.masaKoltukMapping.left === data.kimde) elId = 'seatLeft';
-                    
                     if(elId) { let seat = document.getElementById(elId); if(seat) { seat.style.boxShadow = '0 0 20px #2ecc71'; seat.style.border = '2px solid #2ecc71'; } }
                 }
 
-                // AFK Zamanlayıcı
                 let centerDiv = document.getElementById('masaKasaBilgisi');
                 if(centerDiv) {
-                    let container = document.createElement('div'); container.className = 'turn-timer-bar';
+                    let container = document.createElement('div');
+                    container.className = 'turn-timer-bar';
                     container.style.cssText = "width: 100%; max-width: 150px; height: 8px; background: rgba(0,0,0,0.8); border-radius: 4px; margin: 10px auto 0; overflow: hidden; border: 1px solid #555; position: absolute; left: 50%; transform: translateX(-50%); top: 100%;";
                     let bar = document.createElement('div'); bar.style.cssText = "height: 100%; width: 100%; background: #2ecc71; animation: shrinkBar 15s linear forwards;";
                     container.appendChild(bar); centerDiv.appendChild(container);
                 }
             });
-
             socket.on('oto_tas_atildi_istemci', (data) => {
                 if(data.kim === window.aktifKullaniciAdi) {
                     let tasEl = document.getElementById(data.tas.id);
                     if(tasEl) tasEl.remove(); 
                     if(window.seciliTas && window.seciliTas.id === data.tas.id) window.seciliTas = null; 
+                    window.checkGosterge();
                 }
             });
-
-            // 🔥 SİLGİ KORUMASI VE ZORLA YAZDIRMA MOTORU 🔥
             socket.on('oyun_bitti', (data) => {
                 if (window.suAnkiMasam !== data.masaAdi) return;
 
@@ -532,7 +541,6 @@
                         if(tas.renk === 'kirmizi') textColor = '#cc0000';
                         else if(tas.renk === 'mavi') textColor = '#0000cc';
                         else if(tas.renk === 'sari') textColor = '#d4af37';
-                        
                         let displaySayi = tas.sayi === 'S' ? '☻' : tas.sayi;
                         htmlIcerik += `<div class="okey-tasi-bitis" style="position:relative; width:26px; height:38px; font-size:16px; font-weight:900; color:${textColor}; border-radius:4px; display:flex; justify-content:center; align-items:center; margin:2px;">${displaySayi}</div>`;
                     });
@@ -553,11 +561,9 @@
                         if(sMetin) sMetin.innerHTML = 'Kazanan: ' + data.kazanan + '<br>Sebep: ' + data.sebep;
                         if(sOdul) sOdul.innerHTML = '+' + (data.odul || 0).toLocaleString('tr-TR') + ' ÇİP';
                         
-                        // Kutuya Betona Çakar Gibi Sürekli Yazdırıyoruz
                         let elAlani = document.getElementById('kazananEliAlani');
                         if (elAlani) {
-                            elAlani.innerHTML = htmlIcerik; 
-                            
+                            elAlani.innerHTML = htmlIcerik;
                             let vurusSayisi = 0;
                             let civiMotoru = setInterval(() => {
                                 let hedefKutu = document.getElementById('kazananEliAlani');
@@ -575,14 +581,11 @@
                     }
                 }, 150); 
             });
-
-            // Masa Temizlendiğinde Ekranı Kapatır
             socket.on('masa_temizlendi', (data) => {
                 if(window.suAnkiMasam === data.masaAdi) {
                     if (typeof window.masayiTemizle === 'function') window.masayiTemizle();
                 }
             });
-
             socket.on('izleyici_olarak_katildin', (data) => {
                 setTimeout(() => { 
                     if(window.gelişmişKoltukHizala) window.gelişmişKoltukHizala(data.koltuklar);
@@ -615,8 +618,6 @@
                     if(k) k.innerHTML = `<div class="okey-tasi tas-${data.tas.renk}" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); box-shadow:0 2px 5px rgba(0,0,0,0.8); margin:0;">${data.tas.sayi}</div>`;
                 }
             });
-
-            // 🔥 DESTE YIĞIN MANTIĞI: Eski Taş Silinmeyecek 🔥
             socket.on('yandan_alindi_guncelle', (data) => {
                 if(window.suAnkiMasam === data.masaAdi && data.atanKisi) {
                     let tDiv = 'benimIskartam';
@@ -634,19 +635,15 @@
                     }
                 }
             });
-
             socket.on('masa_sohbet_balonu', (data) => {
                 if(window.suAnkiMasam !== data.masaAdi) return;
-                
                 let elId = 'benimAdimKutusu';
                 let ozelStil = 'top: -50px; left: 50%; transform: translateX(-50%);'; 
-                
                 if(window.masaKoltukMapping) {
                     if(window.masaKoltukMapping.right === data.isim) { elId = 'seatRight'; ozelStil = 'top: 50%; right: 110%; transform: translateY(-50%);'; }
                     else if(window.masaKoltukMapping.top === data.isim) { elId = 'seatTop'; ozelStil = 'top: 110%; left: 50%; transform: translateX(-50%);'; }
                     else if(window.masaKoltukMapping.left === data.isim) { elId = 'seatLeft'; ozelStil = 'top: 50%; left: 110%; transform: translateY(-50%);'; }
                 }
-                
                 let target = document.getElementById(elId);
                 if(target) {
                     let b = document.createElement('div');
@@ -658,7 +655,6 @@
                     setTimeout(() => b.remove(), 4000);
                 }
             });
-
             socket.on('gosterge_basarili', (data) => {
                 if(data.isim === window.aktifKullaniciAdi) {
                     if(window.bildirimGoster) window.bildirimGoster(`⭐ GÖSTERGE YAPILDI! ${data.odul.toLocaleString('tr-TR')} ÇİP KAZANDIN!`, "basari");
@@ -693,33 +689,30 @@
             } catch(e) { }
         }, 500);
 
-        // 🔥 GÜVENLİ PROFİL GÖSTERİCİ (Asla Çökmez) 🔥
         window.profiliGoster = function(hedefIsim) {
             if(!hedefIsim || hedefIsim === "" || hedefIsim === "Bekleniyor..." || hedefIsim === "➕ DAVET" || hedefIsim === "Boş") { 
                 if(window.suAnkiMasam && !window.izleyiciModu) {
-                    if(typeof window.davetMenusuAc === 'function') window.davetMenusuAc(); 
+                    if(typeof window.davetMenusuAc === 'function') window.davetMenusuAc();
                 }
-                return; 
+                return;
             }
             
-            const pEkrani = document.getElementById('profilEkrani'); 
+            const pEkrani = document.getElementById('profilEkrani');
             const pIsim = document.getElementById('profilIsim'); 
             const pCip = document.getElementById('profilCipMiktari'); 
             const pDurum = document.getElementById('profilDurumBadge'); 
             const pOynanan = document.getElementById('profilOynanan'); 
-            const pKazanilan = document.getElementById('profilKazanilan'); 
+            const pKazanilan = document.getElementById('profilKazanilan');
             const pOran = document.getElementById('profilKazanmaOrani'); 
             const pLig = document.getElementById('profilLigBadge'); 
             const pUnvan = document.getElementById('profilUnvanBadge'); 
             const pArkadasBtn = document.getElementById('profilArkadasBtn'); 
             const pDavetBtn = document.getElementById('profilDavetBtn');
-            
             if(pEkrani) pEkrani.style.display = 'flex'; 
             if(pArkadasBtn) pArkadasBtn.dataset.hedef = hedefIsim; 
             if(pDavetBtn) pDavetBtn.dataset.hedef = hedefIsim;
-
             if(pDurum) {
-                pDurum.innerHTML = "🟢 Çevrimiçi"; 
+                pDurum.innerHTML = "🟢 Çevrimiçi";
                 pDurum.style.color = "#2ecc71";
             }
             
@@ -729,43 +722,43 @@
                 if(pArkadasBtn) {
                     pArkadasBtn.style.display = 'block';
                     if (window.benimArkadaslarim && window.benimArkadaslarim.includes(hedefIsim)) { 
-                        pArkadasBtn.innerHTML = "❌ Arkadaştan Çıkar"; 
+                        pArkadasBtn.innerHTML = "❌ Arkadaştan Çıkar";
                         pArkadasBtn.style.background = "linear-gradient(180deg, #e74c3c 0%, #c0392b 100%)"; 
-                        pArkadasBtn.style.color = "#fff"; 
+                        pArkadasBtn.style.color = "#fff";
                     } else { 
-                        pArkadasBtn.innerHTML = "➕ Arkadaş Ekle"; 
+                        pArkadasBtn.innerHTML = "➕ Arkadaş Ekle";
                         pArkadasBtn.style.background = "linear-gradient(180deg, #f1c40f 0%, #f39c12 100%)"; 
-                        pArkadasBtn.style.color = "#111"; 
+                        pArkadasBtn.style.color = "#111";
                     }
                 }
-                if(pDavetBtn) pDavetBtn.style.display = 'block'; 
+                if(pDavetBtn) pDavetBtn.style.display = 'block';
             } else { 
-                if(pArkadasBtn) pArkadasBtn.style.display = 'none'; 
+                if(pArkadasBtn) pArkadasBtn.style.display = 'none';
                 if(pDavetBtn) pDavetBtn.style.display = 'none'; 
             }
 
-            let tacIcon = ""; let ismRengi = "#fff"; let textGlow = "none";
+            let tacIcon = "";
+            let ismRengi = "#fff"; let textGlow = "none";
             if(window.globalKozmetikler && window.globalKozmetikler[hedefIsim]) {
                 if(window.globalKozmetikler[hedefIsim].includes('neon_tac')) tacIcon = "👑 ";
                 if(window.globalKozmetikler[hedefIsim].includes('atesli_isim')) { ismRengi = "#ff4d4d"; textGlow = "0 0 10px rgba(255, 77, 77, 0.8)"; }
             }
             
             if(pIsim) {
-                pIsim.innerHTML = tacIcon + hedefIsim; 
+                pIsim.innerHTML = tacIcon + hedefIsim;
                 pIsim.style.color = ismRengi; 
                 pIsim.style.textShadow = textGlow;
             }
             
-            if(pCip) pCip.innerText = "..."; 
+            if(pCip) pCip.innerText = "...";
             if(pOynanan) pOynanan.innerText = "..."; 
             if(pKazanilan) pKazanilan.innerHTML = "..."; 
             if(pOran) pOran.innerText = "...";
-
             const setStats = (cip, oynanan, kazanilan, oran, ligTxt, ligBg, unvanTxt) => {
                 if(pDurum) { pDurum.innerHTML = "🟢 Çevrimiçi"; pDurum.style.color = "#2ecc71"; }
-                if(pCip) pCip.innerText = cip.toLocaleString('tr-TR'); 
+                if(pCip) pCip.innerText = cip.toLocaleString('tr-TR');
                 if(pOynanan) pOynanan.innerText = oynanan; 
-                if(pKazanilan) pKazanilan.innerHTML = kazanilan + ' <span style="color:#777; font-size:14px;">/</span> <span style="color:#e74c3c; font-size:14px;">' + (oynanan - kazanilan) + '</span>'; 
+                if(pKazanilan) pKazanilan.innerHTML = kazanilan + ' <span style="color:#777; font-size:14px;">/</span> <span style="color:#e74c3c; font-size:14px;">' + (oynanan - kazanilan) + '</span>';
                 if(pOran) pOran.innerText = '%' + oran; 
                 if(pLig) { pLig.innerText = ligTxt; pLig.style.background = ligBg; }
                 if(pUnvan) pUnvan.innerText = unvanTxt;
@@ -776,21 +769,26 @@
                 return; 
             }
 
-            let hash = 0; for (let i = 0; i < hedefIsim.length; i++) { hash = hedefIsim.charCodeAt(i) + ((hash << 5) - hash); } hash = Math.abs(hash);
-            let fakeCip = (hash % 15000000) + 500000; let fakeOynanan = (hash % 800) + 50; let fakeKazanilan = Math.floor(fakeOynanan * ((hash % 30 + 40) / 100)); let fakeOran = Math.floor((fakeKazanilan / fakeOynanan) * 100);
-            
+            let hash = 0;
+            for (let i = 0; i < hedefIsim.length; i++) { hash = hedefIsim.charCodeAt(i) + ((hash << 5) - hash); } hash = Math.abs(hash);
+            let fakeCip = (hash % 15000000) + 500000; let fakeOynanan = (hash % 800) + 50;
+            let fakeKazanilan = Math.floor(fakeOynanan * ((hash % 30 + 40) / 100)); let fakeOran = Math.floor((fakeKazanilan / fakeOynanan) * 100);
             let lig = "🥉 BRONZ LİG"; let ligBg = "linear-gradient(180deg, #cd7f32 0%, #8b4513 100%)";
-            if(fakeCip > 10000000) { lig = "💎 ELMAS LİG"; ligBg = "linear-gradient(180deg, #3498db 0%, #2980b9 100%)"; } else if(fakeCip > 5000000) { lig = "🥇 ALTIN LİG"; ligBg = "linear-gradient(180deg, #f1c40f 0%, #f39c12 100%)"; } else if(fakeCip > 2000000) { lig = "🥈 GÜMÜŞ LİG"; ligBg = "linear-gradient(180deg, #bdc3c7 0%, #95a5a6 100%)"; }
-            let unvan = "🃏 OYUNCU"; if(fakeOran > 60 && fakeOynanan > 50) unvan = "👑 OKEY KRALI"; else if(fakeOynanan > 500) unvan = "⚔️ USTA"; else if(fakeKazanilan > 200) unvan = "🔥 ATEŞ USTASI";
+            if(fakeCip > 10000000) { lig = "💎 ELMAS LİG"; ligBg = "linear-gradient(180deg, #3498db 0%, #2980b9 100%)"; }
+            else if(fakeCip > 5000000) { lig = "🥇 ALTIN LİG"; ligBg = "linear-gradient(180deg, #f1c40f 0%, #f39c12 100%)"; }
+            else if(fakeCip > 2000000) { lig = "🥈 GÜMÜŞ LİG"; ligBg = "linear-gradient(180deg, #bdc3c7 0%, #95a5a6 100%)"; }
+            let unvan = "🃏 OYUNCU";
+            if(fakeOran > 60 && fakeOynanan > 50) unvan = "👑 OKEY KRALI"; else if(fakeOynanan > 500) unvan = "⚔️ USTA";
+            else if(fakeKazanilan > 200) unvan = "🔥 ATEŞ USTASI";
 
             if(window.db) {
                 window.db.collection("kullanicilar").where("isim", "==", hedefIsim).get().then((q) => {
                     if(!q.empty) { 
-                        const data = q.docs[0].data(); let gCip = parseInt(String(data.cip).replace(/[^0-9]/g, '')) || 0; let gOynanan = data.oynananOyun || 0; let gKazanilan = data.kazanilanOyun || 0; let gOran = gOynanan > 0 ? Math.floor((gKazanilan / gOynanan) * 100) : 0;
+                        const data = q.docs[0].data(); let gCip = parseInt(String(data.cip).replace(/[^0-9]/g, '')) || 0; let gOynanan = data.oynananOyun || 0; let gKazanilan = data.kazanilanOyun || 0; 
+                        let gOran = gOynanan > 0 ? Math.floor((gKazanilan / gOynanan) * 100) : 0;
                         let gercekLig = "🥉 BRONZ LİG"; let gercekLigBg = "linear-gradient(180deg, #cd7f32 0%, #8b4513 100%)";
                         if(gCip > 10000000) { gercekLig = "💎 ELMAS LİG"; gercekLigBg = "linear-gradient(180deg, #3498db 0%, #2980b9 100%)"; } else if(gCip > 5000000) { gercekLig = "🥇 ALTIN LİG"; gercekLigBg = "linear-gradient(180deg, #f1c40f 0%, #f39c12 100%)"; } else if(gCip > 2000000) { gercekLig = "🥈 GÜMÜŞ LİG"; gercekLigBg = "linear-gradient(180deg, #bdc3c7 0%, #95a5a6 100%)"; }
                         let gercekUnvan = "🃏 OYUNCU"; if(gOran > 60 && gOynanan > 50) gercekUnvan = "👑 OKEY KRALI"; else if(gOynanan > 500) gercekUnvan = "⚔️ USTA"; else if(gKazanilan > 200) gercekUnvan = "🔥 ATEŞ USTASI";
-                        
                         setStats(gCip, gOynanan, gKazanilan, gOran, gercekLig, gercekLigBg, gercekUnvan);
                     } else { setStats(fakeCip, fakeOynanan, fakeKazanilan, fakeOran, lig, ligBg, unvan); }
                 }).catch(err => { setStats(fakeCip, fakeOynanan, fakeKazanilan, fakeOran, lig, ligBg, unvan); });
