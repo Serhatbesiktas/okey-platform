@@ -13,6 +13,10 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <style>
         /* 🔥 OYUN VE KATMAN KİLİTLERİ 🔥 */
+        body, html {
+            overflow-x: hidden; /* Tüm sayfa genelinde sağa-sola kaymayı engeller */
+        }
+        
         body #kazananEliAlani .okey-tasi-bitis {
             background: #fdfbf7 !important;
             box-shadow: 0 4px 10px rgba(0,0,0,0.8) !important;
@@ -28,14 +32,16 @@
         /* 🔥 EKRANA TAM OTURAN KUSURSUZ VIP GİRİŞ EKRANI 🔥 */
         #authEkrani {
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            padding: 10px; /* Ekrana sığması için padding küçültüldü */
+            padding: 10px; box-sizing: border-box; /* Kilit 1: Taşırmayı önler */
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999999;
-            font-family: 'Arial', sans-serif; overflow-y: auto; /* Çok küçük ekranlarda gizlice kaydırır */
+            font-family: 'Arial', sans-serif; 
+            overflow-x: hidden; overflow-y: auto; /* Kilit 2: Sağa kaymayı tamamen yasaklar */
             background: radial-gradient(circle at 50% -10%, #0f3d23 0%, #05160c 60%, #020804 100%) !important;
         }
         
         .auth-bg-wrapper {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none;
+            overflow: hidden; /* Kilit 3: Arka plandaki taşların ekranı sağa itmesini engeller */
         }
         .bg-glow {
             position: absolute; top: -20%; left: 50%; transform: translateX(-50%);
@@ -57,14 +63,14 @@
 
         .auth-container-yeni {
             width: 100%; max-width: 360px; display: flex; flex-direction: column; 
-            gap: 10px; /* Öğeler arası boşluk küçültüldü */
+            gap: 10px;
             z-index: 10; position: relative; margin: auto;
         }
         
         .auth-logo-alani { text-align: center; margin-bottom: 5px; display: flex; flex-direction: column; align-items: center; }
         .logo-crown { font-size: 24px; color: #f1c40f; margin-bottom: -5px; z-index: 2; text-shadow: 0 0 15px rgba(241,196,15,0.8); }
         .auth-logo-alani h1 {
-            font-size: 46px; /* Dev font küçültüldü */
+            font-size: 46px; 
             margin: 0;
             background: linear-gradient(to bottom, #fceabb, #f8b500);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
@@ -94,7 +100,7 @@
 
         .auth-btn-yeni {
             width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 14px; font-weight: 900;
-            cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); text-transform: uppercase;
+            cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); text-transform: uppercase; box-sizing: border-box;
             display: flex; justify-content: center; align-items: center; transition: transform 0.2s, box-shadow 0.2s;
         }
         .auth-btn-yeni:active { transform: scale(0.97); }
@@ -105,7 +111,7 @@
 
         .auth-bottom-menu {
             display: flex; justify-content: space-between; margin-top: 5px; background: rgba(0,0,0,0.4);
-            border-radius: 12px; padding: 10px; border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px; padding: 10px; border: 1px solid rgba(255,255,255,0.05); box-sizing: border-box;
         }
         .auth-menu-item { display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; color: #a3c4bc; transition: color 0.3s; }
         .auth-menu-item:hover { color: #f1c40f; }
@@ -115,7 +121,7 @@
         }
         .auth-menu-item span { font-size: 8px; text-align: center; text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px; line-height: 1.2; }
 
-        .auth-footer { margin-top: 10px; text-align: center; width: 100%; }
+        .auth-footer { margin-top: 10px; text-align: center; width: 100%; box-sizing: border-box; }
         .auth-footer h3 {
             color: #f1c40f; font-size: 11px; letter-spacing: 4px; margin: 0 0 5px 0;
             display: flex; align-items: center; justify-content: center; gap: 10px;
