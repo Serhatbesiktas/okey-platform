@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VIP Okey Sunucusu</title>
+    <title>VIP Okey Sunucusu - Beyco Games</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="tema.css">
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
@@ -12,324 +12,257 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <style>
-        /* 🔥 OYUN VE KATMAN KİLİTLERİ 🔥 */
+        /* ============================== */
+        /* 1. Global ve Atmosfer Kilitleri */
+        /* ============================== */
         body, html {
-            overflow-x: hidden; /* Tüm sayfa genelinde sağa-sola kaymayı engeller */
-            background: #020b06; /* Premium koyu yeşil arka plan */
+            overflow: hidden; 
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
         }
+
+        .casino-global-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none;
+            background: radial-gradient(circle at 50% -10%, #0f3d23 0%, #05160c 60%, #020804 100%) !important;
+        }
+        .auth-bg-wrapper {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; overflow: hidden;
+        }
+        .bg-glow {
+            position: absolute; top: -20%; left: 50%; transform: translateX(-50%);
+            width: 150%; height: 60%;
+            background: radial-gradient(ellipse at center, rgba(241, 196, 15, 0.12) 0%, transparent 70%);
+        }
+        .bg-tile {
+            position: absolute; width: 75px; height: 105px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px;
+            display: flex; justify-content: center; align-items: center;
+            font-family: Arial, sans-serif; font-size: 38px; font-weight: 900;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6); filter: blur(1.5px);
+        }
+        .bg-tile.t-7 { top: 8%; left: 8%; transform: rotate(-22deg) scale(1.1); color: rgba(231, 76, 60, 0.2); }
+        .bg-tile.t-1 { top: 40%; right: 25%; transform: rotate(15deg) scale(0.85); color: rgba(255, 255, 255, 0.15); }
+        .bg-tile.t-13 { top: 75%; left: 5%; transform: rotate(35deg) scale(1.2); color: rgba(255, 255, 255, 0.1); }
+
+        /* ============================== */
+        /* 2. Giriş (Auth) Ekranı Kilitleri */
+        /* ============================== */
+        #authEkrani {
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            padding: 20px; box-sizing: border-box; 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10;
+            font-family: 'Arial', sans-serif; overflow: auto; 
+        }
+        .auth-container-yeni {
+            width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 15px; z-index: 10; position: relative; margin: auto;
+        }
+        .auth-input-group { position: relative; width: 100%; margin-bottom: 12px; }
+        .auth-input-group span { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #7f8c8d; font-size: 16px; }
+        .auth-input-yeni { width: 100%; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 15px 15px 15px 45px; border-radius: 10px; font-size: 14px; box-sizing: border-box; outline: none; }
+        .auth-btn-yeni { width: 100%; padding: 15px; border: none; border-radius: 10px; font-size: 15px; font-weight: 900; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); text-transform: uppercase; box-sizing: border-box; display: flex; justify-content: center; align-items: center; }
+        #authKullaniciAdi, #authEmail, #authSifre { display: none !important; }
+
+        /* ============================== */
+        /* 3. Lobi Ekranı Kilitleri */
+        /* ============================== */
+        #lobiEkrani {
+            position: relative; z-index: 10; display: none; flex-direction: column;
+            width: 100%; height: 100vh; max-height: 100vh; box-sizing: border-box;
+            padding: 15px 15px 80px 15px; 
+        }
+        .lobi-ust-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .lobi-ust-baslik h2 { margin: 0; font-size: 26px; font-weight: 900; background: linear-gradient(to bottom, #fceabb, #f8b500); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 2px 10px rgba(248,181,0,0.2); }
+        .lobi-ust-baslik p { margin: 3px 0 0 0; font-size: 10px; color: #a3c4bc; letter-spacing: 1px; }
+
+        .lobi-ana-govde { display: flex; flex: 1; gap: 20px; width: 100%; height: calc(100% - 150px); overflow: hidden; }
         
+        .lobi-masalar-bölümü { flex: 2; display: flex; flex-direction: column; height: 100%; }
+        .lobi-panel-baslik { font-size: 12px; font-weight: bold; color: #f1c40f; letter-spacing: 2px; margin-bottom: 10px; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+        .lobi-panel-baslik::after { content: ''; flex: 1; height: 1px; background: rgba(241,196,15,0.2); }
+        .lobi-masalar-scroll { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-right: 8px; }
+        
+        .casino-masa-kart {
+            background: linear-gradient(135deg, #0d1a10 0%, #050a06 100%);
+            border: 1px solid rgba(46, 204, 113, 0.25); border-radius: 15px;
+            padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5), inset 0 0 15px rgba(0,0,0,0.7);
+            transition: border-color 0.3s, transform 0.2s; position: relative; overflow: hidden;
+            width: 100%; box-sizing: border-box; 
+        }
+        .casino-masa-kart.vip-board { border-color: rgba(241, 196, 15, 0.4); }
+        .casino-masa-kart::before { content: ''; position: absolute; top: 0; left: 0; width: 5px; height: 100%; background: #2ecc71; }
+        .casino-masa-kart.vip-board::before { background: #f1c40f; }
+        
+        .masa-sol-detay { display: flex; flex-direction: column; gap: 6px; }
+        .masa-adi-txt { font-size: 16px; font-weight: 900; color: #fff; }
+        .vip-board .masa-adi-txt { color: #f1c40f; text-shadow: 0 0 10px rgba(241,196,15,0.3); }
+        .masa-bahis-badge { font-size: 12px; font-weight: 800; color: #2ecc71; background: rgba(46, 204, 113, 0.12); padding: 4px 10px; border-radius: 8px; width: fit-content; border: 1px solid rgba(46, 204, 113, 0.3); }
+        .vip-board .masa-bahis-badge { color: #f1c40f; background: rgba(241, 196, 15, 0.12); border-color: rgba(241, 196, 15, 0.3); }
+        
+        .masa-sag-aksiyon { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+        .masa-koltuk-skor { font-size: 12px; color: #a3c4bc; font-weight: bold; display: flex; align-items: center; gap: 6px; }
+        .lobi-oyna-btn-yeni { background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%); color: #111; border: none; padding: 8px 18px; border-radius: 8px; font-size: 12px; font-weight: 900; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .vip-board .lobi-oyna-btn-yeni { background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%); }
+        
+        .lobi-oyuncular-bölümü { flex: 1; display: flex; flex-direction: column; height: 100%; max-width: 320px; }
+        .lobi-oyuncular-buzlu-kutu { flex: 1; background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255,255,255,0.07); border-radius: 15px; padding: 12px; display: flex; flex-direction: column; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); box-shadow: inset 0 0 25px rgba(0,0,0,0.7); }
+        .lobi-oyuncular-scroll { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+        
+        .lobi-tekil-oyuncu { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.04); padding: 8px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.03); cursor: pointer; transition: background 0.2s; }
+        .lobi-tekil-oyuncu:hover { background: rgba(46, 204, 113, 0.12); }
+        .lobi-player-dot { width: 7px; height: 7px; background: #2ecc71; border-radius: 50%; box-shadow: 0 0 7px #2ecc71; }
+        .lobi-player-name { font-size: 13px; color: #fff; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+        .lobi-player-chip { font-size: 12px; color: #f1c40f; font-weight: bold; }
+
+        .lobi-aksiyon-alanı { display: flex; gap: 12px; margin-top: 12px; margin-bottom: 12px; width: 100%; }
+        .lobi-aksiyon-btn { flex: 1; padding: 15px; border: none; border-radius: 12px; font-size: 14px; font-weight: 900; cursor: pointer; text-transform: uppercase; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 5px 12px rgba(0,0,0,0.5); }
+        .lobi-aksiyon-btn:active { transform: scale(0.98); }
+        .btn-aksiyon-kur { background: linear-gradient(135deg, #ff33aa 0%, #aa33ff 100%); color: #fff; border: 1px solid rgba(255,255,255,0.1); }
+        .btn-aksiyon-oyna { background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%); color: #111; }
+
+        .lobi-alt-sabit-menu { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; background: rgba(5, 15, 10, 0.95); border-top: 1px solid rgba(46, 204, 113, 0.25); display: flex; justify-content: space-around; align-items: center; z-index: 99999; backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); box-shadow: 0 -5px 25px rgba(0,0,0,0.8); }
+        .lobi-alt-item { display: flex; flex-direction: column; align-items: center; gap: 5px; color: #a3c4bc; cursor: pointer; position: relative; flex: 1; height: 100%; justify-content: center; }
+        .lobi-alt-item.aktif { color: #f1c40f; }
+        .lobi-alt-item.aktif::before { content: ''; position: absolute; top: 0; width: 35px; height: 4px; background: #f1c40f; border-radius: 0 0 5px 5px; box-shadow: 0 2px 12px #f1c40f; }
+        .lobi-alt-item i { font-size: 20px; font-style: normal; }
+        .lobi-alt-item span { font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.6px; }
+
+        @media screen and (max-width: 600px) {
+            .lobi-ana-govde { flex-direction: column; overflow-y: auto; height: auto; padding-bottom: 20px; }
+            .lobi-oyuncular-bölümü { max-width: 100%; height: 250px; margin-top: 15px; }
+            #lobiEkrani { height: auto; min-height: 100vh; overflow-y: auto; }
+        }
+
+        /* 🔥 OYUN MASASI MODÜLÜ KİLİTLERİ 🔥 */
+        #masaEkrani { display: none; z-index: 20; position: fixed; top: 0; left: 0; width: 100%; height: 100vh; overflow: hidden; }
+        .okey-table-ui { width: 100%; height: 100%; }
+
         body #kazananEliAlani .okey-tasi-bitis {
             background: #fdfbf7 !important;
             box-shadow: 0 4px 10px rgba(0,0,0,0.8) !important;
             border: 2px solid #d1ccc0 !important;
         }
-        #iskartaSol { z-index: 100 !important; }
         .pro-gosterge-btn {
             background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%) !important;
             color: #111 !important; font-weight: 900 !important; border: 2px solid #fff !important;
             box-shadow: 0 0 15px rgba(241, 196, 15, 0.5) !important; animation: pulseGold 1.5s infinite;
         }
-
-        /* 🔥 EKRANA TAM OTURAN KUSURSUZ VIP GİRİŞ EKRANI (Orijinal Yedeğin) 🔥 */
-        #authEkrani {
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            padding: 10px; box-sizing: border-box;
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999999;
-            font-family: 'Arial', sans-serif; 
-            overflow-x: hidden; overflow-y: auto;
-            background: radial-gradient(circle at 50% -10%, #0f3d23 0%, #05160c 60%, #020804 100%) !important;
-        }
-        .auth-bg-wrapper { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; overflow: hidden; }
-        .bg-glow { position: absolute; top: -20%; left: 50%; transform: translateX(-50%); width: 150%; height: 60%; background: radial-gradient(ellipse at center, rgba(241, 196, 15, 0.15) 0%, transparent 70%); }
-        .bg-tile { position: absolute; width: 75px; height: 105px; background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.01) 100%); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; display: flex; justify-content: center; align-items: center; font-family: Arial, sans-serif; font-size: 38px; font-weight: 900; box-shadow: 0 15px 35px rgba(0,0,0,0.6), inset 0 2px 5px rgba(255,255,255,0.05); filter: blur(1.5px); }
-        .bg-tile.t-7 { top: 8%; left: 8%; transform: rotate(-22deg) scale(1.1); color: rgba(231, 76, 60, 0.3); }
-        .bg-tile.t-1 { top: 12%; right: 28%; transform: rotate(15deg) scale(0.85); color: rgba(255, 255, 255, 0.25); }
-        .bg-tile.t-13 { top: 15%; right: -5%; transform: rotate(35deg) scale(1.2); color: rgba(255, 255, 255, 0.15); }
-        .auth-container-yeni { width: 100%; max-width: 360px; display: flex; flex-direction: column; gap: 10px; z-index: 10; position: relative; margin: auto; }
-        .auth-logo-alani { text-align: center; margin-bottom: 5px; display: flex; flex-direction: column; align-items: center; }
-        .logo-crown { font-size: 24px; color: #f1c40f; margin-bottom: -5px; z-index: 2; text-shadow: 0 0 15px rgba(241,196,15,0.8); }
-        .auth-logo-alani h1 { font-size: 46px; margin: 0; background: linear-gradient(to bottom, #fceabb, #f8b500); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 900; letter-spacing: 3px; z-index: 1; text-shadow: 0px 5px 15px rgba(0,0,0,0.5); }
-        .auth-logo-alani h2 { font-size: 14px; color: #f1c40f; margin: 0; letter-spacing: 5px; font-weight: 600; }
-        .auth-logo-alani p { color: #a3c4bc; font-size: 9px; letter-spacing: 1px; margin-top: 5px; text-transform: uppercase; }
-        .auth-stats-row { display: flex; justify-content: space-between; background: rgba(0,0,0,0.5); border-radius: 12px; padding: 10px 5px; border: 1px solid rgba(46, 204, 113, 0.15); margin-bottom: 5px; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
-        .auth-stat-box { text-align: center; flex: 1; border-right: 1px solid rgba(255,255,255,0.05); }
-        .auth-stat-box:last-child { border: none; }
-        .auth-stat-box i { font-size: 16px; margin-bottom: 3px; display: block; font-style: normal; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
-        .auth-stat-box .val { font-size: 16px; font-weight: 900; color: #fff; margin-bottom: 1px; }
-        .auth-stat-box .lbl { font-size: 8px; color: #a3c4bc; text-transform: uppercase; letter-spacing: 0.5px; }
-        .auth-input-group { position: relative; width: 100%; margin-bottom: 8px; }
-        .auth-input-group span { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #7f8c8d; font-size: 14px; }
-        .auth-input-yeni { width: 100%; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 12px 12px 12px 35px; border-radius: 8px; font-size: 13px; box-sizing: border-box; outline: none; transition: all 0.3s ease; }
-        .auth-input-yeni:focus { border-color: #f1c40f; box-shadow: 0 0 10px rgba(241, 196, 15, 0.2); }
-        .auth-btn-yeni { width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 14px; font-weight: 900; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); text-transform: uppercase; box-sizing: border-box; display: flex; justify-content: center; align-items: center; transition: transform 0.2s, box-shadow 0.2s; }
-        .auth-btn-yeni:active { transform: scale(0.97); }
-        .btn-gold { background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%); color: #111; box-shadow: 0 0 15px rgba(241, 196, 15, 0.4); }
-        .btn-green { background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%); color: #111; box-shadow: 0 0 15px rgba(46, 204, 113, 0.3); }
-        .btn-black { background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%); color: #f1c40f; border: 1px solid rgba(241,196,15,0.3); }
-        .auth-bottom-menu { display: flex; justify-content: space-between; margin-top: 5px; background: rgba(0,0,0,0.4); border-radius: 12px; padding: 10px; border: 1px solid rgba(255,255,255,0.05); box-sizing: border-box; }
-        .auth-menu-item { display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; color: #a3c4bc; transition: color 0.3s; }
-        .auth-menu-item:hover { color: #f1c40f; }
-        .auth-menu-item .icon-circle { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: center; align-items: center; font-size: 16px; color: #f2c94c; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
-        .auth-menu-item span { font-size: 8px; text-align: center; text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px; line-height: 1.2; }
-        .auth-footer { margin-top: 10px; text-align: center; width: 100%; box-sizing: border-box; }
-        .auth-footer h3 { color: #f1c40f; font-size: 11px; letter-spacing: 4px; margin: 0 0 5px 0; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .auth-footer h3::before, .auth-footer h3::after { content: ''; height: 1px; width: 25px; background: rgba(241, 196, 15, 0.5); }
-        .auth-footer p { color: #777; font-size: 9px; margin: 0; }
-        #authKullaniciAdi, #authEmail, #authSifre { display: none !important; }
-
-        /* 🔥 YENİ KONSEPT LOBİ (Resim 2'ye Birebir Uyumlu Özel Sınıflar) 🔥 */
-        .premium-lobi {
-            position: relative; z-index: 10; display: none; flex-direction: column;
-            width: 100%; height: 100vh; box-sizing: border-box;
-            background: #020b06; font-family: 'Arial', sans-serif;
-            overflow-y: auto; padding-bottom: 75px; /* Alt menü payı */
-        }
-        
-        /* Lobi Üst Bilgi Barı */
-        .pl-topbar {
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 15px; background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
-        }
-        .pl-profile-box { display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.4); padding: 5px 12px 5px 5px; border-radius: 30px; border: 1px solid rgba(241,196,15,0.2); }
-        .pl-avatar { width: 38px; height: 38px; background: #111; border: 2px solid #f1c40f; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 20px; }
-        .pl-user-info { display: flex; flex-direction: column; }
-        .pl-name { color: #fff; font-size: 14px; font-weight: 900; letter-spacing: 1px; margin:0; }
-        .pl-league { color: #d35400; font-size: 9px; font-weight: bold; margin:0; display: flex; align-items: center; gap:3px; }
-        
-        .pl-logo-center { text-align: center; }
-        .pl-logo-center h1 { margin: 0; font-size: 28px; background: linear-gradient(to bottom, #fceabb, #f8b500); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 900; letter-spacing: 2px; }
-        .pl-logo-center p { margin: 0; color: #fff; font-size: 8px; letter-spacing: 3px; }
-        
-        .pl-chip-box { background: rgba(0,0,0,0.6); border: 1px solid #2ecc71; border-radius: 20px; padding: 6px 12px; display: flex; align-items: center; gap: 6px; }
-        .pl-chip-icon { color: #f1c40f; font-weight: 900; font-size: 14px; }
-        .pl-chip-val { color: #fff; font-weight: bold; font-size: 14px; }
-
-        /* Lobi Alt Başlık (Online & Sistem) */
-        .pl-subheader {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 5px 15px; border-bottom: 1px solid rgba(255,255,255,0.05); margin-bottom: 10px;
-        }
-        .pl-online-status { display: flex; align-items: center; gap: 6px; color: #fff; font-size: 11px; font-weight: bold; }
-        .pl-online-dot { width: 8px; height: 8px; background: #2ecc71; border-radius: 50%; box-shadow: 0 0 8px #2ecc71; }
-        .pl-sys-msg { color: #2ecc71; font-size: 10px; flex: 1; text-align: center; }
-        .pl-settings-btn { color: #f1c40f; font-size: 12px; font-weight: bold; }
-
-        /* Lobi İçerik Izgarası */
-        .pl-main-content { padding: 0 15px; display: flex; flex-direction: column; gap: 15px; }
-
-        /* Masa Listesi */
-        .pl-section-header {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;
-        }
-        .pl-title { color: #f1c40f; font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 6px; }
-        .pl-table-list { display: flex; flex-direction: column; gap: 10px; }
-        
-        /* Premium Masa Kartı */
-        .pm-card {
-            background: linear-gradient(90deg, #0a1710 0%, #050c08 100%);
-            border: 1px solid rgba(46, 204, 113, 0.2); border-radius: 12px;
-            padding: 12px; display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5); position: relative;
-        }
-        .pm-card.vip { border-color: rgba(241, 196, 15, 0.4); }
-        .pm-left { display: flex; align-items: center; gap: 12px; }
-        .pm-icon {
-            width: 40px; height: 40px; background: linear-gradient(135deg, #e0e0e0, #ffffff);
-            border-radius: 8px; display: flex; justify-content: center; align-items: center;
-            font-size: 24px; color: #111; box-shadow: inset 0 -3px 5px rgba(0,0,0,0.2), 0 3px 5px rgba(0,0,0,0.5);
-        }
-        .pm-card.vip .pm-icon { background: linear-gradient(135deg, #f1c40f, #f39c12); }
-        .pm-details { display: flex; flex-direction: column; gap: 2px; }
-        .pm-name { color: #fff; font-size: 15px; font-weight: 900; }
-        .pm-card.vip .pm-name { color: #f1c40f; }
-        .pm-bet { color: #f1c40f; font-size: 11px; font-weight: bold; }
-        
-        .pm-right { display: flex; align-items: center; gap: 15px; }
-        .pm-players { color: #a3c4bc; font-size: 11px; font-weight: bold; display: flex; align-items: center; gap: 4px; }
-        .pm-actions { display: flex; gap: 6px; }
-        .btn-izle { background: #8e44ad; color: #fff; border: none; padding: 6px 10px; border-radius: 6px; font-size: 10px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 4px; }
-        .btn-oyna { background: linear-gradient(to bottom, #f1c40f, #f39c12); color: #111; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 900; cursor: pointer; }
-        .btn-dolu { background: #333; color: #f1c40f; border: 1px solid #f1c40f; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 900; cursor: not-allowed; }
-        .btn-vip { background: linear-gradient(to bottom, #2ecc71, #27ae60); color: #111; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 900; cursor: pointer; }
-
-        /* Yatay Oyuncu Listesi */
-        .pl-players-scroll {
-            display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none;
-        }
-        .pl-players-scroll::-webkit-scrollbar { display: none; }
-        .pm-player-card {
-            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 30px;
-            padding: 5px 12px 5px 5px; display: flex; align-items: center; gap: 8px; flex-shrink: 0; cursor: pointer;
-        }
-        .pmp-avatar { width: 30px; height: 30px; background: #111; border-radius: 50%; border: 1px solid #2ecc71; display: flex; justify-content: center; align-items: center; font-size: 14px; position: relative; }
-        .pmp-dot { position: absolute; bottom: 0; right: 0; width: 8px; height: 8px; background: #2ecc71; border-radius: 50%; border: 1px solid #111; }
-        .pmp-info { display: flex; flex-direction: column; }
-        .pmp-name { color: #fff; font-size: 11px; font-weight: bold; }
-        .pmp-chip { color: #f1c40f; font-size: 9px; font-weight: bold; }
-
-        /* Bannerlar */
-        .pl-banners-row { display: flex; gap: 10px; margin-top: 5px; margin-bottom: 20px; }
-        .pl-banner {
-            flex: 1; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; justify-content: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5); cursor: pointer; position: relative; overflow: hidden;
-        }
-        .pl-banner.vip-kur { background: linear-gradient(135deg, #4a148c 0%, #2c3e50 100%); border: 1px solid #8e44ad; }
-        .pl-banner.rastgele { background: linear-gradient(135deg, #b7950b 0%, #3e3104 100%); border: 1px solid #f1c40f; }
-        .pl-banner h3 { margin: 0; font-size: 14px; font-weight: 900; display: flex; align-items: center; gap: 6px; }
-        .pl-banner.vip-kur h3 { color: #fff; }
-        .pl-banner.rastgele h3 { color: #fff; text-shadow: 0 2px 5px #000; }
-        .pl-banner p { margin: 4px 0 0 0; font-size: 9px; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 1px; }
-
-        /* Alt Sabit Menü */
-        .pl-bottom-nav {
-            position: fixed; bottom: 0; left: 0; width: 100%; height: 65px;
-            background: rgba(2, 8, 4, 0.95); border-top: 1px solid rgba(46, 204, 113, 0.2);
-            display: flex; justify-content: space-around; align-items: center; z-index: 99999;
-            backdrop-filter: blur(10px);
-        }
-        .pl-nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #a3c4bc; cursor: pointer; flex: 1; height: 100%; justify-content: center; position: relative; }
-        .pl-nav-item.active { color: #2ecc71; }
-        .pl-nav-item.active::before { content: ''; position: absolute; top: 0; width: 30px; height: 3px; background: #2ecc71; border-radius: 0 0 4px 4px; box-shadow: 0 2px 10px #2ecc71; }
-        .pl-nav-item i { font-size: 20px; font-style: normal; }
-        .pl-nav-item span { font-size: 9px; font-weight: bold; text-transform: uppercase; }
-        
-        .badge-red { position: absolute; top: 10px; right: 25%; background: #e74c3c; color: #fff; font-size: 8px; padding: 2px 5px; border-radius: 10px; font-weight: bold; border: 1px solid #111; }
     </style>
 </head>
 <body>
 
-    <!-- 🔥 GİRİŞ (AUTH) EKRANI MODÜLÜ 🔥 -->
+    <div class="casino-global-bg" id="casinoGlobalBg"></div>
+    <div class="auth-bg-wrapper" id="casinoTilesWrapper">
+        <div class="bg-glow"></div>
+        <div class="bg-tile t-7"><span>7</span></div>
+        <div class="bg-tile t-1"><span>1</span></div>
+        <div class="bg-tile t-13"><span>13</span></div>
+    </div>
+
+    <!-- 🔥 GİRİŞ EKRANI 🔥 -->
     <div id="authEkrani">
-        <div class="auth-bg-wrapper">
-            <div class="bg-glow"></div>
-            <div class="bg-tile t-7"><span>7</span></div>
-            <div class="bg-tile t-1"><span>1</span></div>
-            <div class="bg-tile t-13"><span>13</span></div>
-        </div>
-        
         <div class="auth-container-yeni">
+            
             <div class="auth-logo-alani">
                 <div class="logo-crown">👑</div>
                 <h1>BEYCO</h1>
                 <h2>SERİ OKEY</h2>
                 <p>UYGULAMA İNDİRMEDEN OYNA</p>
             </div>
+
             <div class="auth-stats-row">
                 <div class="auth-stat-box"><i>👥</i><div class="val" id="statOnlineRand">247</div><div class="lbl">KİŞİ ÇEVRİMİÇİ</div></div>
                 <div class="auth-stat-box"><i>🎲</i><div class="val" id="statMasaRand">62</div><div class="lbl">AKTİF MASA</div></div>
                 <div class="auth-stat-box"><i>🏆</i><div class="val" id="statOyunRand">1.842</div><div class="lbl">BUGÜN OYNANAN</div></div>
             </div>
+
             <div id="loginInputs">
-                <div class="auth-input-group" id="kullaniciAdiGroup" style="display:none;"><span>👤</span><input type="text" id="gorselKullaniciAdi" class="auth-input-yeni" placeholder="Oyuncu Nickiniz" onkeyup="document.getElementById('authKullaniciAdi').value = this.value;"></div>
-                <div class="auth-input-group"><span>✉️</span><input type="email" id="gorselEmail" class="auth-input-yeni" placeholder="E-Posta Adresi" onkeyup="document.getElementById('authEmail').value = this.value;"></div>
-                <div class="auth-input-group"><span>🔒</span><input type="password" id="gorselSifre" class="auth-input-yeni" placeholder="Şifre" onkeyup="document.getElementById('authSifre').value = this.value;"></div>
+                <div class="auth-input-group" id="kullaniciAdiGroup" style="display:none;">
+                    <span>👤</span>
+                    <input type="text" id="gorselKullaniciAdi" class="auth-input-yeni" placeholder="Oyuncu Nickiniz">
+                </div>
+                <div class="auth-input-group">
+                    <span>✉️</span>
+                    <input type="email" id="gorselEmail" class="auth-input-yeni" placeholder="E-Posta Adresi">
+                </div>
+                <div class="auth-input-group">
+                    <span>🔒</span>
+                    <input type="password" id="gorselSifre" class="auth-input-yeni" placeholder="Şifre">
+                </div>
             </div>
+
             <div id="loginButonlariGorsel" style="display:flex; flex-direction:column; gap:10px;">
-                <button class="auth-btn-yeni btn-gold" onclick="document.getElementById('btnGiris').click()">GİRİŞ YAP ❯</button>
-                <button class="auth-btn-yeni btn-green" onclick="document.getElementById('kullaniciAdiGroup').style.display='block'; document.getElementById('loginButonlariGorsel').style.display='none'; document.getElementById('kayitButonlariGorsel').style.display='flex'; document.getElementById('btnGecisKayit').click();">YENİ KAYIT OL</button>
-                <button class="auth-btn-yeni btn-black" onclick="document.getElementById('btnMisafir').click()"><span style="font-size:16px; margin-right:5px;">👤</span> HEMEN OYNA <br><span style="font-size:9px; font-weight:normal; text-transform:none; margin-left:auto; color:#a3c4bc;">Misafir olarak devam et</span></button>
+                <button class="auth-btn-yeni btn-gold" id="visualBtnGiris">GİRİŞ YAP ❯</button>
+                <button class="auth-btn-yeni btn-green" id="visualBtnKayitGecis">YENİ KAYIT OL</button>
+                <button class="auth-btn-yeni btn-black" id="visualBtnMisafir"><span style="font-size:16px; margin-right:5px;">👤</span> HEMEN OYNA <br><span style="font-size:10px; font-weight:normal; text-transform:none; margin-left:auto; color:#a3c4bc;">Misafir olarak devam et</span></button>
             </div>
+
             <div id="kayitButonlariGorsel" style="display:none; flex-direction:column; gap:10px;">
-                <button class="auth-btn-yeni btn-green" onclick="document.getElementById('btnKayitTamamla').click()">KAYDI TAMAMLA</button>
-                <button class="auth-btn-yeni btn-black" onclick="document.getElementById('kullaniciAdiGroup').style.display='none'; document.getElementById('kayitButonlariGorsel').style.display='none'; document.getElementById('loginButonlariGorsel').style.display='flex'; document.getElementById('btnGecisGiris').click();">⬅ GİRİŞ EKRANINA DÖN</button>
+                <button class="auth-btn-yeni btn-green" id="visualBtnKayitTamamla">KAYDI TAMAMLA</button>
+                <button class="auth-btn-yeni btn-black" id="visualBtnGirisGecis">⬅ GİRİŞ EKRANINA DÖN</button>
             </div>
+
             <div class="auth-bottom-menu">
                 <div class="auth-menu-item" onclick="alert('Görevleri görmek için giriş yapmalısın!')"><div class="icon-circle">📋</div><span>GÜNLÜK<br>GÖREVLER</span></div>
                 <div class="auth-menu-item" onclick="alert('Klanlara katılmak için giriş yapmalısın!')"><div class="icon-circle">👥</div><span>KLANLAR</span></div>
                 <div class="auth-menu-item" onclick="alert('Sohbete katılmak için giriş yapmalısın!')"><div class="icon-circle">💬</div><span>SOHBET</span></div>
                 <div class="auth-menu-item" onclick="alert('Ödülünü almak için giriş yapmalısın!')"><div class="icon-circle">🎁</div><span>GÜNLÜK<br>ÖDÜL</span></div>
             </div>
+
             <div class="auth-footer"><h3>BEYCO GAMES</h3><p>© 2026 Tüm hakları saklıdır.</p></div>
             
+            <!-- Ana sisteme bağlanan GİZLİ orijinal kodlar -->
             <div style="display:none;">
                 <h2 id="authBaslik"></h2><input type="text" id="authKullaniciAdi"><input type="email" id="authEmail"><input type="password" id="authSifre">
                 <div id="loginButonlari"><button id="btnGiris"></button><button id="btnGecisKayit"></button><button id="btnMisafir"></button></div>
                 <div id="kayitButonlari"><button id="btnKayitTamamla"></button><button id="btnGecisGiris"></button></div>
             </div>
+
         </div>
     </div>
 
-    <!-- 🔥 YENİ PREMIUM LOBİ EKRANI MODÜLÜ 🔥 -->
-    <div id="lobiEkrani" class="premium-lobi">
+    <!-- 🔥 LOBİ EKRANI 🔥 -->
+    <div id="lobiEkrani">
+        <div class="lobi-ust-bar">
+            <div class="lobi-ust-baslik">
+                <h2>BEYCO GAMES</h2>
+                <p>CASINO & VIP LOUNGE</p>
+            </div>
+            <div class="sistem-mesaji" id="sistemMesajiLobi" style="font-size:11px; color:#2ecc71;">Sistem: VIP Giriş Başarılı!</div>
+        </div>
         
-        <div class="pl-topbar">
-            <div class="pl-profile-box" onclick="if(aktifKullaniciAdi) profiliGoster(aktifKullaniciAdi)" style="cursor:pointer;">
-                <div class="pl-avatar">😎</div>
-                <div class="pl-user-info">
-                    <p class="pl-name" id="lobiOyuncuIsmi">Bağlanıyor...</p>
-                    <p class="pl-league">🏆 BRONZ LİG</p>
+        <div class="lobi-aksiyon-alanı">
+            <button class="lobi-aksiyon-btn btn-aksiyon-kur" id="visualBtnMasaKur">👑 VIP MASA KUR</button>
+            <button class="lobi-aksiyon-btn btn-aksiyon-oyna" id="btnRastgeleOyna">🎲 HEMEN OYNA</button>
+        </div>
+
+        <div class="lobi-ana-govde">
+            <div class="lobi-masalar-bölümü">
+                <div class="lobi-panel-baslik">AKTİF VIP MASALAR</div>
+                <div class="lobi-masalar-scroll" id="masalarAlani"></div>
+            </div>
+            <div class="lobi-oyuncular-bölümü">
+                <div class="lobi-panel-baslik">AKTİF OYUNCULAR</div>
+                <div class="lobi-oyuncular-buzlu-kutu">
+                    <div class="lobi-oyuncular-scroll" id="lobidekilerListesi"></div>
                 </div>
-            </div>
-            <div class="pl-logo-center">
-                <h1>BEYCO</h1><p>SERİ OKEY</p>
-            </div>
-            <div class="pl-chip-box">
-                <span class="pl-chip-icon">C</span>
-                <span class="pl-chip-val" id="lobiOyuncuCipi">...</span>
             </div>
         </div>
 
-        <div class="pl-subheader">
-            <div class="pl-online-status"><div class="pl-online-dot"></div> <span id="lobiOnlineSayi">247</span> çevrimiçi</div>
-            <div class="pl-sys-msg">Sistem: Seri Okey Salonlarına Hoş Geldiniz!</div>
-            <div class="pl-settings-btn">🛡️ BEYCO GAMES</div>
+        <div class="lobi-alt-sabit-menu" id="lobiAltMenu">
+            <div class="lobi-alt-item aktif" id="altMenuLobiBtn"><i>🏠</i><span>LOBİ</span></div>
+            <div class="lobi-alt-item" id="altMenuArkadaslarBtn"><i>👥</i><span>ARKADAŞLAR</span></div>
+            <div class="lobi-alt-item" id="altMenuGorevlerBtn"><i>📋</i><span>GÜNLÜK GÖREVLER</span></div>
+            <div class="lobi-alt-item" id="altMenuZenginlerBtn"><i>🏆</i><span>EN ZENGİNLER</span></div>
+            <div class="lobi-alt-item" id="altMenuMagazaBtn"><i>🛒</i><span>VIP MAĞAZA</span></div>
         </div>
-
-        <div class="pl-main-content">
-            
-            <!-- Masalar Listesi -->
-            <div class="pl-section">
-                <div class="pl-section-header">
-                    <div class="pl-title">🎲 MASA SEÇ</div>
-                </div>
-                <div class="pl-table-list" id="masalarAlani">
-                    <!-- Javascript Socket ile Burası Dolacak -->
-                </div>
-            </div>
-
-            <!-- Yatay Oyuncu Listesi -->
-            <div class="pl-section">
-                <div class="pl-section-header">
-                    <div class="pl-title">👥 LOBİDEKİ OYUNCULAR</div>
-                    <span style="color:#2ecc71; font-size:9px; cursor:pointer;">TÜMÜNÜ GÖR</span>
-                </div>
-                <div class="pl-players-scroll" id="lobidekilerListesi">
-                    <!-- Javascript Socket ile Burası Dolacak -->
-                </div>
-            </div>
-
-            <!-- Aksiyon Bannerları -->
-            <div class="pl-banners-row">
-                <div class="pl-banner vip-kur" onclick="document.getElementById('vipMasaKurPanel').style.display='flex'">
-                    <h3>👑 VIP MASA KUR</h3>
-                    <p>ÖZEL JANJANLI ALAN</p>
-                </div>
-                <div class="pl-banner rastgele" id="btnRastgeleOyna">
-                    <h3>⚡ HEMEN OYNA</h3>
-                    <p>RASTGELE MASA</p>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Sabit Alt Menü -->
-        <div class="pl-bottom-nav">
-            <div class="pl-nav-item active"><i>🏠</i><span>LOBİ</span></div>
-            <div class="pl-nav-item" onclick="if(typeof arkadaslarMenusuAc === 'function') arkadaslarMenusuAc();"><i>👥</i><span>ARKADAŞLAR</span></div>
-            <div class="pl-nav-item" onclick="if(typeof gorevleriAc === 'function') gorevleriAc();"><i>📋</i><span>GÖREVLER</span></div>
-            <div class="pl-nav-item" onclick="if(typeof liderlikTablosunuAc === 'function') liderlikTablosunuAc();"><i>🏆</i><span>EN İYİLER</span></div>
-            <div class="pl-nav-item" onclick="let m=document.getElementById('magazaEkrani'); if(m) m.style.display='flex';"><i>🛒</i><span>MAĞAZA</span></div>
-            <div class="pl-nav-item" onclick="if(typeof reklamIzleAksiyon === 'function') reklamIzleAksiyon();"><i>©️</i><span>BEDAVA ÇİP</span><div class="badge-red">!</div></div>
-            <div class="pl-nav-item"><i>💬</i><span>SOHBET</span><div class="badge-red">3</div></div>
-        </div>
-
     </div>
 
-    <!-- 🔥 OYUN MASASI MODÜLÜ (Eski Orijinal Yedek Halin) 🔥 -->
-    <div id="masaEkrani" style="display:none; position:relative; z-index:20;">
+    <!-- 🔥 OYUN MASASI 🔥 -->
+    <div id="masaEkrani" style="display:none;">
         <div class="vip-header" style="position:relative; z-index:30;">
-            <div class="profil-bilgi" onclick="if(aktifKullaniciAdi) profiliGoster(aktifKullaniciAdi)" style="cursor:pointer;">
+            <div class="profil-bilgi" id="myProfileBtnInTable" style="cursor:pointer;">
                 <div class="profil-avatar" id="vipAvatar">😎</div>
                 <div class="profil-isim-kutu">
                     <p class="profil-isim" id="benimAdimKutusu">Bağlanıyor...</p>
@@ -337,9 +270,7 @@
                 </div>
                 <button id="btnCikisYap" class="cikis-btn">🚪 ÇIKIŞ</button>
             </div>
-            <div class="cip-kutu">
-                <div class="cip-ikon">C</div> <span id="benimCipim">Bağlanıyor...</span>
-            </div>
+            <div class="cip-kutu"><div class="cip-ikon">C</div> <span id="benimCipim">Bağlanıyor...</span></div>
         </div>
         <div class="okey-table-ui">
             <button class="return-lobby-btn" id="lobiyeDonBtn">⬅ Lobiye Dön</button>
@@ -369,8 +300,8 @@
         </div>
         <div class="okey-istaka-tuslar-area">
             <div class="pro-tus-takimi">
-                <button class="pro-tus" onclick="if(typeof seriDiz === 'function') seriDiz()">SERİ DİZ</button>
-                <button class="pro-tus" onclick="if(typeof ciftDiz === 'function') ciftDiz()">ÇİFT DİZ</button>
+                <button class="pro-tus" id="btnSeriDiz" onclick="if(typeof seriDiz === 'function') seriDiz()">SERİ DİZ</button>
+                <button class="pro-tus" id="btnCiftDiz" onclick="if(typeof ciftDiz === 'function') ciftDiz()">ÇİFT DİZ</button>
             </div>
             <div class="istaka-container" id="benimIstakam">
                 <div class="istaka-raf raf-ust" id="ustRaf"></div>
@@ -379,7 +310,7 @@
         </div>
     </div>
 
-    <!-- Orijinal Paneller -->
+    <!-- Eski Diğer Paneller -->
     <div id="sohbetCekmecesi" class="sohbet-cekmecesi" style="z-index:40;">
         <div class="cekmence-header"><span>VIP Sohbet</span><button id="sohbetKapatBtn">X</button></div>
         <div id="sohbetMesajlari" class="cekmence-mesajlar"></div>
@@ -426,15 +357,121 @@
     <script src="seyirci.js"></script> 
     
     <script>
-        // Lobi Ekranındaki Avatar ve İsim Bilgilerini Güncelleyen Köprü
+        // ==================================
+        // 🔥 ARAYÜZ VE GÜVENLİK KALKANI 🔥
+        // ==================================
         setInterval(() => {
-            const authIsim = window.aktifKullaniciAdi;
-            const authCip = window.benimAnlikCipim;
-            if(authIsim && document.getElementById('lobiOyuncuIsmi')) document.getElementById('lobiOyuncuIsmi').innerText = authIsim;
-            if(authCip && document.getElementById('lobiOyuncuCipi')) document.getElementById('lobiOyuncuCipi').innerText = authCip.toLocaleString('tr-TR');
-        }, 1000);
+            const masa = document.getElementById('masaEkrani');
+            const auth = document.getElementById('authEkrani');
+            const lobi = document.getElementById('lobiEkrani');
+            const cBg = document.getElementById('casinoGlobalBg');
+            const cTiles = document.getElementById('casinoTilesWrapper');
+            
+            if (masa && (masa.style.display === 'block' || masa.style.display === 'flex')) {
+                masa.style.display = 'block'; 
+                if (auth) auth.style.display = 'none';
+                if (lobi) lobi.style.display = 'none';
+                if (cBg) cBg.style.display = 'none';
+                if (cTiles) cTiles.style.display = 'none';
+            } else if (auth && auth.style.display !== 'none') {
+                if (cBg) cBg.style.display = 'block';
+                if (cTiles) cTiles.style.display = 'block';
+            } else if (lobi && lobi.style.display !== 'none') {
+                if (cBg) cBg.style.display = 'block';
+                if (cTiles) cTiles.style.display = 'block';
+            }
+        }, 150);
 
-        // 🔥 Socket Bağlantıları (Yeni Lobi Sınıflarına Uyarlanmış) 🔥
+        // ==================================
+        // 🔥 OTOMATİK DOLDURMA (AUTOFILL) KİLİDİ 🔥
+        // ==================================
+        window.addEventListener('DOMContentLoaded', (event) => {
+            // Şifreleri ve E-postayı Tıklama Anında Zorla Eşitleyen Motor
+            const senkronizeEt = () => {
+                const gKullanici = document.getElementById('gorselKullaniciAdi');
+                const gEmail = document.getElementById('gorselEmail');
+                const gSifre = document.getElementById('gorselSifre');
+                
+                if(gKullanici) document.getElementById('authKullaniciAdi').value = gKullanici.value;
+                if(gEmail) document.getElementById('authEmail').value = gEmail.value;
+                if(gSifre) document.getElementById('authSifre').value = gSifre.value;
+            };
+
+            const vBtnGiris = document.getElementById('visualBtnGiris');
+            const rBtnGiris = document.getElementById('btnGiris');
+            if(vBtnGiris && rBtnGiris) vBtnGiris.onclick = () => {
+                senkronizeEt(); // Safari/Chrome Autofill Bypass
+                rBtnGiris.click();
+            };
+
+            const vBtnKayitGecis = document.getElementById('visualBtnKayitGecis');
+            const rBtnGecisKayit = document.getElementById('btnGecisKayit');
+            const kGroup = document.getElementById('kullaniciAdiGroup');
+            const lBtnsG = document.getElementById('loginButonlariGorsel');
+            const kBtnsG = document.getElementById('kayitButonlariGorsel');
+            if(vBtnKayitGecis && rBtnGecisKayit) vBtnKayitGecis.onclick = () => {
+                if(kGroup) kGroup.style.display = 'block';
+                if(lBtnsG) lBtnsG.style.display = 'none';
+                if(kBtnsG) kBtnsG.style.display = 'flex';
+                rBtnGecisKayit.click();
+            };
+
+            const vBtnMisafir = document.getElementById('visualBtnMisafir');
+            const rBtnMisafir = document.getElementById('btnMisafir');
+            if(vBtnMisafir && rBtnMisafir) vBtnMisafir.onclick = () => rBtnMisafir.click();
+
+            const vBtnKayitTamamla = document.getElementById('visualBtnKayitTamamla');
+            const rBtnKayitTamamla = document.getElementById('btnKayitTamamla');
+            if(vBtnKayitTamamla && rBtnKayitTamamla) vBtnKayitTamamla.onclick = () => {
+                senkronizeEt(); // Safari/Chrome Autofill Bypass
+                rBtnKayitTamamla.click();
+            };
+
+            const vBtnGirisGecis = document.getElementById('visualBtnGirisGecis');
+            const rBtnGecisGiris = document.getElementById('btnGecisGiris');
+            if(vBtnGirisGecis && rBtnGecisGiris) vBtnGirisGecis.onclick = () => {
+                if(kGroup) kGroup.style.display = 'none';
+                if(kBtnsG) kBtnsG.style.display = 'none';
+                if(lBtnsG) lBtnsG.style.display = 'flex';
+                rBtnGecisGiris.click();
+            };
+
+            const vBtnMasaKur = document.getElementById('visualBtnMasaKur');
+            const rPanelMasaKur = document.getElementById('vipMasaKurPanel');
+            if(vBtnMasaKur && rPanelMasaKur) vBtnMasaKur.onclick = () => rPanelMasaKur.style.display = 'flex';
+
+            const pBtnTable = document.getElementById('myProfileBtnInTable');
+            if(pBtnTable) pBtnTable.onclick = () => {
+                if(typeof profiliGoster === 'function' && window.aktifKullaniciAdi) {
+                    profiliGoster(window.aktifKullaniciAdi);
+                }
+            };
+            
+            const arkadaslarBtn = document.getElementById('altMenuArkadaslarBtn');
+            if(arkadaslarBtn) arkadaslarBtn.onclick = () => { if(typeof arkadaslarMenusuAc === 'function') arkadaslarMenusuAc(); };
+            
+            const gorevlerBtn = document.getElementById('altMenuGorevlerBtn');
+            if(gorevlerBtn) gorevlerBtn.onclick = () => { if(typeof gorevleriAc === 'function') gorevleriAc(); };
+            
+            const zenginlerBtn = document.getElementById('altMenuZenginlerBtn');
+            if(zenginlerBtn) zenginlerBtn.onclick = () => { if(typeof liderlikTablosunuAc === 'function') liderlikTablosunuAc(); };
+            
+            const magazaBtn = document.getElementById('altMenuMagazaBtn');
+            if(magazaBtn) magazaBtn.onclick = () => { 
+                let m = document.getElementById('magazaEkrani');
+                if(m) m.style.display = 'flex'; 
+            };
+        });
+
+        // ==================================
+        // 🔥 SOCKET LOBİ VERİ MOTORU 🔥
+        // ==================================
+        window.masayaOtur = function(masaAdi) {
+            console.log("Masaya oturma isteği: " + masaAdi);
+            if(window.suAnkiMasam === masaAdi) return;
+            if(typeof socket !== 'undefined') socket.emit('masaya_otur', { masaAdi: masaAdi });
+        };
+
         if(typeof socket !== 'undefined') {
             socket.on('masalari_guncelle', (data) => {
                 const masalarAlani = document.getElementById('masalarAlani');
@@ -446,33 +483,22 @@
                     let oturanSayisi = koltuklar.filter(k => k !== null).length;
                     let isVipMasa = masaAdi.includes('VIP:');
                     
-                    let kartClass = isVipMasa ? "pm-card vip" : "pm-card";
+                    let kartClass = isVipMasa ? "casino-masa-kart vip-board" : "casino-masa-kart";
                     let bahisTxt = "10.000 ÇİP";
                     if(masaAdi.includes('20K')) bahisTxt = "20.000 ÇİP";
                     else if(masaAdi.includes('50K')) bahisTxt = "50.000 ÇİP";
                     else if(isVipMasa) bahisTxt = "VIP ÖZEL";
                     
-                    let btnText = oturanSayisi === 4 ? "DOLU" : "HEMEN OYNA";
-                    let btnClass = oturanSayisi === 4 ? "btn-dolu" : "btn-oyna";
-                    if(isVipMasa) { btnText = "HEMEN OYNA"; btnClass = "btn-vip"; }
-                    let icon = isVipMasa ? "👑" : "🎲";
-                    
                     let div = document.createElement('div');
                     div.className = kartClass;
                     div.innerHTML = `
-                        <div class="pm-left">
-                            <div class="pm-icon">${icon}</div>
-                            <div class="pm-details">
-                                <div class="pm-name">${masaAdi}</div>
-                                <div class="pm-bet">${bahisTxt}</div>
-                            </div>
+                        <div class="masa-sol-detay">
+                            <div class="masa-adi-txt">${masaAdi}</div>
+                            <div class="masa-bahis-badge">${bahisTxt}</div>
                         </div>
-                        <div class="pm-right">
-                            <div class="pm-players">👥 ${oturanSayisi}/4</div>
-                            <div class="pm-actions">
-                                <button class="btn-izle" onclick="if(typeof window.masayiIzle === 'function') window.masayiIzle('${masaAdi}')">👁️ İZLE</button>
-                                <button class="${btnClass}" onclick="if(typeof window.masayaOtur === 'function') window.masayaOtur('${masaAdi}')">${btnText}</button>
-                            </div>
+                        <div class="masa-sag-aksiyon">
+                            <div class="masa-koltuk-skor">👥 <span>${oturanSayisi}/4</span></div>
+                            <button class="lobi-oyna-btn-yeni" onclick="window.masayaOtur('${masaAdi}')">MASAYA GİR</button>
                         </div>
                     `;
                     masalarAlani.appendChild(div);
@@ -490,26 +516,19 @@
                     let sahteCip = ((hash % 15000000) + 500000).toLocaleString('tr-TR');
                     
                     let div = document.createElement('div');
-                    div.className = "pm-player-card";
+                    div.className = "lobi-tekil-oyuncu";
                     div.onclick = () => { if(typeof profiliGoster === 'function') profiliGoster(p); };
                     div.innerHTML = `
-                        <div class="pmp-avatar">😎<div class="pmp-dot"></div></div>
-                        <div class="pmp-info">
-                            <div class="pmp-name">${p}</div>
-                            <div class="pmp-chip">C ${sahteCip}</div>
-                        </div>
+                        <div class="lobi-player-dot"></div>
+                        <div class="lobi-player-name">${p}</div>
+                        <div class="lobi-player-chip">C ${sahteCip}</div>
                     `;
                     listKutu.appendChild(div);
                 });
             });
             
-            socket.on('sen_masadasin', () => { 
-                document.getElementById('authEkrani').style.display = 'none'; 
-                document.getElementById('lobiEkrani').style.display = 'none'; 
-            });
-            socket.on('masa_oyun_basladi', () => { 
-                document.getElementById('lobiEkrani').style.display = 'none'; 
-            });
+            socket.on('sen_masadasin', () => { document.getElementById('authEkrani').style.display = 'none'; document.getElementById('lobiEkrani').style.display = 'none'; });
+            socket.on('masa_oyun_basladi', () => { document.getElementById('lobiEkrani').style.display = 'none'; });
             
             socket.on('sync_iskartalar', (data) => {
                 if (window.suAnkiMasam !== data.masaAdi) return;
@@ -545,13 +564,13 @@
 
         setInterval(() => {
             const elOnline = document.getElementById('statOnlineRand');
-            if(elOnline) {
+            const elMasa = document.getElementById('statMasaRand');
+            if(elOnline && elMasa) {
                 let baseOnline = parseInt(elOnline.innerText.replace('.',''));
                 let change = Math.floor(Math.random() * 5) - 2; 
                 let newOnline = baseOnline + change; if(newOnline < 100) newOnline = 150;
-                elOnline.innerText = newOnline;
-                let lobiOnline = document.getElementById('lobiOnlineSayi');
-                if(lobiOnline) lobiOnline.innerText = newOnline;
+                let yeniMasa = Math.floor(newOnline / 4) + Math.floor(Math.random() * 5);
+                elOnline.innerText = newOnline; elMasa.innerText = yeniMasa;
             }
         }, 12000);
 
