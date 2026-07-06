@@ -42,14 +42,14 @@ function desteYaratVeKaristir() {
     for (let i = yeniDeste.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [yeniDeste[i], yeniDeste[j]] = [yeniDeste[j], yeniDeste[i]]; } return yeniDeste;
 }
 
-function oyunuSifirla(masaAdi, kazanan = null, odul = 0, sebep = "", okeyleBittiMi = false) {
+function oyunuSifirla(masaAdi, kazanan = null, odul = 0, sebep = "", okeyleBittiMi = false, ozelBitisEli = null) {
     const masa = masalar[masaAdi];
     if(masa) {
         clearTimeout(masa.turnTimer);
         masa.oyunBasladi = false; masa.oyunBittiBeklemede = true; 
         
-        let sunucuEli = [];
-        if(kazanan && masa.eller[kazanan]) {
+        let sunucuEli = ozelBitisEli || [];
+        if(!ozelBitisEli && kazanan && masa.eller[kazanan]) {
             sunucuEli = [...masa.eller[kazanan]];
         }
 
@@ -80,17 +80,36 @@ function eliKontrolEt(gruplar, gosterge) {
     if (!gosterge) return false;
     let okeySayi = gosterge.sayi === 13 ? 1 : parseInt(gosterge.sayi) + 1; let okeyRenk = gosterge.renk;
     let totalTiles = 0; let isCift = true; let ciftCount = 0;
+    
     for (let grup of gruplar) { totalTiles += grup.length; if (grup.length !== 2) isCift = false; else ciftCount++; }
     if (totalTiles !== 14) return false;
-    function getEffectiveTile(t) { if (t.renk === okeyRenk && parseInt(t.sayi) === okeySayi) return { isOkey: true }; if (t.renk === 'sahte') return { renk: okeyRenk, sayi: okeySayi, isOkey: false }; return { renk: t.renk, sayi: parseInt(t.sayi), isOkey: false }; }
-    if (isCift && ciftCount === 7) { for (let grup of gruplar) { let t1 = getEffectiveTile(grup[0]); let t2 = getEffectiveTile(grup[1]); if (t1.isOkey || t2.isOkey) continue; if (t1.renk !== t2.renk || t1.sayi !== t2.sayi) return false; } return true; }
+
+    function getEffectiveTile(t) { 
+        if (t.renk === okeyRenk && parseInt(t.sayi) === okeySayi) return { isOkey: true }; 
+        if (t.renk === 'sahte') return { renk: okeyRenk, sayi: okeySayi, isOkey: false }; 
+        return { renk: t.renk, sayi: parseInt(t.sayi), isOkey: false }; 
+    }
+
+    if (isCift && ciftCount === 7) { 
+        for (let grup of gruplar) { 
+            let t1 = getEffectiveTile(grup[0]); let t2 = getEffectiveTile(grup[1]); 
+            if (t1.isOkey || t2.isOkey) continue; 
+            if (t1.renk !== t2.renk || t1.sayi !== t2.sayi) return false; 
+        } 
+        return true; 
+    }
+
     for (let grup of gruplar) {
-        if (grup.length < 3) return false; let normalTiles = [];
+        if (grup.length < 3) return false; 
+        
+        let normalTiles = [];
         for (let t of grup) { let eff = getEffectiveTile(t); if (!eff.isOkey) normalTiles.push(eff); }
         if (normalTiles.length === 0) continue; 
+        
         let isAyniSayi = true; let baseSayi = normalTiles[0].sayi; let colors = new Set();
         for (let t of normalTiles) { if (t.sayi !== baseSayi) isAyniSayi = false; colors.add(t.renk); }
         if (colors.size !== normalTiles.length) isAyniSayi = false; 
+        
         let isSeriArtan = true; let isSeriAzalan = true; let firstNormalIdx = grup.findIndex(t => !getEffectiveTile(t).isOkey);
         if (firstNormalIdx !== -1) {
             let cSayi = getEffectiveTile(grup[firstNormalIdx]).sayi; let cRenk = getEffectiveTile(grup[firstNormalIdx]).renk;
@@ -99,7 +118,8 @@ function eliKontrolEt(gruplar, gosterge) {
             let expFwdAzalan = cSayi; for (let i = firstNormalIdx + 1; i < grup.length; i++) { expFwdAzalan = expFwdAzalan === 1 ? 13 : expFwdAzalan - 1; let eff = getEffectiveTile(grup[i]); if (!eff.isOkey) { if (eff.renk !== cRenk || eff.sayi !== expFwdAzalan) { isSeriAzalan = false; break; } } }
             let expBwdAzalan = cSayi; for (let i = firstNormalIdx - 1; i >= 0; i--) { expBwdAzalan = expBwdAzalan === 13 ? 1 : expBwdAzalan + 1; let eff = getEffectiveTile(grup[i]); if (!eff.isOkey) { if (eff.renk !== cRenk || eff.sayi !== expBwdAzalan) { isSeriAzalan = false; break; } } }
         } else { isSeriArtan = false; isSeriAzalan = false; }
-        if (!isAyniSayi && !isSeriArtan && !isSeriAzalan) return false;
+        
+        if (!isAyniSayi && !isSeriArtan && !isSeriAzalan) return false; 
     } return true;
 }
 
@@ -217,7 +237,9 @@ function botHamlesiYap(masaAdi) {
                     let yandakiTas = masa.sonAtilanTas;
                     let isineYararMi = masa.eller[siradaki].filter(t => t.renk === yandakiTas.renk || t.sayi === yandakiTas.sayi).length >= 2;
                     if (isineYararMi && Math.random() > 0.4) {
-                        masa.eller[siradaki].push(yandakiTas); masa.sonAtilanTas = null; tasAldi = true;
+                        masa.eller[siradaki].push(yandakiTas); 
+                        masa.sonAtilanTas = null; 
+                        tasAldi = true;
                         
                         let atanKisi = null; 
                         let yeniUstTas = null;
@@ -262,7 +284,12 @@ function botHamlesiYap(masaAdi) {
                             masa.iskartalar[siradaki].push(bitisTasi);
                             io.emit('ortaya_tas_atildi', { masaAdi: masaAdi, kimAtti: siradaki, tas: bitisTasi });
                             
-                            oyunuSifirla(masaAdi, siradaki, kazanilanPara, "Usta bir dizilimle elini bitirdi!"); 
+                            let siraliBotEli = [...botunEli].sort((a, b) => {
+                                let valA = a.sayi === 'S' ? 14 : parseInt(a.sayi); let valB = b.sayi === 'S' ? 14 : parseInt(b.sayi);
+                                if(valA === valB) return (a.renk || '').localeCompare(b.renk || ''); return valA - valB;
+                            });
+
+                            oyunuSifirla(masaAdi, siradaki, kazanilanPara, "Usta bir dizilimle elini bitirdi!", false, siraliBotEli); 
                             return;
                         }
 
@@ -369,11 +396,7 @@ io.on('connection', (socket) => {
     socket.on('masayi_izle', (data) => {
         const masa = masalar[data.masaAdi];
         if(masa) { 
-            let topIskartalar = {};
-            for(let p in masa.iskartalar) {
-                if(Array.isArray(masa.iskartalar[p]) && masa.iskartalar[p].length > 0) { topIskartalar[p] = masa.iskartalar[p][masa.iskartalar[p].length - 1]; }
-            }
-            socket.emit('izleyici_olarak_katildin', { masaAdi: data.masaAdi, oyunBasladi: masa.oyunBasladi, kalanTas: masa.deste.length, gosterge: masa.gosterge, kasa: masa.kasa, koltuklar: masa.koltuklar, siradaki: masa.siradakiOyuncu, iskartalar: topIskartalar }); 
+            socket.emit('izleyici_olarak_katildin', { masaAdi: data.masaAdi, oyunBasladi: masa.oyunBasladi, kalanTas: masa.deste.length, gosterge: masa.gosterge, kasa: masa.kasa, koltuklar: masa.koltuklar, siradaki: masa.siradakiOyuncu, iskartalar: masa.iskartalar }); 
         }
     });
 
@@ -477,7 +500,7 @@ io.on('connection', (socket) => {
                     } 
                 } 
             }
-            io.emit('yandan_alindi_guncelle', { ...data, atanKisi: atanKisi, yeniUstTas: yeniUstTas }); 
+            io.emit('yandan_alindi_guncelle', { masaAdi: data.masaAdi, kimAldi: data.kimAldi, tas: data.tas, atanKisi: atanKisi, yeniUstTas: yeniUstTas }); 
         } 
     });
     
@@ -492,7 +515,10 @@ io.on('connection', (socket) => {
                 oyuncuCipleri[data.isim] = uCip + kazanilanPara; 
                 io.emit('cip_guncelle_ozel', { isim: data.isim, cip: oyuncuCipleri[data.isim] }); 
                 
-                oyunuSifirla(data.masaAdi, data.isim, kazanilanPara, "Nizami dizilimle el bitti."); 
+                let oyuncununOrijinalEli = [];
+                if (data.gruplar && Array.isArray(data.gruplar)) { data.gruplar.forEach(grup => oyuncununOrijinalEli.push(...grup)); }
+
+                oyunuSifirla(data.masaAdi, data.isim, kazanilanPara, "Nizami dizilimle el bitti.", false, oyuncununOrijinalEli); 
             } else { 
                 socket.emit('hatali_bitis', { mesaj: "Dizilim hatalı!", tasId: data.tasHtmlId }); 
             } 
