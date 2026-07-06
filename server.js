@@ -26,6 +26,14 @@ for(let i=0; i<75; i++) {
     oyuncuKozmetikleri[tamIsim] = (Math.random() > 0.8) ? ['neon_tac'] : [];
 }
 
+// 🔥 TÜM MASADAKİ TAŞ YIĞINLARINI ANINDA SENKRONİZE EDEN ZIRHLI MOTOR 🔥
+function syncIskartalar(masaAdi) {
+    const masa = masalar[masaAdi];
+    if (masa) {
+        io.emit('sync_iskartalar', { masaAdi: masaAdi, iskartalar: masa.iskartalar });
+    }
+}
+
 function getAvailableBot() {
     const usedBots = new Set();
     for(let m in masalar) { masalar[m].koltuklar.forEach(k => { if(k && aktifBotlar.includes(k)) usedBots.add(k); }); }
@@ -148,6 +156,7 @@ function insanHamlesiBaslat(masaAdi, isim) {
              
              if(!otomatikTasCekildiMi) { io.emit('oto_tas_atildi_istemci', { kim: isim, tas: atilan }); }
              io.emit('ortaya_tas_atildi', { masaAdi: masaAdi, kimAtti: isim, tas: atilan });
+             syncIskartalar(masaAdi); // 🔥 Otomatik taş atıldığında yığın güncellenir
         }
         
         masa.afkCount[isim] = (masa.afkCount[isim] || 0) + 1;
@@ -202,6 +211,7 @@ function masadaOyunuBaslat(masaAdi) {
         masa.koltuklar.forEach(oyuncuIsmi => { if(!aktifBotlar.includes(oyuncuIsmi)) { io.emit('taslari_al', { kime: oyuncuIsmi, taslar: masa.eller[oyuncuIsmi] }); } });
         io.emit('masa_ortasi_guncelle', { masaAdi: masaAdi, kalanTas: masa.deste.length, gosterge: masa.gosterge });
         io.emit('sira_guncelle', { masaAdi: masaAdi, kimde: masa.siradakiOyuncu });
+        syncIskartalar(masaAdi); // Oyun başlarken de senkronize et
         
         if(aktifBotlar.includes(masa.siradakiOyuncu)) { botHamlesiYap(masaAdi); }
         else { insanHamlesiBaslat(masaAdi, masa.siradakiOyuncu); }
@@ -255,6 +265,7 @@ function botHamlesiYap(masaAdi) {
                             } 
                         }
                         io.emit('yandan_alindi_guncelle', { masaAdi: masaAdi, kimAldi: siradaki, tas: yandakiTas, atanKisi: atanKisi, yeniUstTas: yeniUstTas });
+                        syncIskartalar(masaAdi); // Bot yandan çekti, yığını güncelle
                     }
                 }
 
@@ -283,6 +294,7 @@ function botHamlesiYap(masaAdi) {
                             if(!masa.iskartalar[siradaki]) masa.iskartalar[siradaki] = [];
                             masa.iskartalar[siradaki].push(bitisTasi);
                             io.emit('ortaya_tas_atildi', { masaAdi: masaAdi, kimAtti: siradaki, tas: bitisTasi });
+                            syncIskartalar(masaAdi);
                             
                             let siraliBotEli = [...botunEli].sort((a, b) => {
                                 let valA = a.sayi === 'S' ? 14 : parseInt(a.sayi); let valB = b.sayi === 'S' ? 14 : parseInt(b.sayi);
@@ -301,6 +313,7 @@ function botHamlesiYap(masaAdi) {
                         masa.iskartalar[siradaki].push(atilanTas);
                         
                         io.emit('ortaya_tas_atildi', { masaAdi: masaAdi, kimAtti: siradaki, tas: atilanTas });
+                        syncIskartalar(masaAdi); // Bot taş attı, yığını güncelle
                         
                         let currentIndex = masa.koltuklar.indexOf(siradaki); if(currentIndex === -1) return;
                         let nextIndex = (currentIndex + 1) % 4; masa.siradakiOyuncu = masa.koltuklar[nextIndex];
@@ -333,6 +346,7 @@ function kullaniciyiMasadanKaldir(isim) {
                 }
 
                 io.emit('sistem_mesaji', `🏃‍♂️💨 ${isim} masadan kaçtı! Yerine ${yeniBot} geçti.`);
+                syncIskartalar(m); // Oyuncu kaçtı, bot devraldı, yığını güncelle
                 
                 if (masalar[m].siradakiOyuncu === isim) { 
                     clearTimeout(masalar[m].turnTimer);
@@ -396,7 +410,13 @@ io.on('connection', (socket) => {
     socket.on('masayi_izle', (data) => {
         const masa = masalar[data.masaAdi];
         if(masa) { 
-            socket.emit('izleyici_olarak_katildin', { masaAdi: data.masaAdi, oyunBasladi: masa.oyunBasladi, kalanTas: masa.deste.length, gosterge: masa.gosterge, kasa: masa.kasa, koltuklar: masa.koltuklar, siradaki: masa.siradakiOyuncu, iskartalar: masa.iskartalar }); 
+            let topIskartalar = {};
+            for(let p in masa.iskartalar) {
+                if(Array.isArray(masa.iskartalar[p]) && masa.iskartalar[p].length > 0) { topIskartalar[p] = masa.iskartalar[p][masa.iskartalar[p].length - 1]; }
+            }
+            socket.emit('izleyici_olarak_katildin', { masaAdi: data.masaAdi, oyunBasladi: masa.oyunBasladi, kalanTas: masa.deste.length, gosterge: masa.gosterge, kasa: masa.kasa, koltuklar: masa.koltuklar, siradaki: masa.siradakiOyuncu, iskartalar: topIskartalar }); 
+            // İzleyiciye tam yığını göster
+            syncIskartalar(data.masaAdi);
         }
     });
 
@@ -469,6 +489,7 @@ io.on('connection', (socket) => {
             masa.iskartalar[data.isim].push(data.tas); 
             
             io.emit('ortaya_tas_atildi', { masaAdi: data.masaAdi, kimAtti: data.isim, tas: data.tas });
+            syncIskartalar(data.masaAdi); // 🔥 Oyuncu taşı attığında yığını herkese güncelle
             
             let currentIndex = masa.koltuklar.indexOf(data.isim); let nextIndex = (currentIndex + 1) % 4; masa.siradakiOyuncu = masa.koltuklar[nextIndex];
             io.emit('sira_guncelle', { masaAdi: data.masaAdi, kimde: masa.siradakiOyuncu }); 
@@ -478,7 +499,17 @@ io.on('connection', (socket) => {
         }
     });
 
-    socket.on('ortadan_tas_cek', (data) => { const masa = masalar[data.masaAdi]; if(masa && masa.siradakiOyuncu === data.isim && masa.deste.length > 0) { masa.sonAtilanTas = null; const cekilenTas = masa.deste.shift(); masa.eller[data.isim].push(cekilenTas); socket.emit('tas_cekildi', cekilenTas); io.emit('masa_ortasi_guncelle', { masaAdi: data.masaAdi, kalanTas: masa.deste.length, gosterge: masa.gosterge }); } });
+    socket.on('ortadan_tas_cek', (data) => { 
+        const masa = masalar[data.masaAdi]; 
+        if(masa && masa.siradakiOyuncu === data.isim && masa.deste.length > 0) { 
+            masa.sonAtilanTas = null; 
+            const cekilenTas = masa.deste.shift(); 
+            masa.eller[data.isim].push(cekilenTas); 
+            socket.emit('tas_cekildi', cekilenTas); 
+            io.emit('masa_ortasi_guncelle', { masaAdi: data.masaAdi, kalanTas: masa.deste.length, gosterge: masa.gosterge }); 
+            syncIskartalar(data.masaAdi); // 🔥 Ortadan çekildiğinde gereksiz yere yığın silinmesin diye zorla yığını gönder
+        } 
+    });
     
     socket.on('yandan_tas_alindi', (data) => { 
         const masa = masalar[data.masaAdi]; 
@@ -500,7 +531,8 @@ io.on('connection', (socket) => {
                     } 
                 } 
             }
-            io.emit('yandan_alindi_guncelle', { masaAdi: data.masaAdi, kimAldi: data.kimAldi, tas: data.tas, atanKisi: atanKisi, yeniUstTas: yeniUstTas }); 
+            io.emit('yandan_alindi_guncelle', { ...data, atanKisi: atanKisi, yeniUstTas: yeniUstTas }); 
+            syncIskartalar(data.masaAdi); // 🔥 Yandan çekilince altından çıkanı garantile
         } 
     });
     
@@ -525,7 +557,7 @@ io.on('connection', (socket) => {
         } 
     });
     
-    socket.on('masaya_geri_don', (data) => { const masa = masalar[data.masaAdi]; if (masa && masa.oyunBasladi && masa.koltuklar.includes(data.isim)) { socket.emit('masa_oyun_basladi', { masaAdi: data.masaAdi, gosterge: masa.gosterge, kalanTas: masa.deste.length, kasa: masa.kasa, koltuklar: masa.koltuklar }); if(masa.eller[data.isim]) { socket.emit('taslari_al', { kime: data.isim, taslar: masa.eller[data.isim] }); } socket.emit('sira_guncelle', { masaAdi: data.masaAdi, kimde: masa.siradakiOyuncu }); } });
+    socket.on('masaya_geri_don', (data) => { const masa = masalar[data.masaAdi]; if (masa && masa.oyunBasladi && masa.koltuklar.includes(data.isim)) { socket.emit('masa_oyun_basladi', { masaAdi: data.masaAdi, gosterge: masa.gosterge, kalanTas: masa.deste.length, kasa: masa.kasa, koltuklar: masa.koltuklar }); if(masa.eller[data.isim]) { socket.emit('taslari_al', { kime: data.isim, taslar: masa.eller[data.isim] }); } socket.emit('sira_guncelle', { masaAdi: data.masaAdi, kimde: masa.siradakiOyuncu }); syncIskartalar(data.masaAdi); } });
     socket.on('masadan_kalk', (data) => { kullaniciyiMasadanKaldir(data.isim); });
     socket.on('disconnect', () => { const kopanIsim = socket.kullaniciAdi; if(kopanIsim) { baglantiKopanlar[kopanIsim] = setTimeout(() => { kullaniciyiMasadanKaldir(kopanIsim); delete oyuncuCipleri[kopanIsim]; io.emit('online_oyuncular', Object.keys(oyuncuCipleri)); delete baglantiKopanlar[kopanIsim]; }, 20000); } });
 
