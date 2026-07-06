@@ -13,15 +13,38 @@ window.masayaGeriDon = function(m) { suAnkiMasam = m; lobiEkrani.style.display =
 window.masayiIzle = function(m) { socket.emit('masayi_izle', { isim: aktifKullaniciAdi, masaAdi: m }); };
 window.masayaDavetEt = function(n) { socket.emit('masaya_davet_et', { kimden: aktifKullaniciAdi, kime: n, masaAdi: suAnkiMasam }); document.getElementById('arkadaslarEkrani').style.display = 'none'; };
 
+// 🔥 KUSURSUZ MASA TEMİZLEME MOTORU (Çökmeyi Önler) 🔥
 window.masayiTemizle = function() { 
-    masaOyunBasladiMi = false; document.getElementById('sonucEkrani').style.display = 'none'; oyunAlanObjeleri.style.display = 'none'; 
-    if(document.getElementById('gostergeBtn')) document.getElementById('gostergeBtn').style.display = 'none'; gostergeHakki = false; 
-    oyunuBaslatBtn.innerText = "🎲 OYUNU BAŞLAT"; oyunuBaslatBtn.style.display = 'block'; oyunuBaslatBtn.disabled = false; oyunuBaslatBtn.style.opacity = '1';
-    bitisAlani.style.display = 'none'; masaKasaBilgisi.style.display = 'none'; bitisAlani.innerHTML = 'BİTİR<br>🏆'; 
+    masaOyunBasladiMi = false; 
+    document.getElementById('sonucEkrani').style.display = 'none'; 
+    oyunAlanObjeleri.style.display = 'none'; 
+    if(document.getElementById('gostergeBtn')) document.getElementById('gostergeBtn').style.display = 'none'; 
+    gostergeHakki = false; 
+    
+    // Tekrar Oyna Kilidi: Oyun başlayana kadar spamlamayı engeller
+    oyunuBaslatBtn.innerText = "🎲 OYUNU BAŞLAT"; 
+    oyunuBaslatBtn.style.display = 'block'; 
+    oyunuBaslatBtn.disabled = false; 
+    oyunuBaslatBtn.style.opacity = '1';
+
+    bitisAlani.style.display = 'none'; 
+    masaKasaBilgisi.style.display = 'none'; 
+    bitisAlani.innerHTML = 'BİTİR<br>🏆'; 
+    
+    // Istakadaki tüm taşları sil
     for(let i=0; i<24; i++) document.getElementById('y'+i).innerHTML = ''; 
+    
+    // Yerdeki (ıskarta) tüm taşları sil
     document.getElementById('benimIskartam').innerHTML = '<div class="iskarta-yazi" id="iskartaYazi">TAŞ AT<br>⬇</div>'; 
-    document.getElementById('iskartaSag').innerHTML = ''; document.getElementById('iskartaSol').innerHTML = ''; document.getElementById('iskartaUst').innerHTML = ''; 
-    document.getElementById('benimAdimKutusu')?.classList.remove('aktif-sira'); document.getElementById('seatRight')?.classList.remove('aktif-sira'); document.getElementById('seatTop')?.classList.remove('aktif-sira'); document.getElementById('seatLeft')?.classList.remove('aktif-sira'); 
+    document.getElementById('iskartaSag').innerHTML = ''; 
+    document.getElementById('iskartaSol').innerHTML = ''; 
+    document.getElementById('iskartaUst').innerHTML = ''; 
+    
+    document.getElementById('benimAdimKutusu')?.classList.remove('aktif-sira'); 
+    document.getElementById('seatRight')?.classList.remove('aktif-sira'); 
+    document.getElementById('seatTop')?.classList.remove('aktif-sira'); 
+    document.getElementById('seatLeft')?.classList.remove('aktif-sira'); 
+    
     benimSiramMi = false; 
 };
 
@@ -82,6 +105,7 @@ window.checkGosterge = function() {
 };
 
 window.elimdekiTasSayisi = function() { let sayi = 0; for(let i=0; i<24; i++) { if(document.getElementById('y'+i).children.length > 0) sayi++; } return sayi; };
+
 window.getIstakaGruplari = function() { 
     let gruplar = []; let currentGrup = []; 
     for(let i=0; i<24; i++) { 
@@ -137,11 +161,22 @@ window.otomatikTasAt = function(tasElementi) {
     } 
 };
 
+// 🔥 BUTON ÇÖKME KİLİDİ (Anti-Spam) 🔥
 if(oyunuBaslatBtn) {
     oyunuBaslatBtn.addEventListener('click', () => { 
-        oyunuBaslatBtn.disabled = true; oyunuBaslatBtn.innerText = "⏳ BAŞLIYOR..."; oyunuBaslatBtn.style.opacity = '0.5';
+        oyunuBaslatBtn.disabled = true;
+        oyunuBaslatBtn.innerText = "⏳ BAŞLIYOR...";
+        oyunuBaslatBtn.style.opacity = '0.5';
         socket.emit('oyunu_baslat', suAnkiMasam); 
-        setTimeout(() => { if(oyunuBaslatBtn) { oyunuBaslatBtn.disabled = false; oyunuBaslatBtn.innerText = "🎲 OYUNU BAŞLAT"; oyunuBaslatBtn.style.opacity = '1'; } }, 4000);
+        
+        // Eğer sunucu bir sebeple cevap vermezse 5 sn sonra butonu aç
+        setTimeout(() => {
+            if(oyunuBaslatBtn) {
+                oyunuBaslatBtn.disabled = false;
+                oyunuBaslatBtn.innerText = "🎲 OYUNU BAŞLAT";
+                oyunuBaslatBtn.style.opacity = '1';
+            }
+        }, 5000);
     });
 }
 
@@ -155,19 +190,32 @@ document.getElementById('iskartaSol')?.addEventListener('click', function() {
     if (benimSiramMi && window.elimdekiTasSayisi() === 14 && this.children.length > 0) { 
         gostergeHakki = false; const tasEl = this.lastElementChild; 
         let renkSinifi = Array.from(tasEl.classList).find(c=>c.startsWith('tas-')); let renk = renkSinifi ? renkSinifi.split('-')[1] : 'siyah'; 
-        const tasObj = { id: tasEl.id, sayi: tasEl.innerText, renk: renk }; this.innerHTML = ''; 
+        const tasObj = { id: tasEl.id, sayi: tasEl.innerText, renk: renk }; 
+        this.innerHTML = ''; 
         for(let i=0; i<24; i++) { if(document.getElementById('y'+i).children.length === 0) { window.tasEkle(tasObj, 'y'+i); break; } } 
         socket.emit('yandan_tas_alindi', { masaAdi: suAnkiMasam, kimAldi: aktifKullaniciAdi, tas: tasObj }); sesCal(sesTasCek); 
     } else if(!benimSiramMi) ozelUyariGoster("Şu an sıra sizde değil!"); else if(window.elimdekiTasSayisi() === 15) ozelUyariGoster("Elinizde zaten 15 taş var!"); 
 });
 
+const btnGostergeDOM = document.getElementById('gostergeBtn');
+if(btnGostergeDOM) {
+    btnGostergeDOM.addEventListener('click', () => {
+        if(suAnkiMasam && aktifKullaniciAdi && gostergeHakki) {
+            socket.emit('gosterge_goster', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi });
+            gostergeHakki = false; btnGostergeDOM.style.display = 'none'; 
+        }
+    });
+}
+
 const sortableOptions = { group: { name: 'istaka', put: (to) => to.el.children.length === 0 }, animation: 100, delay: 0, forceFallback: true, fallbackOnBody: true, fallbackTolerance: 3, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag', easing: "cubic-bezier(0.25, 1, 0.5, 1)", onEnd: function() { sesCal(sesTasKoy); } };
+
 if(ustRaf && altRaf) {
     for(let i=0; i<12; i++) { 
         const yUst = document.createElement('div'); yUst.className = 'yuva'; yUst.id = 'y'+i; ustRaf.appendChild(yUst); new Sortable(yUst, sortableOptions); 
         const yAlt = document.createElement('div'); yAlt.className = 'yuva'; yAlt.id = 'y'+(i+12); altRaf.appendChild(yAlt); new Sortable(yAlt, sortableOptions); 
     }
 }
+
 if(document.getElementById('benimIskartam')) {
     new Sortable(document.getElementById('benimIskartam'), { 
         group: { name: 'istaka', put: function (to) { return benimSiramMi && window.elimdekiTasSayisi() === 15; }, pull: false }, 
@@ -180,6 +228,7 @@ if(document.getElementById('benimIskartam')) {
         } 
     });
 }
+
 if(bitisAlani) {
     new Sortable(bitisAlani, { 
         group: { name: 'istaka', put: function (to) { return benimSiramMi && window.elimdekiTasSayisi() === 15; }, pull: false }, 
@@ -192,86 +241,5 @@ if(bitisAlani) {
             const bitisTasi = { id: atilanTas.id, renk: renk, sayi: atilanTas.innerText }; 
             socket.emit('oyunu_bitir', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi, gruplar: gruplar, bitisTasi: bitisTasi, tasHtmlId: atilanTas.id }); sesCal(sesTasKoy); 
         } 
-    });
-}
-
-// 🔥 KUSURSUZ ARAYÜZ YAMALARI (Orijinal Sistemi Bozmayan Zırh) 🔥
-if (typeof socket !== 'undefined') {
-
-    // Katman (Z-index) Hatası Çözümü
-    let style = document.createElement('style');
-    style.innerHTML = `
-        #iskartaSol { z-index: 100 !important; }
-        #iskartaSol .okey-tasi { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) !important; margin: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.8); }
-        body #kazananEliAlani .okey-tasi-bitis { background: #fdfbf7 !important; box-shadow: 0 4px 10px rgba(0,0,0,0.8) !important; border: 2px solid #d1ccc0 !important; }
-    `;
-    document.head.appendChild(style);
-
-    // Bitiş Ekranı (Siyah Kutu) Zorla Doldurucu
-    socket.on('oyun_bitti', function(data) {
-        if (window.suAnkiMasam !== data.masaAdi) return;
-
-        let htmlIcerik = "";
-        if (data.bitisEli && Array.isArray(data.bitisEli) && data.bitisEli.length > 0) {
-            let siraliEl = [...data.bitisEli].sort((a, b) => {
-                let vA = (a.sayi === 'S') ? 14 : parseInt(a.sayi || 0);
-                let vB = (b.sayi === 'S') ? 14 : parseInt(b.sayi || 0);
-                if(vA === vB) return (a.renk || '').localeCompare(b.renk || '');
-                return vA - vB;
-            });
-
-            siraliEl.forEach(tas => {
-                if(!tas) return;
-                let textColor = '#111';
-                if(tas.renk === 'kirmizi') textColor = '#cc0000';
-                else if(tas.renk === 'mavi') textColor = '#0000cc';
-                else if(tas.renk === 'sari') textColor = '#d4af37';
-
-                let displaySayi = tas.sayi === 'S' ? '☻' : tas.sayi;
-                htmlIcerik += `<div class="okey-tasi-bitis" style="position:relative; width:26px; height:38px; font-size:16px; font-weight:900; color:${textColor}; border-radius:4px; display:flex; justify-content:center; align-items:center; margin:2px;">${displaySayi}</div>`;
-            });
-        } else {
-            htmlIcerik = '<span style="color:#aaa; font-size:12px;">Taşlar alınamadı.</span>';
-        }
-
-        setTimeout(() => {
-            let sEkrani = document.getElementById('sonucEkrani');
-            if (sEkrani) sEkrani.style.display = 'flex';
-            let elAlani = document.getElementById('kazananEliAlani');
-            if (elAlani) {
-                elAlani.innerHTML = htmlIcerik;
-                let vurus = 0;
-                let civi = setInterval(() => {
-                    if(document.getElementById('kazananEliAlani')) document.getElementById('kazananEliAlani').innerHTML = htmlIcerik;
-                    if(++vurus > 5) clearInterval(civi);
-                }, 200);
-            }
-        }, 200);
-    });
-
-    // Yandan Taş Çekildiğinde Eski Taşı (Alttakini) Gösterme Motoru
-    socket.on('yandan_alindi_guncelle', function(data) {
-        if(window.suAnkiMasam === data.masaAdi && data.atanKisi) {
-            let tDiv = 'benimIskartam';
-            if(window.masaKoltukMapping) {
-                if(window.masaKoltukMapping.right === data.atanKisi) tDiv = 'iskartaSag';
-                else if(window.masaKoltukMapping.top === data.atanKisi) tDiv = 'iskartaUst';
-                else if(window.masaKoltukMapping.left === data.atanKisi) tDiv = 'iskartaSol';
-            }
-            let k = document.getElementById(tDiv);
-            if(k) {
-                k.innerHTML = '';
-                if (data.yeniUstTas) {
-                    k.innerHTML = `<div class="okey-tasi tas-${data.yeniUstTas.renk}" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); box-shadow:0 2px 5px rgba(0,0,0,0.8); margin:0;">${data.yeniUstTas.sayi}</div>`;
-                } else if (tDiv === 'benimIskartam') {
-                    k.innerHTML = '<div class="iskarta-yazi" id="iskartaYazi">TAŞ AT<br>⬇</div>';
-                }
-            }
-        }
-    });
-
-    socket.on('masa_oyun_basladi', () => {
-        let sEkrani = document.getElementById('sonucEkrani');
-        if(sEkrani) sEkrani.style.display = 'none';
     });
 }
