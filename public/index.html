@@ -12,12 +12,11 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <style>
-        /* 🔥 OYUN VE KATMAN KİLİTLERİ 🔥 */
+        /* 🔥 EKRAN KİLİTLERİ 🔥 */
         body, html {
             overflow-x: hidden;
             margin: 0; padding: 0;
             width: 100%; height: 100%;
-            background: #020804;
         }
         
         body #kazananEliAlani .okey-tasi-bitis {
@@ -32,7 +31,7 @@
             box-shadow: 0 0 15px rgba(241, 196, 15, 0.5) !important; animation: pulseGold 1.5s infinite;
         }
 
-        /* 🔥 PREMIUM CASINO GENEL ARKA PLAN KİLİDİ 🔥 */
+        /* 🔥 PREMIUM CASINO ARKA PLANLARI (Sadece Lobi ve Girişte Görünür) 🔥 */
         .casino-global-bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none;
             background: radial-gradient(circle at 50% -10%, #0f3d23 0%, #05160c 60%, #020804 100%) !important;
@@ -57,140 +56,72 @@
         .bg-tile.t-1 { top: 40%; right: 25%; transform: rotate(15deg) scale(0.85); color: rgba(255, 255, 255, 0.15); }
         .bg-tile.t-13 { top: 75%; left: 5%; transform: rotate(35deg) scale(1.2); color: rgba(255, 255, 255, 0.1); }
 
-        /* 🔥 PREMIUM RE-DESIGN: LOBİ EKRANI MODÜLÜ 🔥 */
+        /* 🔥 LOBİ EKRANI 🔥 */
         #lobiEkrani {
             position: relative; z-index: 10; display: none; flex-direction: column;
             width: 100%; height: 100vh; max-height: 100vh; box-sizing: border-box;
-            padding: 10px 15px 75px 15px; /* Alt menü için alt pay bırakıldı */
+            padding: 10px 15px 75px 15px; 
         }
         
-        .lobi-ust-bar {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
-        }
-        .lobi-ust-baslik h2 {
-            margin: 0; font-size: 24px; font-weight: 900;
-            background: linear-gradient(to bottom, #fceabb, #f8b500);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-shadow: 0 2px 10px rgba(248,181,0,0.2);
-        }
+        .lobi-ust-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .lobi-ust-baslik h2 { margin: 0; font-size: 24px; font-weight: 900; background: linear-gradient(to bottom, #fceabb, #f8b500); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 2px 10px rgba(248,181,0,0.2); }
         .lobi-ust-baslik p { margin: 2px 0 0 0; font-size: 9px; color: #a3c4bc; letter-spacing: 1px; }
 
-        .lobi-ana-govde {
-            display: flex; flex: 1; gap: 15px; width: 100%; height: calc(100% - 130px); overflow: hidden;
-        }
+        .lobi-ana-govde { display: flex; flex: 1; gap: 15px; width: 100%; height: calc(100% - 130px); overflow: hidden; }
         
-        /* Sol Bölüm: Masalar Listesi */
-        .lobi-masalar-bölümü {
-            flex: 2; display: flex; flex-direction: column; height: 100%;
-        }
-        .lobi-panel-baslik {
-            font-size: 11px; font-weight: bold; color: #f1c40f; letter-spacing: 2px;
-            margin-bottom: 8px; text-transform: uppercase; display: flex; align-items: center; gap: 6px;
-        }
+        .lobi-masalar-bölümü { flex: 2; display: flex; flex-direction: column; height: 100%; }
+        .lobi-panel-baslik { font-size: 11px; font-weight: bold; color: #f1c40f; letter-spacing: 2px; margin-bottom: 8px; text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
         .lobi-panel-baslik::after { content: ''; flex: 1; height: 1px; background: rgba(241,196,15,0.2); }
+        .lobi-masalar-scroll { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 5px; }
         
-        .lobi-masalar-scroll {
-            flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 5px;
-        }
-        
-        /* 🔥 PREMIUM CASINO MASA KARTLARI 🔥 */
-        .casino-masa-kart {
-            background: linear-gradient(135deg, #0d1a10 0%, #050a06 100%);
-            border: 1px solid rgba(46, 204, 113, 0.25); border-radius: 12px;
-            padding: 12px 15px; display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.4), inset 0 0 10px rgba(0,0,0,0.6);
-            transition: border-color 0.3s, transform 0.2s; position: relative; overflow: hidden;
-        }
+        .casino-masa-kart { background: linear-gradient(135deg, #0d1a10 0%, #050a06 100%); border: 1px solid rgba(46, 204, 113, 0.25); border-radius: 12px; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.4), inset 0 0 10px rgba(0,0,0,0.6); transition: border-color 0.3s, transform 0.2s; position: relative; overflow: hidden; }
         .casino-masa-kart:active { transform: scale(0.99); }
         .casino-masa-kart.vip-board { border-color: rgba(241, 196, 15, 0.4); }
-        .casino-masa-kart::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: #2ecc71;
-        }
+        .casino-masa-kart::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: #2ecc71; }
         .casino-masa-kart.vip-board::before { background: #f1c40f; }
         
         .masa-sol-detay { display: flex; flex-direction: column; gap: 4px; }
         .masa-adi-txt { font-size: 15px; font-weight: 900; color: #fff; }
         .vip-board .masa-adi-txt { color: #f1c40f; text-shadow: 0 0 8px rgba(241,196,15,0.3); }
-        .masa-bahis-badge {
-            font-size: 11px; font-weight: 800; color: #2ecc71; background: rgba(46, 204, 113, 0.1);
-            padding: 3px 8px; border-radius: 6px; width: fit-content; border: 1px solid rgba(46, 204, 113, 0.2);
-        }
+        .masa-bahis-badge { font-size: 11px; font-weight: 800; color: #2ecc71; background: rgba(46, 204, 113, 0.1); padding: 3px 8px; border-radius: 6px; width: fit-content; border: 1px solid rgba(46, 204, 113, 0.2); }
         .vip-board .masa-bahis-badge { color: #f1c40f; background: rgba(241, 196, 15, 0.1); border-color: rgba(241, 196, 15, 0.2); }
         
         .masa-sag-aksiyon { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
         .masa-koltuk-skor { font-size: 11px; color: #a3c4bc; font-weight: bold; display: flex; align-items: center; gap: 4px; }
-        .lobi-oyna-btn-yeni {
-            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%); color: #111;
-            border: none; padding: 6px 14px; border-radius: 6px; font-size: 11px; font-weight: 900;
-            cursor: pointer; text-transform: uppercase; box-shadow: 0 3px 8px rgba(0,0,0,0.3);
-        }
+        .lobi-oyna-btn-yeni { background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%); color: #111; border: none; padding: 6px 14px; border-radius: 6px; font-size: 11px; font-weight: 900; cursor: pointer; text-transform: uppercase; box-shadow: 0 3px 8px rgba(0,0,0,0.3); }
         .vip-board .lobi-oyna-btn-yeni { background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%); }
         
-        /* Sağ Bölüm: Lobideki Oyuncular (Buzlu Cam Efektli VIP Kutu) */
-        .lobi-oyuncular-bölümü {
-            flex: 1; display: flex; flex-direction: column; height: 100%; max-width: 280px;
-        }
-        .lobi-oyuncular-buzlu-kutu {
-            flex: 1; background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 12px; padding: 10px; display: flex; flex-direction: column;
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.6);
-        }
-        .lobi-oyuncular-scroll {
-            flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;
-        }
+        .lobi-oyuncular-bölümü { flex: 1; display: flex; flex-direction: column; height: 100%; max-width: 280px; }
+        .lobi-oyuncular-buzlu-kutu { flex: 1; background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: inset 0 0 20px rgba(0,0,0,0.6); }
+        .lobi-oyuncular-scroll { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
         
-        /* Lobideki Tekil Oyuncu Satırı */
-        .lobi-tekil-oyuncu {
-            display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.03);
-            padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.02);
-            cursor: pointer; transition: background 0.2s;
-        }
+        .lobi-tekil-oyuncu { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.03); padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.02); cursor: pointer; transition: background 0.2s; }
         .lobi-tekil-oyuncu:hover { background: rgba(46, 204, 113, 0.1); }
         .lobi-player-dot { width: 6px; height: 6px; background: #2ecc71; border-radius: 50%; box-shadow: 0 0 6px #2ecc71; }
         .lobi-player-name { font-size: 12px; color: #fff; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
         .lobi-player-chip { font-size: 11px; color: #f1c40f; font-weight: bold; }
 
-        /* Ortadaki Aksiyon Butonları */
-        .lobi-aksiyon-alanı {
-            display: flex; gap: 10px; margin-top: 10px; margin-bottom: 10px; width: 100%;
-        }
-        .lobi-aksiyon-btn {
-            flex: 1; padding: 12px; border: none; border-radius: 10px; font-size: 13px; font-weight: 900;
-            cursor: pointer; text-transform: uppercase; display: flex; justify-content: center; align-items: center; gap: 6px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.4); transition: transform 0.1s;
-        }
+        .lobi-aksiyon-alanı { display: flex; gap: 10px; margin-top: 10px; margin-bottom: 10px; width: 100%; }
+        .lobi-aksiyon-btn { flex: 1; padding: 12px; border: none; border-radius: 10px; font-size: 13px; font-weight: 900; cursor: pointer; text-transform: uppercase; display: flex; justify-content: center; align-items: center; gap: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.4); transition: transform 0.1s; }
         .lobi-aksiyon-btn:active { transform: scale(0.98); }
         .btn-aksiyon-kur { background: linear-gradient(135deg, #ff33aa 0%, #aa33ff 100%); color: #fff; border: 1px solid rgba(255,255,255,0.1); }
         .btn-aksiyon-oyna { background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%); color: #111; }
 
-        /* Alt Sabit Menü Sistemi (Resim 2 Konsepti) */
-        .lobi-alt-sabit-menu {
-            position: fixed; bottom: 0; left: 0; width: 100%; height: 65px;
-            background: rgba(5, 15, 10, 0.9); border-top: 1px solid rgba(46, 204, 113, 0.2);
-            display: flex; justify-content: space-around; align-items: center; z-index: 99999;
-            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); box-shadow: 0 -5px 20px rgba(0,0,0,0.7);
-        }
+        .lobi-alt-sabit-menu { position: fixed; bottom: 0; left: 0; width: 100%; height: 65px; background: rgba(5, 15, 10, 0.9); border-top: 1px solid rgba(46, 204, 113, 0.2); display: flex; justify-content: space-around; align-items: center; z-index: 99999; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); box-shadow: 0 -5px 20px rgba(0,0,0,0.7); }
         .lobi-alt-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #a3c4bc; cursor: pointer; position: relative; flex: 1; height: 100%; justify-content: center; }
         .lobi-alt-item.aktif { color: #f1c40f; }
         .lobi-alt-item.aktif::before { content: ''; position: absolute; top: 0; width: 30px; height: 3px; background: #f1c40f; border-radius: 0 0 4px 4px; box-shadow: 0 2px 10px #f1c40f; }
         .lobi-alt-item i { font-size: 18px; font-style: normal; }
         .lobi-alt-item span { font-size: 9px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        /* Mobil Duyarlılık (Responsive) Ayarı */
         @media screen and (max-width: 600px) {
             .lobi-ana-govde { flex-direction: column; overflow-y: auto; height: auto; }
             .lobi-oyuncular-bölümü { max-width: 100%; height: 220px; margin-top: 10px; }
             #lobiEkrani { height: auto; min-height: 100vh; overflow-y: auto; }
         }
 
-        /* Eski Giriş Ekranı ve Gizli Kodlar */
-        #authEkrani {
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            padding: 10px; box-sizing: border-box; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999999;
-            font-family: 'Arial', sans-serif; overflow-x: hidden; overflow-y: auto;
-            background: radial-gradient(circle at 50% -10%, #0f3d23 0%, #05160c 60%, #020804 100%) !important;
-        }
+        /* 🔥 GİRİŞ EKRANI 🔥 */
+        #authEkrani { display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px; box-sizing: border-box; position: relative; width: 100%; height: 100%; z-index: 10; font-family: 'Arial', sans-serif; overflow-x: hidden; overflow-y: auto; }
         .auth-container-yeni { width: 100%; max-width: 360px; display: flex; flex-direction: column; gap: 10px; z-index: 10; position: relative; margin: auto; }
         .auth-input-group { position: relative; width: 100%; margin-bottom: 8px; }
         .auth-input-group span { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #7f8c8d; font-size: 14px; }
@@ -209,8 +140,8 @@
 </head>
 <body>
 
-    <div class="casino-global-bg"></div>
-    <div class="auth-bg-wrapper">
+    <div class="casino-global-bg" id="casinoGlobalBg"></div>
+    <div class="auth-bg-wrapper" id="casinoTilesWrapper">
         <div class="bg-glow"></div>
         <div class="bg-tile t-7"><span>7</span></div>
         <div class="bg-tile t-1"><span>1</span></div>
@@ -248,10 +179,10 @@
                 <div class="auth-menu-item" onclick="alert('Görevleri görmek için giriş yapmalısın!')"><div class="icon-circle">📋</div><span>GÜNLÜK<br>GÖREVLER</span></div>
                 <div class="auth-menu-item" onclick="alert('Klanlara katılmak için giriş yapmalısın!')"><div class="icon-circle">👥</div><span>KLANLAR</span></div>
                 <div class="auth-menu-item" onclick="alert('Sohbete katılmak için giriş yapmalısın!')"><div class="icon-circle">💬</div><span>SOHBET</span></div>
-                <div class="auth-menu-item" onclick="alert('Ödülünü almak için giriş yapmalısın!')"><div class="icon-circle">🎁</div><span>GÜNLÜK<br>ÖDÜL</span>
-                </div>
+                <div class="auth-menu-item" onclick="alert('Ödülünü almak için giriş yapmalısın!')"><div class="icon-circle">🎁</div><span>GÜNLÜK<br>ÖDÜL</span></div>
             </div>
             <div class="auth-footer"><h3>BEYCO GAMES</h3><p>© 2026 Tüm hakları saklıdır.</p></div>
+            
             <div style="display:none;">
                 <h2 id="authBaslik"></h2><input type="text" id="authKullaniciAdi"><input type="email" id="authEmail"><input type="password" id="authSifre">
                 <div id="loginButonlari"><button id="btnGiris"></button><button id="btnGecisKayit"></button><button id="btnMisafir"></button></div>
@@ -288,7 +219,7 @@
             </div>
         </div>
 
-        <div class="lobi-alt-sabit-menu">
+        <div class="lobi-alt-sabit-menu" id="lobiAltMenu">
             <div class="lobi-alt-item aktif" onclick="document.getElementById('lobiEkrani').style.display='flex';">
                 <i>🏠</i><span>LOBİ</span>
             </div>
@@ -307,7 +238,7 @@
         </div>
     </div>
 
-    <div id="masaEkrani" style="display:none; z-index:20; position:relative;">
+    <div id="masaEkrani" style="display:none; z-index:20; position:relative; width: 100%; height: 100vh;">
         <div class="vip-header" style="position:relative; z-index:30;">
             <div class="profil-bilgi" onclick="if(aktifKullaniciAdi) profiliGoster(aktifKullaniciAdi)" style="cursor:pointer;">
                 <div class="profil-avatar" id="vipAvatar">😎</div>
@@ -366,6 +297,39 @@
         <div class="cekmence-input"><input type="text" id="sohbetInput" placeholder="Mesaj yaz..." maxlength="40"><button id="sohbetGonderBtn">Gönder</button></div>
     </div>
     <div id="flashBildirim" class="flash-bildirim"></div>
+    
+    <div id="vipMasaKurPanel" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:9999999; flex-direction:column; justify-content:center; align-items:center;">
+        <div class="magaza-kutu" style="max-width: 320px; text-align:center; border:2px solid #ff33aa; box-shadow: 0 0 25px #ff33aa;">
+            <h2 style="color:#ff33aa; font-size:22px; margin-bottom:15px; text-shadow:0 0 10px #ff33aa;">👑 VIP MASA AYARLARI</h2>
+            <p style="color:#a3c4bc; font-size:12px; margin-bottom:20px;">Odanın gizlilik ve bahis rütbesini belirle patron!</p>
+            <label style="color:#fff; font-size:11px; font-weight:bold; display:block; text-align:left; margin-bottom:5px;">MASA BAHİS MİKTARI:</label>
+            <select id="vipMasaBahis" class="auth-input" style="display:block; width:100%; background:#111; color:#fff; border:1px solid #ff33aa; margin-bottom:15px; padding:10px; border-radius:8px;">
+                <option value="10000">10.000 ÇİP</option>
+                <option value="20000" selected>20.000 ÇİP</option>
+                <option value="50000">50.000 ÇİP</option>
+                <option value="100000">100.000 ÇİP</option>
+            </select>
+            <label style="color:#fff; font-size:11px; font-weight:bold; display:block; text-align:left; margin-bottom:5px;">ERİŞİM KİLİDİ:</label>
+            <select id="vipMasaGizlilik" class="auth-input" style="display:block; width:100%; background:#111; color:#fff; border:1px solid #ff33aa; margin-bottom:25px; padding:10px; border-radius:8px;">
+                <option value="true" selected>🔒 Sadece Davet (Kilitli)</option>
+                <option value="false">🔓 Herkese Açık (Genel)</option>
+            </select>
+            <div style="display:flex; gap:10px;">
+                <button onclick="vipMasaKurAksiyon()" class="satin-al-btn" style="flex:1; background: linear-gradient(135deg, #ff33aa, #aa33ff); color:#fff;">ODAYI AÇ</button>
+                <button onclick="document.getElementById('vipMasaKurPanel').style.display='none'" class="satin-al-btn" style="flex:1; background:#333;">İPTAL</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="sonucEkrani" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:999999; flex-direction:column; justify-content:center; align-items:center;">
+        <div class="sonuc-kutu" style="max-width: 450px; width: 95%;">
+            <h1 id="sonucBaslik">Oyun Bitti!</h1>
+            <p id="sonucMetin">Kazanan: ...</p>
+            <div id="kazananEliAlani" style="display:flex; justify-content:center; flex-wrap:wrap; gap:2px; margin: 15px 0; padding:10px; background:rgba(0,0,0,0.6); border-radius:10px; border: 1px solid #f2c94c; min-height: 50px;"></div>
+            <p id="sonucOdul"></p>
+            <button class="sonuc-btn" onclick="document.getElementById('sonucEkrani').style.display='none'">MASAYA DÖN</button>
+        </div>
+    </div>
 
     <script src="globals.js"></script>
     <script src="auth.js"></script>
@@ -377,8 +341,24 @@
     <script src="seyirci.js"></script> 
     
     <script>
+        // 🔥 ARAYÜZ KORUMA MOTORU (Oyun Çökmelerini Önler) 🔥
+        setInterval(() => {
+            const masa = document.getElementById('masaEkrani');
+            const cBg = document.getElementById('casinoGlobalBg');
+            const cTiles = document.getElementById('casinoTilesWrapper');
+            
+            // Eğer oyun masası açıksa, Lobi'nin kumarhane arka planını kapat ve masayı ZORLA 'flex' yap
+            if (masa && (masa.style.display === 'block' || masa.style.display === 'flex')) {
+                masa.style.display = 'flex'; // Pancake olmasını %100 önler
+                if (cBg) cBg.style.display = 'none';
+                if (cTiles) cTiles.style.display = 'none';
+            } else {
+                if (cBg) cBg.style.display = 'block';
+                if (cTiles) cTiles.style.display = 'block';
+            }
+        }, 200);
+
         if(typeof socket !== 'undefined') {
-            // 🔥 YIĞIN SENKRONİZASYON MOTORU (Asla Eski Taş Silinmez) 🔥
             socket.on('sync_iskartalar', (data) => {
                 if (window.suAnkiMasam !== data.masaAdi) return;
                 ['iskartaUst', 'iskartaSag', 'iskartaSol', 'benimIskartam'].forEach(id => {
@@ -412,7 +392,6 @@
                 }
             });
 
-            // 🔥 MASALARI KONSEPT TASARIMA UYGUN OLARAK LİSTELEME YAMASI 🔥
             socket.on('masalari_guncelle', (data) => {
                 const masalarAlani = document.getElementById('masalarAlani');
                 if (!masalarAlani) return;
@@ -445,7 +424,6 @@
                 }
             });
 
-            // 🔥 OYUNCULARI LÜKS YARI ŞEFFAF LİSTEYE BASMA YAMASI 🔥
             socket.on('online_oyuncular', (list) => {
                 const listKutu = document.getElementById('lobidekilerListesi');
                 if(!listKutu) return;
@@ -472,23 +450,20 @@
                 window.gostergeTasiObj = data.gosterge; window.gostergeGosterildi = false;
                 const gBtn = document.getElementById('gostergeBtn'); if(gBtn) gBtn.style.display = 'none';
                 document.getElementById('lobiEkrani').style.display = 'none';
-                document.getElementById('masaEkrani').style.display = 'block';
+                document.getElementById('masaEkrani').style.display = 'flex'; // DÜZELTİLDİ: block değil, flex.
             });
+            
+            socket.on('sen_masadasin', (data) => {
+                document.getElementById('authEkrani').style.display = 'none';
+                document.getElementById('lobiEkrani').style.display = 'none';
+                document.getElementById('masaEkrani').style.display = 'flex'; // DÜZELTİLDİ: block değil, flex.
+            });
+
             socket.on('masa_ortasi_guncelle', (data) => { window.gostergeTasiObj = data.gosterge; });
             socket.on('gosterge_basarili', (data) => { if(data.isim === window.aktifKullaniciAdi) { window.gostergeGosterildi = true; const gBtn = document.getElementById('gostergeBtn'); if(gBtn) gBtn.style.display = 'none'; } });
             socket.on('kozmetikleri_guncelle', (data) => { window.globalKozmetikler = data; });
         }
 
-        // Girişte ve Çıkışta Lobi / Masa Ekran Kontrolünü sağlayan kilit entegrasyonu
-        if(typeof socket !== 'undefined') {
-            socket.on('sen_masadasin', (data) => {
-                document.getElementById('authEkrani').style.display = 'none';
-                document.getElementById('lobiEkrani').style.display = 'none';
-                document.getElementById('masaEkrani').style.display = 'block';
-            });
-        }
-
-        // İstatistikleri Canlıymış gibi oynatan motor
         setInterval(() => {
             const elOnline = document.getElementById('statOnlineRand');
             const elMasa = document.getElementById('statMasaRand');
@@ -500,6 +475,70 @@
                 elOnline.innerText = newOnline; elMasa.innerText = yeniMasa;
             }
         }, 12000);
+        
+        const temaStilleri = document.createElement('style');
+        temaStilleri.innerHTML = `
+            body.tema-royal, body.tema-royal #lobiEkrani { background: #000 !important; background-image: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%) !important; }
+            body.tema-royal #masaEkrani { background: #0d0a05 !important; background-image: radial-gradient(circle at center, #2a2010 0%, #0d0a05 100%) !important; border: 2px solid #ffd700 !important; box-shadow: inset 0 0 50px rgba(255,215,0,0.1) !important; }
+            body.tema-royal .istaka-container { background: #1a0f0a !important; background-image: linear-gradient(to bottom, #3a2b1c, #1a0f0a) !important; border: 2px solid #ffd700 !important; box-shadow: 0 5px 15px rgba(255,215,0,0.2) !important; }
+            body.tema-royal .okey-tasi { background: #222 !important; border: 1px solid #ffd700 !important; box-shadow: 0 2px 5px #000 !important; }
+            body.tema-royal .okey-tasi.tas-kirmizi { color: #ff4d4d !important; }
+            body.tema-royal .okey-tasi.tas-siyah { color: #ffffff !important; text-shadow: 0 0 3px rgba(255,255,255,0.5) !important; }
+            body.tema-royal .okey-tasi.tas-mavi { color: #4da6ff !important; }
+            body.tema-royal .okey-tasi.tas-sari { color: #ffd700 !important; }
+            body.tema-royal #masaOrtasiYazi { color: #ffd700 !important; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5) !important; }
+            body.tema-royal .kapali-deste { background: linear-gradient(135deg, #ffd700, #b8860b) !important; color: #000 !important; text-shadow: none !important; border: 2px solid #fff !important; box-shadow: 0 5px 15px rgba(255,215,0,0.4) !important; font-weight: 900 !important; }
+            body.tema-royal .gosterge-tasi { background: #222 !important; border: 2px solid #ffd700 !important; animation: pulseGold 2s infinite !important; }
+
+            body.tema-neon, body.tema-neon #lobiEkrani { background: #000 !important; background-image: radial-gradient(circle at center, #0b0c10 0%, #000000 100%) !important; }
+            body.tema-neon #masaEkrani { background: #0b0c10 !important; background-image: linear-gradient(135deg, #1f2833, #0b0c10) !important; border: 2px solid #00f3ff !important; box-shadow: inset 0 0 30px rgba(0,243,255,0.3) !important; }
+            body.tema-neon .istaka-container { background: #1f2833 !important; border: 2px solid #bc13fe !important; box-shadow: 0 0 15px #bc13fe !important; }
+            body.tema-neon .okey-tasi { background: #0b0c10 !important; border: 1px solid #00f3ff !important; box-shadow: 0 0 8px rgba(0,243,255,0.5) inset !important; }
+            body.tema-neon .okey-tasi.tas-kirmizi { color: #ff0055 !important; text-shadow: 0 0 8px #ff0055 !important; }
+            body.tema-neon .okey-tasi.tas-siyah { color: #e0e0e0 !important; text-shadow: 0 0 8px #fff !important; }
+            body.tema-neon .okey-tasi.tas-mavi { color: #00f3ff !important; text-shadow: 0 0 8px #00f3ff !important; }
+            body.tema-neon .okey-tasi.tas-sari { color: #ffea00 !important; text-shadow: 0 0 8px #ffea00 !important; }
+            body.tema-neon #masaOrtasiYazi { color: #00f3ff !important; text-shadow: 0 0 15px #bc13fe !important; }
+            body.tema-neon .kapali-deste { background: #0b0c10 !important; color: #00f3ff !important; border: 2px solid #bc13fe !important; box-shadow: 0 0 15px #bc13fe, inset 0 0 10px #00f3ff !important; text-shadow: 0 0 8px #00f3ff !important; }
+            body.tema-neon .gosterge-tasi { background: #0b0c10 !important; border: 2px solid #00f3ff !important; animation: pulseNeon 1.5s infinite !important; }
+
+            body.tema-kizil, body.tema-kizil #lobiEkrani { background: #1a0508 !important; background-image: radial-gradient(circle at center, #4a0e17 0%, #1a0508 100%) !important; }
+            body.tema-kizil #masaEkrani { background: #2b080d !important; background-image: radial-gradient(circle, #5c111c, #2b080d) !important; border: 4px solid #8b5a2b !important; box-shadow: inset 0 0 80px rgba(0,0,0,0.9) !important; }
+            body.tema-kizil .istaka-container { background: #2b080d !important; background-image: linear-gradient(to bottom, #5c111c, #2b080d) !important; border: 3px solid #8b5a2b !important; }
+            body.tema-kizil .okey-tasi { background: #fff8dc !important; border: 1px solid #8b5a2b !important; box-shadow: 1px 2px 4px rgba(0,0,0,0.5) !important; }
+            body.tema-kizil .okey-tasi.tas-kirmizi { color: #cc0000 !important; font-weight: 900 !important; }
+            body.tema-kizil .okey-tasi.tas-siyah { color: #000000 !important; font-weight: 900 !important; }
+            body.tema-kizil .okey-tasi.tas-mavi { color: #0000cc !important; font-weight: 900 !important; }
+            body.tema-kizil .okey-tasi.tas-sari { color: #d4af37 !important; font-weight: 900 !important; }
+            body.tema-kizil #masaOrtasiYazi { color: #f2c94c !important; }
+            body.tema-kizil .kapali-deste { background: linear-gradient(135deg, #8b5a2b, #5c3a18) !important; color: #fff8dc !important; border: 2px solid #f2c94c !important; box-shadow: 0 5px 15px rgba(0,0,0,0.8) !important; }
+            body.tema-kizil .gosterge-tasi { background: #fff8dc !important; border: 2px solid #8b5a2b !important; box-shadow: 0 0 15px rgba(255, 77, 77, 0.6) !important; }
+        `;
+        document.head.appendChild(temaStilleri);
+
+        setInterval(() => {
+            try {
+                let uygulanacak = [];
+                if (typeof aktifKozmetikler !== 'undefined') uygulanacak = aktifKozmetikler;
+                else if (window.aktifKozmetikler) uygulanacak = window.aktifKozmetikler;
+                let masaAdi = null;
+                if (typeof suAnkiMasam !== 'undefined') masaAdi = suAnkiMasam;
+                else if (window.suAnkiMasam) masaAdi = window.suAnkiMasam;
+                let gKoz = null;
+                if (typeof globalKozmetikler !== 'undefined') gKoz = globalKozmetikler;
+                else if (window.globalKozmetikler) gKoz = window.globalKozmetikler;
+
+                if (masaAdi && masaAdi.includes('VIP:')) {
+                    let masaSahibi = masaAdi.split('VIP:')[1].split('Masası')[0].trim();
+                    if (gKoz && gKoz[masaSahibi]) { uygulanacak = gKoz[masaSahibi]; }
+                }
+
+                document.body.classList.remove('tema-royal', 'tema-neon', 'tema-kizil');
+                if (uygulanacak.includes('tema_royal')) document.body.classList.add('tema-royal');
+                else if (uygulanacak.includes('tema_neon')) document.body.classList.add('tema-neon');
+                else if (uygulanacak.includes('tema_kizil')) document.body.classList.add('tema-kizil');
+            } catch(e) { }
+        }, 500);
     </script>
 </body>
 </html>
