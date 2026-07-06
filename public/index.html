@@ -12,22 +12,185 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <style>
+        /* 🔥 OYUN VE KATMAN KİLİTLERİ 🔥 */
         body #kazananEliAlani .okey-tasi-bitis {
             background: #fdfbf7 !important;
             box-shadow: 0 4px 10px rgba(0,0,0,0.8) !important;
             border: 2px solid #d1ccc0 !important;
         }
         #iskartaSol { z-index: 100 !important; }
-
         .pro-gosterge-btn {
             background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%) !important;
             color: #111 !important; font-weight: 900 !important; border: 2px solid #fff !important;
             box-shadow: 0 0 15px rgba(241, 196, 15, 0.5) !important; animation: pulseGold 1.5s infinite;
         }
+
+        /* 🔥 YENİ NESİL PRO GİRİŞ EKRANI (VIP TASARIM) 🔥 */
+        #authEkrani {
+            background: radial-gradient(circle at top, #113a22 0%, #05120a 100%) !important;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            padding: 20px; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999999;
+            font-family: 'Arial', sans-serif;
+        }
+        .auth-container-yeni {
+            width: 100%; max-width: 360px; display: flex; flex-direction: column; gap: 15px; z-index: 10;
+        }
+        .auth-logo-alani { text-align: center; margin-bottom: 5px; }
+        .auth-logo-alani h1 {
+            font-size: 50px; margin: 0;
+            background: linear-gradient(to bottom, #fceabb, #f8b500);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            font-weight: 900; text-shadow: 0 4px 20px rgba(248, 181, 0, 0.3); letter-spacing: 2px;
+        }
+        .auth-logo-alani h2 { font-size: 18px; color: #fff; margin: 5px 0; letter-spacing: 5px; font-weight: 300; }
+        .auth-logo-alani p { color: #f1c40f; font-size: 11px; letter-spacing: 1px; margin: 0; text-transform: uppercase; }
+        
+        .auth-stats-row {
+            display: flex; justify-content: space-between; background: rgba(0,0,0,0.4);
+            border-radius: 12px; padding: 15px 10px; border: 1px solid rgba(46, 204, 113, 0.2); margin-bottom: 15px;
+        }
+        .auth-stat-box { text-align: center; flex: 1; border-right: 1px solid rgba(255,255,255,0.05); }
+        .auth-stat-box:last-child { border: none; }
+        .auth-stat-box i { font-size: 18px; color: #2ecc71; margin-bottom: 5px; display: block; font-style: normal; }
+        .auth-stat-box .val { font-size: 18px; font-weight: 900; color: #f1c40f; margin-bottom: 2px; text-shadow: 0 0 10px rgba(241,196,15,0.5); }
+        .auth-stat-box .lbl { font-size: 8px; color: #a3c4bc; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .auth-input-group { position: relative; width: 100%; margin-bottom: 12px; }
+        .auth-input-group span { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #7f8c8d; font-size: 16px; }
+        .auth-input-yeni {
+            width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); color: #fff;
+            padding: 15px 15px 15px 45px; border-radius: 10px; font-size: 14px; box-sizing: border-box; outline: none; transition: all 0.3s ease;
+        }
+        .auth-input-yeni:focus { border-color: #2ecc71; box-shadow: 0 0 10px rgba(46, 204, 113, 0.3); }
+
+        .auth-btn-yeni {
+            width: 100%; padding: 15px; border: none; border-radius: 10px; font-size: 15px; font-weight: 900;
+            cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); text-transform: uppercase;
+            display: flex; justify-content: center; align-items: center; transition: transform 0.2s;
+        }
+        .auth-btn-yeni:active { transform: scale(0.97); }
+        .btn-gold { background: linear-gradient(to right, #f2c94c, #f2994a); color: #111; }
+        .btn-green { background: linear-gradient(to right, #11998e, #38ef7d); color: #111; }
+        .btn-gray { background: linear-gradient(to bottom, #434343, #111); color: #fff; border: 1px solid rgba(255,255,255,0.1); }
+
+        .auth-bottom-menu {
+            display: flex; justify-content: space-between; margin-top: 10px; background: rgba(0,0,0,0.3);
+            border-radius: 15px; padding: 15px; border: 1px solid rgba(255,255,255,0.05);
+        }
+        .auth-menu-item { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; color: #a3c4bc; transition: color 0.3s; }
+        .auth-menu-item:hover { color: #f1c40f; }
+        .auth-menu-item .icon-circle {
+            width: 42px; height: 42px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            display: flex; justify-content: center; align-items: center; font-size: 20px; color: #f2c94c; box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+        .auth-menu-item span { font-size: 9px; text-align: center; text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px; line-height: 1.2; }
+
+        .auth-footer { margin-top: 20px; text-align: center; width: 100%; }
+        .auth-footer h3 {
+            color: #f1c40f; font-size: 13px; letter-spacing: 4px; margin: 0 0 8px 0;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .auth-footer h3::before, .auth-footer h3::after { content: ''; height: 1px; width: 25px; background: rgba(241, 196, 15, 0.5); }
+        .auth-footer p { color: #777; font-size: 10px; margin: 0; }
+        
+        /* Orijinal inputları gizlemek için */
+        #authKullaniciAdi, #authEmail, #authSifre { display: none !important; }
     </style>
 </head>
 <body>
 
+    <!-- 🔥 YENİ NESİL VİTRİN: GİRİŞ EKRANI 🔥 -->
+    <div id="authEkrani">
+        <div class="auth-container-yeni">
+            
+            <div class="auth-logo-alani">
+                <div style="font-size:60px; text-shadow:0 0 30px rgba(241,196,15,0.8); margin-bottom:-15px;">👑</div>
+                <h1>BEYCO</h1>
+                <h2>— SERİ OKEY —</h2>
+                <p>UYGULAMA İNDİRMEDEN OYNA</p>
+            </div>
+
+            <!-- Canlı İstatistikler -->
+            <div class="auth-stats-row">
+                <div class="auth-stat-box">
+                    <i>👥</i>
+                    <div class="val" id="statOnlineRand">247</div>
+                    <div class="lbl">KİŞİ ÇEVRİMİÇİ</div>
+                </div>
+                <div class="auth-stat-box">
+                    <i>🪑</i>
+                    <div class="val" id="statMasaRand">62</div>
+                    <div class="lbl">AKTİF MASA</div>
+                </div>
+                <div class="auth-stat-box">
+                    <i>🏆</i>
+                    <div class="val" id="statOyunRand">1.842</div>
+                    <div class="lbl">BUGÜN OYNANAN</div>
+                </div>
+            </div>
+
+            <!-- Giriş Inputları -->
+            <div id="loginInputs">
+                <div class="auth-input-group" id="kullaniciAdiGroup" style="display:none;">
+                    <span>👤</span>
+                    <input type="text" id="gorselKullaniciAdi" class="auth-input-yeni" placeholder="Oyuncu Nickiniz (Örn: KRAL_34)" onkeyup="document.getElementById('authKullaniciAdi').value = this.value;">
+                </div>
+                <div class="auth-input-group">
+                    <span>✉️</span>
+                    <input type="email" id="gorselEmail" class="auth-input-yeni" placeholder="E-Posta Adresi" onkeyup="document.getElementById('authEmail').value = this.value;">
+                </div>
+                <div class="auth-input-group">
+                    <span>🔒</span>
+                    <input type="password" id="gorselSifre" class="auth-input-yeni" placeholder="Şifre" onkeyup="document.getElementById('authSifre').value = this.value;">
+                </div>
+            </div>
+
+            <!-- Butonlar -->
+            <div id="loginButonlariGorsel" style="display:flex; flex-direction:column; gap:10px;">
+                <button class="auth-btn-yeni btn-gold" onclick="document.getElementById('btnGiris').click()">GİRİŞ YAP <span style="margin-left:5px;">❯</span></button>
+                <button class="auth-btn-yeni btn-green" onclick="document.getElementById('kullaniciAdiGroup').style.display='block'; document.getElementById('loginButonlariGorsel').style.display='none'; document.getElementById('kayitButonlariGorsel').style.display='flex'; document.getElementById('btnGecisKayit').click();">YENİ KAYIT OL</button>
+                <button class="auth-btn-yeni btn-gray" onclick="document.getElementById('btnMisafir').click()"><span style="font-size:20px; margin-right:5px;">🎲</span> HEMEN OYNA <br><span style="font-size:10px; font-weight:normal; text-transform:none; margin-left:auto; color:#ccc;">Misafir olarak devam et</span></button>
+            </div>
+
+            <div id="kayitButonlariGorsel" style="display:none; flex-direction:column; gap:10px;">
+                <button class="auth-btn-yeni btn-green" onclick="document.getElementById('btnKayitTamamla').click()">KAYDI TAMAMLA</button>
+                <button class="auth-btn-yeni btn-gray" onclick="document.getElementById('kullaniciAdiGroup').style.display='none'; document.getElementById('kayitButonlariGorsel').style.display='none'; document.getElementById('loginButonlariGorsel').style.display='flex'; document.getElementById('btnGecisGiris').click();">⬅ GİRİŞ EKRANINA DÖN</button>
+            </div>
+
+            <!-- Alt Menü -->
+            <div class="auth-bottom-menu">
+                <div class="auth-menu-item" onclick="alert('Görevleri görmek için giriş yapmalısın!')">
+                    <div class="icon-circle">📋</div><span>GÜNLÜK<br>GÖREVLER</span>
+                </div>
+                <div class="auth-menu-item" onclick="alert('Klanlara katılmak için giriş yapmalısın!')">
+                    <div class="icon-circle">👥</div><span>KLANLAR</span>
+                </div>
+                <div class="auth-menu-item" onclick="alert('Sohbete katılmak için giriş yapmalısın!')">
+                    <div class="icon-circle">💬</div><span>SOHBET</span>
+                </div>
+                <div class="auth-menu-item" onclick="alert('Ödülünü almak için giriş yapmalısın!')">
+                    <div class="icon-circle">🎁</div><span>GÜNLÜK<br>ÖDÜL</span>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="auth-footer">
+                <h3>BEYCO GAMES</h3>
+                <p>© 2026 Tüm hakları saklıdır.</p>
+            </div>
+
+            <!-- Orijinal Gizli Input ve Butonlar (Sistemin çökmemesi için) -->
+            <div style="display:none;">
+                <h2 id="authBaslik"></h2>
+                <input type="text" id="authKullaniciAdi"><input type="email" id="authEmail"><input type="password" id="authSifre">
+                <div id="loginButonlari"><button id="btnGiris"></button><button id="btnGecisKayit"></button><button id="btnMisafir"></button></div>
+                <div id="kayitButonlari"><button id="btnKayitTamamla"></button><button id="btnGecisGiris"></button></div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Eski Oyun Arayüzü İçerikleri -->
     <div id="reklamEkrani" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:9999999; flex-direction:column; justify-content:center; align-items:center;">
         <div class="magaza-kutu" style="text-align:center; border: 2px solid #2ecc71; max-width: 320px; padding: 25px;">
             <h2 style="color:#2ecc71; margin-bottom:10px; font-size:20px;">Sponsorlu İçerik</h2>
@@ -218,26 +381,6 @@
                     <p style="font-size:10px; color:#aaa; margin-bottom: 10px; padding:0 5px;">Koyu bordo kadife masa ve ahşap detaylar.</p>
                     <button class="satin-al-btn" id="btn_tema_kizil" onclick="magazaIslem('tema_kizil', 30000000)">30 Milyon ÇİP</button>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="authEkrani">
-        <div class="auth-kutu">
-            <div class="zar-ikon"></div>
-            <h2 id="authBaslik"></h2>
-            
-            <input type="text" id="authKullaniciAdi" class="auth-input" placeholder="Oyuncu Nickiniz (Örn: KRAL_34)" style="display:none;">
-            <input type="email" id="authEmail" class="auth-input" placeholder="E-Posta Adresi">
-            <input type="password" id="authSifre" class="auth-input" placeholder="Şifre">
-            <div id="loginButonlari">
-                <button id="btnGiris" class="auth-btn btn-sari">GİRİŞ YAP</button>
-                <button id="btnGecisKayit" class="auth-btn btn-yesil">YENİ KAYIT OL</button>
-                <button id="btnMisafir" class="auth-btn btn-gri">MİSAFİR OLARAK OYNA</button>
-            </div>
-            <div id="kayitButonlari" style="display:none;">
-                <button id="btnKayitTamamla" class="auth-btn btn-yesil">KAYDI TAMAMLA</button>
-                <button id="btnGecisGiris" class="auth-btn btn-gri" style="margin-top:10px;">⬅ GİRİŞ EKRANINA DÖN</button>
             </div>
         </div>
     </div>
@@ -439,7 +582,13 @@
                 
                 ['iskartaUst', 'iskartaSag', 'iskartaSol', 'benimIskartam'].forEach(id => {
                     let el = document.getElementById(id);
-                    if(el) el.innerHTML = '';
+                    if(el) {
+                        if(id === 'benimIskartam' && (!data.iskartalar[window.aktifKullaniciAdi] || data.iskartalar[window.aktifKullaniciAdi].length === 0)) {
+                            el.innerHTML = '<div class="iskarta-yazi" id="iskartaYazi">TAŞ AT<br>⬇</div>';
+                        } else {
+                            el.innerHTML = '';
+                        }
+                    }
                 });
 
                 for(let player in data.iskartalar) {
@@ -452,9 +601,10 @@
                     
                     let k = document.getElementById(tDiv);
                     if(k && Array.isArray(data.iskartalar[player])) {
-                        if (data.iskartalar[player].length === 0 && tDiv === 'benimIskartam') {
-                            k.innerHTML = '<div class="iskarta-yazi" id="iskartaYazi">TAŞ AT<br>⬇</div>';
-                        } else {
+                        if (data.iskartalar[player].length > 0) {
+                            if(tDiv === 'benimIskartam' && document.getElementById('iskartaYazi')) {
+                                document.getElementById('iskartaYazi').style.display = 'none';
+                            }
                             data.iskartalar[player].forEach((tas, index) => {
                                 if(!tas) return;
                                 let topOffset = index * -4;
@@ -598,45 +748,6 @@
                 }
             });
 
-            socket.on('izleyici_olarak_katildin', (data) => {
-                setTimeout(() => { 
-                    if(window.gelişmişKoltukHizala) window.gelişmişKoltukHizala(data.koltuklar);
-                    ['iskartaUst', 'iskartaSag', 'iskartaSol', 'benimIskartam'].forEach(id => { 
-                        let el = document.getElementById(id); 
-                        if(el) {
-                            if(id === 'benimIskartam') el.innerHTML = '<div class="iskarta-yazi" id="iskartaYazi">TAŞ AT<br>⬇</div>';
-                            else el.innerHTML = '';
-                        }
-                    });
-                    
-                    if(data.iskartalar) {
-                        for(let bot in data.iskartalar) {
-                            let tDiv = 'benimIskartam';
-                            if(window.masaKoltukMapping && window.masaKoltukMapping.right === bot) tDiv = 'iskartaSag';
-                            else if(window.masaKoltukMapping && window.masaKoltukMapping.top === bot) tDiv = 'iskartaUst';
-                            else if(window.masaKoltukMapping && window.masaKoltukMapping.left === bot) tDiv = 'iskartaSol';
-                            
-                            let k = document.getElementById(tDiv);
-                            if(k) {
-                                data.iskartalar[bot].forEach((tas, index) => {
-                                    if(tDiv === 'benimIskartam' && document.getElementById('iskartaYazi')) {
-                                        document.getElementById('iskartaYazi').style.display = 'none';
-                                    }
-                                    let topOffset = index * -4;
-                                    let leftOffset = index * 2;
-                                    let tEl = document.createElement('div');
-                                    tEl.className = `okey-tasi tas-${tas.renk}`;
-                                    tEl.innerText = tas.sayi;
-                                    tEl.id = tas.id;
-                                    tEl.style.cssText = `position:absolute; top:50%; left:50%; transform:translate(calc(-50% + ${leftOffset}px), calc(-50% + ${topOffset}px)) !important; box-shadow:0 2px 5px rgba(0,0,0,0.8); margin:0;`;
-                                    k.appendChild(tEl);
-                                });
-                            }
-                        }
-                    }
-                }, 150);
-            });
-
             socket.on('masa_sohbet_balonu', (data) => {
                 if(window.suAnkiMasam !== data.masaAdi) return;
                 let elId = 'benimAdimKutusu';
@@ -661,7 +772,7 @@
             socket.on('gosterge_basarili', (data) => {
                 if(data.isim === window.aktifKullaniciAdi) {
                     if(window.bildirimGoster) window.bildirimGoster(`⭐ GÖSTERGE YAPILDI! ${data.odul.toLocaleString('tr-TR')} ÇİP KAZANDIN!`, "basari");
-                    const gBtn = document.getElementById('gostergeBtn');
+                    const gBtn = document.getElementById('gostergeBtn'); 
                     if(gBtn) gBtn.style.display = 'none';
                     window.gostergeGosterildi = true;
                 }
@@ -796,6 +907,23 @@
                 }).catch(err => { setStats(fakeCip, fakeOynanan, fakeKazanilan, fakeOran, lig, ligBg, unvan); });
             } else { setStats(fakeCip, fakeOynanan, fakeKazanilan, fakeOran, lig, ligBg, unvan); }
         };
+
+        // Yeni arayüz istatistiklerini simüle etmek için (Görsel Canlılık)
+        setInterval(() => {
+            const elOnline = document.getElementById('statOnlineRand');
+            const elMasa = document.getElementById('statMasaRand');
+            if(elOnline && elMasa) {
+                let baseOnline = parseInt(elOnline.innerText.replace('.',''));
+                let change = Math.floor(Math.random() * 5) - 2; // -2 ile +2 arası değişim
+                let newOnline = baseOnline + change;
+                if(newOnline < 100) newOnline = 150;
+                
+                let yeniMasa = Math.floor(newOnline / 4) + Math.floor(Math.random() * 5);
+                
+                elOnline.innerText = newOnline;
+                elMasa.innerText = yeniMasa;
+            }
+        }, 12000);
     </script>
 </body>
 </html>
