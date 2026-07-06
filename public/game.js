@@ -13,7 +13,7 @@ window.masayaGeriDon = function(m) { suAnkiMasam = m; lobiEkrani.style.display =
 window.masayiIzle = function(m) { socket.emit('masayi_izle', { isim: aktifKullaniciAdi, masaAdi: m }); };
 window.masayaDavetEt = function(n) { socket.emit('masaya_davet_et', { kimden: aktifKullaniciAdi, kime: n, masaAdi: suAnkiMasam }); document.getElementById('arkadaslarEkrani').style.display = 'none'; };
 
-// 🔥 KUSURSUZ MASA TEMİZLEME MOTORU (Çökmeyi Önler) 🔥
+// 🔥 KUSURSUZ MASA TEMİZLEME MOTORU 🔥
 window.masayiTemizle = function() { 
     masaOyunBasladiMi = false; 
     document.getElementById('sonucEkrani').style.display = 'none'; 
@@ -21,7 +21,6 @@ window.masayiTemizle = function() {
     if(document.getElementById('gostergeBtn')) document.getElementById('gostergeBtn').style.display = 'none'; 
     gostergeHakki = false; 
     
-    // Tekrar Oyna Kilidi: Oyun başlayana kadar spamlamayı engeller
     oyunuBaslatBtn.innerText = "🎲 OYUNU BAŞLAT"; 
     oyunuBaslatBtn.style.display = 'block'; 
     oyunuBaslatBtn.disabled = false; 
@@ -31,10 +30,8 @@ window.masayiTemizle = function() {
     masaKasaBilgisi.style.display = 'none'; 
     bitisAlani.innerHTML = 'BİTİR<br>🏆'; 
     
-    // Istakadaki tüm taşları sil
     for(let i=0; i<24; i++) document.getElementById('y'+i).innerHTML = ''; 
     
-    // Yerdeki (ıskarta) tüm taşları sil
     document.getElementById('benimIskartam').innerHTML = '<div class="iskarta-yazi" id="iskartaYazi">TAŞ AT<br>⬇</div>'; 
     document.getElementById('iskartaSag').innerHTML = ''; 
     document.getElementById('iskartaSol').innerHTML = ''; 
@@ -86,23 +83,8 @@ window.tasEkle = function(tasData, yuvaId) {
     document.getElementById(yuvaId).appendChild(div); 
 };
 
-window.checkGosterge = function() { 
-    const btn = document.getElementById('gostergeBtn'); if(!btn) return; btn.style.display = 'none'; 
-    if(!benimSiramMi || !gostergeHakki) return; 
-    let gostergeDiv = document.getElementById('gostergeTasi'); 
-    if(gostergeDiv && gostergeDiv.innerText) { 
-        let gSayi = gostergeDiv.innerText; let renkClass = Array.from(gostergeDiv.classList).find(c => c.startsWith('tas-')); 
-        if(!renkClass) return; let gRenk = renkClass.replace('tas-', ''); let varMi = false; 
-        for(let i=0; i<24; i++) { 
-            let yuva = document.getElementById('y'+i); 
-            if(yuva.children.length > 0) { 
-                let t = yuva.children[0]; let tRenkClass = Array.from(t.classList).find(c => c.startsWith('tas-')); 
-                if(tRenkClass && tRenkClass.replace('tas-', '') === gRenk && t.innerText === gSayi) varMi = true; 
-            } 
-        } 
-        if(varMi) btn.style.display = 'block'; 
-    } 
-};
+// Pasif bırakıldı, hata yapmasın diye index.html içine taşındı
+window.checkGosterge = function() {}; 
 
 window.elimdekiTasSayisi = function() { let sayi = 0; for(let i=0; i<24; i++) { if(document.getElementById('y'+i).children.length > 0) sayi++; } return sayi; };
 
@@ -161,21 +143,14 @@ window.otomatikTasAt = function(tasElementi) {
     } 
 };
 
-// 🔥 BUTON ÇÖKME KİLİDİ (Anti-Spam) 🔥
 if(oyunuBaslatBtn) {
     oyunuBaslatBtn.addEventListener('click', () => { 
         oyunuBaslatBtn.disabled = true;
         oyunuBaslatBtn.innerText = "⏳ BAŞLIYOR...";
         oyunuBaslatBtn.style.opacity = '0.5';
         socket.emit('oyunu_baslat', suAnkiMasam); 
-        
-        // Eğer sunucu bir sebeple cevap vermezse 5 sn sonra butonu aç
         setTimeout(() => {
-            if(oyunuBaslatBtn) {
-                oyunuBaslatBtn.disabled = false;
-                oyunuBaslatBtn.innerText = "🎲 OYUNU BAŞLAT";
-                oyunuBaslatBtn.style.opacity = '1';
-            }
+            if(oyunuBaslatBtn) { oyunuBaslatBtn.disabled = false; oyunuBaslatBtn.innerText = "🎲 OYUNU BAŞLAT"; oyunuBaslatBtn.style.opacity = '1'; }
         }, 5000);
     });
 }
@@ -186,12 +161,17 @@ kalanTasBilgi?.addEventListener('click', () => {
     } else if(!benimSiramMi) ozelUyariGoster("Şu an sıra sizde değil!"); else ozelUyariGoster("Önce taşı atmalısınız!"); 
 });
 
+// 🔥 TIKLANINCA YIĞININ ALTINI SİLMEYEN GÜVENLİ KOD 🔥
 document.getElementById('iskartaSol')?.addEventListener('click', function() { 
     if (benimSiramMi && window.elimdekiTasSayisi() === 14 && this.children.length > 0) { 
-        gostergeHakki = false; const tasEl = this.lastElementChild; 
+        gostergeHakki = false; 
+        const tasEl = this.lastElementChild; 
         let renkSinifi = Array.from(tasEl.classList).find(c=>c.startsWith('tas-')); let renk = renkSinifi ? renkSinifi.split('-')[1] : 'siyah'; 
         const tasObj = { id: tasEl.id, sayi: tasEl.innerText, renk: renk }; 
-        this.innerHTML = ''; 
+        
+        // Kutuyu tamamen silmek yerine sadece alınan taşı sil (Eski taşlar yerinde kalsın)
+        this.removeChild(tasEl); 
+        
         for(let i=0; i<24; i++) { if(document.getElementById('y'+i).children.length === 0) { window.tasEkle(tasObj, 'y'+i); break; } } 
         socket.emit('yandan_tas_alindi', { masaAdi: suAnkiMasam, kimAldi: aktifKullaniciAdi, tas: tasObj }); sesCal(sesTasCek); 
     } else if(!benimSiramMi) ozelUyariGoster("Şu an sıra sizde değil!"); else if(window.elimdekiTasSayisi() === 15) ozelUyariGoster("Elinizde zaten 15 taş var!"); 
