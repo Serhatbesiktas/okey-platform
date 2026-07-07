@@ -67,3 +67,172 @@ body.tema-kizil .istaka-container {
 body.tema-kizil #masaOrtasiYazi {
     color: #f2c94c !important;
 }
+/* ========================================================================= */
+/* 🔥 BEYCO GAMES MASTER THEME: TEMA-PREMIUM (.tema-premium Sınıfı Kilidi) 🔥 */
+/* ========================================================================= */
+
+/* 1. Global ve Giriş Ekranı Düzenlemeleri */
+body.tema-premium {
+    background-color: #021107 !important; /* Premium Koyu Yeşil Zemin */
+}
+
+/* Giriş Ekranına O Çok Sevilen Silik Okey Taşlı Arka Planı Zorla Giydir */
+body.tema-premium #authEkrani {
+    background-color: #0d1f14 !important;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120"><g opacity="0.04" fill="none" stroke="%23ffffff" stroke-width="2"><rect x="15" y="15" width="22" height="32" rx="4"/><circle cx="26" cy="31" r="4" fill="%23ffffff"/><rect x="75" y="65" width="22" height="32" rx="4"/><circle cx="86" cy="81" r="4" fill="%23ffffff"/></g></svg>') !important;
+    background-repeat: repeat !important;
+    background-size: 150px !important;
+}
+
+/* Giriş Kutusu (Orijinal ID'leri bozmadan premium casino havası) */
+body.tema-premium .auth-kutu {
+    background: rgba(0, 0, 0, 0.75) !important;
+    border: 1px solid rgba(241, 196, 15, 0.3) !important;
+    border-radius: 20px !important;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.8), inset 0 0 20px rgba(241,196,15,0.05) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+}
+
+/* Giriş Başlığına Altın Varak ve Crown Efekti */
+body.tema-premium .auth-kutu::before {
+    content: '👑 BEYCO\A SERİ OKEY';
+    white-space: pre-wrap;
+    display: block;
+    text-align: center;
+    font-size: 32px;
+    font-weight: 900;
+    line-height: 1.2;
+    margin-bottom: 20px;
+    background: linear-gradient(to bottom, #fceabb, #f8b500);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0px 5px 15px rgba(0,0,0,0.5);
+    letter-spacing: 2px;
+}
+
+/* Orijinal Inputları ve Butonları Premium Yap (Klavye Autofill Asla Bozamaz) */
+body.tema-premium .auth-input {
+    background: #fdfae3 !important;
+    border: 2px solid rgba(241, 196, 15, 0.2) !important;
+    color: #111 !important;
+    border-radius: 12px !important;
+    font-weight: bold !important;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.1) !important;
+}
+body.tema-premium .auth-input:focus {
+    border-color: #f1c40f !important;
+    box-shadow: 0 0 15px rgba(241, 196, 15, 0.4) !important;
+}
+
+body.tema-premium .auth-btn {
+    border-radius: 12px !important;
+    font-size: 14px !important;
+    font-weight: 900 !important;
+}
+body.tema-premium .btn-sari { background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%) !important; color: #111 !important; }
+body.tema-premium .btn-yesil { background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%) !important; color: #111 !important; }
+
+/* 2. Lobi Ekranı Düzenlemeleri (Sadece Tema Aktifken Orijinal Yapıyı Ezer) */
+body.tema-premium #lobiEkrani {
+    background: #020a05 !important;
+}
+
+body.tema-premium .vip-header {
+    background: linear-gradient(180deg, #0a1710 0%, rgba(10,23,16,0.9) 100%) !important;
+    border-bottom: 2px solid #f1c40f !important;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.8) !important;
+}
+body.tema-premium .profil-isim { color: #f1c40f !important; text-shadow: 0 0 5px rgba(241,196,15,0.5) !important; }
+body.tema-premium .cip-kutu { background: rgba(0,0,0,0.6) !important; border: 1px solid #2ecc71 !important; border-radius: 20px !important; }
+
+body.tema-premium .sistem-mesaji {
+    background: rgba(0,0,0,0.6) !important;
+    border: 1px solid rgba(46,204,113,0.3) !important;
+    color: #2ecc71 !important;
+    border-radius: 8px !important;
+}
+body.tema-premium .masa-sec-baslik {
+    color: #f1c40f !important;
+    font-weight: 900 !important;
+    letter-spacing: 2px !important;
+    border-bottom: 1px solid rgba(241, 196, 15, 0.2) !important;
+}
+
+/* Lobi Masalar Paneli ve Kartları */
+body.tema-premium .masalar-panel > div {
+    background: linear-gradient(90deg, #0a1710 0%, #050c08 100%) !important;
+    border: 1px solid rgba(46, 204, 113, 0.2) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5) !important;
+    border-left: 5px solid #2ecc71 !important;
+}
+body.tema-premium .masalar-panel > div.vip-board {
+    border-color: rgba(241, 196, 15, 0.3) !important;
+    border-left: 5px solid #f1c40f !important;
+}
+
+body.tema-premium .players-panel {
+    background: rgba(0,0,0,0.5) !important;
+    border: 1px solid rgba(255,255,255,0.05) !important;
+    border-radius: 15px !important;
+}
+
+/* 🔥 Lobi Dev Aksiyon Butonları (Yan Yana ve Resimli Hale CSS ile Getirildi!) 🔥 */
+body.tema-premium .btn-hemen-oyna {
+    position: relative !important;
+    bottom: auto !important;
+    z-index: 10 !important;
+    width: calc(100% - 30px) !important;
+    margin: 0 15px 15px 15px !important;
+    text-align: left !important;
+    padding: 20px !important;
+    border-radius: 12px !important;
+    min-height: 85px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5) !important;
+    box-shrink: 0 !important;
+}
+body.tema-premium .btn-hemen-oyna span {
+    display: block !important;
+    font-size: 10px !important;
+    font-weight: bold !important;
+    color: rgba(255,255,255,0.7) !important;
+    margin-top: 4px !important;
+    text-transform: uppercase !important;
+}
+
+/* 3D Görselleri Butonların Sağ Tarafına Akıllıca Yerleştir */
+body.tema-premium button[onclick*="vipMasaKurPanel"] {
+    background-color: #2c103a !important;
+    background-image: linear-gradient(90deg, #4a148c 45%, transparent 100%), url('vip_masa.png') !important;
+    background-size: contain !important;
+    background-position: right center !important;
+    background-repeat: no-repeat !important;
+    border: 1px solid #8e44ad !important;
+    color: #fff !important;
+}
+body.tema-premium button#btnRastgeleOyna {
+    background-color: #3e3104 !important;
+    background-image: linear-gradient(90deg, #b7950b 45%, transparent 100%), url('zarlar_cipler.png') !important;
+    background-size: contain !important;
+    background-position: right center !important;
+    background-repeat: no-repeat !important;
+    border: 1px solid #f1c40f !important;
+    color: #fff !important;
+}
+
+/* Alt Sabit Menü */
+body.tema-premium .alt-menu-container {
+    background: rgba(2, 8, 4, 0.95) !important;
+    border-top: 1px solid rgba(46, 204, 113, 0.25) !important;
+    backdrop-filter: blur(10px) !important;
+    height: 70px !important;
+}
+body.tema-premium .alt-menu-item.active { color: #2ecc71 !important; }
+body.tema-premium .alt-menu-item.active::before { 
+    content: ''; position: absolute; top: 0; width: 30px; height: 3px; 
+    background: #2ecc71 !important; border-radius: 0 0 4px 4px; box-shadow: 0 2px 10px #2ecc71; 
+}
