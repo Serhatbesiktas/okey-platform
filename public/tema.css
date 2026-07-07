@@ -1533,3 +1533,65 @@ content:"👑";
 content:"🎲";
 
 }
+/* ============================= */
+/* MOBİL KAYDIRMA DÜZELTMESİ */
+/* ============================= */
+
+html{
+    width:100%;
+    max-width:100%;
+    overflow-x:hidden !important;
+    overscroll-behavior-x:none;
+}
+
+body{
+    width:100%;
+    max-width:100%;
+    overflow-x:hidden !important;
+    position:relative;
+    margin:0;
+    padding:0;
+    overscroll-behavior-x:none;
+    touch-action:pan-y;
+    -webkit-overflow-scrolling:touch;
+}
+
+*{
+    box-sizing:border-box;
+}
+
+#lobiEkrani,
+#masaEkrani,
+.vip-header,
+.alt-menu-container,
+.players-panel,
+.masalar-panel,
+.sistem-mesaji,
+.masa-sec-baslik{
+    width:100%;
+    max-width:100%;
+    overflow-x:hidden;
+}
+
+.masa-kart,
+.players-panel,
+.player-card,
+.vip-header,
+.sistem-mesaji{
+    max-width:100%;
+}
+
+img,
+canvas,
+video{
+    max-width:100%;
+    height:auto;
+    display:block;
+}
+
+/* iPhone Safari */
+body{
+    position:fixed;
+    inset:0;
+    overflow-y:auto;
+}
