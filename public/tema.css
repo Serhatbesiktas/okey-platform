@@ -256,3 +256,327 @@ transform:none;
 }
 
 }
+/* ==========================================================
+   👑 BEYCO GAMES PREMIUM V4
+   PART 2 - PREMIUM LOBİ
+========================================================== */
+
+/* ===== VIP HEADER ===== */
+
+body.tema-premium .vip-header{
+
+position:sticky;
+top:0;
+
+z-index:100;
+
+background:
+linear-gradient(
+180deg,
+rgba(14,26,18,.97),
+rgba(5,10,7,.94)
+)!important;
+
+backdrop-filter:blur(18px);
+
+border-bottom:1px solid rgba(255,215,0,.18);
+
+box-shadow:
+0 10px 25px rgba(0,0,0,.35);
+
+}
+
+/* Profil */
+
+body.tema-premium .profil-avatar{
+
+width:54px;
+height:54px;
+
+border-radius:50%;
+
+border:2px solid #ffd84d;
+
+background:
+linear-gradient(
+180deg,
+#2b4b31,
+#132319
+);
+
+box-shadow:
+0 0 18px rgba(255,215,0,.20);
+
+}
+
+/* İsim */
+
+body.tema-premium .profil-isim{
+
+font-size:17px;
+
+font-weight:900;
+
+color:#ffffff;
+
+letter-spacing:.3px;
+
+}
+
+/* VIP */
+
+body.tema-premium .vip-badge{
+
+padding:4px 10px;
+
+border-radius:30px;
+
+background:
+linear-gradient(
+180deg,
+#ffe27a,
+#d89c00
+);
+
+color:#222;
+
+font-size:10px;
+
+font-weight:900;
+
+}
+
+/* Çip Kutusu */
+
+body.tema-premium .cip-kutu{
+
+padding:8px 14px;
+
+border-radius:30px;
+
+background:
+rgba(255,255,255,.05)!important;
+
+border:1px solid rgba(255,215,0,.22)!important;
+
+backdrop-filter:blur(14px);
+
+box-shadow:
+0 8px 20px rgba(0,0,0,.35);
+
+}
+
+/* ==================================================== */
+/* SİSTEM MESAJI */
+/* ==================================================== */
+
+body.tema-premium .sistem-mesaji{
+
+margin:14px;
+
+padding:14px;
+
+border-radius:16px;
+
+background:
+rgba(15,42,25,.72)!important;
+
+border:1px solid rgba(46,204,113,.20)!important;
+
+color:#8ef7b0!important;
+
+font-weight:700;
+
+backdrop-filter:blur(12px);
+
+box-shadow:
+0 8px 20px rgba(0,0,0,.30);
+
+}
+
+/* ==================================================== */
+/* BAŞLIK */
+/* ==================================================== */
+
+body.tema-premium .masa-sec-baslik{
+
+font-size:24px;
+
+font-weight:900;
+
+letter-spacing:2px;
+
+text-align:center;
+
+margin:18px 0;
+
+color:#ffd84d!important;
+
+position:relative;
+
+}
+
+body.tema-premium .masa-sec-baslik::after{
+
+content:"";
+
+display:block;
+
+width:110px;
+
+height:3px;
+
+margin:8px auto 0;
+
+border-radius:20px;
+
+background:
+linear-gradient(
+90deg,
+transparent,
+#ffd84d,
+transparent);
+
+}
+
+/* ==================================================== */
+/* MASA KARTLARI */
+/* ==================================================== */
+
+body.tema-premium .masalar-panel{
+
+padding:12px;
+
+display:flex;
+
+flex-direction:column;
+
+gap:14px;
+
+}
+
+body.tema-premium .masalar-panel>div{
+
+position:relative;
+
+overflow:hidden;
+
+border-radius:20px;
+
+background:
+linear-gradient(
+135deg,
+#0f2418,
+#08140d
+)!important;
+
+border:1px solid rgba(46,204,113,.15)!important;
+
+padding:16px;
+
+transition:.25s;
+
+box-shadow:
+
+0 12px 25px rgba(0,0,0,.35);
+
+}
+
+/* Sol premium çizgi */
+
+body.tema-premium .masalar-panel>div::before{
+
+content:"";
+
+position:absolute;
+
+left:0;
+
+top:0;
+
+width:5px;
+
+height:100%;
+
+background:
+linear-gradient(
+180deg,
+#53ff92,
+#11ba53
+);
+
+}
+
+/* VIP Masa */
+
+body.tema-premium .masalar-panel>div.vip-board{
+
+border-color:rgba(255,215,0,.25)!important;
+
+}
+
+body.tema-premium .masalar-panel>div.vip-board::before{
+
+background:
+linear-gradient(
+180deg,
+#ffe27a,
+#d69b00
+);
+
+}
+
+/* Hover */
+
+@media (hover:hover){
+
+body.tema-premium .masalar-panel>div:hover{
+
+transform:translateY(-3px);
+
+box-shadow:
+
+0 18px 35px rgba(0,0,0,.45);
+
+}
+
+}
+
+/* ==================================================== */
+/* OYUNCU PANELİ */
+/* ==================================================== */
+
+body.tema-premium .players-panel{
+
+margin:14px;
+
+padding:14px;
+
+border-radius:20px;
+
+background:
+rgba(255,255,255,.04)!important;
+
+border:1px solid rgba(255,255,255,.06)!important;
+
+backdrop-filter:blur(16px);
+
+}
+
+/* Satırlar */
+
+body.tema-premium .players-panel>div{
+
+padding:10px;
+
+border-radius:12px;
+
+transition:.20s;
+
+}
+
+body.tema-premium .players-panel>div:hover{
+
+background:rgba(255,255,255,.05);
+
+}
