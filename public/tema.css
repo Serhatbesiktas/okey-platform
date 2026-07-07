@@ -236,3 +236,291 @@ body.tema-premium .alt-menu-item.active::before {
     content: ''; position: absolute; top: 0; width: 30px; height: 3px; 
     background: #2ecc71 !important; border-radius: 0 0 4px 4px; box-shadow: 0 2px 10px #2ecc71; 
 }
+
+/* =======================================================
+   👑 BEYCO UI V2
+   PART 1
+   Premium Casino Lobby
+=======================================================*/
+
+:root{
+
+--gold:#f8d24d;
+--gold2:#c9920a;
+
+--green:#26d96b;
+--green2:#15853d;
+
+--dark:#08140d;
+
+--panel:rgba(7,16,11,.72);
+
+--white:#ffffff;
+
+}
+
+
+/*------------------------------------
+GENEL ARKAPLAN
+------------------------------------*/
+
+body.tema-premium{
+
+background:
+radial-gradient(circle at top,#1d5d39 0%,#0c2b1b 30%,#051109 75%,#020604 100%) !important;
+
+overflow:hidden;
+
+}
+
+
+/* hareketli ışık */
+
+body.tema-premium::before{
+
+content:"";
+
+position:fixed;
+
+left:-20%;
+
+top:-30%;
+
+width:800px;
+
+height:800px;
+
+background:
+
+radial-gradient(circle,
+
+rgba(255,220,100,.14),
+
+transparent 70%);
+
+filter:blur(70px);
+
+animation:beycoGlow 18s infinite alternate;
+
+pointer-events:none;
+
+z-index:0;
+
+}
+
+
+@keyframes beycoGlow{
+
+0%{
+
+transform:translate(0,0);
+
+}
+
+100%{
+
+transform:translate(120px,70px);
+
+}
+
+}
+
+
+/*------------------------------------
+HEADER
+------------------------------------*/
+
+body.tema-premium .vip-header{
+
+background:
+
+linear-gradient(
+
+180deg,
+
+rgba(16,32,20,.96),
+
+rgba(5,12,7,.96)
+
+)!important;
+
+backdrop-filter:blur(18px);
+
+border-bottom:1px solid rgba(255,215,0,.25)!important;
+
+box-shadow:
+
+0 10px 30px rgba(0,0,0,.55),
+
+0 0 25px rgba(255,215,0,.08);
+
+}
+
+
+/* avatar */
+
+body.tema-premium .profil-avatar{
+
+border:3px solid var(--gold);
+
+background:
+
+linear-gradient(
+
+180deg,
+
+#27492d,
+
+#0d2013);
+
+box-shadow:
+
+0 0 18px rgba(255,215,0,.25);
+
+}
+
+
+/* isim */
+
+body.tema-premium .profil-isim{
+
+font-size:17px;
+
+font-weight:900;
+
+color:#fff;
+
+letter-spacing:.4px;
+
+}
+
+
+/* vip */
+
+body.tema-premium .vip-badge{
+
+background:
+
+linear-gradient(
+
+135deg,
+
+#f8d24d,
+
+#c58d06);
+
+color:#111;
+
+padding:3px 10px;
+
+border-radius:30px;
+
+font-size:10px;
+
+font-weight:900;
+
+box-shadow:
+
+0 5px 10px rgba(0,0,0,.4);
+
+}
+
+
+/* çip kutusu */
+
+body.tema-premium .cip-kutu{
+
+background:
+
+rgba(255,255,255,.05)!important;
+
+backdrop-filter:blur(15px);
+
+border:1px solid rgba(255,215,0,.25)!important;
+
+border-radius:50px;
+
+box-shadow:
+
+0 8px 18px rgba(0,0,0,.4);
+
+}
+
+
+/*------------------------------------
+SİSTEM MESAJI
+------------------------------------*/
+
+body.tema-premium .sistem-mesaji{
+
+background:
+
+rgba(255,255,255,.05)!important;
+
+border-radius:14px;
+
+padding:12px;
+
+border:1px solid rgba(46,204,113,.20)!important;
+
+box-shadow:
+
+0 8px 25px rgba(0,0,0,.45);
+
+color:#9df8bc!important;
+
+}
+
+
+/*------------------------------------
+MASA BAŞLIK
+------------------------------------*/
+
+body.tema-premium .masa-sec-baslik{
+
+font-size:23px;
+
+font-weight:900;
+
+letter-spacing:2px;
+
+color:#fff!important;
+
+text-shadow:
+
+0 0 12px rgba(255,215,0,.25);
+
+margin-top:10px;
+
+}
+
+
+/* altın çizgi */
+
+body.tema-premium .masa-sec-baslik::after{
+
+content:"";
+
+display:block;
+
+width:120px;
+
+height:3px;
+
+margin:8px auto 0;
+
+border-radius:30px;
+
+background:
+
+linear-gradient(
+
+90deg,
+
+transparent,
+
+var(--gold),
+
+transparent);
+
+}
