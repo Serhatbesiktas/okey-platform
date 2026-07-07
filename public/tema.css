@@ -524,3 +524,277 @@ var(--gold),
 transparent);
 
 }
+/*======================================================
+        BEYCO UI V2
+        PART 2
+        PREMIUM LOBBY CARDS
+======================================================*/
+
+/* MASA KARTLARI */
+
+body.tema-premium .masa-kart,
+body.tema-premium .masalar-panel > div{
+
+position:relative;
+
+overflow:hidden;
+
+border-radius:22px !important;
+
+background:
+linear-gradient(
+135deg,
+rgba(7,23,12,.98),
+rgba(10,40,18,.98)
+)!important;
+
+border:1px solid rgba(46,204,113,.20)!important;
+
+box-shadow:
+0 12px 28px rgba(0,0,0,.55),
+inset 0 1px rgba(255,255,255,.05);
+
+transition:.25s;
+
+}
+
+
+/* soldaki yeşil çizgi */
+
+body.tema-premium .masalar-panel>div::before{
+
+content:"";
+
+position:absolute;
+
+left:0;
+
+top:0;
+
+bottom:0;
+
+width:6px;
+
+background:
+linear-gradient(
+180deg,
+#4cff8d,
+#0fb44e);
+
+box-shadow:
+0 0 20px #24ff73;
+
+}
+
+
+/* üst ışık */
+
+body.tema-premium .masalar-panel>div::after{
+
+content:"";
+
+position:absolute;
+
+top:0;
+
+left:0;
+
+right:0;
+
+height:1px;
+
+background:
+rgba(255,255,255,.08);
+
+}
+
+
+/* hover */
+
+body.tema-premium .masalar-panel>div:hover{
+
+transform:translateY(-2px);
+
+box-shadow:
+
+0 18px 35px rgba(0,0,0,.6),
+
+0 0 20px rgba(46,204,113,.12);
+
+}
+
+
+/*----------------------------------------------------*/
+/* İZLE BUTONU */
+/*----------------------------------------------------*/
+
+body.tema-premium button[id*=izle],
+
+body.tema-premium .btn-izle{
+
+background:
+
+linear-gradient(
+
+135deg,
+
+#9b4dff,
+
+#7b2de2)!important;
+
+color:white!important;
+
+border:none!important;
+
+border-radius:14px!important;
+
+font-weight:900;
+
+box-shadow:
+
+0 8px 18px rgba(155,77,255,.45);
+
+}
+
+
+/*----------------------------------------------------*/
+/* OTUR */
+/*----------------------------------------------------*/
+
+body.tema-premium .btn-otur,
+
+body.tema-premium .btn-gir{
+
+background:
+
+linear-gradient(
+
+135deg,
+
+#ffd84b,
+
+#f4a300)!important;
+
+color:#111!important;
+
+font-weight:900;
+
+border:none!important;
+
+border-radius:14px!important;
+
+box-shadow:
+
+0 8px 18px rgba(255,208,0,.40);
+
+}
+
+
+/*----------------------------------------------------*/
+/* DOLU */
+/*----------------------------------------------------*/
+
+body.tema-premium .btn-dolu{
+
+background:
+
+linear-gradient(
+
+135deg,
+
+#ff5b5b,
+
+#cc2d2d)!important;
+
+color:white!important;
+
+}
+
+
+/*----------------------------------------------------*/
+/* OYUNCU LİSTESİ */
+/*----------------------------------------------------*/
+
+body.tema-premium .players-panel{
+
+border-radius:20px!important;
+
+background:
+
+rgba(0,0,0,.35)!important;
+
+backdrop-filter:blur(16px);
+
+padding:14px;
+
+box-shadow:
+
+0 12px 30px rgba(0,0,0,.45);
+
+}
+
+
+/* oyuncu satırı */
+
+body.tema-premium .players-panel>div{
+
+border-radius:14px;
+
+padding:10px;
+
+transition:.25s;
+
+}
+
+body.tema-premium .players-panel>div:hover{
+
+background:rgba(255,255,255,.05);
+
+}
+
+
+/*----------------------------------------------------*/
+/* ALT MENÜ */
+/*----------------------------------------------------*/
+
+body.tema-premium .alt-menu-container{
+
+height:78px!important;
+
+border-top:1px solid rgba(255,215,0,.15);
+
+background:
+
+rgba(4,10,6,.96)!important;
+
+backdrop-filter:blur(18px);
+
+}
+
+
+/* ikon */
+
+body.tema-premium .alt-menu-ikon{
+
+transition:.25s;
+
+}
+
+
+/* aktif */
+
+body.tema-premium .alt-menu-item.active .alt-menu-ikon{
+
+transform:scale(1.18);
+
+filter:drop-shadow(0 0 8px #2ecc71);
+
+}
+
+body.tema-premium .alt-menu-item.active{
+
+color:#2ecc71!important;
+
+font-weight:900;
+
+}
