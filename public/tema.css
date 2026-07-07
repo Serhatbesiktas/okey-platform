@@ -580,3 +580,364 @@ body.tema-premium .players-panel>div:hover{
 background:rgba(255,255,255,.05);
 
 }
+/* ==========================================================
+   👑 BEYCO GAMES PREMIUM V4
+   PART 3 - PREMIUM ACTIONS & ALT MENÜ
+==========================================================*/
+
+/* ======================================================
+   DEV AKSİYON BUTONLARI
+======================================================*/
+
+body.tema-premium .btn-hemen-oyna{
+
+position:relative;
+
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:flex-start;
+
+overflow:hidden;
+
+width:calc(100% - 24px);
+
+margin:12px;
+
+padding:22px;
+
+min-height:96px;
+
+border-radius:22px;
+
+font-size:19px;
+
+font-weight:900;
+
+letter-spacing:.5px;
+
+border:none;
+
+cursor:pointer;
+
+transition:.25s;
+
+box-shadow:
+
+0 14px 35px rgba(0,0,0,.35);
+
+}
+
+/* Alt yazı */
+
+body.tema-premium .btn-hemen-oyna span{
+
+margin-top:6px;
+
+font-size:11px;
+
+font-weight:700;
+
+opacity:.85;
+
+text-transform:uppercase;
+
+letter-spacing:1px;
+
+}
+
+/* Dokunma */
+
+body.tema-premium .btn-hemen-oyna:active{
+
+transform:scale(.97);
+
+}
+
+/* Işık geçişi */
+
+body.tema-premium .btn-hemen-oyna::before{
+
+content:"";
+
+position:absolute;
+
+left:-140px;
+
+top:0;
+
+width:90px;
+
+height:100%;
+
+background:
+
+linear-gradient(
+
+90deg,
+
+transparent,
+
+rgba(255,255,255,.28),
+
+transparent);
+
+transform:skewX(-18deg);
+
+animation:beycoButtonLight 3.8s infinite;
+
+}
+
+@keyframes beycoButtonLight{
+
+0%{
+
+left:-140px;
+
+}
+
+100%{
+
+left:130%;
+
+}
+
+}
+
+/* ======================================================
+   VIP MASA KUR
+======================================================*/
+
+body.tema-premium button[onclick*="vipMasaKurPanel"]{
+
+background:
+
+linear-gradient(
+
+135deg,
+
+#7423e6,
+
+#41117f
+
+)!important;
+
+border:1px solid rgba(255,255,255,.12)!important;
+
+color:#fff!important;
+
+}
+
+body.tema-premium button[onclick*="vipMasaKurPanel"]::after{
+
+content:"👑";
+
+position:absolute;
+
+right:24px;
+
+bottom:12px;
+
+font-size:52px;
+
+opacity:.18;
+
+}
+
+/* ======================================================
+   RASTGELE OYNA
+======================================================*/
+
+body.tema-premium #btnRastgeleOyna{
+
+background:
+
+linear-gradient(
+
+135deg,
+
+#ffcf3a,
+
+#ff8d00
+
+)!important;
+
+color:#fff!important;
+
+border:1px solid rgba(255,255,255,.15)!important;
+
+}
+
+body.tema-premium #btnRastgeleOyna::after{
+
+content:"🎲";
+
+position:absolute;
+
+right:22px;
+
+bottom:10px;
+
+font-size:48px;
+
+opacity:.18;
+
+}
+
+/* ======================================================
+   ALT MENÜ
+======================================================*/
+
+body.tema-premium .alt-menu-container{
+
+position:fixed;
+
+left:0;
+
+right:0;
+
+bottom:0;
+
+height:78px;
+
+padding-bottom:env(safe-area-inset-bottom);
+
+display:flex;
+
+align-items:center;
+
+justify-content:space-around;
+
+background:
+
+rgba(6,18,11,.95)!important;
+
+backdrop-filter:blur(18px);
+
+border-top:1px solid rgba(255,215,0,.10);
+
+box-shadow:
+
+0 -8px 30px rgba(0,0,0,.40);
+
+}
+
+/* Menü */
+
+body.tema-premium .alt-menu-item{
+
+position:relative;
+
+display:flex;
+
+flex-direction:column;
+
+align-items:center;
+
+justify-content:center;
+
+gap:5px;
+
+flex:1;
+
+transition:.25s;
+
+color:#cfcfcf;
+
+}
+
+/* İkon */
+
+body.tema-premium .alt-menu-ikon{
+
+font-size:22px;
+
+transition:.25s;
+
+}
+
+/* Yazı */
+
+body.tema-premium .alt-menu-item span{
+
+font-size:10px;
+
+font-weight:700;
+
+}
+
+/* Aktif */
+
+body.tema-premium .alt-menu-item.active{
+
+color:#42ff90!important;
+
+}
+
+body.tema-premium .alt-menu-item.active .alt-menu-ikon{
+
+transform:scale(1.22);
+
+filter:drop-shadow(0 0 10px #42ff90);
+
+}
+
+/* Üst çizgi */
+
+body.tema-premium .alt-menu-item.active::before{
+
+content:"";
+
+position:absolute;
+
+top:0;
+
+width:32px;
+
+height:3px;
+
+border-radius:20px;
+
+background:#42ff90;
+
+box-shadow:
+
+0 0 12px #42ff90;
+
+}
+
+/* Hover */
+
+@media (hover:hover){
+
+body.tema-premium .alt-menu-item:hover{
+
+transform:translateY(-3px);
+
+}
+
+}
+
+/* ======================================================
+   TOAST
+======================================================*/
+
+body.tema-premium .toast,
+
+body.tema-premium .bildirim{
+
+border-radius:18px;
+
+background:
+
+rgba(8,24,15,.94)!important;
+
+border:1px solid rgba(255,215,0,.15)!important;
+
+backdrop-filter:blur(18px);
+
+box-shadow:
+
+0 10px 25px rgba(0,0,0,.35);
+
+}
