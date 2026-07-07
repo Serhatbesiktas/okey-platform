@@ -1590,8 +1590,23 @@ video{
 }
 
 /* iPhone Safari */
+html,
 body{
-    position:fixed;
-    inset:0;
-    overflow-y:auto;
+    overflow-x:hidden !important;
+    max-width:100%;
+}
+
+body{
+    margin:0;
+    padding:0;
+}
+
+#lobiEkrani,
+#masaEkrani{
+    overflow-x:hidden;
+}
+
+*{
+    box-sizing:border-box;
+}
 }
