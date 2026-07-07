@@ -798,3 +798,321 @@ color:#2ecc71!important;
 font-weight:900;
 
 }
+/* ============================================================
+   PART 2 - PREMIUM LOBİ KARTLARI
+============================================================ */
+
+/* MASA BAŞLIK */
+body.tema-premium .masa-sec-baslik{
+    position:relative;
+    font-size:42px!important;
+    font-weight:900!important;
+    letter-spacing:5px;
+    color:#fff!important;
+    padding-bottom:18px;
+    margin:20px 15px!important;
+}
+
+body.tema-premium .masa-sec-baslik::after{
+    content:"";
+    position:absolute;
+    left:50%;
+    transform:translateX(-50%);
+    bottom:0;
+    width:180px;
+    height:4px;
+    border-radius:50px;
+
+    background:linear-gradient(
+        90deg,
+        transparent,
+        #ffd84d,
+        #fff6c2,
+        #ffd84d,
+        transparent
+    );
+
+    box-shadow:
+    0 0 12px #ffd84d,
+    0 0 25px #ffd84d;
+}
+
+/* ===================================================== */
+
+body.tema-premium .masalar-panel>div{
+
+    position:relative;
+
+    overflow:hidden;
+
+    background:
+    linear-gradient(
+    135deg,
+    #082114,
+    #031109
+    )!important;
+
+    border-radius:22px!important;
+
+    border:1px solid rgba(70,255,120,.25)!important;
+
+    padding:18px!important;
+
+    margin-bottom:16px!important;
+
+    transition:.30s;
+
+    box-shadow:
+    inset 0 0 30px rgba(0,0,0,.45),
+    0 12px 30px rgba(0,0,0,.45);
+
+}
+
+
+/* SOL YEŞİL ÇİZGİ */
+
+body.tema-premium .masalar-panel>div::before{
+
+content:"";
+
+position:absolute;
+
+left:0;
+top:0;
+
+width:6px;
+height:100%;
+
+background:linear-gradient(
+180deg,
+#48ff7c,
+#00d26a
+);
+
+box-shadow:0 0 15px #48ff7c;
+
+}
+
+/* SAĞ IŞIK */
+
+body.tema-premium .masalar-panel>div::after{
+
+content:"";
+
+position:absolute;
+
+right:-120px;
+top:-40px;
+
+width:240px;
+height:180px;
+
+background:radial-gradient(
+circle,
+rgba(255,215,0,.14),
+transparent 70%
+);
+
+transform:rotate(-20deg);
+
+}
+
+/* HOVER */
+
+body.tema-premium .masalar-panel>div:hover{
+
+transform:translateY(-3px);
+
+box-shadow:
+
+0 15px 35px rgba(0,0,0,.55),
+
+0 0 18px rgba(46,204,113,.25);
+
+}
+
+/* ===================================================== */
+/* İZLE BUTONU */
+
+body.tema-premium .btn-izle{
+
+background:linear-gradient(
+180deg,
+#bf67ff,
+#8f3fe5
+)!important;
+
+border:none!important;
+
+border-radius:14px!important;
+
+font-weight:900;
+
+color:#fff;
+
+box-shadow:
+
+0 0 16px rgba(191,103,255,.55);
+
+transition:.25s;
+
+}
+
+body.tema-premium .btn-izle:hover{
+
+transform:scale(1.05);
+
+}
+
+/* ===================================================== */
+/* OTUR */
+
+body.tema-premium .btn-otur{
+
+background:linear-gradient(
+180deg,
+#ffd94f,
+#f2b400
+)!important;
+
+border:none!important;
+
+border-radius:14px!important;
+
+font-weight:900;
+
+color:#1d1d1d;
+
+box-shadow:
+0 0 18px rgba(255,210,0,.45);
+
+}
+
+body.tema-premium .btn-otur:hover{
+
+transform:scale(1.05);
+
+}
+
+/* ===================================================== */
+/* DOLU */
+
+body.tema-premium .btn-dolu{
+
+background:linear-gradient(
+180deg,
+#ffca42,
+#e7a400
+)!important;
+
+color:#222!important;
+
+border:none!important;
+
+font-weight:900;
+
+border-radius:14px!important;
+
+}
+
+/* ===================================================== */
+/* LOBİ OYUNCU LİSTESİ */
+
+body.tema-premium .players-panel{
+
+background:#030b06!important;
+
+border-radius:18px!important;
+
+padding:10px!important;
+
+border:1px solid rgba(255,255,255,.05)!important;
+
+}
+
+body.tema-premium .player-item{
+
+background:#07150d;
+
+border-radius:14px;
+
+margin-bottom:10px;
+
+padding:14px;
+
+transition:.25s;
+
+}
+
+body.tema-premium .player-item:hover{
+
+background:#0b2015;
+
+transform:translateX(6px);
+
+}
+
+body.tema-premium .player-item::before{
+
+content:"";
+
+width:14px;
+height:14px;
+
+border-radius:50%;
+
+background:#19ff52;
+
+display:inline-block;
+
+margin-right:10px;
+
+box-shadow:0 0 12px #19ff52;
+
+}
+
+/* ===================================================== */
+/* HEADER ÇİP KUTUSU */
+
+body.tema-premium .cip-kutu{
+
+background:
+
+linear-gradient(
+180deg,
+#111,
+#050505
+)!important;
+
+border:2px solid rgba(255,214,0,.25)!important;
+
+box-shadow:
+
+0 0 18px rgba(255,214,0,.18);
+
+}
+
+/* ===================================================== */
+/* ALT MENÜ */
+
+body.tema-premium .alt-menu-item{
+
+transition:.30s;
+
+}
+
+body.tema-premium .alt-menu-item:hover{
+
+transform:translateY(-5px);
+
+}
+
+body.tema-premium .alt-menu-item.active{
+
+color:#3cff8b!important;
+
+text-shadow:
+
+0 0 10px #3cff8b;
+
+}
