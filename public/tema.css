@@ -1,943 +1,246 @@
 /* ==========================================================
    👑 BEYCO GAMES PREMIUM V4
-   PART 1 - TEMEL ALTYAPI
-========================================================== */
+   PART 4 - PREMIUM OYUN MASASI
+==========================================================*/
 
-/* ===== MOBİL ALTYAPI ===== */
+/* =========================
+   MASA
+========================= */
 
-html{
-    width:100%;
-    height:100%;
-    overflow-x:hidden;
-    background:#06120b;
-    -webkit-text-size-adjust:100%;
-}
+body.tema-premium #masaEkrani{
 
-body.tema-premium{
+background:
+radial-gradient(circle at center,
+#2f7b4d 0%,
+#185531 45%,
+#0c2d19 75%,
+#06120b 100%) !important;
 
-    margin:0;
-    padding:0;
-
-    width:100%;
-    min-height:100vh;
-
-    overflow-x:hidden;
-
-    background:
-    radial-gradient(circle at top,
-    #17472d 0%,
-    #0b2417 35%,
-    #051109 70%,
-    #020604 100%) !important;
-
-    color:#fff;
-
-    font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    Roboto,
-    Arial,
-    sans-serif;
-
-    -webkit-font-smoothing:antialiased;
-}
-
-/* ===== SAFE AREA ===== */
-
-#authEkrani,
-#lobiEkrani,
-#masaEkrani{
-
-padding-left:max(12px,env(safe-area-inset-left));
-padding-right:max(12px,env(safe-area-inset-right));
+overflow:hidden;
 
 }
 
-/* ===== GİRİŞ EKRANI ===== */
+/* =========================
+   MASA IŞIĞI
+========================= */
 
-body.tema-premium #authEkrani{
+body.tema-premium #masaEkrani::before{
 
-display:flex;
-justify-content:center;
-align-items:center;
+content:"";
+
+position:absolute;
+
+left:50%;
+top:50%;
+
+transform:translate(-50%,-50%);
+
+width:90%;
+
+height:90%;
+
+border-radius:50%;
 
 background:
 
-radial-gradient(circle at top,
+radial-gradient(circle,
 
-#1b5f3b,
+rgba(255,255,255,.08),
 
-#0a2115 55%,
+transparent 70%);
 
-#020604 100%) !important;
+pointer-events:none;
 
 }
 
-/* ===== GİRİŞ KUTUSU ===== */
+/* =========================
+   İSTAKALAR
+========================= */
 
-body.tema-premium .auth-kutu{
-
-width:min(380px,92vw);
-
-padding:28px;
-
-border-radius:24px;
+body.tema-premium .istaka-container{
 
 background:
 
 linear-gradient(
 180deg,
-rgba(20,32,24,.94),
-rgba(8,15,10,.94)
+#74491f,
+#47270f
 )!important;
 
-border:1px solid rgba(255,215,0,.18);
+border:2px solid rgba(255,214,120,.18)!important;
 
-backdrop-filter:blur(18px);
+border-radius:18px;
 
 box-shadow:
 
-0 15px 45px rgba(0,0,0,.55),
+0 12px 22px rgba(0,0,0,.45),
 
-0 0 35px rgba(255,215,0,.05),
-
-inset 0 1px rgba(255,255,255,.04);
+inset 0 2px rgba(255,255,255,.08);
 
 }
 
-/* ===== BAŞLIK ===== */
+/* =========================
+   OKEY TAŞI
+========================= */
 
-body.tema-premium .auth-kutu::before{
+body.tema-premium .okey-tasi{
 
-content:"👑 BEYCO GAMES";
+background:
 
-display:block;
+linear-gradient(
+180deg,
+#ffffff,
+#ececec
+)!important;
 
-text-align:center;
+border-radius:8px;
 
-font-size:34px;
+border:1px solid rgba(0,0,0,.18);
+
+box-shadow:
+
+0 3px 10px rgba(0,0,0,.25);
+
+transition:
+
+transform .15s,
+
+box-shadow .15s;
+
+}
+
+/* Seçili taş */
+
+body.tema-premium .okey-tasi.secili,
+
+body.tema-premium .okey-tasi.selected{
+
+transform:translateY(-10px);
+
+box-shadow:
+
+0 12px 20px rgba(255,215,0,.35);
+
+}
+
+/* Dokununca */
+
+body.tema-premium .okey-tasi:active{
+
+transform:translateY(-5px);
+
+}
+
+/* =========================
+   ORTA GÖSTERGE
+========================= */
+
+body.tema-premium #masaOrtasiYazi{
+
+color:#ffe27a!important;
 
 font-weight:900;
 
-letter-spacing:2px;
+text-shadow:
 
-margin-bottom:26px;
-
-background:
-linear-gradient(
-180deg,
-#fff8d8,
-#ffd84d,
-#d79b08);
-
--webkit-background-clip:text;
-
--webkit-text-fill-color:transparent;
+0 0 10px rgba(255,215,0,.45);
 
 }
 
-/* ===== INPUT ===== */
+/* =========================
+   RAKİP AVATARI
+========================= */
 
-body.tema-premium .auth-input{
+body.tema-premium .oyuncu-avatar,
 
-height:54px;
+body.tema-premium .player-avatar{
 
-border-radius:15px;
+border-radius:50%;
 
-background:#fdf9e8;
-
-border:2px solid rgba(255,215,0,.12);
-
-color:#111;
-
-font-size:15px;
-
-font-weight:700;
-
-padding-left:18px;
-
-transition:.25s;
+border:3px solid rgba(255,215,0,.35);
 
 box-shadow:
 
-inset 0 2px 6px rgba(0,0,0,.08);
+0 0 15px rgba(255,215,0,.18);
 
 }
 
-body.tema-premium .auth-input:focus{
+/* =========================
+   TUR GÖSTERGESİ
+========================= */
 
-border-color:#ffd84d;
+body.tema-premium .aktif,
 
-box-shadow:
+body.tema-premium .aktif-oyuncu{
 
-0 0 0 4px rgba(255,216,77,.15);
-
-}
-
-/* ===== BUTON ===== */
-
-body.tema-premium .auth-btn{
-
-height:54px;
-
-border-radius:15px;
-
-font-weight:900;
-
-letter-spacing:.5px;
-
-transition:.20s;
-
-box-shadow:
-
-0 10px 25px rgba(0,0,0,.25);
+animation:beycoTurn 1.2s infinite alternate;
 
 }
 
-body.tema-premium .auth-btn:active{
-
-transform:scale(.97);
-
-}
-
-body.tema-premium .btn-sari{
-
-background:
-linear-gradient(
-180deg,
-#ffe27a,
-#f1b400
-)!important;
-
-color:#222!important;
-
-}
-
-body.tema-premium .btn-yesil{
-
-background:
-linear-gradient(
-180deg,
-#43e37f,
-#1fa652
-)!important;
-
-color:#fff!important;
-
-}
-
-/* ===== FADE ===== */
-
-#authEkrani,
-#lobiEkrani,
-#masaEkrani{
-
-animation:beycoFade .35s ease;
-
-}
-
-@keyframes beycoFade{
+@keyframes beycoTurn{
 
 from{
 
-opacity:0;
+box-shadow:
 
-transform:translateY(8px);
+0 0 0 rgba(46,204,113,0);
 
 }
 
 to{
 
-opacity:1;
-
-transform:none;
-
-}
-
-}
-/* ==========================================================
-   👑 BEYCO GAMES PREMIUM V4
-   PART 2 - PREMIUM LOBİ
-========================================================== */
-
-/* ===== VIP HEADER ===== */
-
-body.tema-premium .vip-header{
-
-position:sticky;
-top:0;
-
-z-index:100;
-
-background:
-linear-gradient(
-180deg,
-rgba(14,26,18,.97),
-rgba(5,10,7,.94)
-)!important;
-
-backdrop-filter:blur(18px);
-
-border-bottom:1px solid rgba(255,215,0,.18);
-
-box-shadow:
-0 10px 25px rgba(0,0,0,.35);
-
-}
-
-/* Profil */
-
-body.tema-premium .profil-avatar{
-
-width:54px;
-height:54px;
-
-border-radius:50%;
-
-border:2px solid #ffd84d;
-
-background:
-linear-gradient(
-180deg,
-#2b4b31,
-#132319
-);
-
-box-shadow:
-0 0 18px rgba(255,215,0,.20);
-
-}
-
-/* İsim */
-
-body.tema-premium .profil-isim{
-
-font-size:17px;
-
-font-weight:900;
-
-color:#ffffff;
-
-letter-spacing:.3px;
-
-}
-
-/* VIP */
-
-body.tema-premium .vip-badge{
-
-padding:4px 10px;
-
-border-radius:30px;
-
-background:
-linear-gradient(
-180deg,
-#ffe27a,
-#d89c00
-);
-
-color:#222;
-
-font-size:10px;
-
-font-weight:900;
-
-}
-
-/* Çip Kutusu */
-
-body.tema-premium .cip-kutu{
-
-padding:8px 14px;
-
-border-radius:30px;
-
-background:
-rgba(255,255,255,.05)!important;
-
-border:1px solid rgba(255,215,0,.22)!important;
-
-backdrop-filter:blur(14px);
-
-box-shadow:
-0 8px 20px rgba(0,0,0,.35);
-
-}
-
-/* ==================================================== */
-/* SİSTEM MESAJI */
-/* ==================================================== */
-
-body.tema-premium .sistem-mesaji{
-
-margin:14px;
-
-padding:14px;
-
-border-radius:16px;
-
-background:
-rgba(15,42,25,.72)!important;
-
-border:1px solid rgba(46,204,113,.20)!important;
-
-color:#8ef7b0!important;
-
-font-weight:700;
-
-backdrop-filter:blur(12px);
-
-box-shadow:
-0 8px 20px rgba(0,0,0,.30);
-
-}
-
-/* ==================================================== */
-/* BAŞLIK */
-/* ==================================================== */
-
-body.tema-premium .masa-sec-baslik{
-
-font-size:24px;
-
-font-weight:900;
-
-letter-spacing:2px;
-
-text-align:center;
-
-margin:18px 0;
-
-color:#ffd84d!important;
-
-position:relative;
-
-}
-
-body.tema-premium .masa-sec-baslik::after{
-
-content:"";
-
-display:block;
-
-width:110px;
-
-height:3px;
-
-margin:8px auto 0;
-
-border-radius:20px;
-
-background:
-linear-gradient(
-90deg,
-transparent,
-#ffd84d,
-transparent);
-
-}
-
-/* ==================================================== */
-/* MASA KARTLARI */
-/* ==================================================== */
-
-body.tema-premium .masalar-panel{
-
-padding:12px;
-
-display:flex;
-
-flex-direction:column;
-
-gap:14px;
-
-}
-
-body.tema-premium .masalar-panel>div{
-
-position:relative;
-
-overflow:hidden;
-
-border-radius:20px;
-
-background:
-linear-gradient(
-135deg,
-#0f2418,
-#08140d
-)!important;
-
-border:1px solid rgba(46,204,113,.15)!important;
-
-padding:16px;
-
-transition:.25s;
-
 box-shadow:
 
-0 12px 25px rgba(0,0,0,.35);
-
-}
-
-/* Sol premium çizgi */
-
-body.tema-premium .masalar-panel>div::before{
-
-content:"";
-
-position:absolute;
-
-left:0;
-
-top:0;
-
-width:5px;
-
-height:100%;
-
-background:
-linear-gradient(
-180deg,
-#53ff92,
-#11ba53
-);
-
-}
-
-/* VIP Masa */
-
-body.tema-premium .masalar-panel>div.vip-board{
-
-border-color:rgba(255,215,0,.25)!important;
-
-}
-
-body.tema-premium .masalar-panel>div.vip-board::before{
-
-background:
-linear-gradient(
-180deg,
-#ffe27a,
-#d69b00
-);
-
-}
-
-/* Hover */
-
-@media (hover:hover){
-
-body.tema-premium .masalar-panel>div:hover{
-
-transform:translateY(-3px);
-
-box-shadow:
-
-0 18px 35px rgba(0,0,0,.45);
+0 0 20px rgba(46,204,113,.55);
 
 }
 
 }
 
-/* ==================================================== */
-/* OYUNCU PANELİ */
-/* ==================================================== */
+/* =========================
+   OKEY GÖSTERGESİ
+========================= */
 
-body.tema-premium .players-panel{
+body.tema-premium .gosterge,
 
-margin:14px;
-
-padding:14px;
-
-border-radius:20px;
-
-background:
-rgba(255,255,255,.04)!important;
-
-border:1px solid rgba(255,255,255,.06)!important;
-
-backdrop-filter:blur(16px);
-
-}
-
-/* Satırlar */
-
-body.tema-premium .players-panel>div{
-
-padding:10px;
+body.tema-premium .okey-gosterge{
 
 border-radius:12px;
 
-transition:.20s;
+background:
+
+rgba(255,255,255,.06);
+
+backdrop-filter:blur(8px);
+
+border:1px solid rgba(255,215,0,.18);
 
 }
 
-body.tema-premium .players-panel>div:hover{
+/* =========================
+   MASA GÖLGESİ
+========================= */
 
-background:rgba(255,255,255,.05);
-
-}
-/* ==========================================================
-   👑 BEYCO GAMES PREMIUM V4
-   PART 3 - PREMIUM ACTIONS & ALT MENÜ
-==========================================================*/
-
-/* ======================================================
-   DEV AKSİYON BUTONLARI
-======================================================*/
-
-body.tema-premium .btn-hemen-oyna{
-
-position:relative;
-
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:flex-start;
-
-overflow:hidden;
-
-width:calc(100% - 24px);
-
-margin:12px;
-
-padding:22px;
-
-min-height:96px;
-
-border-radius:22px;
-
-font-size:19px;
-
-font-weight:900;
-
-letter-spacing:.5px;
-
-border:none;
-
-cursor:pointer;
-
-transition:.25s;
-
-box-shadow:
-
-0 14px 35px rgba(0,0,0,.35);
-
-}
-
-/* Alt yazı */
-
-body.tema-premium .btn-hemen-oyna span{
-
-margin-top:6px;
-
-font-size:11px;
-
-font-weight:700;
-
-opacity:.85;
-
-text-transform:uppercase;
-
-letter-spacing:1px;
-
-}
-
-/* Dokunma */
-
-body.tema-premium .btn-hemen-oyna:active{
-
-transform:scale(.97);
-
-}
-
-/* Işık geçişi */
-
-body.tema-premium .btn-hemen-oyna::before{
+body.tema-premium #masaEkrani::after{
 
 content:"";
 
 position:absolute;
-
-left:-140px;
-
-top:0;
-
-width:90px;
-
-height:100%;
-
-background:
-
-linear-gradient(
-
-90deg,
-
-transparent,
-
-rgba(255,255,255,.28),
-
-transparent);
-
-transform:skewX(-18deg);
-
-animation:beycoButtonLight 3.8s infinite;
-
-}
-
-@keyframes beycoButtonLight{
-
-0%{
-
-left:-140px;
-
-}
-
-100%{
-
-left:130%;
-
-}
-
-}
-
-/* ======================================================
-   VIP MASA KUR
-======================================================*/
-
-body.tema-premium button[onclick*="vipMasaKurPanel"]{
-
-background:
-
-linear-gradient(
-
-135deg,
-
-#7423e6,
-
-#41117f
-
-)!important;
-
-border:1px solid rgba(255,255,255,.12)!important;
-
-color:#fff!important;
-
-}
-
-body.tema-premium button[onclick*="vipMasaKurPanel"]::after{
-
-content:"👑";
-
-position:absolute;
-
-right:24px;
-
-bottom:12px;
-
-font-size:52px;
-
-opacity:.18;
-
-}
-
-/* ======================================================
-   RASTGELE OYNA
-======================================================*/
-
-body.tema-premium #btnRastgeleOyna{
-
-background:
-
-linear-gradient(
-
-135deg,
-
-#ffcf3a,
-
-#ff8d00
-
-)!important;
-
-color:#fff!important;
-
-border:1px solid rgba(255,255,255,.15)!important;
-
-}
-
-body.tema-premium #btnRastgeleOyna::after{
-
-content:"🎲";
-
-position:absolute;
-
-right:22px;
-
-bottom:10px;
-
-font-size:48px;
-
-opacity:.18;
-
-}
-
-/* ======================================================
-   ALT MENÜ
-======================================================*/
-
-body.tema-premium .alt-menu-container{
-
-position:fixed;
 
 left:0;
-
 right:0;
-
 bottom:0;
 
-height:78px;
-
-padding-bottom:env(safe-area-inset-bottom);
-
-display:flex;
-
-align-items:center;
-
-justify-content:space-around;
+height:120px;
 
 background:
 
-rgba(6,18,11,.95)!important;
+linear-gradient(
+180deg,
+transparent,
+rgba(0,0,0,.35)
+);
 
-backdrop-filter:blur(18px);
-
-border-top:1px solid rgba(255,215,0,.10);
-
-box-shadow:
-
-0 -8px 30px rgba(0,0,0,.40);
-
-}
-
-/* Menü */
-
-body.tema-premium .alt-menu-item{
-
-position:relative;
-
-display:flex;
-
-flex-direction:column;
-
-align-items:center;
-
-justify-content:center;
-
-gap:5px;
-
-flex:1;
-
-transition:.25s;
-
-color:#cfcfcf;
-
-}
-
-/* İkon */
-
-body.tema-premium .alt-menu-ikon{
-
-font-size:22px;
-
-transition:.25s;
-
-}
-
-/* Yazı */
-
-body.tema-premium .alt-menu-item span{
-
-font-size:10px;
-
-font-weight:700;
-
-}
-
-/* Aktif */
-
-body.tema-premium .alt-menu-item.active{
-
-color:#42ff90!important;
-
-}
-
-body.tema-premium .alt-menu-item.active .alt-menu-ikon{
-
-transform:scale(1.22);
-
-filter:drop-shadow(0 0 10px #42ff90);
-
-}
-
-/* Üst çizgi */
-
-body.tema-premium .alt-menu-item.active::before{
-
-content:"";
-
-position:absolute;
-
-top:0;
-
-width:32px;
-
-height:3px;
-
-border-radius:20px;
-
-background:#42ff90;
-
-box-shadow:
-
-0 0 12px #42ff90;
-
-}
-
-/* Hover */
-
-@media (hover:hover){
-
-body.tema-premium .alt-menu-item:hover{
-
-transform:translateY(-3px);
-
-}
-
-}
-
-/* ======================================================
-   TOAST
-======================================================*/
-
-body.tema-premium .toast,
-
-body.tema-premium .bildirim{
-
-border-radius:18px;
-
-background:
-
-rgba(8,24,15,.94)!important;
-
-border:1px solid rgba(255,215,0,.15)!important;
-
-backdrop-filter:blur(18px);
-
-box-shadow:
-
-0 10px 25px rgba(0,0,0,.35);
+pointer-events:none;
 
 }
