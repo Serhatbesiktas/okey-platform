@@ -244,3 +244,344 @@ rgba(0,0,0,.35)
 pointer-events:none;
 
 }
+/* ==========================================================
+   👑 BEYCO GAMES PREMIUM V4
+   PART 5 - PREMIUM EFFECTS & FINAL
+==========================================================*/
+
+
+/* =======================================
+   PREMIUM CAM EFEKTİ
+======================================= */
+
+body.tema-premium .vip-header,
+body.tema-premium .players-panel,
+body.tema-premium .sistem-mesaji,
+body.tema-premium .cip-kutu{
+
+backdrop-filter:blur(18px);
+-webkit-backdrop-filter:blur(18px);
+
+}
+
+
+/* =======================================
+   TÜM BUTONLAR
+======================================= */
+
+body.tema-premium button{
+
+transition:
+
+transform .18s ease,
+
+box-shadow .18s ease,
+
+filter .18s ease;
+
+}
+
+body.tema-premium button:active{
+
+transform:scale(.96);
+
+filter:brightness(.95);
+
+}
+
+
+/* =======================================
+   PREMIUM GÖLGE
+======================================= */
+
+body.tema-premium .masalar-panel>div,
+body.tema-premium .players-panel,
+body.tema-premium .btn-hemen-oyna,
+body.tema-premium .auth-kutu{
+
+box-shadow:
+
+0 12px 30px rgba(0,0,0,.35),
+
+0 1px rgba(255,255,255,.04) inset;
+
+}
+
+
+/* =======================================
+   ALTIN PARLAMA
+======================================= */
+
+body.tema-premium .vip-header::after{
+
+content:"";
+
+position:absolute;
+
+left:-150px;
+
+top:0;
+
+width:90px;
+
+height:100%;
+
+background:
+
+linear-gradient(
+
+90deg,
+
+transparent,
+
+rgba(255,255,255,.20),
+
+transparent);
+
+transform:skewX(-18deg);
+
+animation:beycoHeaderLight 8s infinite;
+
+pointer-events:none;
+
+}
+
+@keyframes beycoHeaderLight{
+
+0%{
+
+left:-150px;
+
+}
+
+100%{
+
+left:130%;
+
+}
+
+}
+
+
+/* =======================================
+   ONLINE YEŞİL NOKTA
+======================================= */
+
+.online,
+
+.online-dot,
+
+.player-online{
+
+animation:beycoOnline 1.4s infinite;
+
+}
+
+@keyframes beycoOnline{
+
+0%{
+
+opacity:.55;
+
+transform:scale(.95);
+
+}
+
+50%{
+
+opacity:1;
+
+transform:scale(1.15);
+
+}
+
+100%{
+
+opacity:.55;
+
+transform:scale(.95);
+
+}
+
+}
+
+
+/* =======================================
+   ALT MENÜ
+======================================= */
+
+body.tema-premium .alt-menu-item{
+
+transition:.25s;
+
+}
+
+body.tema-premium .alt-menu-item.active{
+
+font-weight:900;
+
+}
+
+body.tema-premium .alt-menu-item.active .alt-menu-ikon{
+
+filter:
+
+drop-shadow(0 0 10px rgba(46,204,113,.70));
+
+}
+
+
+/* =======================================
+   PREMIUM SCROLL
+======================================= */
+
+::-webkit-scrollbar{
+
+width:5px;
+
+}
+
+::-webkit-scrollbar-thumb{
+
+background:#26d96b;
+
+border-radius:30px;
+
+}
+
+
+/* =======================================
+   GİRİŞ ANİMASYONU
+======================================= */
+
+body.tema-premium .auth-kutu{
+
+animation:beycoLogin .45s ease;
+
+}
+
+@keyframes beycoLogin{
+
+from{
+
+opacity:0;
+
+transform:
+
+translateY(20px)
+
+scale(.97);
+
+}
+
+to{
+
+opacity:1;
+
+transform:none;
+
+}
+
+}
+
+
+/* =======================================
+   MASA KARTI GİRİŞİ
+======================================= */
+
+body.tema-premium .masalar-panel>div{
+
+animation:beycoCard .35s ease;
+
+}
+
+@keyframes beycoCard{
+
+from{
+
+opacity:0;
+
+transform:translateY(18px);
+
+}
+
+to{
+
+opacity:1;
+
+transform:none;
+
+}
+
+}
+
+
+/* =======================================
+   SAYFA GEÇİŞİ
+======================================= */
+
+#authEkrani,
+#lobiEkrani,
+#masaEkrani{
+
+animation:beycoPage .30s ease;
+
+}
+
+@keyframes beycoPage{
+
+from{
+
+opacity:0;
+
+}
+
+to{
+
+opacity:1;
+
+}
+
+}
+
+
+/* =======================================
+   PERFORMANS
+======================================= */
+
+body.tema-premium *{
+
+-webkit-tap-highlight-color:transparent;
+
+}
+
+button,
+.okey-tasi,
+.alt-menu-item,
+.masalar-panel>div{
+
+will-change:transform;
+
+}
+
+
+/* =======================================
+   IOS SAFE AREA
+======================================= */
+
+.alt-menu-container{
+
+padding-bottom:max(8px,env(safe-area-inset-bottom));
+
+}
+
+.vip-header{
+
+padding-top:max(10px,env(safe-area-inset-top));
+
+}
+
+
+/* =======================================
+   BİTTİ
+======================================= */
