@@ -3,8 +3,8 @@
 // ==========================================
 window.profiliGoster = function(hedefIsim) {
     if(!hedefIsim || hedefIsim === "" || hedefIsim === "Bekleniyor..." || hedefIsim === "➕ DAVET" || hedefIsim === "Boş") { 
-        if(window.suAnkiMasam && !window.izleyiciModu) {
-            if(typeof window.davetMenusuAc === 'function') window.davetMenusuAc(); 
+        if(typeof suAnkiMasam !== 'undefined' && suAnkiMasam && typeof izleyiciModu !== 'undefined' && !izleyiciModu) {
+            if(typeof davetMenusuAc === 'function') davetMenusuAc(); 
         }
         return; 
     }
@@ -30,12 +30,12 @@ window.profiliGoster = function(hedefIsim) {
         pDurum.style.color = "#2ecc71";
     }
     
-    let isOnline = (window.onlineOyuncularListesi && window.onlineOyuncularListesi.includes(hedefIsim)) || hedefIsim === window.aktifKullaniciAdi;
+    let isOnline = (typeof onlineOyuncularListesi !== 'undefined' && onlineOyuncularListesi.includes(hedefIsim)) || (typeof aktifKullaniciAdi !== 'undefined' && hedefIsim === aktifKullaniciAdi);
     
-    if (hedefIsim !== window.aktifKullaniciAdi) {
+    if (typeof aktifKullaniciAdi !== 'undefined' && hedefIsim !== aktifKullaniciAdi) {
         if(pArkadasBtn) {
             pArkadasBtn.style.display = 'block';
-            if (window.benimArkadaslarim && window.benimArkadaslarim.includes(hedefIsim)) { 
+            if (typeof benimArkadaslarim !== 'undefined' && benimArkadaslarim.includes(hedefIsim)) { 
                 pArkadasBtn.innerHTML = "❌ Arkadaştan Çıkar"; 
                 pArkadasBtn.style.background = "linear-gradient(180deg, #e74c3c 0%, #c0392b 100%)"; 
                 pArkadasBtn.style.color = "#fff"; 
@@ -52,9 +52,9 @@ window.profiliGoster = function(hedefIsim) {
     }
 
     let tacIcon = ""; let ismRengi = "#fff"; let textGlow = "none";
-    if(window.globalKozmetikler && window.globalKozmetikler[hedefIsim]) {
-        if(window.globalKozmetikler[hedefIsim].includes('neon_tac')) tacIcon = "👑 ";
-        if(window.globalKozmetikler[hedefIsim].includes('atesli_isim')) { ismRengi = "#ff4d4d"; textGlow = "0 0 10px rgba(255, 77, 77, 0.8)"; }
+    if(typeof globalKozmetikler !== 'undefined' && globalKozmetikler[hedefIsim]) {
+        if(globalKozmetikler[hedefIsim].includes('neon_tac')) tacIcon = "👑 ";
+        if(globalKozmetikler[hedefIsim].includes('atesli_isim')) { ismRengi = "#ff4d4d"; textGlow = "0 0 10px rgba(255, 77, 77, 0.8)"; }
     }
     
     if(pIsim) {
@@ -78,7 +78,6 @@ window.profiliGoster = function(hedefIsim) {
         if(pUnvan) pUnvan.innerText = unvanTxt;
     };
     
-    // BÜYÜK KÜÇÜK HARF MİSAFİR ÇİP HATASI BURADA DÜZELTİLDİ
     let hIsimKiyas = hedefIsim.toUpperCase();
     if(hIsimKiyas.startsWith("MİSAFİR") || hIsimKiyas.startsWith("MISAFIR")) { 
         setStats(20000, 0, 0, 0, "🥉 BRONZ LİG", "linear-gradient(180deg, #cd7f32 0%, #8b4513 100%)", "MİSAFİR");
@@ -92,8 +91,8 @@ window.profiliGoster = function(hedefIsim) {
     if(fakeCip > 10000000) { lig = "💎 ELMAS LİG"; ligBg = "linear-gradient(180deg, #3498db 0%, #2980b9 100%)"; } else if(fakeCip > 5000000) { lig = "🥇 ALTIN LİG"; ligBg = "linear-gradient(180deg, #f1c40f 0%, #f39c12 100%)"; } else if(fakeCip > 2000000) { lig = "🥈 GÜMÜŞ LİG"; ligBg = "linear-gradient(180deg, #bdc3c7 0%, #95a5a6 100%)"; }
     let unvan = "🃏 OYUNCU"; if(fakeOran > 60 && fakeOynanan > 50) unvan = "👑 OKEY KRALI"; else if(fakeOynanan > 500) unvan = "⚔️ USTA"; else if(fakeKazanilan > 200) unvan = "🔥 ATEŞ USTASI";
 
-    if(typeof window.db !== 'undefined') {
-        window.db.collection("kullanicilar").where("isim", "==", hedefIsim).get().then((q) => {
+    if(typeof db !== 'undefined') {
+        db.collection("kullanicilar").where("isim", "==", hedefIsim).get().then((q) => {
             if(!q.empty) { 
                 const data = q.docs[0].data(); let gCip = parseInt(String(data.cip).replace(/[^0-9]/g, '')) || 0; let gOynanan = data.oynananOyun || 0; let gKazanilan = data.kazanilanOyun || 0; let gOran = gOynanan > 0 ? Math.floor((gKazanilan / gOynanan) * 100) : 0;
                 let gercekLig = "🥉 BRONZ LİG"; let gercekLigBg = "linear-gradient(180deg, #cd7f32 0%, #8b4513 100%)";
@@ -107,9 +106,10 @@ window.profiliGoster = function(hedefIsim) {
 };
 
 window.esyaFirlatAksiyon = function(esyaIcon) {
-    if(typeof window.isMisafir !== 'undefined' && window.isMisafir) { window.ozelUyariGoster("⚠️ Eşya fırlatılamaz!"); return; } const hedef = document.getElementById('profilArkadasBtn').dataset.hedef;
-    let safCip = parseInt(String(window.benimAnlikCipim).replace(/[^0-9]/g, '')) || 0;
-    if(!hedef || !window.suAnkiMasam || hedef === window.aktifKullaniciAdi || safCip < 5000) return;
-    if(typeof socket !== 'undefined') socket.emit('esya_firlat', { masaAdi: window.suAnkiMasam, kimden: window.aktifKullaniciAdi, kime: hedef, esya: esyaIcon }); 
+    if(typeof isMisafir !== 'undefined' && isMisafir) { ozelUyariGoster("⚠️ Eşya fırlatılamaz!"); return; } 
+    const hedef = document.getElementById('profilArkadasBtn').dataset.hedef;
+    let safCip = parseInt(String(typeof benimAnlikCipim !== 'undefined' ? benimAnlikCipim : 0).replace(/[^0-9]/g, '')) || 0;
+    if(!hedef || (typeof suAnkiMasam === 'undefined' || !suAnkiMasam) || (typeof aktifKullaniciAdi !== 'undefined' && hedef === aktifKullaniciAdi) || safCip < 5000) return;
+    if(typeof socket !== 'undefined') socket.emit('esya_firlat', { masaAdi: suAnkiMasam, kimden: aktifKullaniciAdi, kime: hedef, esya: esyaIcon }); 
     document.getElementById('profilEkrani').style.display = 'none';
 };
