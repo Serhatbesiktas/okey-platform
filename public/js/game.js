@@ -4,34 +4,48 @@
 window.masaKoltukMapping = { bottom: '', right: '', top: '', left: '' };
 
 window.masayaOtur = function(m) { 
-    let bahis = 0; if(m.includes('20K')) bahis = 20000; else if(m.includes('50K')) bahis = 50000; else if(m.includes('10K')) bahis = 10000;
-    let safCip = parseInt(String(benimAnlikCipim).replace(/[^0-9]/g, '')) || 0;
-    if(safCip < bahis) { ozelUyariGoster("⚠️ Yetersiz Bakiye! Bu masaya oturmak için en az " + bahis.toLocaleString() + " ÇİP gerekiyor."); return; }
-    
-    suAnkiMasam = m; 
-    socket.emit('masaya_otur', { isim: aktifKullaniciAdi, masaAdi: m }); 
-    
-    // EKRAN GEÇİŞİ HATASI BURADA DÜZELTİLDİ
-    document.getElementById('lobiEkrani').style.display = 'none'; 
-    document.getElementById('masaEkrani').style.display = 'flex'; 
-    document.getElementById('masaOrtasiYazi').innerHTML = m.toUpperCase() + "<br><span style='font-size:9px; color:rgba(255,255,255,0.3);'>BEYCO GAMES</span>";
+    try {
+        let bahis = 0; if(m.includes('20K')) bahis = 20000; else if(m.includes('50K')) bahis = 50000; else if(m.includes('10K')) bahis = 10000;
+        let safCip = parseInt(String(window.benimAnlikCipim || 0).replace(/[^0-9]/g, '')) || 0;
+        
+        if(safCip < bahis) { 
+            if(typeof window.ozelUyariGoster === 'function') window.ozelUyariGoster("⚠️ Yetersiz Bakiye! Bu masaya oturmak için en az " + bahis.toLocaleString() + " ÇİP gerekiyor."); 
+            else alert("Yetersiz Bakiye!");
+            return; 
+        }
+        
+        window.suAnkiMasam = m; 
+        if(typeof socket !== 'undefined') socket.emit('masaya_otur', { isim: window.aktifKullaniciAdi, masaAdi: m }); 
+        
+        const lobi = document.getElementById('lobiEkrani');
+        const masa = document.getElementById('masaEkrani');
+        const yazi = document.getElementById('masaOrtasiYazi');
+        
+        if(lobi) lobi.style.display = 'none'; 
+        if(masa) masa.style.display = 'flex'; 
+        if(yazi) yazi.innerHTML = m.toUpperCase() + "<br><span style='font-size:9px; color:rgba(255,255,255,0.3);'>BEYCO GAMES</span>";
+    } catch(err) {
+        console.error("Masaya oturma hatası:", err);
+    }
 };
 
 window.masayaGeriDon = function(m) { 
-    suAnkiMasam = m; 
-    document.getElementById('lobiEkrani').style.display = 'none'; 
-    document.getElementById('masaEkrani').style.display = 'flex'; 
-    socket.emit('masaya_geri_don', { masaAdi: m, isim: aktifKullaniciAdi }); 
+    window.suAnkiMasam = m; 
+    const lobi = document.getElementById('lobiEkrani');
+    const masa = document.getElementById('masaEkrani');
+    if(lobi) lobi.style.display = 'none'; 
+    if(masa) masa.style.display = 'flex'; 
+    if(typeof socket !== 'undefined') socket.emit('masaya_geri_don', { masaAdi: m, isim: window.aktifKullaniciAdi }); 
 };
 
-window.masayiIzle = function(m) { socket.emit('masayi_izle', { isim: aktifKullaniciAdi, masaAdi: m }); };
+window.masayiIzle = function(m) { if(typeof socket !== 'undefined') socket.emit('masayi_izle', { isim: window.aktifKullaniciAdi, masaAdi: m }); };
 
 window.masayiTemizle = function() { 
-    masaOyunBasladiMi = false; 
+    window.masaOyunBasladiMi = false; 
     if(document.getElementById('sonucEkrani')) document.getElementById('sonucEkrani').style.display = 'none'; 
     const oyunAlanObjeleri = document.getElementById('oyunAlanObjeleri'); if(oyunAlanObjeleri) oyunAlanObjeleri.style.display = 'none'; 
     if(document.getElementById('gostergeBtn')) document.getElementById('gostergeBtn').style.display = 'none'; 
-    gostergeHakki = false; 
+    window.gostergeHakki = false; 
     
     const oyunuBaslatBtn = document.getElementById('oyunuBaslatBtn');
     if(oyunuBaslatBtn) { oyunuBaslatBtn.innerText = "🎲 OYUNU BAŞLAT"; oyunuBaslatBtn.style.display = 'block'; oyunuBaslatBtn.disabled = false; oyunuBaslatBtn.style.opacity = '1'; }
@@ -51,20 +65,20 @@ window.masayiTemizle = function() {
     document.getElementById('seatRight')?.classList.remove('aktif-sira'); 
     document.getElementById('seatTop')?.classList.remove('aktif-sira'); 
     document.getElementById('seatLeft')?.classList.remove('aktif-sira'); 
-    benimSiramMi = false; 
+    window.benimSiramMi = false; 
 };
 
 window.gelişmişKoltukHizala = function(koltuklar) {
-    let idx = koltuklar.indexOf(aktifKullaniciAdi); if(idx === -1) idx = 0; 
+    let idx = koltuklar.indexOf(window.aktifKullaniciAdi); if(idx === -1) idx = 0; 
     window.masaKoltukMapping.bottom = koltuklar[idx] || ""; window.masaKoltukMapping.right = koltuklar[(idx+1)%4] || ""; window.masaKoltukMapping.top = koltuklar[(idx+2)%4] || ""; window.masaKoltukMapping.left = koltuklar[(idx+3)%4] || "";
 
-    const rightEl = document.getElementById('seatRight'); if(rightEl) { rightEl.innerText = window.masaKoltukMapping.right || (izleyiciModu ? "Boş" : "➕ DAVET"); rightEl.dataset.isim = window.masaKoltukMapping.right; }
-    const topEl = document.getElementById('seatTop'); if(topEl) { topEl.innerText = window.masaKoltukMapping.top || (izleyiciModu ? "Boş" : "➕ DAVET"); topEl.dataset.isim = window.masaKoltukMapping.top; }
-    const leftEl = document.getElementById('seatLeft'); if(leftEl) { leftEl.innerText = window.masaKoltukMapping.left || (izleyiciModu ? "Boş" : "➕ DAVET"); leftEl.dataset.isim = window.masaKoltukMapping.left; }
+    const rightEl = document.getElementById('seatRight'); if(rightEl) { rightEl.innerText = window.masaKoltukMapping.right || (window.izleyiciModu ? "Boş" : "➕ DAVET"); rightEl.dataset.isim = window.masaKoltukMapping.right; }
+    const topEl = document.getElementById('seatTop'); if(topEl) { topEl.innerText = window.masaKoltukMapping.top || (window.izleyiciModu ? "Boş" : "➕ DAVET"); topEl.dataset.isim = window.masaKoltukMapping.top; }
+    const leftEl = document.getElementById('seatLeft'); if(leftEl) { leftEl.innerText = window.masaKoltukMapping.left || (window.izleyiciModu ? "Boş" : "➕ DAVET"); leftEl.dataset.isim = window.masaKoltukMapping.left; }
     const benimKutu = document.getElementById('benimAdimKutusu');
     if (benimKutu) {
         benimKutu.dataset.isim = window.masaKoltukMapping.bottom;
-        if (izleyiciModu) { const masaOrtasi = document.getElementById('masaOrtasiYazi'); if(masaOrtasi) masaOrtasi.innerHTML = `${suAnkiMasam.toUpperCase()}<br><span style='font-size:10px; color:#f2c94c;'>İzleyici Modu</span><br><span style='font-size:9px; color:#a3c4bc;'>Aşağıdaki Oyuncu: ${window.masaKoltukMapping.bottom || 'Boş'}</span>`; }
+        if (window.izleyiciModu) { const masaOrtasi = document.getElementById('masaOrtasiYazi'); if(masaOrtasi) masaOrtasi.innerHTML = `${(window.suAnkiMasam||"MASA").toUpperCase()}<br><span style='font-size:10px; color:#f2c94c;'>İzleyici Modu</span><br><span style='font-size:9px; color:#a3c4bc;'>Aşağıdaki Oyuncu: ${window.masaKoltukMapping.bottom || 'Boş'}</span>`; }
     }
 };
 
@@ -105,7 +119,7 @@ window.seriDiz = function() {
     const renkDeger = { 'kirmizi': 1, 'siyah': 2, 'mavi': 3, 'sari': 4, 'sahte': 5 }; 
     taslar.sort((a, b) => { if (renkDeger[a.renk] !== renkDeger[b.renk]) return renkDeger[a.renk] - renkDeger[b.renk]; return a.sayi - b.sayi; }); 
     taslar.forEach((tasObj, index) => { document.getElementById('y'+index).appendChild(tasObj.el); }); 
-    if(typeof sesCal === 'function') sesCal(typeof sesTasCek !== 'undefined' ? sesTasCek : ''); 
+    if(typeof window.sesCal === 'function') window.sesCal(typeof window.sesTasCek !== 'undefined' ? window.sesTasCek : ''); 
 };
 
 window.ciftDiz = function() { 
@@ -119,22 +133,22 @@ window.ciftDiz = function() {
     } 
     taslar.sort((a, b) => { if (a.sayi !== b.sayi) return a.sayi - b.sayi; return a.renk.localeCompare(b.renk); }); 
     taslar.forEach((tasObj, index) => { document.getElementById('y'+index).appendChild(tasObj.el); }); 
-    if(typeof sesCal === 'function') sesCal(typeof sesTasCek !== 'undefined' ? sesTasCek : ''); 
+    if(typeof window.sesCal === 'function') window.sesCal(typeof window.sesTasCek !== 'undefined' ? window.sesTasCek : ''); 
 };
 
 window.otomatikTasAt = function(tasElementi) { 
-    if (!benimSiramMi) { if(typeof ozelUyariGoster === 'function') ozelUyariGoster("Şu an sıra sizde değil!"); return; }
-    if (window.elimdekiTasSayisi() !== 15) { if(typeof ozelUyariGoster === 'function') ozelUyariGoster("Sadece 15 taşınız varken ortaya taş atabilirsiniz!"); return; }
+    if (!window.benimSiramMi) { if(typeof window.ozelUyariGoster === 'function') window.ozelUyariGoster("Şu an sıra sizde değil!"); return; }
+    if (window.elimdekiTasSayisi() !== 15) { if(typeof window.ozelUyariGoster === 'function') window.ozelUyariGoster("Sadece 15 taşınız varken ortaya taş atabilirsiniz!"); return; }
 
-    gostergeHakki = false; if(document.getElementById('gostergeBtn')) document.getElementById('gostergeBtn').style.display = 'none'; 
+    window.gostergeHakki = false; if(document.getElementById('gostergeBtn')) document.getElementById('gostergeBtn').style.display = 'none'; 
     const iskartaKutusu = document.getElementById('benimIskartam'); 
     if (iskartaKutusu) { 
         iskartaKutusu.appendChild(tasElementi); 
         tasElementi.style.position = 'absolute'; tasElementi.style.top = '50%'; tasElementi.style.left = '50%'; tasElementi.style.transform = 'translate(-50%, -50%)'; tasElementi.style.margin = '0'; 
         if(document.getElementById('iskartaYazi')) document.getElementById('iskartaYazi').style.display = 'none'; 
         let renkSinifi = Array.from(tasElementi.classList).find(c=>c.startsWith('tas-')); let renk = renkSinifi ? renkSinifi.split('-')[1] : 'siyah'; 
-        socket.emit('tas_atildi', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi, tas: { id: tasElementi.id, renk: renk, sayi: tasElementi.innerText } }); 
-        if(typeof sesCal === 'function') sesCal(typeof sesTasKoy !== 'undefined' ? sesTasKoy : ''); 
+        if(typeof socket !== 'undefined') socket.emit('tas_atildi', { masaAdi: window.suAnkiMasam, isim: window.aktifKullaniciAdi, tas: { id: tasElementi.id, renk: renk, sayi: tasElementi.innerText } }); 
+        if(typeof window.sesCal === 'function') window.sesCal(typeof window.sesTasKoy !== 'undefined' ? window.sesTasKoy : ''); 
     } 
 };
 
@@ -142,41 +156,41 @@ const oyunuBaslatBtnDOM = document.getElementById('oyunuBaslatBtn');
 if(oyunuBaslatBtnDOM) {
     oyunuBaslatBtnDOM.addEventListener('click', () => { 
         oyunuBaslatBtnDOM.disabled = true; oyunuBaslatBtnDOM.innerText = "⏳ BAŞLIYOR..."; oyunuBaslatBtnDOM.style.opacity = '0.5';
-        socket.emit('oyunu_baslat', suAnkiMasam); 
+        if(typeof socket !== 'undefined') socket.emit('oyunu_baslat', window.suAnkiMasam); 
         setTimeout(() => { if(oyunuBaslatBtnDOM) { oyunuBaslatBtnDOM.disabled = false; oyunuBaslatBtnDOM.innerText = "🎲 OYUNU BAŞLAT"; oyunuBaslatBtnDOM.style.opacity = '1'; } }, 5000);
     });
 }
 
 document.getElementById('kalanTasBilgi')?.addEventListener('click', () => { 
-    if (benimSiramMi && window.elimdekiTasSayisi() === 14) { 
-        gostergeHakki = false; socket.emit('ortadan_tas_cek', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi }); 
-        if(typeof sesCal === 'function') sesCal(typeof sesTasCek !== 'undefined' ? sesTasCek : ''); 
-    } else if(!benimSiramMi) { if(typeof ozelUyariGoster === 'function') ozelUyariGoster("Şu an sıra sizde değil!"); } else { if(typeof ozelUyariGoster === 'function') ozelUyariGoster("Önce taşı atmalısınız!"); }
+    if (window.benimSiramMi && window.elimdekiTasSayisi() === 14) { 
+        window.gostergeHakki = false; if(typeof socket !== 'undefined') socket.emit('ortadan_tas_cek', { masaAdi: window.suAnkiMasam, isim: window.aktifKullaniciAdi }); 
+        if(typeof window.sesCal === 'function') window.sesCal(typeof window.sesTasCek !== 'undefined' ? window.sesTasCek : ''); 
+    } else if(!window.benimSiramMi) { if(typeof window.ozelUyariGoster === 'function') window.ozelUyariGoster("Şu an sıra sizde değil!"); } else { if(typeof window.ozelUyariGoster === 'function') window.ozelUyariGoster("Önce taşı atmalısınız!"); }
 });
 
 document.getElementById('iskartaSol')?.addEventListener('click', function() { 
-    if (benimSiramMi && window.elimdekiTasSayisi() === 14 && this.children.length > 0) { 
-        gostergeHakki = false; const tasEl = this.lastElementChild; 
+    if (window.benimSiramMi && window.elimdekiTasSayisi() === 14 && this.children.length > 0) { 
+        window.gostergeHakki = false; const tasEl = this.lastElementChild; 
         let renkSinifi = Array.from(tasEl.classList).find(c=>c.startsWith('tas-')); let renk = renkSinifi ? renkSinifi.split('-')[1] : 'siyah'; 
         const tasObj = { id: tasEl.id, sayi: tasEl.innerText, renk: renk }; 
         this.removeChild(tasEl); 
         for(let i=0; i<24; i++) { if(document.getElementById('y'+i).children.length === 0) { window.tasEkle(tasObj, 'y'+i); break; } } 
-        socket.emit('yandan_tas_alindi', { masaAdi: suAnkiMasam, kimAldi: aktifKullaniciAdi, tas: tasObj }); 
-        if(typeof sesCal === 'function') sesCal(typeof sesTasCek !== 'undefined' ? sesTasCek : ''); 
-    } else if(!benimSiramMi) { if(typeof ozelUyariGoster === 'function') ozelUyariGoster("Şu an sıra sizde değil!"); } else if(window.elimdekiTasSayisi() === 15) { if(typeof ozelUyariGoster === 'function') ozelUyariGoster("Elinizde zaten 15 taş var!"); } 
+        if(typeof socket !== 'undefined') socket.emit('yandan_tas_alindi', { masaAdi: window.suAnkiMasam, kimAldi: window.aktifKullaniciAdi, tas: tasObj }); 
+        if(typeof window.sesCal === 'function') window.sesCal(typeof window.sesTasCek !== 'undefined' ? window.sesTasCek : ''); 
+    } else if(!window.benimSiramMi) { if(typeof window.ozelUyariGoster === 'function') window.ozelUyariGoster("Şu an sıra sizde değil!"); } else if(window.elimdekiTasSayisi() === 15) { if(typeof window.ozelUyariGoster === 'function') window.ozelUyariGoster("Elinizde zaten 15 taş var!"); } 
 });
 
 const btnGostergeDOM = document.getElementById('gostergeBtn');
 if(btnGostergeDOM) {
     btnGostergeDOM.addEventListener('click', () => {
-        if(suAnkiMasam && aktifKullaniciAdi && gostergeHakki) {
-            socket.emit('gosterge_goster', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi });
-            gostergeHakki = false; btnGostergeDOM.style.display = 'none'; 
+        if(window.suAnkiMasam && window.aktifKullaniciAdi && window.gostergeHakki) {
+            if(typeof socket !== 'undefined') socket.emit('gosterge_goster', { masaAdi: window.suAnkiMasam, isim: window.aktifKullaniciAdi });
+            window.gostergeHakki = false; btnGostergeDOM.style.display = 'none'; 
         }
     });
 }
 
-const sortableOptions = { group: { name: 'istaka', put: (to) => to.el.children.length === 0 }, animation: 100, delay: 0, forceFallback: true, fallbackOnBody: true, fallbackTolerance: 3, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag', easing: "cubic-bezier(0.25, 1, 0.5, 1)", onEnd: function() { if(typeof sesCal === 'function') sesCal(typeof sesTasKoy !== 'undefined' ? sesTasKoy : ''); } };
+const sortableOptions = { group: { name: 'istaka', put: (to) => to.el.children.length === 0 }, animation: 100, delay: 0, forceFallback: true, fallbackOnBody: true, fallbackTolerance: 3, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag', easing: "cubic-bezier(0.25, 1, 0.5, 1)", onEnd: function() { if(typeof window.sesCal === 'function') window.sesCal(typeof window.sesTasKoy !== 'undefined' ? window.sesTasKoy : ''); } };
 
 const ustRaf = document.getElementById('ustRaf');
 const altRaf = document.getElementById('altRaf');
@@ -190,14 +204,14 @@ if(ustRaf && altRaf) {
 const isKartaKutu = document.getElementById('benimIskartam');
 if(isKartaKutu && typeof Sortable !== 'undefined') {
     new Sortable(isKartaKutu, { 
-        group: { name: 'istaka', put: function (to) { return benimSiramMi && window.elimdekiTasSayisi() === 15; }, pull: false }, 
+        group: { name: 'istaka', put: function (to) { return window.benimSiramMi && window.elimdekiTasSayisi() === 15; }, pull: false }, 
         animation: 150, forceFallback: true, fallbackOnBody: true, emptyInsertThreshold: 100, 
         onAdd: function (evt) { 
-            gostergeHakki = false; if(document.getElementById('iskartaYazi')) document.getElementById('iskartaYazi').style.display = 'none'; 
+            window.gostergeHakki = false; if(document.getElementById('iskartaYazi')) document.getElementById('iskartaYazi').style.display = 'none'; 
             const atilanTas = evt.item; atilanTas.style.position = 'absolute'; atilanTas.style.top = '50%'; atilanTas.style.left = '50%'; atilanTas.style.transform = 'translate(-50%, -50%)'; atilanTas.style.margin = '0'; 
             let renkSinifi = Array.from(atilanTas.classList).find(c=>c.startsWith('tas-')); let renk = renkSinifi ? renkSinifi.split('-')[1] : 'siyah'; 
-            socket.emit('tas_atildi', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi, tas: { id: atilanTas.id, renk: renk, sayi: atilanTas.innerText } }); 
-            if(typeof sesCal === 'function') sesCal(typeof sesTasKoy !== 'undefined' ? sesTasKoy : ''); 
+            if(typeof socket !== 'undefined') socket.emit('tas_atildi', { masaAdi: window.suAnkiMasam, isim: window.aktifKullaniciAdi, tas: { id: atilanTas.id, renk: renk, sayi: atilanTas.innerText } }); 
+            if(typeof window.sesCal === 'function') window.sesCal(typeof window.sesTasKoy !== 'undefined' ? window.sesTasKoy : ''); 
         } 
     });
 }
@@ -205,16 +219,16 @@ if(isKartaKutu && typeof Sortable !== 'undefined') {
 const bitisAlanKutu = document.getElementById('bitisAlani');
 if(bitisAlanKutu && typeof Sortable !== 'undefined') {
     new Sortable(bitisAlanKutu, { 
-        group: { name: 'istaka', put: function (to) { return benimSiramMi && window.elimdekiTasSayisi() === 15; }, pull: false }, 
+        group: { name: 'istaka', put: function (to) { return window.benimSiramMi && window.elimdekiTasSayisi() === 15; }, pull: false }, 
         animation: 150, forceFallback: true, fallbackOnBody: true, emptyInsertThreshold: 100, 
         onAdd: function (evt) { 
-            gostergeHakki = false; const atilanTas = evt.item; 
+            window.gostergeHakki = false; const atilanTas = evt.item; 
             atilanTas.style.position = 'absolute'; atilanTas.style.top = '50%'; atilanTas.style.left = '50%'; atilanTas.style.transform = 'translate(-50%, -50%)'; atilanTas.style.margin = '0'; 
             let gruplar = window.getIstakaGruplari(); 
             let renkSinifi = Array.from(atilanTas.classList).find(c=>c.startsWith('tas-')); let renk = renkSinifi ? renkSinifi.split('-')[1] : 'siyah'; 
             const bitisTasi = { id: atilanTas.id, renk: renk, sayi: atilanTas.innerText }; 
-            socket.emit('oyunu_bitir', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi, gruplar: gruplar, bitisTasi: bitisTasi, tasHtmlId: atilanTas.id }); 
-            if(typeof sesCal === 'function') sesCal(typeof sesTasKoy !== 'undefined' ? sesTasKoy : ''); 
+            if(typeof socket !== 'undefined') socket.emit('oyunu_bitir', { masaAdi: window.suAnkiMasam, isim: window.aktifKullaniciAdi, gruplar: gruplar, bitisTasi: bitisTasi, tasHtmlId: atilanTas.id }); 
+            if(typeof window.sesCal === 'function') window.sesCal(typeof window.sesTasKoy !== 'undefined' ? window.sesTasKoy : ''); 
         } 
     });
 }
