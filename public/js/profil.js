@@ -30,12 +30,12 @@ window.profiliGoster = function(hedefIsim) {
         pDurum.style.color = "#2ecc71";
     }
     
-    let isOnline = (typeof onlineOyuncularListesi !== 'undefined' && onlineOyuncularListesi.includes(hedefIsim)) || hedefIsim === aktifKullaniciAdi;
+    let isOnline = (onlineOyuncularListesi && onlineOyuncularListesi.includes(hedefIsim)) || hedefIsim === aktifKullaniciAdi;
     
     if (hedefIsim !== aktifKullaniciAdi) {
         if(pArkadasBtn) {
             pArkadasBtn.style.display = 'block';
-            if (typeof benimArkadaslarim !== 'undefined' && benimArkadaslarim.includes(hedefIsim)) { 
+            if (benimArkadaslarim && benimArkadaslarim.includes(hedefIsim)) { 
                 pArkadasBtn.innerHTML = "❌ Arkadaştan Çıkar"; 
                 pArkadasBtn.style.background = "linear-gradient(180deg, #e74c3c 0%, #c0392b 100%)"; 
                 pArkadasBtn.style.color = "#fff"; 
@@ -52,7 +52,7 @@ window.profiliGoster = function(hedefIsim) {
     }
 
     let tacIcon = ""; let ismRengi = "#fff"; let textGlow = "none";
-    if(typeof globalKozmetikler !== 'undefined' && globalKozmetikler[hedefIsim]) {
+    if(globalKozmetikler && globalKozmetikler[hedefIsim]) {
         if(globalKozmetikler[hedefIsim].includes('neon_tac')) tacIcon = "👑 ";
         if(globalKozmetikler[hedefIsim].includes('atesli_isim')) { ismRengi = "#ff4d4d"; textGlow = "0 0 10px rgba(255, 77, 77, 0.8)"; }
     }
@@ -105,12 +105,14 @@ window.profiliGoster = function(hedefIsim) {
     } else { setStats(fakeCip, fakeOynanan, fakeKazanilan, fakeOran, lig, ligBg, unvan); }
 };
 
+// 🔥 SİLİNEN EŞYA FIRLATMA MOTORU GERİ GELDİ 🔥
 window.esyaFirlatAksiyon = function(esyaIcon) {
-    if(typeof isMisafir !== 'undefined' && isMisafir) { ozelUyariGoster("⚠️ Eşya fırlatılamaz!"); return; } 
+    if(isMisafir) { ozelUyariGoster("⚠️ Eşya fırlatılamaz!"); return; } 
     const hedef = document.getElementById('profilArkadasBtn').dataset.hedef;
-    let safCip = parseInt(String(typeof benimAnlikCipim !== 'undefined' ? benimAnlikCipim : 0).replace(/[^0-9]/g, '')) || 0;
-    if(!hedef || (typeof suAnkiMasam === 'undefined' || !suAnkiMasam) || (typeof aktifKullaniciAdi !== 'undefined' && hedef === aktifKullaniciAdi) || safCip < 5000) return;
-    if(typeof socket !== 'undefined') socket.emit('esya_firlat', { masaAdi: suAnkiMasam, kimden: aktifKullaniciAdi, kime: hedef, esya: esyaIcon }); 
-    let pEkrani = document.getElementById('profilEkrani');
-    if(pEkrani) pEkrani.style.display = 'none';
+    let safCip = parseInt(String(benimAnlikCipim).replace(/[^0-9]/g, '')) || 0;
+    
+    if(!hedef || !suAnkiMasam || hedef === aktifKullaniciAdi || safCip < 5000) return;
+    
+    socket.emit('esya_firlat', { masaAdi: suAnkiMasam, kimden: aktifKullaniciAdi, kime: hedef, esya: esyaIcon }); 
+    document.getElementById('profilEkrani').style.display = 'none';
 };
