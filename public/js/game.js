@@ -7,17 +7,28 @@ window.masayaOtur = function(m) {
     let bahis = 0; if(m.includes('20K')) bahis = 20000; else if(m.includes('50K')) bahis = 50000; else if(m.includes('10K')) bahis = 10000;
     let safCip = parseInt(String(benimAnlikCipim).replace(/[^0-9]/g, '')) || 0;
     if(safCip < bahis) { ozelUyariGoster("⚠️ Yetersiz Bakiye! Bu masaya oturmak için en az " + bahis.toLocaleString() + " ÇİP gerekiyor."); return; }
-    suAnkiMasam = m; socket.emit('masaya_otur', { isim: aktifKullaniciAdi, masaAdi: m }); 
-    document.getElementById('lobiEkrani').style.display = 'none'; document.getElementById('masaEkrani').style.display = 'flex'; 
+    
+    suAnkiMasam = m; 
+    socket.emit('masaya_otur', { isim: aktifKullaniciAdi, masaAdi: m }); 
+    
+    // EKRAN GEÇİŞİ HATASI BURADA DÜZELTİLDİ
+    document.getElementById('lobiEkrani').style.display = 'none'; 
+    document.getElementById('masaEkrani').style.display = 'flex'; 
     document.getElementById('masaOrtasiYazi').innerHTML = m.toUpperCase() + "<br><span style='font-size:9px; color:rgba(255,255,255,0.3);'>BEYCO GAMES</span>";
 };
 
-window.masayaGeriDon = function(m) { suAnkiMasam = m; document.getElementById('lobiEkrani').style.display = 'none'; document.getElementById('masaEkrani').style.display = 'flex'; socket.emit('masaya_geri_don', { masaAdi: m, isim: aktifKullaniciAdi }); };
+window.masayaGeriDon = function(m) { 
+    suAnkiMasam = m; 
+    document.getElementById('lobiEkrani').style.display = 'none'; 
+    document.getElementById('masaEkrani').style.display = 'flex'; 
+    socket.emit('masaya_geri_don', { masaAdi: m, isim: aktifKullaniciAdi }); 
+};
+
 window.masayiIzle = function(m) { socket.emit('masayi_izle', { isim: aktifKullaniciAdi, masaAdi: m }); };
 
 window.masayiTemizle = function() { 
     masaOyunBasladiMi = false; 
-    document.getElementById('sonucEkrani').style.display = 'none'; 
+    if(document.getElementById('sonucEkrani')) document.getElementById('sonucEkrani').style.display = 'none'; 
     const oyunAlanObjeleri = document.getElementById('oyunAlanObjeleri'); if(oyunAlanObjeleri) oyunAlanObjeleri.style.display = 'none'; 
     if(document.getElementById('gostergeBtn')) document.getElementById('gostergeBtn').style.display = 'none'; 
     gostergeHakki = false; 
@@ -112,8 +123,8 @@ window.ciftDiz = function() {
 };
 
 window.otomatikTasAt = function(tasElementi) { 
-    if (!benimSiramMi) { ozelUyariGoster("Şu an sıra sizde değil!"); return; }
-    if (window.elimdekiTasSayisi() !== 15) { ozelUyariGoster("Sadece 15 taşınız varken ortaya taş atabilirsiniz!"); return; }
+    if (!benimSiramMi) { if(typeof ozelUyariGoster === 'function') ozelUyariGoster("Şu an sıra sizde değil!"); return; }
+    if (window.elimdekiTasSayisi() !== 15) { if(typeof ozelUyariGoster === 'function') ozelUyariGoster("Sadece 15 taşınız varken ortaya taş atabilirsiniz!"); return; }
 
     gostergeHakki = false; if(document.getElementById('gostergeBtn')) document.getElementById('gostergeBtn').style.display = 'none'; 
     const iskartaKutusu = document.getElementById('benimIskartam'); 
@@ -140,7 +151,7 @@ document.getElementById('kalanTasBilgi')?.addEventListener('click', () => {
     if (benimSiramMi && window.elimdekiTasSayisi() === 14) { 
         gostergeHakki = false; socket.emit('ortadan_tas_cek', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi }); 
         if(typeof sesCal === 'function') sesCal(typeof sesTasCek !== 'undefined' ? sesTasCek : ''); 
-    } else if(!benimSiramMi) ozelUyariGoster("Şu an sıra sizde değil!"); else ozelUyariGoster("Önce taşı atmalısınız!"); 
+    } else if(!benimSiramMi) { if(typeof ozelUyariGoster === 'function') ozelUyariGoster("Şu an sıra sizde değil!"); } else { if(typeof ozelUyariGoster === 'function') ozelUyariGoster("Önce taşı atmalısınız!"); }
 });
 
 document.getElementById('iskartaSol')?.addEventListener('click', function() { 
@@ -152,7 +163,7 @@ document.getElementById('iskartaSol')?.addEventListener('click', function() {
         for(let i=0; i<24; i++) { if(document.getElementById('y'+i).children.length === 0) { window.tasEkle(tasObj, 'y'+i); break; } } 
         socket.emit('yandan_tas_alindi', { masaAdi: suAnkiMasam, kimAldi: aktifKullaniciAdi, tas: tasObj }); 
         if(typeof sesCal === 'function') sesCal(typeof sesTasCek !== 'undefined' ? sesTasCek : ''); 
-    } else if(!benimSiramMi) ozelUyariGoster("Şu an sıra sizde değil!"); else if(window.elimdekiTasSayisi() === 15) ozelUyariGoster("Elinizde zaten 15 taş var!"); 
+    } else if(!benimSiramMi) { if(typeof ozelUyariGoster === 'function') ozelUyariGoster("Şu an sıra sizde değil!"); } else if(window.elimdekiTasSayisi() === 15) { if(typeof ozelUyariGoster === 'function') ozelUyariGoster("Elinizde zaten 15 taş var!"); } 
 });
 
 const btnGostergeDOM = document.getElementById('gostergeBtn');
