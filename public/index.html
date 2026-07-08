@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>VIP Okey Sunucusu</title>
     
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#020804">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Seri Okey">
+    
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/animations.css">
     <link rel="stylesheet" href="css/auth.css">
@@ -411,7 +417,7 @@
             <div class="iskarta-alani" id="benimIskartam"><div class="iskarta-yazi" id="iskartaYazi">TAŞ AT<br>⬇</div></div>
         </div>
 
-        <div class="okey-istaka-tuslar-area">
+        <div class="okey-table-ui-tuslar">
             <div class="pro-tus-takimi">
                 <button class="pro-tus" onclick="seriDiz()">SERİ DİZ</button>
                 <button class="pro-tus" onclick="ciftDiz()">ÇİFT DİZ</button>
@@ -433,6 +439,16 @@
     <script src="js/mesajlar.js"></script>
     <script src="js/muzik.js"></script>
     <script src="js/seyirci.js"></script> 
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(reg => console.log('👑 BEYCO App Service Worker aktif!'))
+                    .catch(err => console.log('SW Hatası:', err));
+            });
+        }
+    </script>
 
 </body>
 </html>
