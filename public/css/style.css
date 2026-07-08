@@ -17,3 +17,38 @@ body::after { content: "made by beyco games"; position: fixed; bottom: 5px; left
 .flash-bildirim.goster { display: block; animation: flashAnim 3.5s forwards; }
 .bot-speech-bubble { position: absolute; bottom: 120%; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #f1c40f, #f39c12); color: #111; padding: 8px 12px; border-radius: 12px; font-size: 11px; font-weight: 900; white-space: nowrap; box-shadow: 0 4px 15px rgba(0,0,0,0.5); animation: popBubble 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), fadeBubble 0.5s ease-in 4s forwards; pointer-events: none; z-index: 1000; }
 .bot-speech-bubble::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border-width: 6px; border-style: solid; border-color: #f39c12 transparent transparent transparent; }
+
+/* ==========================================
+   🚀 PWA AÇILIŞ EKRANI (SPLASH SCREEN)
+========================================== */
+#splashScreen {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(circle at center, #0a1f12 0%, #020804 100%);
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    z-index: 99999999;
+    transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+}
+.splash-logo { 
+    font-size: 70px; filter: drop-shadow(0 0 20px rgba(241,196,15,0.8)); 
+    margin-bottom: 5px; animation: pulseGold 1.5s infinite alternate; 
+}
+.splash-title { 
+    font-size: 45px; margin: 0; color: #fceabb; 
+    background: linear-gradient(to bottom, #fceabb, #f8b500); 
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+    font-weight: 900; letter-spacing: 5px; 
+}
+.splash-subtitle { 
+    font-size: 14px; margin: 0; color: #2ecc71; 
+    letter-spacing: 8px; font-weight: bold; margin-bottom: 50px; 
+}
+.splash-loader { 
+    width: 45px; height: 45px; border: 4px solid rgba(46, 204, 113, 0.1); 
+    border-top: 4px solid #2ecc71; border-radius: 50%; 
+    animation: spinLoader 1s linear infinite; 
+}
+.splash-footer { 
+    position: absolute; bottom: 30px; font-size: 11px; 
+    color: rgba(255,255,255,0.2); letter-spacing: 3px; font-weight: bold; 
+}
+@keyframes spinLoader { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
