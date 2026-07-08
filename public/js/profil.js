@@ -78,7 +78,9 @@ window.profiliGoster = function(hedefIsim) {
         if(pUnvan) pUnvan.innerText = unvanTxt;
     };
     
-    if(hedefIsim.startsWith("MİSAFİR_")) { 
+    // BÜYÜK KÜÇÜK HARF MİSAFİR ÇİP HATASI BURADA DÜZELTİLDİ
+    let hIsimKiyas = hedefIsim.toUpperCase();
+    if(hIsimKiyas.startsWith("MİSAFİR") || hIsimKiyas.startsWith("MISAFIR")) { 
         setStats(20000, 0, 0, 0, "🥉 BRONZ LİG", "linear-gradient(180deg, #cd7f32 0%, #8b4513 100%)", "MİSAFİR");
         return; 
     }
@@ -90,7 +92,7 @@ window.profiliGoster = function(hedefIsim) {
     if(fakeCip > 10000000) { lig = "💎 ELMAS LİG"; ligBg = "linear-gradient(180deg, #3498db 0%, #2980b9 100%)"; } else if(fakeCip > 5000000) { lig = "🥇 ALTIN LİG"; ligBg = "linear-gradient(180deg, #f1c40f 0%, #f39c12 100%)"; } else if(fakeCip > 2000000) { lig = "🥈 GÜMÜŞ LİG"; ligBg = "linear-gradient(180deg, #bdc3c7 0%, #95a5a6 100%)"; }
     let unvan = "🃏 OYUNCU"; if(fakeOran > 60 && fakeOynanan > 50) unvan = "👑 OKEY KRALI"; else if(fakeOynanan > 500) unvan = "⚔️ USTA"; else if(fakeKazanilan > 200) unvan = "🔥 ATEŞ USTASI";
 
-    if(window.db) {
+    if(typeof window.db !== 'undefined') {
         window.db.collection("kullanicilar").where("isim", "==", hedefIsim).get().then((q) => {
             if(!q.empty) { 
                 const data = q.docs[0].data(); let gCip = parseInt(String(data.cip).replace(/[^0-9]/g, '')) || 0; let gOynanan = data.oynananOyun || 0; let gKazanilan = data.kazanilanOyun || 0; let gOran = gOynanan > 0 ? Math.floor((gKazanilan / gOynanan) * 100) : 0;
@@ -105,7 +107,7 @@ window.profiliGoster = function(hedefIsim) {
 };
 
 window.esyaFirlatAksiyon = function(esyaIcon) {
-    if(typeof isMisafir !== 'undefined' && isMisafir) { ozelUyariGoster("⚠️ Eşya fırlatılamaz!"); return; } const hedef = document.getElementById('profilArkadasBtn').dataset.hedef;
+    if(typeof window.isMisafir !== 'undefined' && window.isMisafir) { window.ozelUyariGoster("⚠️ Eşya fırlatılamaz!"); return; } const hedef = document.getElementById('profilArkadasBtn').dataset.hedef;
     let safCip = parseInt(String(window.benimAnlikCipim).replace(/[^0-9]/g, '')) || 0;
     if(!hedef || !window.suAnkiMasam || hedef === window.aktifKullaniciAdi || safCip < 5000) return;
     if(typeof socket !== 'undefined') socket.emit('esya_firlat', { masaAdi: window.suAnkiMasam, kimden: window.aktifKullaniciAdi, kime: hedef, esya: esyaIcon }); 
