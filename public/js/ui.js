@@ -223,3 +223,13 @@ setInterval(() => {
         elMasa.innerText = yeniMasa;
     }
 }, 12000);
+window.addEventListener('load', () => {
+    const splash = document.getElementById('splashScreen');
+    if (splash) {
+        setTimeout(() => {
+            splash.style.opacity = '0';
+            splash.style.visibility = 'hidden';
+            setTimeout(() => splash.remove(), 500); 
+        }, 1000); 
+    }
+});
