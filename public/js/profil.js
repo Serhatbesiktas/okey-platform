@@ -3,8 +3,8 @@
 // ==========================================
 window.profiliGoster = function(hedefIsim) {
     if(!hedefIsim || hedefIsim === "" || hedefIsim === "Bekleniyor..." || hedefIsim === "➕ DAVET" || hedefIsim === "Boş") { 
-        if(typeof suAnkiMasam !== 'undefined' && suAnkiMasam && typeof izleyiciModu !== 'undefined' && !izleyiciModu) {
-            if(typeof davetMenusuAc === 'function') davetMenusuAc(); 
+        if(suAnkiMasam && !izleyiciModu) {
+            if(typeof window.davetMenusuAc === 'function') window.davetMenusuAc(); 
         }
         return; 
     }
@@ -30,9 +30,9 @@ window.profiliGoster = function(hedefIsim) {
         pDurum.style.color = "#2ecc71";
     }
     
-    let isOnline = (typeof onlineOyuncularListesi !== 'undefined' && onlineOyuncularListesi.includes(hedefIsim)) || (typeof aktifKullaniciAdi !== 'undefined' && hedefIsim === aktifKullaniciAdi);
+    let isOnline = (typeof onlineOyuncularListesi !== 'undefined' && onlineOyuncularListesi.includes(hedefIsim)) || hedefIsim === aktifKullaniciAdi;
     
-    if (typeof aktifKullaniciAdi !== 'undefined' && hedefIsim !== aktifKullaniciAdi) {
+    if (hedefIsim !== aktifKullaniciAdi) {
         if(pArkadasBtn) {
             pArkadasBtn.style.display = 'block';
             if (typeof benimArkadaslarim !== 'undefined' && benimArkadaslarim.includes(hedefIsim)) { 
@@ -111,5 +111,6 @@ window.esyaFirlatAksiyon = function(esyaIcon) {
     let safCip = parseInt(String(typeof benimAnlikCipim !== 'undefined' ? benimAnlikCipim : 0).replace(/[^0-9]/g, '')) || 0;
     if(!hedef || (typeof suAnkiMasam === 'undefined' || !suAnkiMasam) || (typeof aktifKullaniciAdi !== 'undefined' && hedef === aktifKullaniciAdi) || safCip < 5000) return;
     if(typeof socket !== 'undefined') socket.emit('esya_firlat', { masaAdi: suAnkiMasam, kimden: aktifKullaniciAdi, kime: hedef, esya: esyaIcon }); 
-    document.getElementById('profilEkrani').style.display = 'none';
+    let pEkrani = document.getElementById('profilEkrani');
+    if(pEkrani) pEkrani.style.display = 'none';
 };
