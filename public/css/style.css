@@ -1,0 +1,19 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background-color: #050d08; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; height: 100dvh; overflow: hidden; }
+body, html { overflow-x: hidden; }
+.main-container { display: flex; flex-direction: column; flex: 1; overflow-y: auto; }
+
+/* BEYCO GAMES İMZALAR VE FİLİGRANLAR */
+.okey-table-ui::before { content: "SERİ OKEY"; position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); font-size: 28px; font-weight: 900; color: rgba(255, 255, 255, 0.05); letter-spacing: 5px; pointer-events: none; z-index: 1; }
+.okey-table-ui::after { content: "made by beyco games"; position: absolute; top: 55%; left: 50%; transform: translate(-50%, -50%); font-size: 12px; font-weight: bold; color: rgba(255, 255, 255, 0.05); letter-spacing: 2px; pointer-events: none; z-index: 1; }
+body::after { content: "made by beyco games"; position: fixed; bottom: 5px; left: 0; width: 100%; text-align: center; font-size: 11px; font-weight: bold; color: rgba(255, 255, 255, 0.15); pointer-events: none; z-index: 999999; letter-spacing: 1px; }
+.beyco-imza { font-size: 11px !important; color: #7f8c8d !important; text-align: center !important; margin-top: 20px !important; letter-spacing: 2px !important; text-transform: uppercase !important; }
+.beyco-imza span { color: #f2c94c !important; font-weight: 900 !important; text-shadow: 0 0 5px rgba(242, 201, 76, 0.3) !important; }
+
+/* GLOBAL BUTONLAR VE BİLDİRİMLER */
+.cikis-btn { background: rgba(231, 76, 60, 0.15); color: #e74c3c; border: 1px solid #e74c3c; padding: 4px 10px; border-radius: 8px; font-weight: bold; font-size: 10px; cursor: pointer; transition: 0.2s; margin-left: 15px; }
+.cikis-btn:active { transform: scale(0.9); background: #e74c3c; color: #fff; }
+.flash-bildirim { position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%); background: linear-gradient(135deg, #ffe266, #d49a00); color: #050d08; padding: 16px 32px; border-radius: 50px; font-weight: 900; font-size: 16px; text-transform: uppercase; box-shadow: 0 15px 40px rgba(0,0,0,0.85), 0 0 25px rgba(255, 226, 102, 0.6); z-index: 9999; text-align: center; border: 3px solid #ffffff; pointer-events: none; opacity: 0; display: none; }
+.flash-bildirim.goster { display: block; animation: flashAnim 3.5s forwards; }
+.bot-speech-bubble { position: absolute; bottom: 120%; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #f1c40f, #f39c12); color: #111; padding: 8px 12px; border-radius: 12px; font-size: 11px; font-weight: 900; white-space: nowrap; box-shadow: 0 4px 15px rgba(0,0,0,0.5); animation: popBubble 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), fadeBubble 0.5s ease-in 4s forwards; pointer-events: none; z-index: 1000; }
+.bot-speech-bubble::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border-width: 6px; border-style: solid; border-color: #f39c12 transparent transparent transparent; }
