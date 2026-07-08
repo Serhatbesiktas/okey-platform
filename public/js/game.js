@@ -83,15 +83,50 @@ window.tasEkle = function(tasData, yuvaId) {
     document.getElementById(yuvaId).appendChild(div); 
 };
 
-// 🔥 GÖSTERGE SİSTEMİ EKLENDİ 🔥
+// 🔥 GÖSTERGE KONTROL MOTORU (YENİDEN AKTİF VE DÜZELTİLDİ) 🔥
 window.checkGosterge = function() { 
     const btnGosterge = document.getElementById('gostergeBtn');
-    if (btnGosterge) {
-        if (typeof gostergeHakki !== 'undefined' && gostergeHakki) {
-            btnGosterge.style.display = 'block';
-        } else {
-            btnGosterge.style.display = 'none';
+    const gTasiContainer = document.getElementById('gostergeTasi');
+
+    if (!btnGosterge || !gTasiContainer) return;
+
+    // 1. Gösterge hakkı yoksa direkt gizle
+    if (typeof gostergeHakki === 'undefined' || !gostergeHakki) {
+        btnGosterge.style.display = 'none';
+        return;
+    }
+
+    // 2. Ortadaki gösterge taşının rengini ve sayısını bul
+    let gTasi = gTasiContainer.children.length > 0 ? gTasiContainer.children[0] : gTasiContainer;
+    let gRenkClass = Array.from(gTasi.classList).find(c => c.startsWith('tas-'));
+    if (!gRenkClass) return; // Ortada taş yoksa çık
+    
+    let gRenk = gRenkClass.replace('tas-', '');
+    let gSayi = parseInt(gTasi.innerText);
+
+    // 3. Elimdeki taşları tek tek kontrol et (Bende var mı?)
+    let bendeVarMi = false;
+    for (let i = 0; i < 24; i++) {
+        let yuva = document.getElementById('y' + i);
+        if (yuva && yuva.children.length > 0) {
+            let tas = yuva.children[0];
+            let tRenkClass = Array.from(tas.classList).find(c => c.startsWith('tas-'));
+            let tRenk = tRenkClass ? tRenkClass.replace('tas-', '') : '';
+            let tSayi = parseInt(tas.innerText);
+
+            // Eğer ortadaki taş ile elimdeki taş birebir eşleşiyorsa
+            if (tRenk === gRenk && tSayi === gSayi) {
+                bendeVarMi = true;
+                break;
+            }
         }
+    }
+
+    // 4. Sadece hakkım varsa VE taş gerçekten elimdeyse butonu göster!
+    if (bendeVarMi) {
+        btnGosterge.style.display = 'block';
+    } else {
+        btnGosterge.style.display = 'none';
     }
 };
 
