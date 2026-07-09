@@ -55,7 +55,7 @@ socket.on('masalari_guncelle', (lobidekiMasalar) => {
 
         const isVIP = masaAdi.toUpperCase().includes('VIP') || masaAdi.includes('50K') || masaAdi.includes('100K');
         const vipBadge = isVIP ? '<span class="vip-badge-tag">👑 VIP</span>' : '';
-        const bahisHtml = bahisMiktari ? `<div class="masa-bahis">💰 ${bahisMiktari} Bahis</div>` : '';
+        const bahisHtml = bahisMiktari ? `<div class="masa-bahis">💰 ${bahisMiktari}</div>` : '';
         
         let izleBtn = !benVarim ? `<button class="btn-izle" onclick="masayiIzle('${masaAdi}')">👁️ İZLE</button>` : '';
         let doluRozetClass = (dolu>=4 && !benVarim) ? 'disabled' : '';
@@ -199,9 +199,6 @@ socket.on('oyun_bitti', (data) => {
     } 
 });
 
-// ==========================================
-// YEDEK/ÖNLEM SOCKET DİNLEYİCİLERİ
-// ==========================================
 if(typeof socket !== 'undefined') {
     socket.on('sync_iskartalar', (data) => {
         if (window.suAnkiMasam !== data.masaAdi) return;
