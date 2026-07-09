@@ -36,3 +36,104 @@
 .lobi-oyuncu-kutu { max-height: 180px !important; overflow-y: auto !important; background: rgba(0,0,0,0.3) !important; border-radius: 10px !important; padding: 5px !important; border: 1px solid rgba(255,255,255,0.05) !important; }
 .btn-izle { background: linear-gradient(180deg, #9b59b6 0%, #8e44ad 100%) !important; color: #fff !important; border: none !important; padding: 8px 15px !important; border-radius: 8px !important; font-weight: 800 !important; font-size: 13px !important; cursor: pointer !important; box-shadow: 0 4px 10px rgba(155, 89, 182, 0.3) !important; transition: all 0.2s ease !important; margin-right: 5px !important; }
 .btn-izle:active { transform: scale(0.95); box-shadow: none; }
+/* ==========================================
+   BEYCO GAMES - PREMİUM LOBİ (MASA) TASARIMI
+   ========================================== */
+
+#masa-listesi {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    padding: 20px;
+    overflow-y: auto;
+    /* Eğer dış kapsayıcıda arka plan varsa burayı şeffaf tutuyoruz */
+    background: transparent; 
+}
+
+/* Her Bir Masa Kartının Modern Görünümü */
+.masa-karti {
+    background: rgba(20, 30, 48, 0.8); /* Koyu lacivert/siyah saydam zemin */
+    backdrop-filter: blur(12px); /* Cam efekti */
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Fare Üzerine Gelince (Hover) Altın Parlaması */
+.masa-karti:hover {
+    transform: translateY(-5px);
+    border-color: rgba(242, 201, 76, 0.5); /* f2c94c - Altın rengi */
+    box-shadow: 0 12px 40px rgba(242, 201, 76, 0.15);
+}
+
+/* Masa İsmi */
+.masa-karti h3 {
+    color: #ffffff;
+    font-size: 18px;
+    margin-top: 0;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+}
+
+/* Bahis Miktarı / Durum */
+.masa-karti .bahis {
+    color: #2ecc71; /* Fıstık yeşili */
+    font-size: 15px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    background: rgba(46, 204, 113, 0.1);
+    padding: 5px 10px;
+    border-radius: 6px;
+    display: inline-block;
+    align-self: center;
+}
+
+/* Oyuncu Sayısı Bilgisi */
+.masa-karti .oyuncu-sayisi {
+    color: #a3c4bc;
+    font-size: 13px;
+    margin-bottom: 20px;
+}
+
+/* Otur / İzle Butonları */
+.masa-karti button {
+    background: linear-gradient(135deg, #f2c94c 0%, #f2994a 100%);
+    color: #111;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-weight: 800;
+    font-size: 14px;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    box-shadow: 0 4px 15px rgba(242, 201, 76, 0.3);
+}
+
+.masa-karti button:hover {
+    opacity: 0.95;
+    transform: scale(1.03);
+}
+
+/* İzle Butonu İçin Alternatif Stil (Eğer kullanıyorsan) */
+.masa-karti button.izle-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    box-shadow: none;
+    margin-top: 10px;
+}
+.masa-karti button.izle-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
