@@ -52,3 +52,84 @@ body::after { content: "made by beyco games"; position: fixed; bottom: 5px; left
     color: rgba(255,255,255,0.2); letter-spacing: 3px; font-weight: bold; 
 }
 @keyframes spinLoader { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+
+
+
+
+/* 🔥 YENİ VIP MASA LİSTESİ (ESKİ KODLARI KESİN EZER) 🔥 */
+#masalarAlani { 
+    display: grid !important; 
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important; 
+    gap: 15px !important; 
+    padding: 15px !important; 
+    flex: 1 !important; 
+    overflow-y: auto !important; 
+}
+
+#masalarAlani .masa-kart { 
+    background: rgba(20, 30, 48, 0.95) !important; 
+    backdrop-filter: blur(12px) !important; 
+    -webkit-backdrop-filter: blur(12px) !important; 
+    border: 1px solid rgba(242, 201, 76, 0.4) !important; 
+    border-radius: 16px !important; 
+    padding: 15px !important; 
+    display: flex !important; 
+    flex-direction: column !important; 
+    justify-content: space-between !important; 
+    align-items: center !important; 
+    text-align: center !important;
+    position: relative !important; 
+    overflow: hidden !important; 
+    box-shadow: 0 8px 20px rgba(0,0,0,0.6) !important; 
+    gap: 10px !important;
+    height: auto !important;
+    flex: unset !important;
+}
+
+#masalarAlani .masa-kart:hover { transform: translateY(-5px) !important; border-color: rgba(242, 201, 76, 0.9) !important; box-shadow: 0 12px 30px rgba(242, 201, 76, 0.3) !important; }
+
+#masalarAlani .kart-sol { display: flex !important; flex-direction: column !important; align-items: center !important; gap: 5px !important; width: 100% !important; flex: unset !important; }
+#masalarAlani .zar-kutu { display: none !important; } 
+#masalarAlani .masa-kart-isim { font-size: 16px !important; font-weight: 900 !important; color: #f2c94c !important; letter-spacing: 1px !important; text-transform: uppercase !important; margin: 0 !important; text-shadow: 0 2px 4px rgba(0,0,0,0.8) !important; }
+
+#masalarAlani .kart-sag { display: flex !important; flex-direction: column !important; align-items: center !important; gap: 8px !important; width: 100% !important; flex: unset !important; }
+
+#masalarAlani .masa-kisi-kutu { 
+    background: rgba(46, 204, 113, 0.15) !important; 
+    color: #2ecc71 !important; 
+    padding: 6px 12px !important; 
+    border-radius: 8px !important; 
+    font-size: 13px !important; 
+    font-weight: bold !important; 
+    border: 1px solid rgba(46, 204, 113, 0.3) !important; 
+    width: 100% !important;
+    justify-content: center !important;
+}
+
+#masalarAlani .btn-otur { 
+    background: linear-gradient(135deg, #f2c94c 0%, #f2994a 100%) !important; 
+    color: #111 !important; 
+    border: none !important; 
+    padding: 10px !important; 
+    border-radius: 10px !important; 
+    font-weight: 900 !important; 
+    font-size: 13px !important; 
+    width: 100% !important; 
+    text-transform: uppercase !important; 
+    box-shadow: 0 4px 15px rgba(242, 201, 76, 0.4) !important; 
+}
+
+#masalarAlani .btn-izle { 
+    background: rgba(255, 255, 255, 0.1) !important; 
+    color: #fff !important; 
+    border: 1px solid rgba(255,255,255,0.2) !important; 
+    padding: 8px !important; 
+    border-radius: 10px !important; 
+    font-weight: 800 !important; 
+    font-size: 12px !important; 
+    width: 100% !important; 
+    margin: 0 !important;
+    box-shadow: none !important;
+}
+#masalarAlani .btn-izle:hover { background: rgba(255, 255, 255, 0.2) !important; }
