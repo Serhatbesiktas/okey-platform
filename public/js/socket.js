@@ -33,7 +33,7 @@ socket.on('cip_guncelle', (cip) => {
     }
 });
 
-// ⸻ SADE, KOMPAKT VE ROZETLİ MASA RENDER DÖNGÜSÜ ⸻
+// ⸻ SADE, KOMPAKT VE ROZETLİ MASA RENDER DÖNGÜSÜ (Bahis Sorunu Çözüldü) ⸻
 socket.on('masalari_guncelle', (lobidekiMasalar) => {
     guncelMasalar = lobidekiMasalar; 
     if(!masalarAlani) return; 
@@ -57,7 +57,9 @@ socket.on('masalari_guncelle', (lobidekiMasalar) => {
         const isVIP = masaAdi.toUpperCase().includes('VIP') || masaAdi.includes('50K') || masaAdi.includes('100K');
         const vipClass = isVIP ? 'vip-board' : '';
         const vipBadge = isVIP ? '<span class="vip-badge-tag">👑 VIP</span>' : '';
-        const bahisHtml = bahisMiktari ? `<div class="masa-bahis">💰 ${bahisMiktari} Bahis</div>` : '';
+        
+        // "Bahis" yazısının çift çıkma sorunu giderildi (Kelimenin biri silindi)
+        const bahisHtml = bahisMiktari ? `<div class="masa-bahis">💰 ${bahisMiktari}</div>` : '';
 
         // Aksiyon Butonları (Dolu butonu artık 'btn-dolu' CSS sınıfı ile rozet görünümlü)
         const txt = benVarim ? 'OTURDUN' : (dolu >= 4 ? '🔴 DOLU' : 'OTUR');
