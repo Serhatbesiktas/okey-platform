@@ -1,6 +1,6 @@
 #masaEkrani { display: none; flex: 1; background-color: #020603; position: relative; padding: 10px; flex-direction: column; overflow: hidden; }
 
-/* ⸻ GERÇEKÇİ OKEY MASASI ZEMİNİ (Keçe Dokusu ve Vignette) ⸻ */
+/* ⸻ GERÇEKÇİ OKEY MASASI ZEMİNİ ⸻ */
 .okey-table-ui { 
     background-color: #12381f;
     background-image: 
@@ -25,7 +25,7 @@
 }
 .return-lobby-btn:active { transform: scale(0.94); background: rgba(220, 53, 69, 0.4); border-color: #e74c3c; }
 
-/* ⸻ OYUNCU KOLTUKLARI (Premium Cam Efekti ve Glow) ⸻ */
+/* ⸻ OYUNCU KOLTUKLARI ⸻ */
 .player-seat { 
     position: absolute; 
     background: rgba(10, 25, 15, 0.45); 
@@ -36,13 +36,18 @@
     box-shadow: inset 0 2px 15px rgba(0,0,0,0.4), 0 6px 15px rgba(0,0,0,0.3); 
     min-width: 90px; max-width: 110px; text-align: center; 
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap; 
-    z-index: 5; transition: all 0.25s ease; text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+    z-index: 5; 
+    /* 60 FPS Geçiş Efekti (Fade) */
+    transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.25s ease, border-color 0.25s ease, color 0.25s ease; 
+    text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+    will-change: transform, box-shadow;
 }
+
 .seat-top { top: 12px; left: 50%; transform: translateX(-50%); }
 .seat-right { top: 25%; right: -30px; transform: translateY(-50%) rotate(-90deg); }
 .seat-left { bottom: 25%; left: -30px; transform: translateY(-50%) rotate(90deg); }
 
-/* 💡 BOŞ KOLTUK SİLÜETİ (Sadece CSS ile HTML/JS bozmadan eklendi) */
+/* BOŞ KOLTUK SİLÜETİ */
 .player-seat[data-isim=""], .player-seat[data-isim="Boş"], .player-seat[data-isim="➕ DAVET"] { 
     color: rgba(255,255,255,0.4); font-style: italic; 
     border-color: rgba(255,255,255,0.1); background-color: rgba(0,0,0,0.2); 
@@ -51,8 +56,13 @@
     background-position: center; background-repeat: no-repeat; background-size: 26px;
 }
 
-/* AKTİF SIRA PARLAMASI */
-.aktif-sira { border-color: #f1c40f !important; box-shadow: 0 0 20px rgba(241, 196, 15, 0.4), inset 0 0 10px rgba(241, 196, 15, 0.2) !important; color: #f1c40f !important; z-index: 10; }
+/* 🔥 AKTİF SIRA PARLAMASI VE 150ms ANİMASYON 🔥 */
+.aktif-sira { 
+    border-color: #2ecc71 !important; 
+    box-shadow: 0 0 25px rgba(46, 204, 113, 0.4), inset 0 0 12px rgba(46, 204, 113, 0.2) !important; 
+    color: #2ecc71 !important; 
+    z-index: 10; 
+}
 .seat-top.aktif-sira { transform: translateX(-50%) scale(1.05) !important; }
 .seat-right.aktif-sira { transform: translateY(-50%) rotate(-90deg) scale(1.05) !important; }
 .seat-left.aktif-sira { transform: translateY(-50%) rotate(90deg) scale(1.05) !important; }
@@ -72,7 +82,21 @@
 .oyun-baslat-btn { background: linear-gradient(180deg, #f1c40f 0%, #f39c12 100%); color: #111; border: none; padding: 12px 28px; border-radius: 12px; font-weight: 900; font-size: 14px; cursor: pointer; box-shadow: 0 5px 15px rgba(241, 196, 15, 0.3); margin-top: 5px; transition: transform 0.15s ease, box-shadow 0.15s ease; z-index: 50; position: relative;}
 .oyun-baslat-btn:active { transform: scale(0.95); box-shadow: 0 2px 8px rgba(241, 196, 15, 0.2); }
 
-/* ⸻ GÖSTERGE VE DESTE (Aynı Boy, Yumuşak Gölge) ⸻ */
+/* ⸻ ZAMANLAYICI BAR (Turn Timer) - JS Çakışmaması İçin EZİLDİ ⸻ */
+body .turn-timer-bar {
+    width: 100% !important; max-width: 150px !important; height: 6px !important;
+    background: rgba(0,0,0,0.5) !important; border-radius: 6px !important;
+    border: 1px solid rgba(46, 204, 113, 0.2) !important;
+    position: absolute !important; left: 50% !important; transform: translateX(-50%) !important; top: 100% !important;
+    margin-top: 15px !important; overflow: hidden !important;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5) !important;
+}
+body .turn-timer-bar div {
+    background: linear-gradient(90deg, #2ecc71, #27ae60) !important;
+    box-shadow: 0 0 10px rgba(46, 204, 113, 0.6) !important;
+}
+
+/* ⸻ GÖSTERGE VE DESTE ⸻ */
 .kalan-tas-bilgi-container { display: none; flex-direction: column; align-items: center; gap: 10px; }
 .kapali-deste, .gosterge-tasi { 
     width: 46px; height: 62px; border-radius: 8px; 
@@ -85,15 +109,18 @@
 .kapali-deste:active { transform: translateY(3px); border-bottom-width: 2px; box-shadow: 0 2px 6px rgba(0,0,0,0.4), inset 0 1px 3px #fff; }
 .gosterge-tasi { background: linear-gradient(135deg, #fffff5 0%, #f0e6d0 100%); border: 1px solid #c8bfae; border-bottom: 5px solid #a39882; pointer-events: none; }
 
-/* ⸻ BİTİR ALANI ⸻ */
+/* ⸻ BİTİR ALANI (Premium Dokunuş) ⸻ */
 #bitisAlani { 
     position: relative; display: none; width: 46px; height: 62px; 
-    background-color: rgba(220, 53, 69, 0.05); border: 1.5px dashed rgba(220, 53, 69, 0.4); 
+    background-color: rgba(220, 53, 69, 0.05); border: 1.5px solid rgba(220, 53, 69, 0.2); 
     border-radius: 8px; align-items: center; justify-content: center; 
-    color: rgba(255, 153, 162, 0.6); font-weight: 800; font-size: 10px; 
+    color: rgba(255, 153, 162, 0.4); font-weight: 800; font-size: 10px; 
     text-align: center; transition: all 0.2s ease; box-shadow: inset 0 0 10px rgba(0,0,0,0.2); 
 }
-#bitisAlani.sortable-drag-over { background-color: rgba(220, 53, 69, 0.25); color: #fff; border: 2px solid #ff4d4d; box-shadow: 0 0 20px rgba(220, 53, 69, 0.5), inset 0 0 10px rgba(220, 53, 69, 0.3); text-shadow: 0 0 5px #ff4d4d; }
+#bitisAlani.sortable-drag-over { 
+    background-color: rgba(220, 53, 69, 0.25); color: #fff; border: 2px solid #ff4d4d; 
+    box-shadow: 0 0 20px rgba(220, 53, 69, 0.5), inset 0 0 10px rgba(220, 53, 69, 0.3); text-shadow: 0 0 5px #ff4d4d; 
+}
 #bitisAlani .okey-tasi { position: absolute !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; width: 38px !important; height: 52px !important; font-size: 18px !important; border-bottom-width: 3px !important; pointer-events: none !important; }
 body #kazananEliAlani .okey-tasi-bitis { background: #fdfbf7 !important; box-shadow: 0 4px 10px rgba(0,0,0,0.8) !important; border: 2px solid #d1ccc0 !important; }
 
@@ -109,24 +136,36 @@ body #kazananEliAlani .okey-tasi-bitis { background: #fdfbf7 !important; box-sha
 #iskartaSol { bottom: 25%; left: 35px; transform: translateY(50%); cursor: pointer; z-index: 100 !important; }
 #iskartaSol:active { transform: translateY(50%) scale(0.92); box-shadow: inset 0 2px 6px rgba(0,0,0,0.6); }
 
+/* 🔥 TAŞ AT ALANI RÖTUŞU 🔥 */
 #benimIskartam { 
     position: absolute; bottom: 105px; right: 18px; width: 60px; height: 80px; 
     background: rgba(10, 15, 10, 0.6); border: 1.5px dashed rgba(241, 196, 15, 0.4); 
     border-radius: 12px; display: flex; align-items: center; justify-content: center; z-index: 10; 
     transition: all 0.2s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.3), inset 0 0 15px rgba(0,0,0,0.4);
 }
-#benimIskartam.sortable-drag-over { background-color: rgba(241, 196, 15, 0.2); border: 2px solid #f1c40f; box-shadow: 0 0 25px rgba(241, 196, 15, 0.4); }
+#benimIskartam.sortable-drag-over { 
+    background-color: rgba(241, 196, 15, 0.15); border: 2px solid #f1c40f; 
+    box-shadow: 0 0 20px rgba(241, 196, 15, 0.3); transform: scale(1.05); /* Küçük animasyon */
+}
 .iskarta-yazi { pointer-events: none; color: rgba(241, 196, 15, 0.7); font-weight: 800; font-size: 10px; text-align: center; text-shadow: 0 2px 4px #000; letter-spacing: 0.5px; }
 .kilitli-iskarta { border-color: #dc3545 !important; opacity: 0.4; box-shadow: none !important; }
-.iskarta-alani .okey-tasi { position: absolute !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; width: 38px !important; height: 52px !important; font-size: 18px !important; border-bottom-width: 3px !important; pointer-events: none !important; }
 
-/* ⸻ SOL MENÜ & SABİT BUTONLAR (Aynı Boyut, Şık Cam Efekti) ⸻ */
+/* ⸻ YERE ATILAN TAŞIN ANİMASYONU ⸻ */
+.iskarta-alani .okey-tasi { 
+    position: absolute !important; top: 50% !important; left: 50% !important; 
+    transform: translate(-50%, -50%) !important; width: 38px !important; height: 52px !important; 
+    font-size: 18px !important; border-bottom-width: 3px !important; pointer-events: none !important; 
+    animation: tasDus .2s cubic-bezier(0.175, 0.885, 0.32, 1.27) forwards; /* Pürüzsüz düşüş efekti */
+}
+@keyframes tasDus { 0% { transform: translate(-50%, -50%) scale(1.3); opacity: 0; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
+
+/* ⸻ SOL MENÜ & SABİT BUTONLAR ⸻ */
 #sound-toggle-btn, .pro-sohbet-tetikleyici, #sohbetAcBtn, #mesajlarBtn, #mesaj-btn, .genel-mesaj-btn, #ozelMesajBtn, .ozel-mesaj-btn, [id*="ozel"], [class*="ozel-mesaj"], [id*="zarf"], .zarf-btn, .pm-btn, .mesaj-kutusu-btn { 
     position: fixed !important; width: 42px !important; height: 42px !important; 
     border-radius: 50% !important; display: flex !important; justify-content: center !important; align-items: center !important; 
     background: rgba(10, 25, 15, 0.65) !important; backdrop-filter: blur(10px) !important; -webkit-backdrop-filter: blur(10px) !important; 
     color: #fff !important; font-size: 18px !important; cursor: pointer !important; z-index: 9998 !important; padding: 0 !important; margin: 0 !important; 
-    border: 1px solid rgba(255,255,255,0.15) !important; box-shadow: 0 4px 15px rgba(0,0,0,0.3) !important; transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1) !important; 
+    border: 1px solid rgba(255,255,255,0.1) !important; box-shadow: 0 4px 15px rgba(0,0,0,0.3) !important; transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1) !important; 
 }
 #sound-toggle-btn:active, .pro-sohbet-tetikleyici:active, #sohbetAcBtn:active, #mesajlarBtn:active, #ozelMesajBtn:active { transform: scale(0.9) !important; background: rgba(255,255,255,0.1) !important; }
 #sound-toggle-btn { top: 85px !important; left: 15px !important; }
@@ -135,7 +174,7 @@ body #kazananEliAlani .okey-tasi-bitis { background: #fdfbf7 !important; box-sha
 #mesajlarBtn, #mesaj-btn, .genel-mesaj-btn { top: 195px !important; left: 15px !important; }
 #ozelMesajBtn, .ozel-mesaj-btn, [id*="ozel"], [class*="ozel-mesaj"], [id*="zarf"], .zarf-btn, .pm-btn, .mesaj-kutusu-btn { top: 85px !important; right: 15px !important; left: auto !important; }
 
-/* ⸻ ISTAKA ALANI (Derinlik Eklendi, Boyutlar Aynı) ⸻ */
+/* ⸻ ISTAKA ALANI ⸻ */
 .okey-istaka-tuslar-area { width: 100%; display: flex; flex-direction: column; gap: 6px; }
 .pro-tus-takimi { width: 100%; display: flex; justify-content: flex-start; align-items: center; padding: 2px 5px; gap: 10px; z-index: 10; }
 .pro-tus { padding: 0 18px; height: 38px; background-color: rgba(17, 38, 24, 0.8); border: 1px solid rgba(46, 204, 113, 0.3); color: #f1c40f; border-radius: 10px; font-weight: 800; font-size: 11px; text-transform: uppercase; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.4); transition: all 0.15s ease; backdrop-filter: blur(5px);}
@@ -146,12 +185,30 @@ body #kazananEliAlani .okey-tasi-bitis { background: #fdfbf7 !important; box-sha
 .raf-alt { background: linear-gradient(to bottom, #522b11, #3f1d08); box-shadow: inset 0 4px 8px rgba(0,0,0,0.7); border-top: 2px solid rgba(255,255,255,0.03); }
 .yuva { flex: 1; height: 100%; background: rgba(0, 0, 0, 0.4); border-radius: 5px; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: inset 0 3px 6px rgba(0,0,0,0.7);}
 
-/* ⸻ OKEY TAŞLARI ⸻ */
-.okey-tasi { width: 100%; height: 94%; max-width: 38px; background: linear-gradient(135deg, #fffff9 0%, #ece5cd 100%); border-radius: 6px; border: 1px solid #dcd3c1; border-bottom: 5px solid #a39882; box-shadow: 0 4px 8px rgba(0,0,0,0.5), inset 0 1px 2px #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 900; font-size: clamp(15px, 4.5vw, 22px); font-family: 'Arial Black', Arial, sans-serif; cursor: grab; touch-action: manipulation; user-select: none; z-index: 30; transition: transform 0.15s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.15s ease; }
-.okey-tasi:active { cursor: grabbing; border-bottom-width: 2px; transform: scale(0.95) translateY(3px); box-shadow: 0 2px 4px rgba(0,0,0,0.4); }
-.okey-tasi::after { content: ''; position: absolute; top: 2px; left: 2px; right: 2px; bottom: 2px; border: 1px solid rgba(0,0,0,0.03); border-radius: 4px; }
+/* ⸻ OKEY TAŞLARI (Pürüzsüz Seçim ve Gölge Efekti) ⸻ */
+.okey-tasi { 
+    width: 100%; height: 94%; max-width: 38px; 
+    background: linear-gradient(135deg, #fffff9 0%, #ece5cd 100%); 
+    border-radius: 6px; border: 1px solid #dcd3c1; border-bottom: 5px solid #a39882; 
+    box-shadow: 0 4px 8px rgba(0,0,0,0.5), inset 0 1px 2px #fff; 
+    display: flex; flex-direction: column; align-items: center; justify-content: center; 
+    font-weight: 900; font-size: clamp(15px, 4.5vw, 22px); font-family: 'Arial Black', Arial, sans-serif; 
+    cursor: grab; touch-action: manipulation; user-select: none; z-index: 30; 
+    /* 150-200ms yumuşak geçiş kuralı */
+    transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.15s ease-out, top 0.2s ease-out, left 0.2s ease-out !important; 
+    will-change: transform, box-shadow, top, left;
+}
+.okey-tasi:active { 
+    cursor: grabbing; border-bottom-width: 2px; 
+    transform: scale(1.08) translateY(-4px) !important; /* Hafif büyüme */
+    box-shadow: 0 10px 20px rgba(0,0,0,0.6), inset 0 1px 2px #fff !important; 
+}
 .sortable-ghost { opacity: 0.1; } 
-.sortable-drag { box-shadow: 0 25px 40px rgba(0,0,0,0.8) !important; transform: scale(1.15) translateY(-25px) !important; z-index: 99999 !important; border-bottom-width: 7px !important; }
+.sortable-drag { 
+    box-shadow: 0 15px 30px rgba(0,0,0,0.7) !important; 
+    transform: scale(1.1) translateY(-15px) !important; 
+    z-index: 99999 !important; border-bottom-width: 7px !important; 
+}
 .tas-kirmizi { color: #e74c3c; text-shadow: 0 0.5px 1px rgba(0,0,0,0.1); } 
 .tas-siyah { color: #1c2833; text-shadow: 0 0.5px 1px rgba(0,0,0,0.1); } 
 .tas-mavi { color: #2980b9; text-shadow: 0 0.5px 1px rgba(0,0,0,0.1); } 
@@ -161,8 +218,8 @@ body #kazananEliAlani .okey-tasi-bitis { background: #fdfbf7 !important; box-sha
 .gosterge-btn:active { transform: scale(0.95); }
 .pro-gosterge-btn { background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%) !important; color: #111 !important; font-weight: 900 !important; border: 2px solid #fff !important; box-shadow: 0 0 15px rgba(241, 196, 15, 0.5) !important; animation: pulseGold 1.5s infinite; }
 
-/* ⸻ SOHBET ÇEKMECESİ VE EMOJİLER (Korundu) ⸻ */
-.sohbet-cekmecesi { position: fixed; top: 0; right: -320px; width: 300px; height: 100%; background: linear-gradient(to left, rgba(6, 18, 11, 1) 0%, rgba(10, 25, 15, 0.98) 100%); border-left: 2px solid #2ecc71; box-shadow: -10px 0 30px rgba(0,0,0,0.9); z-index: 99999; display: flex; flex-direction: column; transition: right 0.3s cubic-bezier(0.25, 1, 0.5, 1); }
+/* ⸻ SOHBET ÇEKMECESİ ⸻ */
+.sohbet-cekmecesi { position: fixed; top: 0; right: -320px; width: 300px; height: 100%; background: linear-gradient(to left, rgba(6, 18, 11, 1) 0%, rgba(10, 25, 15, 0.98) 100%); border-left: 1px solid rgba(46, 204, 113, 0.3); box-shadow: -10px 0 30px rgba(0,0,0,0.9); z-index: 99999; display: flex; flex-direction: column; transition: right 0.3s cubic-bezier(0.25, 1, 0.5, 1); }
 .sohbet-cekmecesi.acik { right: 0; }
 .cekmence-header { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(0,0,0,0.5); border-bottom: 1px solid rgba(46, 204, 113, 0.3); color: #f2c94c; font-weight: bold; }
 .cekmence-header button { background: none; border: none; color: #dc3545; font-size: 20px; font-weight: bold; cursor: pointer; }
@@ -174,7 +231,7 @@ body #kazananEliAlani .okey-tasi-bitis { background: #fdfbf7 !important; box-sha
 .cekmence-emojiler button:active { background: #2ecc71; transform: scale(0.9); }
 .cekmence-input { display: flex; padding: 15px; background: rgba(0,0,0,0.5); gap: 10px; }
 .cekmence-input input { flex: 1; background: rgba(255,255,255,0.1); border: 1px solid rgba(46, 204, 113, 0.4); border-radius: 8px; color: white; padding: 10px; outline: none; }
-.cekmence-input button { background: #2ecc71; color: #000; border: none; border-radius: 8px; padding: 0 15px; font-weight: bold; cursor: pointer; }
+.cekmence-input button { background: #2ecc71; color: #000; border: none; border-radius: 8px; padding: 0 15px; font-weight: bold; cursor: pointer; transition: transform 0.15s ease;}
 .cekmence-input button:active { transform: scale(0.95); }
 .anlik-mesaj-alani { position: absolute; top: 70px; left: 15px; z-index: 40; pointer-events: none; display: flex; flex-direction: column; gap: 5px; }
 .anlik-mesaj { background: rgba(5, 15, 8, 0.85); border: 1px solid #2ecc71; color: #fff; padding: 8px 15px; border-radius: 20px; font-size: 12px; animation: silin 4s forwards; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
