@@ -5,161 +5,36 @@
 .profil-isim-kutu { display: flex; flex-direction: column; align-items: flex-start; }
 .profil-isim { font-size: 15px; font-weight: bold; margin: 0; color: #fff; display: flex; align-items: center; gap: 5px; transition: all 0.3s; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
 .vip-badge { background: linear-gradient(180deg, #f2d94c 0%, #d4af37 100%); color: #000; font-size: 9px; font-weight: 900; padding: 2px 6px; border-radius: 4px; margin-top: 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
-
 .cip-kutu { background: rgba(13, 43, 26, 0.6); border: 1px solid #2ecc71; box-shadow: 0 0 12px rgba(46, 204, 113, 0.4), inset 0 0 6px rgba(46, 204, 113, 0.2); padding: 8px 15px; border-radius: 12px; display: flex; align-items: center; gap: 8px; font-weight: bold; color: #fff; font-size: 16px; position: relative;}
 .cip-ikon { background: linear-gradient(180deg, #ffe066 0%, #f5b041 100%); color: #000; width: 20px; height: 20px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 12px; font-weight: 900; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
-
 .sistem-mesaji { padding: 10px 20px; font-size: 12px; color: #a3c4bc; display: flex; align-items: center; gap: 8px; background-color: rgba(11, 28, 17, 0.5); flex-shrink: 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
 .sistem-mesaji::before { content: ''; display: inline-block; width: 8px; height: 8px; background-color: #2ecc71; border-radius: 50%; box-shadow: 0 0 8px #2ecc71; }
 .masa-sec-baslik { padding: 15px 20px 5px 20px; font-size: 12px; font-weight: 800; color: #52796f; letter-spacing: 2px; text-transform: uppercase; }
 
-/* ⸻ PREMIUM, SADE VE MODERN MASA KARTLARI (FINAL POLISH) ⸻ */
-.tables-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 10px; /* Boşluklar sıkılaştırıldı */
-    padding: 10px 15px;
-    flex: 1;
-    overflow-y: auto;
-}
-
-.masa-kart {
-    /* Siyaha yakın koyu yeşil degrade, lacivert tonlar yok edildi */
-    background: linear-gradient(180deg, rgba(12, 22, 15, 0.85) 0%, rgba(6, 12, 8, 0.95) 100%) !important;
-    backdrop-filter: blur(8px) !important;
-    -webkit-backdrop-filter: blur(8px) !important;
-    /* İnce, modern yeşil kenarlık */
-    border: 1px solid rgba(46, 204, 113, 0.12) !important;
-    border-radius: 16px !important; /* Yumuşatılmış köşeler */
-    padding: 10px 14px !important; /* Kart yüksekliği %15 azaltıldı */
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25) !important; /* Gölge hafifletildi */
-    transition: transform 0.15s ease-out, box-shadow 0.15s ease-out !important; /* 60 FPS hızlandırılmış geçiş */
-    will-change: transform, box-shadow;
-}
-
-.masa-kart:active {
-    transform: scale(0.98) !important; /* Karta basınca hafif içeri ezilme */
-    box-shadow: 0 2px 15px rgba(46, 204, 113, 0.15) !important; /* Hafif parlama */
-}
-
-/* VIP KART RÖTUŞLARI */
-.masa-kart.vip-board {
-    border: 1px solid rgba(241, 196, 15, 0.25) !important; /* İnce altın çerçeve */
-    background: linear-gradient(180deg, rgba(20, 18, 10, 0.85) 0%, rgba(10, 9, 5, 0.95) 100%) !important;
-    box-shadow: 0 4px 12px rgba(241, 196, 15, 0.05) !important; /* Abartısız hafif altın parıltı */
-}
-
-.masa-kart.vip-board:active {
-    box-shadow: 0 2px 15px rgba(241, 196, 15, 0.15) !important;
-}
+/* ⸻ PREMIUM, SADE VE MODERN MASA KARTLARI ⸻ */
+.tables-panel { display: flex; flex-direction: column; gap: 10px; padding: 10px 15px; flex: 1; overflow-y: auto; }
+.masa-kart { background: linear-gradient(180deg, rgba(12, 22, 15, 0.85) 0%, rgba(6, 12, 8, 0.95) 100%) !important; backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important; border: 1px solid rgba(46, 204, 113, 0.12) !important; border-radius: 16px !important; padding: 10px 14px !important; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25) !important; transition: transform 0.15s ease-out, box-shadow 0.15s ease-out !important; will-change: transform, box-shadow; }
+.masa-kart:active { transform: scale(0.98) !important; box-shadow: 0 2px 15px rgba(46, 204, 113, 0.15) !important; }
+.masa-kart.vip-board { border: 1px solid rgba(241, 196, 15, 0.25) !important; background: linear-gradient(180deg, rgba(20, 18, 10, 0.85) 0%, rgba(10, 9, 5, 0.95) 100%) !important; box-shadow: 0 4px 12px rgba(241, 196, 15, 0.05) !important; }
+.masa-kart.vip-board:active { box-shadow: 0 2px 15px rgba(241, 196, 15, 0.15) !important; }
 
 .masa-sol { display: flex; flex-direction: column; gap: 4px; flex: 1; align-items: flex-start;}
-
-.masa-adi {
-    font-size: 13px !important; /* Başlık ferahlatıldı */
-    font-weight: 800 !important;
-    color: #fff !important;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.5) !important;
-}
-
-.masa-bahis {
-    font-size: 10px !important; /* Bahis miktarı küçültüldü */
-    font-weight: 700 !important;
-    color: #f1c40f !important;
-    margin-top: 2px !important;
-    display: inline-block;
-    background: rgba(241, 196, 15, 0.1) !important;
-    padding: 2px 6px !important;
-    border-radius: 4px !important;
-}
-
-.vip-badge-tag {
-    border: 1px solid rgba(241, 196, 15, 0.3) !important;
-    color: #f1c40f !important;
-    font-size: 8px !important; /* Rozet küçültüldü ve sadeleşti */
-    font-weight: 800 !important;
-    padding: 2px 5px !important;
-    border-radius: 4px !important;
-    letter-spacing: 0.5px !important;
-    background: rgba(241, 196, 15, 0.1) !important;
-    margin-left: 4px !important;
-}
+.masa-adi { font-size: 13px !important; font-weight: 800 !important; color: #fff !important; display: flex; align-items: center; gap: 6px; text-shadow: 0 1px 2px rgba(0,0,0,0.5) !important; }
+.masa-bahis { font-size: 10px !important; font-weight: 700 !important; color: #f1c40f !important; margin-top: 2px !important; display: inline-block; background: rgba(241, 196, 15, 0.1) !important; padding: 2px 6px !important; border-radius: 4px !important; }
+.vip-badge-tag { border: 1px solid rgba(241, 196, 15, 0.3) !important; color: #f1c40f !important; font-size: 8px !important; font-weight: 800 !important; padding: 2px 5px !important; border-radius: 4px !important; letter-spacing: 0.5px !important; background: rgba(241, 196, 15, 0.1) !important; margin-left: 4px !important; }
 
 .masa-sag { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
-
-.masa-oyuncu-sayisi {
-    font-size: 10px !important;
-    font-weight: 700 !important;
-    color: #2ecc71 !important; /* İstenildiği gibi yeşil bırakıldı */
-    margin-bottom: 2px !important;
-    background: rgba(46, 204, 113, 0.05) !important;
-    padding: 2px 6px !important;
-    border-radius: 4px !important;
-}
-
+.masa-oyuncu-sayisi { font-size: 10px !important; font-weight: 700 !important; color: #2ecc71 !important; margin-bottom: 2px !important; background: rgba(46, 204, 113, 0.05) !important; padding: 2px 6px !important; border-radius: 4px !important; }
 .masa-aksiyon { display: flex; gap: 8px; width: 100%; justify-content: flex-end; align-items: center;}
 
 /* BUTON RÖTUŞLARI */
-.btn-izle {
-    background: linear-gradient(180deg, #9b59b6 0%, #8e44ad 100%) !important;
-    color: #fff !important;
-    border: 1px solid rgba(155, 89, 182, 0.5) !important; /* Hafif çerçeve parlaklığı */
-    padding: 6px 12px !important;
-    border-radius: 8px !important;
-    font-weight: 800 !important;
-    font-size: 10px !important;
-    box-shadow: 0 3px 10px rgba(155, 89, 182, 0.25) !important; /* Premium gölge */
-    cursor: pointer !important;
-    transition: transform 0.15s ease-out, box-shadow 0.15s ease-out !important;
-    will-change: transform, box-shadow;
-}
+.btn-izle { background: linear-gradient(180deg, #9b59b6 0%, #8e44ad 100%) !important; color: #fff !important; border: 1px solid rgba(155, 89, 182, 0.5) !important; padding: 6px 12px !important; border-radius: 8px !important; font-weight: 800 !important; font-size: 10px !important; box-shadow: 0 3px 10px rgba(155, 89, 182, 0.25) !important; cursor: pointer !important; transition: transform 0.15s ease-out, box-shadow 0.15s ease-out !important; will-change: transform, box-shadow; }
+.btn-izle:active { transform: scale(0.94) !important; box-shadow: 0 1px 5px rgba(155, 89, 182, 0.4) !important; }
+.btn-otur { background: linear-gradient(180deg, #f1c40f 0%, #f39c12 100%) !important; color: #111 !important; border: none !important; padding: 6px 14px !important; border-radius: 8px !important; font-weight: 800 !important; font-size: 10px !important; box-shadow: 0 3px 10px rgba(241, 196, 15, 0.25) !important; cursor: pointer !important; transition: transform 0.15s ease-out !important; will-change: transform; }
+.btn-otur:active { transform: scale(0.94) !important; }
+.btn-dolu { background: linear-gradient(180deg, #2a2a2a 0%, #1f1f1f 100%) !important; color: #ffffff !important; border: 1px solid rgba(255,255,255,0.08) !important; box-shadow: 0 2px 5px rgba(0,0,0,0.3) !important; cursor: not-allowed !important; padding: 6px 12px !important; border-radius: 8px !important; font-weight: 700 !important; font-size: 10px !important; letter-spacing: 0.5px !important; text-align: center !important; opacity: 0.9 !important; }
 
-.btn-izle:active {
-    transform: scale(0.94) !important; /* Basınca küçük ölçek animasyonu */
-    box-shadow: 0 1px 5px rgba(155, 89, 182, 0.4) !important;
-}
-
-.btn-otur {
-    background: linear-gradient(180deg, #f1c40f 0%, #f39c12 100%) !important;
-    color: #111 !important;
-    border: none !important;
-    padding: 6px 14px !important;
-    border-radius: 8px !important;
-    font-weight: 800 !important;
-    font-size: 10px !important;
-    box-shadow: 0 3px 10px rgba(241, 196, 15, 0.25) !important;
-    cursor: pointer !important;
-    transition: transform 0.15s ease-out !important;
-    will-change: transform;
-}
-
-.btn-otur:active {
-    transform: scale(0.94) !important;
-}
-
-.btn-dolu {
-    /* JS tarafındaki Kırmızı Emoji ile birleşince rozet etkisi verecek */
-    background: linear-gradient(180deg, #2a2a2a 0%, #1f1f1f 100%) !important;
-    color: #ffffff !important;
-    border: 1px solid rgba(255,255,255,0.08) !important;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3) !important;
-    cursor: not-allowed !important;
-    padding: 6px 12px !important;
-    border-radius: 8px !important;
-    font-weight: 700 !important;
-    font-size: 10px !important;
-    letter-spacing: 0.5px !important;
-    text-align: center !important;
-    opacity: 0.9 !important;
-}
-
-/* ⸻ SABİT ALT MENÜ (DEĞİŞTİRİLMEDİ) ⸻ */
+/* ⸻ SABİT ALT MENÜ ⸻ */
 .alt-menu-container { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; background: linear-gradient(0deg, #050d08 0%, #0c1c12 100%); border-top: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-around; align-items: center; padding: 0 10px; z-index: 10; }
 .alt-menu-item { display: flex; flex-direction: column; align-items: center; gap: 5px; color: #52796f; font-size: 10px; font-weight: bold; cursor: pointer; transition: color 0.2s; }
 .alt-menu-item.active { color: #f2c94c; }
@@ -169,10 +44,10 @@
 .lobi-oyuncu-isim { font-weight: bold; color: #0dcaf0; font-size: 13px; }
 .lobi-oyuncu-kutu { max-height: 180px !important; overflow-y: auto !important; background: rgba(0,0,0,0.3) !important; border-radius: 10px !important; padding: 5px !important; border: 1px solid rgba(255,255,255,0.05) !important; }
 
-/* ⸻ YAN YANA AKSİYON BUTONLARI (DEĞİŞTİRİLMEDİ) ⸻ */
-.quick-actions-wrapper {
+/* 🚀 SIFIRDAN YAZILAN YAN YANA AKSİYON BUTONLARI (ESKİ KODLAR SİLİNDİ) 🚀 */
+.beyco-aksiyon-wrapper {
     position: fixed;
-    bottom: 75px;
+    bottom: 75px; /* Alt menünün hemen üstü */
     left: 0;
     width: 100%;
     display: flex;
@@ -181,52 +56,30 @@
     padding: 10px 15px;
     z-index: 9999;
     background: linear-gradient(0deg, rgba(5, 13, 8, 0.95) 0%, rgba(5, 13, 8, 0.6) 50%, transparent 100%);
+    box-sizing: border-box;
 }
 
-body.tema-premium .quick-actions-wrapper .btn-hemen-oyna,
-.quick-actions-wrapper .btn-hemen-oyna {
-    position: relative !important;
-    bottom: auto !important;
-    left: auto !important;
-    transform: none !important;
-    flex: 1 !important;
-    width: 100% !important;
-    min-height: auto !important;
-    margin: 0 !important;
-    padding: 12px 5px !important;
-    border-radius: 12px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    font-weight: 900 !important;
-    font-size: 13px !important;
-    cursor: pointer !important;
+.beyco-btn {
+    flex: 1; /* Butonları eşit genişlikte yan yana dizer */
+    border: none;
+    padding: 12px 5px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    font-weight: 900;
+    font-size: 13px;
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    text-align: center;
+    transition: transform 0.2s ease;
 }
 
-.quick-actions-wrapper .btn-hemen-oyna span {
-    font-size: 9px !important;
-    font-weight: 600 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.5px !important;
-    opacity: 0.8 !important;
-    margin-top: 4px !important;
-    color: rgba(255,255,255,0.8) !important;
-}
+.beyco-btn:active { transform: scale(0.96); }
+.beyco-btn span { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.8; }
 
-.quick-actions-wrapper .aksiyon-vip {
-    background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%) !important;
-    color: #fff !important;
-    border: 1px solid rgba(155, 89, 182, 0.4) !important;
-    box-shadow: 0 4px 10px rgba(155, 89, 182, 0.3) !important;
-}
-
-.quick-actions-wrapper .aksiyon-hizli {
-    background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%) !important;
-    color: #111 !important;
-    border: 1px solid rgba(241, 196, 15, 0.4) !important;
-    box-shadow: 0 4px 10px rgba(241, 196, 15, 0.3) !important;
-}
-.quick-actions-wrapper .aksiyon-hizli span {
-    color: rgba(17,17,17,0.8) !important;
-}
+.vip-btn { background: linear-gradient(135deg, #9b59b6, #8e44ad); border: 1px solid rgba(155, 89, 182, 0.4); }
+.hizli-btn { background: linear-gradient(135deg, #f1c40f, #f39c12); color: #111; border: 1px solid rgba(241, 196, 15, 0.4); }
