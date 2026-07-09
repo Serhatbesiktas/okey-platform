@@ -25,7 +25,7 @@
     flex: 1 !important; 
     overflow-y: auto !important; 
     background: transparent !important;
-    padding-bottom: 250px !important; /* Alt menü kaydırma boşluğu */
+    padding-bottom: 250px !important; /* Alt menü kaydırma boşluğu (masaların altını kesmez) */
 }
 
 /* 🔥 MASA KARTLARI (PREMIUM CAM EFEKTİ) 🔥 */
@@ -48,7 +48,7 @@
     margin-bottom: 0 !important;
 }
 
-/* Hover Animasyonları (Mobil & Masaüstü uyumlu akıcı tepki) */
+/* Hover Animasyonları */
 .masa-kart:hover { 
     transform: translateY(-4px) !important; 
     border-color: rgba(46, 204, 113, 0.3) !important; 
@@ -56,8 +56,7 @@
     background: rgba(20, 38, 25, 0.65) !important;
 }
 
-/* Filigran (İsteğe bağlı arka plan deseni) */
-.masa-watermark { display: none !important; } /* Temiz görünüm için gizlendi */
+.masa-watermark { display: none !important; }
 
 /* Kart Sol Taraf (Masa İsmi) */
 .kart-sol { 
@@ -68,7 +67,7 @@
     flex: 1 !important; 
     z-index: 2 !important; 
 }
-.zar-kutu { display: none !important; } /* Casino hissini yok ettik */
+.zar-kutu { display: none !important; }
 .masa-kart-isim { 
     font-size: 19px !important; 
     font-weight: 800 !important; 
@@ -88,12 +87,12 @@
     z-index: 2 !important; 
 }
 
-/* Oyuncu Durum Kutusu (Oval ve Premium) */
+/* Oyuncu Durum Kutusu */
 .masa-kisi-kutu { 
     background: rgba(0, 0, 0, 0.35) !important; 
     color: #a3c4bc !important; 
     padding: 6px 14px !important; 
-    border-radius: 20px !important; /* Tam Yuvarlak hat */
+    border-radius: 20px !important; 
     font-size: 13px !important; 
     font-weight: 700 !important; 
     border: 1px solid rgba(255, 255, 255, 0.05) !important; 
@@ -102,11 +101,10 @@
     box-shadow: inset 0 2px 4px rgba(0,0,0,0.2) !important;
 }
 
-/* Buton Grubu Kapsayıcısı */
 .kart-sag > div {
     display: flex !important;
     gap: 8px !important;
-    flex-direction: row !important; /* Butonları yan yana tut */
+    flex-direction: row !important; 
 }
 
 /* 🔥 YENİ OTUR BUTONU (Premium Sade Altın) 🔥 */
@@ -115,7 +113,7 @@
     color: #111 !important; 
     border: none !important; 
     padding: 10px 22px !important; 
-    border-radius: 12px !important; /* Yumuşak köşe */
+    border-radius: 12px !important; 
     font-weight: 800 !important; 
     font-size: 14px !important; 
     cursor: pointer !important; 
@@ -141,7 +139,7 @@
 
 /* 🔥 YENİ İZLE BUTONU (Saydam ve Şık) 🔥 */
 .btn-izle { 
-    background: rgba(155, 89, 182, 0.15) !important; /* Hafif Mor Premium Ton */
+    background: rgba(155, 89, 182, 0.15) !important; 
     color: #e0b0ff !important; 
     border: 1px solid rgba(155, 89, 182, 0.3) !important; 
     padding: 10px 18px !important; 
@@ -159,14 +157,67 @@
 }
 .btn-izle:active { transform: scale(0.95) !important; }
 
-/* ALT MENÜ VE EKRANLAR (Aynen Korundu) */
+/* ALT MENÜ VE EKRANLAR */
 .alt-menu-container { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; background: linear-gradient(0deg, #050d08 0%, #0c1c12 100%); border-top: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-around; align-items: center; padding: 0 10px; z-index: 10; }
 .alt-menu-item { display: flex; flex-direction: column; align-items: center; gap: 5px; color: #52796f; font-size: 10px; font-weight: bold; cursor: pointer; transition: color 0.2s; }
 .alt-menu-item.active { color: #f2c94c; }
 .alt-menu-ikon { font-size: 20px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
-.btn-hemen-oyna { position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%); background: linear-gradient(180deg, #ffe066 0%, #e6a100 100%); color: #111; border: none; padding: 12px 30px; border-radius: 12px; font-weight: 900; font-size: 14px; cursor: pointer; box-shadow: 0 10px 25px rgba(230, 161, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.4); display: flex; flex-direction: column; align-items: center; gap: 2px; width: 180px; z-index: 15; transition: transform 0.15s ease; }
-.btn-hemen-oyna:active { transform: translateX(-50%) scale(0.95); box-shadow: 0 4px 10px rgba(230, 161, 0, 0.2); }
-.btn-hemen-oyna span { font-size: 10px; font-weight: 600; color: rgba(5, 13, 8, 0.7); text-transform: uppercase; letter-spacing: 0.5px; }
+
 .lobi-oyuncu-satir { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: rgba(0,0,0,0.4); border-bottom: 1px solid #1e3f28; border-radius: 6px; }
 .lobi-oyuncu-isim { font-weight: bold; color: #0dcaf0; font-size: 13px;}
 .lobi-oyuncu-kutu { max-height: 180px !important; overflow-y: auto !important; background: rgba(0,0,0,0.3) !important; border-radius: 10px !important; padding: 5px !important; border: 1px solid rgba(255,255,255,0.05) !important; }
+
+/* 🔥 VIP MASA KUR VE HEMEN OYNA BUTONLARINI YAN YANA DİZEN MOTOR 🔥 */
+#lobiEkrani button.btn-hemen-oyna {
+    position: fixed !important;
+    bottom: 85px !important; 
+    width: calc(50% - 15px) !important; 
+    height: 54px !important; 
+    border-radius: 14px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 0 10px !important;
+    font-size: 13px !important;
+    font-weight: 800 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    transition: transform 0.2s ease, opacity 0.2s ease !important;
+    z-index: 9999 !important;
+}
+
+/* Soldaki Buton: VIP Masa Kur */
+#lobiEkrani button.btn-hemen-oyna[onclick*="vipMasaKurPanel"] {
+    left: 10px !important; 
+    right: auto !important;
+    background: linear-gradient(135deg, #ff33aa 0%, #aa33ff 100%) !important;
+    box-shadow: 0 8px 20px rgba(255, 51, 170, 0.25) !important;
+    border: 1px solid rgba(255, 51, 170, 0.4) !important;
+    transform: none !important; 
+}
+
+/* Sağdaki Buton: Hemen Oyna */
+#lobiEkrani #btnRastgeleOyna.btn-hemen-oyna {
+    right: 10px !important; 
+    left: auto !important;
+    background: linear-gradient(135deg, #ffe066 0%, #e6a100 100%) !important;
+    box-shadow: 0 8px 20px rgba(230, 161, 0, 0.25) !important;
+    border: 1px solid rgba(255, 224, 102, 0.3) !important;
+    transform: none !important; 
+}
+
+/* Alt Açıklama Yazıları */
+#lobiEkrani button.btn-hemen-oyna span {
+    font-size: 9px !important;
+    font-weight: 600 !important;
+    color: rgba(0, 0, 0, 0.6) !important;
+    text-transform: uppercase !important;
+    margin-top: 2px !important;
+}
+
+/* Buton Tıklama (Active) Tepkisi */
+#lobiEkrani button.btn-hemen-oyna:active {
+    transform: scale(0.95) !important;
+    box-shadow: none !important;
+}
