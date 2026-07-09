@@ -133,3 +133,7 @@ body::after { content: "made by beyco games"; position: fixed; bottom: 5px; left
     box-shadow: none !important;
 }
 #masalarAlani .btn-izle:hover { background: rgba(255, 255, 255, 0.2) !important; }
+/* 🔥 LOBİ EN ALT KARTLARIN GÖRÜNMESİ İÇİN BOŞLUK 🔥 */
+#masalarAlani {
+    padding-bottom: 250px !important; 
+}
