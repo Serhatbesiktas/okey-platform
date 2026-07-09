@@ -33,7 +33,7 @@ socket.on('cip_guncelle', (cip) => {
     }
 });
 
-// ⸻ YEPYENİ, KOMPAKT VE TEMİZ MASA RENDER DÖNGÜSÜ ⸻
+// ⸻ SADE, KOMPAKT VE ROZETLİ MASA RENDER DÖNGÜSÜ ⸻
 socket.on('masalari_guncelle', (lobidekiMasalar) => {
     guncelMasalar = lobidekiMasalar; 
     if(!masalarAlani) return; 
@@ -42,32 +42,43 @@ socket.on('masalari_guncelle', (lobidekiMasalar) => {
     Object.entries(lobidekiMasalar).forEach(([masaAdi, koltuklar]) => {
         const dolu = koltuklar.filter(k => k !== null).length; 
         const benVarim = koltuklar.includes(aktifKullaniciAdi);
-        
-        // Mantık fonksiyonları aynı
         const action = benVarim ? `masayaGeriDon('${masaAdi}')` : `masayaOtur('${masaAdi}')`; 
         
+        // Bahis miktarını parantezden çıkarıp ayrı satıra yazmak için mantık
+        let gercekMasaAdi = masaAdi;
+        let bahisMiktari = "";
+        if(masaAdi.includes('(') && masaAdi.includes(')')) {
+            let parcalar = masaAdi.split('(');
+            gercekMasaAdi = parcalar[0].trim();
+            bahisMiktari = parcalar[1].replace(')', '').trim();
+        }
+
         // VIP Algılama
         const isVIP = masaAdi.toUpperCase().includes('VIP') || masaAdi.includes('50K') || masaAdi.includes('100K');
         const vipClass = isVIP ? 'vip-board' : '';
         const vipBadge = isVIP ? '<span class="vip-badge-tag">👑 VIP</span>' : '';
+        const bahisHtml = bahisMiktari ? `<div class="masa-bahis">💰 ${bahisMiktari} Bahis</div>` : '';
 
-        // Aksiyon Butonları
-        const txt = benVarim ? 'OTURDUN' : (dolu >= 4 ? 'MASA DOLU' : 'OTUR');
+        // Aksiyon Butonları (Dolu butonu artık 'btn-dolu' CSS sınıfı ile rozet görünümlü)
+        const txt = benVarim ? 'OTURDUN' : (dolu >= 4 ? '🔴 DOLU' : 'OTUR');
         const btnDisabled = (dolu >= 4 && !benVarim) ? 'disabled' : '';
-        const btnClass = dolu >= 4 && !benVarim ? 'disabled' : '';
+        const btnClass = dolu >= 4 && !benVarim ? 'btn-dolu disabled' : 'btn-otur';
         const izleBtn = (!benVarim && dolu > 0) ? `<button class="btn-izle" onclick="masayiIzle('${masaAdi}')">İZLE</button>` : '';
 
-        // Saf Tasarım, Dağınık Emojiler Yok!
+        // Saf Tasarım, Dağınık Emojiler Yok! Sadece oyuncu sayısı.
         masalarAlani.innerHTML += `
         <div class="masa-kart ${vipClass}">
             <div class="masa-sol">
-                <div class="masa-adi">🎲 ${masaAdi} ${vipBadge}</div>
-                <div class="masa-oyuncu-sayisi">👥 ${dolu} / 4 Oyuncu</div>
+                <div class="masa-adi">🎲 ${gercekMasaAdi} ${vipBadge}</div>
+                ${bahisHtml}
             </div>
             
             <div class="masa-sag">
-                ${izleBtn}
-                <button class="btn-otur ${btnClass}" onclick="${action}" ${btnDisabled}>${txt}</button>
+                <div class="masa-oyuncu-sayisi">👥 ${dolu} / 4 Oyuncu</div>
+                <div class="masa-aksiyon">
+                    ${izleBtn}
+                    <button class="${btnClass}" onclick="${action}" ${btnDisabled}>${txt}</button>
+                </div>
             </div>
         </div>`;
         
