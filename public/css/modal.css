@@ -2,6 +2,11 @@
    AAA PREMİUM MODAL TASARIMLARI (Discord / Apple Stili)
 ========================================================= */
 
+/* ⸻ WATERMARK GİZLEME (Safari / Menü Çakışması Çözümü) ⸻ */
+body::after {
+    display: none !important;
+}
+
 /* ⸻ ARKA PLAN (Blur & Animasyon) ⸻ */
 .premium-modal-overlay {
     position: fixed;
@@ -25,13 +30,13 @@
 
 /* ⸻ ANA MODAL KUTUSU ⸻ */
 .premium-modal-box {
-    background: rgba(18, 22, 20, 0.95);
+    background: rgba(22, 26, 24, 0.95); /* Apple / Discord koyu teması */
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 22px;
+    border-radius: 20px;
     padding: 32px 24px;
     width: 100%;
-    max-width: 360px;
-    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.05);
+    max-width: 340px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.05); /* Yumuşatılmış gölge */
     text-align: center;
     transform: scale(0.92);
     animation: modalScaleIn 220ms cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
@@ -57,7 +62,7 @@
 .modal-icon-wrapper svg { width: 28px; height: 28px; }
 
 .warning-icon { color: #f2c94c; box-shadow: 0 0 20px rgba(242, 201, 76, 0.15); border-color: rgba(242, 201, 76, 0.3); }
-.danger-icon { color: #e74c3c; box-shadow: 0 0 20px rgba(231, 76, 60, 0.15); border-color: rgba(231, 76, 60, 0.3); }
+.danger-icon { color: #ff4757; box-shadow: 0 0 20px rgba(255, 71, 87, 0.15); border-color: rgba(255, 71, 87, 0.3); }
 .vip-icon { color: #f1c40f; box-shadow: 0 0 20px rgba(241, 196, 15, 0.15); border-color: rgba(241, 196, 15, 0.3); }
 .invite-icon { color: #3498db; box-shadow: 0 0 20px rgba(52, 152, 219, 0.15); border-color: rgba(52, 152, 219, 0.3); }
 
@@ -66,7 +71,7 @@
     font-size: 20px;
     font-weight: 900;
     color: #fff;
-    margin: 0 0 8px 0;
+    margin: 0 0 12px 0; /* Boşluk artırıldı */
     letter-spacing: 0.5px;
 }
 
@@ -79,7 +84,7 @@
 
 /* ⸻ BİLGİ KUTUSU (Çıkış Ekranı İçin) ⸻ */
 .info-box {
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(0, 0, 0, 0.25);
     border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 12px;
     padding: 12px;
@@ -95,7 +100,7 @@
     margin-bottom: 6px;
 }
 .info-box-item:last-child { margin-bottom: 0; }
-.info-dot { width: 6px; height: 6px; background: #e74c3c; border-radius: 50%; box-shadow: 0 0 5px #e74c3c; }
+.info-dot { width: 6px; height: 6px; background: #ff4757; border-radius: 50%; box-shadow: 0 0 5px #ff4757; }
 
 /* ⸻ SELECT (DROPDOWN) DÜZENLEMESİ ⸻ */
 .premium-form-group {
@@ -137,7 +142,7 @@
     box-shadow: 0 0 10px rgba(241, 196, 15, 0.2);
 }
 
-/* ⸻ BUTONLAR ⸻ */
+/* ⸻ BUTONLAR (Eşit Yükseklik & Premium Renkler) ⸻ */
 .premium-btn-group {
     display: flex;
     gap: 10px;
@@ -147,7 +152,10 @@
 .premium-btn {
     flex: 1;
     border: none;
-    padding: 14px 10px;
+    height: 48px; /* Yükseklikler eşitlendi */
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border-radius: 12px;
     font-weight: 900;
     font-size: 13px;
@@ -155,6 +163,7 @@
     transition: transform 0.15s ease, box-shadow 0.15s ease;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    box-sizing: border-box;
 }
 
 .premium-btn:active { transform: scale(0.96); }
@@ -167,7 +176,7 @@
 }
 
 .btn-danger {
-    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    background: linear-gradient(135deg, #ff4757, #cb2d3e); /* Premium Kırmızı */
     color: #fff;
     box-shadow: 0 4px 15px rgba(231, 76, 60, 0.25);
 }
@@ -179,8 +188,9 @@
 }
 
 .btn-dark {
-    background: rgba(255, 255, 255, 0.05);
+    background: linear-gradient(135deg, #3a3f44, #24282b); /* Premium Discord Gri */
     color: #fff;
     border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
-.btn-dark:hover { background: rgba(255, 255, 255, 0.08); }
+.btn-dark:hover { background: linear-gradient(135deg, #454b51, #2c3136); }
