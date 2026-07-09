@@ -1,223 +1,428 @@
-/* ==========================================
-   BEYCO GAMES - PREMİUM LOBİ TASARIMI
-   ========================================== */
-
-/* GENEL LOBİ YERLEŞİMİ */
-#lobiEkrani { display: flex; flex-direction: column; flex: 1; position: relative; padding-bottom: 140px; }
-.vip-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: linear-gradient(180deg, #0b1c11 0%, #050d08 100%); flex-shrink: 0; border-bottom: 1px solid rgba(46, 204, 113, 0.15); box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
-.profil-bilgi { display: flex; align-items: center; gap: 10px; }
-.profil-avatar { width: 45px; height: 45px; background: radial-gradient(circle, #1e3f28 0%, #0d1f14 100%); border-radius: 50%; border: 2px solid #52796f; display: flex; justify-content: center; align-items: center; font-size: 20px; transition: transform 0.3s ease; }
-.profil-isim-kutu { display: flex; flex-direction: column; align-items: flex-start; }
-.profil-isim { font-size: 15px; font-weight: bold; margin: 0; color: #fff; display: flex; align-items: center; gap: 5px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-.vip-badge { background: linear-gradient(180deg, #f2d94c 0%, #d4af37 100%); color: #000; font-size: 9px; font-weight: 900; padding: 2px 6px; border-radius: 4px; margin-top: 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
-.cip-kutu { background: rgba(13, 43, 26, 0.6); border: 1px solid #2ecc71; box-shadow: 0 0 12px rgba(46, 204, 113, 0.4), inset 0 0 6px rgba(46, 204, 113, 0.2); padding: 8px 15px; border-radius: 12px; display: flex; align-items: center; gap: 8px; font-weight: bold; color: #fff; font-size: 16px; position: relative;}
-.cip-ikon { background: linear-gradient(180deg, #ffe066 0%, #f5b041 100%); color: #000; width: 20px; height: 20px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 12px; font-weight: 900; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
-.sistem-mesaji { padding: 10px 20px; font-size: 12px; color: #a3c4bc; display: flex; align-items: center; gap: 8px; background-color: rgba(11, 28, 17, 0.5); flex-shrink: 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
-.sistem-mesaji::before { content: ''; display: inline-block; width: 8px; height: 8px; background-color: #2ecc71; border-radius: 50%; box-shadow: 0 0 8px #2ecc71; }
-.masa-sec-baslik { padding: 15px 20px 5px 20px; font-size: 12px; font-weight: 800; color: #52796f; letter-spacing: 2px; text-transform: uppercase; }
-
-/* 🔥 YENİ MODERN GLASSMORPHISM GRID LİSTESİ 🔥 */
-#masalarAlani, .tables-panel { 
-    display: grid !important; 
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important; /* Geniş ve ferah kartlar */
-    gap: 20px !important; 
-    padding: 15px 20px !important; 
-    flex: 1 !important; 
-    overflow-y: auto !important; 
-    background: transparent !important;
-    padding-bottom: 250px !important; /* Alt menü kaydırma boşluğu (masaların altını kesmez) */
+#lobiEkrani { 
+    display: flex; 
+    flex-direction: column; 
+    flex: 1; 
+    position: relative; 
+    padding-bottom: 140px; 
 }
 
-/* 🔥 MASA KARTLARI (PREMIUM CAM EFEKTİ) 🔥 */
-.masa-kart { 
-    background: rgba(15, 30, 20, 0.55) !important; /* Sade Koyu Yeşil Saydam Zemin */
-    backdrop-filter: blur(16px) !important; 
-    -webkit-backdrop-filter: blur(16px) !important; 
-    border: 1px solid rgba(255, 255, 255, 0.08) !important; 
-    border-radius: 20px !important; /* Modern Yuvarlak Köşeler */
-    padding: 20px !important; 
-    display: flex !important; 
-    flex-direction: row !important; /* İçeriği yatay hizala */
-    justify-content: space-between !important; 
-    align-items: center !important; 
-    position: relative !important; 
-    overflow: hidden !important; 
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25) !important; /* Zarif Gölge */
-    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease, border-color 0.3s ease !important; /* 60 FPS Animasyon */
-    min-height: 120px !important;
-    margin-bottom: 0 !important;
+.vip-header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 15px 20px; 
+    background: linear-gradient(180deg, #0b1c11 0%, #050d08 100%); 
+    flex-shrink: 0; 
+    border-bottom: 1px solid rgba(46, 204, 113, 0.15); 
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5); 
 }
 
-/* Hover Animasyonları */
-.masa-kart:hover { 
-    transform: translateY(-4px) !important; 
-    border-color: rgba(46, 204, 113, 0.3) !important; 
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4) !important; 
-    background: rgba(20, 38, 25, 0.65) !important;
+.profil-bilgi { 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
 }
 
-.masa-watermark { display: none !important; }
-
-/* Kart Sol Taraf (Masa İsmi) */
-.kart-sol { 
-    display: flex !important; 
-    flex-direction: column !important; 
-    align-items: flex-start !important; 
-    justify-content: center !important;
-    flex: 1 !important; 
-    z-index: 2 !important; 
-}
-.zar-kutu { display: none !important; }
-.masa-kart-isim { 
-    font-size: 19px !important; 
-    font-weight: 800 !important; 
-    color: #ffffff !important; 
-    letter-spacing: 0.5px !important; 
-    text-transform: uppercase !important; 
-    margin: 0 !important; 
-    text-shadow: 0 2px 4px rgba(0,0,0,0.3) !important; 
+.profil-avatar { 
+    width: 45px; 
+    height: 45px; 
+    background: radial-gradient(circle, #1e3f28 0%, #0d1f14 100%); 
+    border-radius: 50%; 
+    border: 2px solid #52796f; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    font-size: 20px; 
+    transition: all 0.3s; 
 }
 
-/* Kart Sağ Taraf (Oyuncu Sayısı ve Butonlar) */
-.kart-sag { 
-    display: flex !important; 
-    flex-direction: column !important; 
-    align-items: flex-end !important; 
-    gap: 12px !important; 
-    z-index: 2 !important; 
+.profil-isim-kutu { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: flex-start; 
 }
 
-/* Oyuncu Durum Kutusu */
-.masa-kisi-kutu { 
-    background: rgba(0, 0, 0, 0.35) !important; 
-    color: #a3c4bc !important; 
-    padding: 6px 14px !important; 
-    border-radius: 20px !important; 
-    font-size: 13px !important; 
-    font-weight: 700 !important; 
-    border: 1px solid rgba(255, 255, 255, 0.05) !important; 
-    display: inline-flex !important;
-    align-items: center !important;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2) !important;
+.profil-isim { 
+    font-size: 15px; 
+    font-weight: bold; 
+    margin: 0; 
+    color: #fff; 
+    display: flex; 
+    align-items: center; 
+    gap: 5px; 
+    transition: all 0.3s; 
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5); 
 }
 
-.kart-sag > div {
-    display: flex !important;
-    gap: 8px !important;
-    flex-direction: row !important; 
+.vip-badge { 
+    background: linear-gradient(180deg, #f2d94c 0%, #d4af37 100%); 
+    color: #000; 
+    font-size: 9px; 
+    font-weight: 900; 
+    padding: 2px 6px; 
+    border-radius: 4px; 
+    margin-top: 2px; 
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3); 
 }
 
-/* 🔥 YENİ OTUR BUTONU (Premium Sade Altın) 🔥 */
-.btn-otur { 
-    background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%) !important; 
-    color: #111 !important; 
-    border: none !important; 
-    padding: 10px 22px !important; 
-    border-radius: 12px !important; 
-    font-weight: 800 !important; 
-    font-size: 14px !important; 
-    cursor: pointer !important; 
-    transition: transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.2s ease !important; 
-    text-transform: uppercase !important; 
-    box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3) !important; 
-    margin: 0 !important;
-}
-.btn-otur:hover { 
-    transform: scale(1.05) !important; 
-    box-shadow: 0 6px 20px rgba(243, 156, 18, 0.4) !important; 
-}
-.btn-otur:active { transform: scale(0.95) !important; }
-
-/* DOLU Butonu (İnaktif) */
-.btn-otur.disabled { 
-    background: rgba(255, 255, 255, 0.08) !important; 
-    color: #a3c4bc !important; 
-    box-shadow: none !important; 
-    cursor: not-allowed !important; 
-    border: 1px solid rgba(255,255,255,0.05) !important; 
+.cip-kutu { 
+    background: rgba(13, 43, 26, 0.6); 
+    border: 1px solid #2ecc71; 
+    box-shadow: 0 0 12px rgba(46, 204, 113, 0.4), inset 0 0 6px rgba(46, 204, 113, 0.2); 
+    padding: 8px 15px; 
+    border-radius: 12px; 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+    font-weight: bold; 
+    color: #fff; 
+    font-size: 16px; 
+    position: relative;
 }
 
-/* 🔥 YENİ İZLE BUTONU (Saydam ve Şık) 🔥 */
-.btn-izle { 
-    background: rgba(155, 89, 182, 0.15) !important; 
-    color: #e0b0ff !important; 
-    border: 1px solid rgba(155, 89, 182, 0.3) !important; 
-    padding: 10px 18px !important; 
-    border-radius: 12px !important; 
-    font-weight: 800 !important; 
-    font-size: 13px !important; 
-    cursor: pointer !important; 
-    box-shadow: none !important; 
-    transition: all 0.2s ease !important; 
-    margin: 0 !important;
+.cip-ikon { 
+    background: linear-gradient(180deg, #ffe066 0%, #f5b041 100%); 
+    color: #000; 
+    width: 20px; 
+    height: 20px; 
+    border-radius: 50%; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    font-size: 12px; 
+    font-weight: 900; 
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3); 
 }
-.btn-izle:hover { 
-    background: rgba(155, 89, 182, 0.3) !important; 
-    transform: scale(1.05) !important; 
+
+.sistem-mesaji { 
+    padding: 10px 20px; 
+    font-size: 12px; 
+    color: #a3c4bc; 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+    background-color: rgba(11, 28, 17, 0.5); 
+    flex-shrink: 0; 
+    border-bottom: 1px solid rgba(255,255,255,0.03); 
 }
-.btn-izle:active { transform: scale(0.95) !important; }
 
-/* ALT MENÜ VE EKRANLAR */
-.alt-menu-container { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; background: linear-gradient(0deg, #050d08 0%, #0c1c12 100%); border-top: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-around; align-items: center; padding: 0 10px; z-index: 10; }
-.alt-menu-item { display: flex; flex-direction: column; align-items: center; gap: 5px; color: #52796f; font-size: 10px; font-weight: bold; cursor: pointer; transition: color 0.2s; }
-.alt-menu-item.active { color: #f2c94c; }
-.alt-menu-ikon { font-size: 20px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+.sistem-mesaji::before { 
+    content: ''; 
+    display: inline-block; 
+    width: 8px; 
+    height: 8px; 
+    background-color: #2ecc71; 
+    border-radius: 50%; 
+    box-shadow: 0 0 8px #2ecc71; 
+}
 
-.lobi-oyuncu-satir { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: rgba(0,0,0,0.4); border-bottom: 1px solid #1e3f28; border-radius: 6px; }
-.lobi-oyuncu-isim { font-weight: bold; color: #0dcaf0; font-size: 13px;}
-.lobi-oyuncu-kutu { max-height: 180px !important; overflow-y: auto !important; background: rgba(0,0,0,0.3) !important; border-radius: 10px !important; padding: 5px !important; border: 1px solid rgba(255,255,255,0.05) !important; }
+.masa-sec-baslik { 
+    padding: 15px 20px 5px 20px; 
+    font-size: 12px; 
+    font-weight: 800; 
+    color: #52796f; 
+    letter-spacing: 2px; 
+    text-transform: uppercase; 
+}
 
-/* 🔥 VIP MASA KUR VE HEMEN OYNA BUTONLARINI YAN YANA DİZEN MOTOR 🔥 */
-#lobiEkrani button.btn-hemen-oyna {
-    position: fixed !important;
-    bottom: 85px !important; 
-    width: calc(50% - 15px) !important; 
-    height: 54px !important; 
-    border-radius: 14px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    align-items: center !important;
-    padding: 0 10px !important;
-    font-size: 13px !important;
+/* ⸻ YAŞAYAN VE NEFES ALAN MODERM MASA PANELLERİ ⸻ */
+.tables-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 15px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.masa-kart {
+    background: rgba(20, 35, 25, 0.4);
+    border: 1px solid rgba(46, 204, 113, 0.15);
+    border-radius: 18px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.masa-kart:active {
+    transform: scale(0.97);
+}
+
+/* 👑 MİLYARDER VIP MASA TASARIMI */
+.masa-kart.vip-board {
+    border: 2px solid #f1c40f !important;
+    background: linear-gradient(135deg, rgba(35, 30, 10, 0.5) 0%, rgba(15, 12, 5, 0.6) 100%) !important;
+    box-shadow: 0 0 25px rgba(241, 196, 15, 0.2), 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+}
+
+.masa-kart.vip-board::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(241, 196, 15, 0.06) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.vip-badge-tag {
+    background: linear-gradient(135deg, #f1c40f, #f39c12);
+    color: #000;
+    font-size: 10px;
+    font-weight: 900;
+    padding: 2px 8px;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(241, 196, 15, 0.3);
+    margin-left: 8px;
+    display: inline-block;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.masa-kart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 2;
+}
+
+.masa-unvan-alani {
+    display: flex;
+    align-items: center;
+}
+
+.masa-ikon-baslik {
+    font-size: 15px;
+    font-weight: 800;
+    color: #ffffff;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.masa-oyuncu-sayisi {
+    font-size: 12px;
+    font-weight: 600;
+    color: #84a59d;
+    background: rgba(0,0,0,0.3);
+    padding: 4px 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.03);
+}
+
+.masa-kart-body {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    z-index: 2;
+}
+
+/* REEL AVATAR YUVALARI */
+.slots-container {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 10px 14px;
+    border-radius: 14px;
+    width: 100%;
+}
+
+.koltuk-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.koltuk-circle.koltuk-dolu {
+    background: linear-gradient(180deg, #1e3f28, #0d1f14);
+    border: 2px solid #2ecc71;
+    color: #ffffff;
+    box-shadow: 0 0 12px rgba(46, 204, 113, 0.3);
+}
+
+.vip-board .koltuk-circle.koltuk-dolu {
+    background: linear-gradient(180deg, #3a2e0b, #151003);
+    border: 2px solid #f1c40f;
+    box-shadow: 0 0 12px rgba(241, 196, 15, 0.3);
+}
+
+.koltuk-circle.koltuk-bos {
+    border: 2px dashed rgba(255, 255, 255, 0.15);
+    background: transparent;
+    color: rgba(255, 255, 255, 0.15);
+    font-size: 16px;
+}
+
+.koltuk-emoji {
+    font-size: 12px;
+    margin-left: 2px;
+}
+
+.masa-kart-footer {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    z-index: 2;
+}
+
+/* AKSİYON BUTONLARI */
+.masa-kart .btn-izle {
+    background: linear-gradient(180deg, #9b59b6 0%, #8e44ad 100%) !important;
+    color: #fff !important;
+    border: none !important;
+    padding: 10px 16px !important;
+    border-radius: 10px !important;
     font-weight: 800 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.5px !important;
-    transition: transform 0.2s ease, opacity 0.2s ease !important;
-    z-index: 9999 !important;
+    font-size: 12px !important;
+    cursor: pointer !important;
+    box-shadow: 0 4px 10px rgba(155, 89, 182, 0.25) !important;
+    transition: all 0.2s ease !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-/* Soldaki Buton: VIP Masa Kur */
-#lobiEkrani button.btn-hemen-oyna[onclick*="vipMasaKurPanel"] {
-    left: 10px !important; 
-    right: auto !important;
-    background: linear-gradient(135deg, #ff33aa 0%, #aa33ff 100%) !important;
-    box-shadow: 0 8px 20px rgba(255, 51, 170, 0.25) !important;
-    border: 1px solid rgba(255, 51, 170, 0.4) !important;
-    transform: none !important; 
+.masa-kart .btn-izle:active {
+    transform: scale(0.95);
 }
 
-/* Sağdaki Buton: Hemen Oyna */
-#lobiEkrani #btnRastgeleOyna.btn-hemen-oyna {
-    right: 10px !important; 
-    left: auto !important;
-    background: linear-gradient(135deg, #ffe066 0%, #e6a100 100%) !important;
-    box-shadow: 0 8px 20px rgba(230, 161, 0, 0.25) !important;
-    border: 1px solid rgba(255, 224, 102, 0.3) !important;
-    transform: none !important; 
+.masa-kart .btn-otur {
+    flex: 1;
+    background: linear-gradient(180deg, #2ecc71 0%, #27ae60 100%) !important;
+    color: #fff !important;
+    border: none !important;
+    padding: 10px 20px !important;
+    border-radius: 10px !important;
+    font-weight: 800 !important;
+    font-size: 12px !important;
+    cursor: pointer !important;
+    box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3) !important;
+    transition: all 0.2s ease !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-/* Alt Açıklama Yazıları */
-#lobiEkrani button.btn-hemen-oyna span {
-    font-size: 9px !important;
-    font-weight: 600 !important;
-    color: rgba(0, 0, 0, 0.6) !important;
-    text-transform: uppercase !important;
-    margin-top: 2px !important;
+.masa-kart .btn-otur:active {
+    transform: scale(0.95);
 }
 
-/* Buton Tıklama (Active) Tepkisi */
-#lobiEkrani button.btn-hemen-oyna:active {
-    transform: scale(0.95) !important;
+.masa-kart .btn-otur.disabled {
+    background: rgba(231, 76, 60, 0.12) !important;
+    color: #e74c3c !important;
+    border: 1px solid rgba(231, 76, 60, 0.25) !important;
     box-shadow: none !important;
+    cursor: not-allowed !important;
+}
+
+/* ALTMENÜ VE DİĞER SABİT ÖGELER */
+.alt-menu-container { 
+    position: fixed; 
+    bottom: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 70px; 
+    background: linear-gradient(0deg, #050d08 0%, #0c1c12 100%); 
+    border-top: 1px solid rgba(255,255,255,0.06); 
+    display: flex; 
+    justify-content: space-around; 
+    align-items: center; 
+    padding: 0 10px; 
+    z-index: 10; 
+}
+
+.alt-menu-item { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    gap: 5px; 
+    color: #52796f; 
+    font-size: 10px; 
+    font-weight: bold; 
+    cursor: pointer; 
+    transition: color 0.2s; 
+}
+
+.alt-menu-item.active { 
+    color: #f2c94c; 
+}
+
+.alt-menu-ikon { 
+    font-size: 20px; 
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); 
+}
+
+.btn-hemen-oyna { 
+    position: fixed; 
+    bottom: 85px; 
+    left: 50%; 
+    transform: translateX(-50%); 
+    background: linear-gradient(180deg, #ffe066 0%, #e6a100 100%); 
+    color: #111; 
+    border: none; 
+    padding: 12px 30px; 
+    border-radius: 12px; 
+    font-weight: 900; 
+    font-size: 14px; 
+    cursor: pointer; 
+    box-shadow: 0 10px 25px rgba(230, 161, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.4); 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    gap: 2px; 
+    width: 180px; 
+    z-index: 15; 
+    transition: all 0.15s ease; 
+}
+
+.btn-hemen-oyna:active { 
+    transform: translateX(-50%) scale(0.95); 
+    box-shadow: 0 4px 10px rgba(230, 161, 0, 0.2); 
+}
+
+.btn-hemen-oyna span { 
+    font-size: 10px; 
+    font-weight: 600; 
+    color: rgba(5, 13, 8, 0.7); 
+    text-transform: uppercase; 
+    letter-spacing: 0.5px; 
+}
+
+.lobi-oyuncu-satir { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 10px; 
+    background: rgba(0,0,0,0.4); 
+    border-bottom: 1px solid #1e3f28; 
+    border-radius: 6px; 
+}
+
+.lobi-oyuncu-isim { 
+    font-weight: bold; 
+    color: #0dcaf0; 
+    font-size: 13px;
+}
+
+.lobi-oyuncu-kutu { 
+    max-height: 180px !important; 
+    overflow-y: auto !important; 
+    background: rgba(0,0,0,0.3) !important; 
+    border-radius: 10px !important; 
+    padding: 5px !important; 
+    border: 1px solid rgba(255,255,255,0.05) !important; 
 }
