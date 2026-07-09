@@ -124,54 +124,117 @@
         </div>
     </div>
 
+    <!-- REKLAM EKRANI (Aynı bırakıldı) -->
     <div id="reklamEkrani" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:9999999; flex-direction:column; justify-content:center; align-items:center;">
-        <div class="magaza-kutu" style="text-align:center; border: 2px solid #2ecc71; max-width: 320px; padding: 25px;">
+        <div style="text-align:center; border: 2px solid #2ecc71; max-width: 320px; padding: 25px; border-radius: 20px; background: #0b1a12;">
             <h2 style="color:#2ecc71; margin-bottom:10px; font-size:20px;">Sponsorlu İçerik</h2>
             <p style="color:#a3c4bc; font-size:13px; line-height:1.5;">Videoyu sonuna kadar izle patron!</p>
             <div id="reklamSayac" style="font-size: 45px; color: #f2c94c; font-weight: 900; margin: 15px 0; text-shadow: 0 0 15px rgba(242, 201, 76, 0.5);">15</div>
             <div style="width:100%; height:180px; background:#0a0a0a; border:1px solid #2ecc71; border-radius:10px; display:flex; justify-content:center; align-items:center; color:#555; font-size:11px; text-transform:uppercase;">[Beyco Games Ad Network]</div>
-            <button id="btnReklamKapat" onclick="reklamOduluAl()" class="satin-al-btn" style="display:none; width:100%; background:linear-gradient(180deg, #ffe066 0%, #db9d13 100%); color:#111; margin-top:20px;">🎁 25.000 ÇİPİ AL</button>
+            <button id="btnReklamKapat" onclick="reklamOduluAl()" style="display:none; width:100%; background:linear-gradient(180deg, #ffe066 0%, #db9d13 100%); color:#111; margin-top:20px; border:none; padding:12px; border-radius:8px; font-weight:bold;">🎁 25.000 ÇİPİ AL</button>
         </div>
     </div>
 
     <div id="canliIstekKutusuContainer"></div>
 
-    <div id="uyariModalEkrani" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999999; flex-direction:column; justify-content:center; align-items:center;">
-        <div class="magaza-kutu" style="text-align:center; border: 2px solid #f2c94c; max-width: 300px; padding: 25px;">
-            <div style="font-size:45px; margin-bottom:10px;">⚠️</div>
-            <h2 style="color:#f2c94c; margin-bottom:15px; font-size:20px;">SİSTEM MESAJI</h2>
-            <p id="uyariModalMetni" style="color:#fff; font-size:14px; margin-bottom:20px; line-height:1.5;">...</p>
-            <button onclick="document.getElementById('uyariModalEkrani').style.display='none'" class="satin-al-btn" style="background:#f2c94c; color:#000; font-size: 14px; padding: 10px 30px; font-weight:bold;">TAMAM</button>
-        </div>
-    </div>
-
-    <div id="vipMasaKurPanel" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:9999999; flex-direction:column; justify-content:center; align-items:center;">
-        <div class="magaza-kutu" style="max-width: 320px; text-align:center; border:2px solid #ff33aa; box-shadow: 0 0 25px #ff33aa;">
-            <h2 style="color:#ff33aa; font-size:22px; margin-bottom:15px; text-shadow:0 0 10px #ff33aa;">👑 VIP MASA AYARLARI</h2>
-            <p style="color:#a3c4bc; font-size:12px; margin-bottom:20px;">Odanın gizlilik ve bahis rütbesini belirle patron!</p>
-            <label style="color:#fff; font-size:11px; font-weight:bold; display:block; text-align:left; margin-bottom:5px;">MASA BAHİS MİKTARI:</label>
-            <select id="vipMasaBahis" class="auth-input" style="display:block; width:100%; background:#111; color:#fff; border:1px solid #ff33aa; margin-bottom:15px; padding:10px; border-radius:8px;">
-                <option value="10000">10.000 ÇİP</option>
-                <option value="20000" selected>20.000 ÇİP</option>
-                <option value="50000">50.000 ÇİP</option>
-                <option value="100000">100.000 ÇİP</option>
-            </select>
-            <label style="color:#fff; font-size:11px; font-weight:bold; display:block; text-align:left; margin-bottom:5px;">ERİŞİM KİLİDİ:</label>
-            <select id="vipMasaGizlilik" class="auth-input" style="display:block; width:100%; background:#111; color:#fff; border:1px solid #ff33aa; margin-bottom:25px; padding:10px; border-radius:8px;">
-                <option value="true" selected>🔒 Sadece Davet (Kilitli)</option>
-                <option value="false">🔓 Herkese Açık (Genel)</option>
-            </select>
-            <div style="display:flex; gap:10px;">
-                <button onclick="vipMasaKurAksiyon()" class="satin-al-btn" style="flex:1; background: linear-gradient(135deg, #ff33aa, #aa33ff); color:#fff;">ODAYI AÇ</button>
-                <button onclick="document.getElementById('vipMasaKurPanel').style.display='none'" class="satin-al-btn" style="flex:1; background:#333;">İPTAL</button>
+    <!-- 1. YENİ AAA UYARI MODALI -->
+    <div id="uyariModalEkrani" class="premium-modal-overlay" style="display:none;">
+        <div class="premium-modal-box">
+            <div class="modal-icon-wrapper warning-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            </div>
+            <h2 class="premium-modal-title">Sistem Mesajı</h2>
+            <p id="uyariModalMetni" class="premium-modal-desc">...</p>
+            <div class="premium-btn-group">
+                <button onclick="document.getElementById('uyariModalEkrani').style.display='none'" class="premium-btn btn-gold">Tamam</button>
             </div>
         </div>
     </div>
 
+    <!-- 2. YENİ AAA VIP MASA KURMA MODALI -->
+    <div id="vipMasaKurPanel" class="premium-modal-overlay" style="display:none;">
+        <div class="premium-modal-box">
+            <div class="modal-icon-wrapper vip-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            </div>
+            <h2 class="premium-modal-title">VIP Masa Oluştur</h2>
+            <p class="premium-modal-desc">Odanın gizlilik ve bahis rütbesini belirle.</p>
+            
+            <div class="premium-form-group">
+                <label class="premium-label">Masa Bahis Miktarı</label>
+                <div class="select-wrapper">
+                    <!-- ID'ler aynı, backend bozulmaz -->
+                    <select id="vipMasaBahis" class="premium-select">
+                        <option value="10000">10.000 ÇİP</option>
+                        <option value="20000" selected>20.000 ÇİP</option>
+                        <option value="50000">50.000 ÇİP</option>
+                        <option value="100000">100.000 ÇİP</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="premium-form-group">
+                <label class="premium-label">Erişim Kilidi</label>
+                <div class="select-wrapper">
+                    <!-- ID'ler aynı -->
+                    <select id="vipMasaGizlilik" class="premium-select">
+                        <option value="true" selected>Sadece Davet (Kilitli)</option>
+                        <option value="false">Herkese Açık (Genel)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="premium-btn-group">
+                <!-- Fonksiyonlar aynı -->
+                <button onclick="vipMasaKurAksiyon()" class="premium-btn btn-gold">Odayı Aç</button>
+                <button onclick="document.getElementById('vipMasaKurPanel').style.display='none'" class="premium-btn btn-dark">İptal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. YENİ AAA ÇIKIŞ UYARISI MODALI (Modern Confirmation Dialog) -->
+    <div id="cikisUyariEkrani" class="premium-modal-overlay" style="display:none;">
+        <div class="premium-modal-box">
+            <div class="modal-icon-wrapper danger-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            </div>
+            <h2 class="premium-modal-title">Masadan Ayrıl</h2>
+            <p class="premium-modal-desc">Masadan ayrılmak istediğine emin misin?</p>
+            
+            <div class="info-box">
+                <div class="info-box-item"><div class="info-dot"></div><span>50.000 Çip cezası uygulanacaktır.</span></div>
+                <div class="info-box-item"><div class="info-dot"></div><span>Oyun devam eder.</span></div>
+            </div>
+
+            <div class="premium-btn-group">
+                <!-- Fonksiyon aynı -->
+                <button id="btnCikisOnayla" class="premium-btn btn-danger">Masadan Ayrıl</button>
+                <button onclick="document.getElementById('cikisUyariEkrani').style.display='none'" class="premium-btn btn-dark">Vazgeç</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. YENİ AAA DAVET GELDİ MODALI -->
+    <div id="davetGeldiEkrani" class="premium-modal-overlay" style="display:none;">
+        <div class="premium-modal-box">
+            <div class="modal-icon-wrapper invite-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+            </div>
+            <h2 class="premium-modal-title">Özel Masa Daveti</h2>
+            <p id="davetMetni" class="premium-modal-desc">Birisi seni masaya çağırıyor...</p>
+            
+            <div class="premium-btn-group">
+                <button id="btnDavetKabul" class="premium-btn btn-success">Kabul Et</button>
+                <button onclick="document.getElementById('davetGeldiEkrani').style.display='none'" class="premium-btn btn-dark">Reddet</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANELS (Profil, Liderlik, Magaza vb. tasarımları sabit tutuldu) -->
     <div id="gorevlerEkrani" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:999999; flex-direction:column; justify-content:center; align-items:center;">
-        <div class="magaza-kutu" style="max-height: 85vh; display: flex; flex-direction: column; width: 95%; max-width: 400px; border:2px solid #2ecc71; box-shadow: 0 0 20px rgba(46, 204, 113, 0.4);">
-            <div class="magaza-header" style="border-bottom: 1px solid #2ecc71; padding-bottom: 10px; margin-bottom: 15px;">
-                <h2 style="color:#2ecc71;">📜 GÜNLÜK GÖREVLER</h2>
+        <div class="magaza-kutu" style="max-height: 85vh; display: flex; flex-direction: column; width: 95%; max-width: 400px; border:2px solid #2ecc71; box-shadow: 0 0 20px rgba(46, 204, 113, 0.4); border-radius: 15px; padding: 20px;">
+            <div class="magaza-header" style="border-bottom: 1px solid #2ecc71; padding-bottom: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+                <h2 style="color:#2ecc71; margin:0;">📜 GÜNLÜK GÖREVLER</h2>
                 <button onclick="document.getElementById('gorevlerEkrani').style.display='none'" style="background:none;border:none;color:#e74c3c;font-size:24px;cursor:pointer;font-weight:bold;">X</button>
             </div>
             <div id="gorevListesi" style="display:flex; flex-direction:column; gap:10px; overflow-y:auto; padding-right:5px;"></div>
@@ -179,7 +242,7 @@
     </div>
 
     <div id="profilEkrani" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999999; flex-direction:column; justify-content:center; align-items:center;">
-        <div class="magaza-kutu" style="max-width: 340px; width:90%; border: 2px solid #f2c94c; text-align: center; padding: 25px 20px; position:relative; box-shadow: 0 0 20px rgba(242, 201, 76, 0.2);">
+        <div class="magaza-kutu" style="max-width: 340px; width:90%; border: 2px solid #f2c94c; text-align: center; padding: 25px 20px; position:relative; box-shadow: 0 0 20px rgba(242, 201, 76, 0.2); border-radius: 15px; background: #0b1a12;">
             <button onclick="document.getElementById('profilEkrani').style.display='none'" style="position:absolute; top:15px; right:20px; background:none; border:none; color:#e74c3c; font-size:24px; cursor:pointer; font-weight:bold;">X</button>
             <div id="profilAvatarAlan" style="width:70px; height:70px; margin: 0 auto 10px; background: radial-gradient(circle, #1e3f28 0%, #0d1f14 100%); border-radius:50%; border:3px solid #52796f; display:flex; justify-content:center; align-items:center; font-size:35px; box-shadow: 0 0 15px rgba(46, 204, 113, 0.3);">😎</div>
             <h2 id="profilIsim" style="color:#ff4d4d; margin-bottom:5px; font-size:24px; text-shadow: 0 0 10px rgba(255, 77, 77, 0.5);">Yükleniyor...</h2>
@@ -207,117 +270,94 @@
                 <div id="profilCipMiktari" style="font-size:26px; font-weight:900; color:#fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">...</div>
             </div>
             <div style="display:flex; flex-direction:column; gap:10px;">
-                <button id="profilArkadasBtn" onclick="profilArkadasAksiyon()" class="satin-al-btn" style="background: linear-gradient(180deg, #f1c40f 0%, #f39c12 100%); color:#111; font-weight:bold; border:none;">➕ Arkadaş Ekle</button>
-                <button id="profilDavetBtn" onclick="profilDavetAksiyon()" class="satin-al-btn" style="background: linear-gradient(180deg, #2ecc71 0%, #27ae60 100%); color:#fff; font-weight:bold; border:none;">🎲 Masaya Davet Et</button>
-                <button class="satin-al-btn" style="background: linear-gradient(180deg, #3498db 0%, #2980b9 100%); color:#fff; font-weight:bold; border:none;" onclick="document.getElementById('profilEkrani').style.display='none'; document.getElementById('sohbetCekmecesi').classList.add('acik'); let inp = document.getElementById('sohbetInput'); inp.value = '@' + document.getElementById('profilArkadasBtn').dataset.hedef + ' '; inp.focus();">💬 ÖZEL MESAJ GÖNDER</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="cikisUyariEkrani" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:999999; flex-direction:column; justify-content:center; align-items:center;">
-        <div class="magaza-kutu" style="text-align:center;">
-            <div style="font-size:50px; margin-bottom:10px;">⚠️</div>
-            <h2 style="color:#e74c3c; margin-bottom:10px;">MASADAN ÇIKIYORSUN!</h2>
-            <p style="color:#fff; font-size:14px; margin-bottom:20px;">Çıkmak istediğine emin misin?</p>
-            <div style="display:flex; gap:10px;">
-                <button id="btnCikisOnayla" class="satin-al-btn" style="flex:1; background:#e74c3c; color:#fff;">EVET, ÇIK</button>
-                <button onclick="document.getElementById('cikisUyariEkrani').style.display='none'" class="satin-al-btn" style="flex:1;">İPTAL</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="davetGeldiEkrani" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:999999; flex-direction:column; justify-content:center; align-items:center;">
-        <div class="magaza-kutu" style="text-align:center; border: 2px solid #ff33aa; box-shadow: 0 0 20px #ff33aa;">
-            <div style="font-size:50px; margin-bottom:10px;">💌</div>
-            <h2 style="color:#f2c94c; margin-bottom:10px;">ÖZEL MASA DAVETİ!</h2>
-            <p id="davetMetni" style="color:#fff; font-size:14px; margin-bottom:20px;">Birisi seni masaya çağırıyor...</p>
-            <div style="display:flex; gap:10px;">
-                <button id="btnDavetKabul" class="satin-al-btn" style="flex:1; background:#2ecc71; color:#111;">KABUL ET</button>
-                <button onclick="document.getElementById('davetGeldiEkrani').style.display='none'" class="satin-al-btn" style="flex:1; background:#e74c3c; color:#fff;">REDDET</button>
+                <button id="profilArkadasBtn" onclick="profilArkadasAksiyon()" style="background: linear-gradient(180deg, #f1c40f 0%, #f39c12 100%); color:#111; font-weight:bold; border:none; padding:10px; border-radius:8px;">➕ Arkadaş Ekle</button>
+                <button id="profilDavetBtn" onclick="profilDavetAksiyon()" style="background: linear-gradient(180deg, #2ecc71 0%, #27ae60 100%); color:#fff; font-weight:bold; border:none; padding:10px; border-radius:8px;">🎲 Masaya Davet Et</button>
+                <button style="background: linear-gradient(180deg, #3498db 0%, #2980b9 100%); color:#fff; font-weight:bold; border:none; padding:10px; border-radius:8px;" onclick="document.getElementById('profilEkrani').style.display='none'; document.getElementById('sohbetCekmecesi').classList.add('acik'); let inp = document.getElementById('sohbetInput'); inp.value = '@' + document.getElementById('profilArkadasBtn').dataset.hedef + ' '; inp.focus();">💬 ÖZEL MESAJ GÖNDER</button>
             </div>
         </div>
     </div>
 
     <div id="arkadaslarEkrani" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:99999; flex-direction:column; justify-content:center; align-items:center;">
-        <div class="magaza-kutu" style="max-height: 85vh; display: flex; flex-direction: column; width: 95%; max-width: 500px;">
-            <div class="magaza-header">
-                <h2>👥 ARKADAŞ LİSTESİ</h2>
+        <div class="magaza-kutu" style="max-height: 85vh; display: flex; flex-direction: column; width: 95%; max-width: 500px; border-radius:15px; padding:20px; background:#0b1a12;">
+            <div class="magaza-header" style="display:flex; justify-content:space-between; border-bottom:1px solid #2ecc71; padding-bottom:10px;">
+                <h2 style="color:#2ecc71; margin:0;">👥 ARKADAŞ LİSTESİ</h2>
                 <button onclick="document.getElementById('arkadaslarEkrani').style.display='none'" style="background:none;border:none;color:#e74c3c;font-size:24px;cursor:pointer;font-weight:bold;">X</button>
             </div>
-            <div id="arkadasListesiDiv" style="overflow-y:auto; padding-right:5px; flex:1; display:flex; flex-direction:column; gap:10px;"></div>
+            <div id="arkadasListesiDiv" style="overflow-y:auto; padding-right:5px; flex:1; display:flex; flex-direction:column; gap:10px; margin-top:10px;"></div>
         </div>
     </div>
 
     <div id="liderlikEkrani" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:99999; flex-direction:column; justify-content:center; align-items:center;">
-        <div class="magaza-kutu" style="max-height: 85vh; display: flex; flex-direction: column; width: 95%; max-width: 500px;">
-            <div class="magaza-header">
-                <h2>🏆 EN ZENGİNLER (TOP 5)</h2>
+        <div class="magaza-kutu" style="max-height: 85vh; display: flex; flex-direction: column; width: 95%; max-width: 500px; border-radius:15px; padding:20px; background:#0b1a12;">
+            <div class="magaza-header" style="display:flex; justify-content:space-between; border-bottom:1px solid #f1c40f; padding-bottom:10px;">
+                <h2 style="color:#f1c40f; margin:0;">🏆 EN ZENGİNLER (TOP 5)</h2>
                 <button onclick="document.getElementById('liderlikEkrani').style.display='none'" style="background:none;border:none;color:#e74c3c;font-size:24px;cursor:pointer;font-weight:bold;">X</button>
             </div>
-            <div id="liderlikListesi" style="overflow-y:auto; padding-right:5px; flex:1; display:flex; flex-direction:column; gap:10px;"></div>
+            <div id="liderlikListesi" style="overflow-y:auto; padding-right:5px; flex:1; display:flex; flex-direction:column; gap:10px; margin-top:10px;"></div>
         </div>
     </div>
 
     <div id="gunlukBonusEkrani" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.92); z-index:999999; flex-direction:column; justify-content:center; align-items:center;">
-        <div class="bonus-kutu">
-            <h2>🎁 GÜNLÜK VIP ÖDÜLÜ</h2>
-            <div class="dijital-gosterge" id="dijitalGosterge">000.000</div>
-            <button class="bonus-btn" id="btnBonusCevir" onclick="gunlukKasaCevir()">🔒 KASAYI AÇ</button>
+        <div style="background: linear-gradient(135deg, #112618 0%, #06120b 100%); border: 3px solid #2ecc71; border-radius: 20px; padding: 40px 30px; text-align: center; box-shadow: 0 0 50px rgba(46, 204, 113, 0.4); width: 90%; max-width: 400px;">
+            <h2 style="color: #2ecc71; font-size: 26px; margin-bottom: 10px; text-shadow: 0 0 10px rgba(46,204,113,0.5);">🎁 GÜNLÜK VIP ÖDÜLÜ</h2>
+            <div id="dijitalGosterge" style="background: #000; color: #f2c94c; font-family: 'Courier New', Courier, monospace; font-size: 45px; font-weight: 900; padding: 15px 20px; border-radius: 10px; border: 2px inset #f2c94c; letter-spacing: 5px; margin-bottom: 25px; box-shadow: inset 0 0 20px rgba(242, 201, 76, 0.2);">000.000</div>
+            <button id="btnBonusCevir" onclick="gunlukKasaCevir()" style="background: linear-gradient(180deg, #ffe066 0%, #db9d13 100%); color: #000; border: none; padding: 15px 40px; border-radius: 12px; font-weight: 900; font-size: 18px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.4); width: 100%; transition: all 0.2s;">🔒 KASAYI AÇ</button>
         </div>
     </div>
 
     <div id="magazaEkrani" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:99999; flex-direction:column; justify-content:center; align-items:center;">
-        <div class="magaza-kutu" style="max-height:85vh; overflow-y:auto;">
-            <div class="magaza-header">
-                <h2>🛒 VIP MAĞAZA</h2>
+        <div class="magaza-kutu" style="max-height:85vh; overflow-y:auto; border-radius:15px; padding:20px; background:#0b1a12; width:95%; max-width:600px;">
+            <div class="magaza-header" style="display:flex; justify-content:space-between; border-bottom:1px solid #f1c40f; padding-bottom:10px; margin-bottom:20px;">
+                <h2 style="color:#f1c40f; margin:0;">🛒 VIP MAĞAZA</h2>
                 <button onclick="document.getElementById('magazaEkrani').style.display='none'" style="background:none;border:none;color:#e74c3c;font-size:24px;cursor:pointer;">X</button>
             </div>
             
-            <div class="magaza-icerik">
-                <div class="urun-kart">
-                    <div class="urun-ikon" style="border: 3px solid #f2c94c; box-shadow: 0 0 15px #f2c94c;">😎</div>
-                    <h3>Altın Çerçeve</h3>
-                    <button class="satin-al-btn" id="btn_altin_cerceve" onclick="magazaIslem('altin_cerceve', 500000)">500.000 ÇİP</button>
+            <div style="display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none;">
+                <div style="background: rgba(0,0,0,0.5); border: 1px solid #1e3f28; border-radius: 12px; padding: 20px; text-align: center; min-width: 140px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; gap: 10px; flex: 1;">
+                    <div style="font-size: 35px; width: 65px; height: 65px; display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.05); border-radius: 50%; margin-bottom: 5px; border: 3px solid #f2c94c; box-shadow: 0 0 15px #f2c94c;">😎</div>
+                    <h3 style="color: #fff; font-size: 14px;">Altın Çerçeve</h3>
+                    <button id="btn_altin_cerceve" onclick="magazaIslem('altin_cerceve', 500000)" style="background: linear-gradient(180deg, #ffe066 0%, #db9d13 100%); color: #000; border: none; padding: 10px 5px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; width: 100%; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">500.000 ÇİP</button>
                 </div>
-                <div class="urun-kart">
-                    <div class="urun-ikon" style="color: #00ffcc; text-shadow: 0 0 15px #00ffcc;">👑</div>
-                    <h3>Neon Kral Tacı</h3>
-                    <button class="satin-al-btn" id="btn_neon_tac" onclick="magazaIslem('neon_tac', 1500000)">1.5M ÇİP</button>
+                <div style="background: rgba(0,0,0,0.5); border: 1px solid #1e3f28; border-radius: 12px; padding: 20px; text-align: center; min-width: 140px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; gap: 10px; flex: 1;">
+                    <div style="font-size: 35px; width: 65px; height: 65px; display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.05); border-radius: 50%; margin-bottom: 5px; color: #00ffcc; text-shadow: 0 0 15px #00ffcc;">👑</div>
+                    <h3 style="color: #fff; font-size: 14px;">Neon Kral Tacı</h3>
+                    <button id="btn_neon_tac" onclick="magazaIslem('neon_tac', 1500000)" style="background: linear-gradient(180deg, #ffe066 0%, #db9d13 100%); color: #000; border: none; padding: 10px 5px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; width: 100%; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">1.5M ÇİP</button>
                 </div>
-                <div class="urun-kart">
-                    <div class="urun-ikon" style="color: #ff4d4d; text-shadow: 0 0 15px #ff4d4d;">🔥</div>
-                    <h3>Ateşli İsim</h3>
-                    <button class="satin-al-btn" id="btn_atesli_isim" onclick="magazaIslem('atesli_isim', 3000000)">3M ÇİP</button>
+                <div style="background: rgba(0,0,0,0.5); border: 1px solid #1e3f28; border-radius: 12px; padding: 20px; text-align: center; min-width: 140px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; gap: 10px; flex: 1;">
+                    <div style="font-size: 35px; width: 65px; height: 65px; display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.05); border-radius: 50%; margin-bottom: 5px; color: #ff4d4d; text-shadow: 0 0 15px #ff4d4d;">🔥</div>
+                    <h3 style="color: #fff; font-size: 14px;">Ateşli İsim</h3>
+                    <button id="btn_atesli_isim" onclick="magazaIslem('atesli_isim', 3000000)" style="background: linear-gradient(180deg, #ffe066 0%, #db9d13 100%); color: #000; border: none; padding: 10px 5px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; width: 100%; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">3M ÇİP</button>
                 </div>
             </div>
 
             <h3 style="color:#f2c94c; text-align:center; width:100%; margin-top:20px; border-bottom:1px solid #52796f; padding-bottom:5px;">👑 MİLYARDER TEMALARI</h3>
             
-            <div class="magaza-icerik" style="margin-top: 15px;">
-                <div class="urun-kart" style="border-color:#ffd700;">
-                    <div class="urun-ikon" style="font-size:30px; border:none; box-shadow:none; background:transparent;">👑</div>
-                    <h3 style="font-size:14px;">Kraliyet Altını</h3>
+            <div style="display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; margin-top: 15px;">
+                <div style="background: rgba(0,0,0,0.5); border: 1px solid #ffd700; border-radius: 12px; padding: 20px; text-align: center; min-width: 140px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; gap: 10px; flex: 1;">
+                    <div style="font-size:30px; border:none; box-shadow:none; background:transparent;">👑</div>
+                    <h3 style="font-size:14px; color:#fff;">Kraliyet Altını</h3>
                     <p style="font-size:10px; color:#aaa; margin-bottom: 10px; padding:0 5px;">Masanı altın yaldızlı bir saraya çevirir.</p>
-                    <button class="satin-al-btn" id="btn_tema_royal" onclick="magazaIslem('tema_royal', 10000000)">10 Milyon ÇİP</button>
+                    <button id="btn_tema_royal" onclick="magazaIslem('tema_royal', 10000000)" style="background: linear-gradient(180deg, #ffe066 0%, #db9d13 100%); color: #000; border: none; padding: 10px 5px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; width: 100%; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">10 Milyon ÇİP</button>
                 </div>
 
-                <div class="urun-kart" style="border-color:#00f3ff;">
-                    <div class="urun-ikon" style="font-size:30px; border:none; box-shadow:none; background:transparent;">🌌</div>
-                    <h3 style="font-size:14px;">Siber Pavyon</h3>
+                <div style="background: rgba(0,0,0,0.5); border: 1px solid #00f3ff; border-radius: 12px; padding: 20px; text-align: center; min-width: 140px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; gap: 10px; flex: 1;">
+                    <div style="font-size:30px; border:none; box-shadow:none; background:transparent;">🌌</div>
+                    <h3 style="font-size:14px; color:#fff;">Siber Pavyon</h3>
                     <p style="font-size:10px; color:#aaa; margin-bottom: 10px; padding:0 5px;">Masayı neon mor/mavi siber ortama çevirir.</p>
-                    <button class="satin-al-btn" id="btn_tema_neon" onclick="magazaIslem('tema_neon', 20000000)">20 Milyon ÇİP</button>
+                    <button id="btn_tema_neon" onclick="magazaIslem('tema_neon', 20000000)" style="background: linear-gradient(180deg, #ffe066 0%, #db9d13 100%); color: #000; border: none; padding: 10px 5px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; width: 100%; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">20 Milyon ÇİP</button>
                 </div>
 
-                <div class="urun-kart" style="border-color:#8b5a2b;">
-                    <div class="urun-ikon" style="font-size:30px; border:none; box-shadow:none; background:transparent;">🍷</div>
-                    <h3 style="font-size:14px;">Kızıl Baron</h3>
+                <div style="background: rgba(0,0,0,0.5); border: 1px solid #8b5a2b; border-radius: 12px; padding: 20px; text-align: center; min-width: 140px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; gap: 10px; flex: 1;">
+                    <div style="font-size:30px; border:none; box-shadow:none; background:transparent;">🍷</div>
+                    <h3 style="font-size:14px; color:#fff;">Kızıl Baron</h3>
                     <p style="font-size:10px; color:#aaa; margin-bottom: 10px; padding:0 5px;">Koyu bordo kadife masa ve ahşap detaylar.</p>
-                    <button class="satin-al-btn" id="btn_tema_kizil" onclick="magazaIslem('tema_kizil', 30000000)">30 Milyon ÇİP</button>
+                    <button id="btn_tema_kizil" onclick="magazaIslem('tema_kizil', 30000000)" style="background: linear-gradient(180deg, #ffe066 0%, #db9d13 100%); color: #000; border: none; padding: 10px 5px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; width: 100%; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">30 Milyon ÇİP</button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- MAIN UI -->
     <div class="vip-header">
         <div class="profil-bilgi" onclick="if(aktifKullaniciAdi) profiliGoster(aktifKullaniciAdi)" style="cursor:pointer;">
             <div class="profil-avatar" id="vipAvatar">😎</div>
@@ -346,14 +386,11 @@
             <div id="lobidekilerListesi" style="display:flex; flex-direction:column; gap:5px;"></div>
         </div>
 
-        <!-- 🔥 YENİ YAPI: Eski 'btn-hemen-oyna' class'ı korundu ki JS ve onclick bozulmasın. 
-             Sadece CSS'te important ile ezeceğimiz wrapper içine alındı 🔥 -->
-        <div class="quick-actions-wrapper">
-            <button onclick="document.getElementById('vipMasaKurPanel').style.display='flex'" class="btn-hemen-oyna aksiyon-vip">
+        <div class="beyco-aksiyon-wrapper">
+            <button onclick="document.getElementById('vipMasaKurPanel').style.display='flex'" class="beyco-btn vip-btn">
                 👑 VIP Masa Kur <span>Özel Alan</span>
             </button>
-
-            <button id="btnRastgeleOyna" class="btn-hemen-oyna aksiyon-hizli">
+            <button id="btnRastgeleOyna" class="beyco-btn hizli-btn">
                 ⚡ Hemen Oyna <span>Rastgele Masa</span>
             </button>
         </div>
@@ -389,11 +426,11 @@
 
         <div id="flashBildirim" class="flash-bildirim"></div>
 
-        <div id="sonucEkrani">
-            <div class="sonuc-kutu" style="max-width: 450px; width: 95%;">
+        <div id="sonucEkrani" class="premium-modal-overlay" style="display:none;">
+            <div class="sonuc-kutu">
                 <h1 id="sonucBaslik">Oyun Bitti!</h1>
                 <p id="sonucMetin">Kazanan: ...</p>
-                <div id="kazananEliAlani" style="display:flex; justify-content:center; flex-wrap:wrap; gap:2px; margin: 15px 0; padding:10px; background:rgba(0,0,0,0.6); border-radius:10px; border: 1px solid #f2c94c; min-height: 50px;"></div>
+                <div id="kazananEliAlani" style="display:flex; justify-content:center; flex-wrap:wrap; gap:2px; margin: 15px 0; min-height: 50px;"></div>
                 <p id="sonucOdul"></p>
                 <button class="sonuc-btn" onclick="document.getElementById('sonucEkrani').style.display='none'">MASAYA DÖN</button>
             </div>
