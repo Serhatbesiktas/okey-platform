@@ -33,7 +33,7 @@ socket.on('cip_guncelle', (cip) => {
     }
 });
 
-// ⸻ AMİRAL GEMİSİ: AKILLI MASA SLOT MOTORU (DEĞİŞTİRİLMEDİ, GÖRSEL YAPILANDIRILDI) ⸻
+// ⸻ AMİRAL GEMİSİ: KOMPAKT, PREMİUM VE 3 SÜTUNLU LOBİ HTML RENDER DÖNGÜSÜ ⸻
 socket.on('masalari_guncelle', (lobidekiMasalar) => {
     guncelMasalar = lobidekiMasalar; 
     if(!masalarAlani) return; 
@@ -42,53 +42,55 @@ socket.on('masalari_guncelle', (lobidekiMasalar) => {
     Object.entries(lobidekiMasalar).forEach(([masaAdi, koltuklar]) => {
         const dolu = koltuklar.filter(k => k !== null).length; 
         const benVarim = koltuklar.includes(aktifKullaniciAdi);
+        
+        // Mantık fonksiyonları aynı
         const action = benVarim ? `masayaGeriDon('${masaAdi}')` : `masayaOtur('${masaAdi}')`; 
         
-        // VIP Oda Analiz Süzgeci
+        // İnce ve sade VIP algılama
         const isVIP = masaAdi.toUpperCase().includes('VIP') || masaAdi.includes('50K') || masaAdi.includes('100K');
         const vipClass = isVIP ? 'vip-board' : '';
-        const vipBadge = isVIP ? '<span class="vip-badge-tag">👑 VIP</span>' : '';
+        const vipBadge = isVIP ? '<div class="vip-badge-tag">👑 VIP</div>' : '';
 
-        // Durumsal Etiket ve Buton Sınıfları
-        const txt = benVarim ? 'OTURDUN ✓' : (dolu >= 4 ? '🔴 MASA DOLU' : '🟢 BOŞ KOLTUĞA OTUR');
+        // Aksiyon Butonları Metin ve Sınıfı
+        const txt = benVarim ? 'OTURDUN ✓' : (dolu >= 4 ? 'MASA DOLU' : 'OTUR');
         const btnDisabled = (dolu >= 4 && !benVarim) ? 'disabled' : '';
         const btnClass = dolu >= 4 && !benVarim ? 'disabled' : '';
-        const izleBtn = !benVarim ? `<button class="btn-izle" onclick="masayiIzle('${masaAdi}')">🟣 İZLE</button>` : '';
+        const izleBtn = (!benVarim && dolu > 0) ? `<button class="btn-izle" onclick="masayiIzle('${masaAdi}')">İZLE</button>` : '';
 
-        // 4 Koltuk Yuvasının Canlı Olarak Döngüyle İşlenmesi
+        // Orta Masadaki 4 Koltuğu (2x2 Grid) Doldur
         let koltukHtml = '';
+        const defaultAvatars = ["😀", "😎", "🙂", "🤩"];
         for(let i = 0; i < 4; i++) {
             if(koltuklar[i]) {
                 let koz = (globalKozmetikler && globalKozmetikler[koltuklar[i]]) || [];
-                let emoji = "😀";
-                if(i === 1) emoji = "😎";
-                if(i === 2) emoji = "🙂";
-                if(i === 3) emoji = "👑";
+                let emoji = defaultAvatars[i % 4];
                 if(koz.includes('neon_tac')) emoji = "👑";
-                koltukHtml += `<div class="koltuk-circle koltuk-dolu" title="${koltuklar[i]}">👤 <span class="koltuk-emoji">${emoji}</span></div>`;
+                koltukHtml += `<div class="mini-koltuk dolu" title="${koltuklar[i]}">${emoji}</div>`;
             } else {
-                koltukHtml += `<div class="koltuk-circle koltuk-bos">○</div>`;
+                koltukHtml += `<div class="mini-koltuk bos">+</div>`;
             }
         }
 
-        // AAA Mobil Uygulama Standartlarında DOM Çıktısı
+        // Yeni Kompakt 3 Sütunlu HTML Yerleşimi
         masalarAlani.innerHTML += `
         <div class="masa-kart ${vipClass}">
-            <div class="masa-kart-header">
-                <div class="masa-unvan-alani">
-                    <span class="masa-ikon-baslik">🎲 ${masaAdi}</span>
-                    ${vipBadge}
-                </div>
-                <div class="masa-oyuncu-sayisi">${dolu} / 4 Oyuncu</div>
+            <div class="masa-sol">
+                <div class="masa-adi">🎲 ${masaAdi}</div>
+                ${vipBadge}
             </div>
-            <div class="masa-kart-body">
-                <div class="slots-container">
+            
+            <div class="masa-orta">
+                <div class="mini-masa-oval">
                     ${koltukHtml}
                 </div>
             </div>
-            <div class="masa-kart-footer">
-                ${izleBtn}
-                <button class="btn-otur ${btnClass}" onclick="${action}" ${btnDisabled}>${txt}</button>
+            
+            <div class="masa-sag">
+                <div class="masa-oyuncu-sayisi">👥 ${dolu} / 4</div>
+                <div class="masa-aksiyon">
+                    ${izleBtn}
+                    <button class="btn-otur ${btnClass}" onclick="${action}" ${btnDisabled}>${txt}</button>
+                </div>
             </div>
         </div>`;
         
@@ -235,7 +237,7 @@ socket.on('oyun_bitti', (data) => {
         }
     }, 150); 
     
-    // Eski temizleme ve bayrak sıfırlama rutinleri bozulmadan çalışmaya devam eder
+    // Temizleme rutinleri bozulmadan korunur
     sonucEkrani.style.display = 'flex'; 
     const flash = document.getElementById('flashBildirim'); 
     if (flash) flash.classList.remove('goster'); 
@@ -359,60 +361,6 @@ if(typeof socket !== 'undefined') {
             if(tasEl) tasEl.remove(); 
             if(window.seciliTas && window.seciliTas.id === data.tas.id) window.seciliTas = null; 
         }
-    });
-
-    socket.on('oyun_bitti', (data) => {
-        if (window.suAnkiMasam !== data.masaAdi) return;
-
-        let htmlIcerik = "";
-        if (data.bitisEli && Array.isArray(data.bitisEli) && data.bitisEli.length > 0) {
-            let siraliEl = [...data.bitisEli];
-            siraliEl.forEach(tas => {
-                if(!tas) return; 
-                let textColor = '#111';
-                if(tas.renk === 'kirmizi') textColor = '#cc0000';
-                else if(tas.renk === 'mavi') textColor = '#0000cc';
-                else if(tas.renk === 'sari') textColor = '#d4af37';
-                
-                let displaySayi = tas.sayi === 'S' ? '☻' : tas.sayi;
-                htmlIcerik += `<div class="okey-tasi-bitis" style="position:relative; width:26px; height:38px; font-size:16px; font-weight:900; color:${textColor}; border-radius:4px; display:flex; justify-content:center; align-items:center; margin:2px;">${displaySayi}</div>`;
-            });
-        } else {
-            htmlIcerik = '<span style="color:#aaa; font-size:12px;">Sunucudan taş bilgisi alınamadı.</span>';
-        }
-
-        setTimeout(() => {
-            let sEkrani = document.getElementById('sonucEkrani');
-            if (sEkrani) sEkrani.style.display = 'flex';
-            
-            let sBaslik = document.getElementById('sonucBaslik');
-            let sMetin = document.getElementById('sonucMetin');
-            let sOdul = document.getElementById('sonucOdul');
-            
-            if (data.kazanan) {
-                if(sBaslik) sBaslik.innerHTML = (data.kazanan === window.aktifKullaniciAdi) ? '🏆 TEBRİKLER, KAZANDIN! 🏆' : '😢 OYUN BİTTİ!';
-                if(sMetin) sMetin.innerHTML = 'Kazanan: ' + data.kazanan + '<br>Sebep: ' + data.sebep;
-                if(sOdul) sOdul.innerHTML = '+' + (data.odul || 0).toLocaleString('tr-TR') + ' ÇİP';
-                
-                let elAlani = document.getElementById('kazananEliAlani');
-                if (elAlani) {
-                    elAlani.innerHTML = htmlIcerik; 
-                    let vurusSayisi = 0;
-                    let civiMotoru = setInterval(() => {
-                        let hedefKutu = document.getElementById('kazananEliAlani');
-                        if(hedefKutu) hedefKutu.innerHTML = htmlIcerik;
-                        vurusSayisi++;
-                        if(vurusSayisi > 10) clearInterval(civiMotoru); 
-                    }, 200);
-                }
-            } else {
-                if(sBaslik) sBaslik.innerHTML = '⚖️ BERABERE!';
-                if(sMetin) sMetin.innerHTML = data.sebep;
-                if(sOdul) sOdul.innerHTML = '';
-                let elAlani = document.getElementById('kazananEliAlani');
-                if(elAlani) elAlani.innerHTML = '';
-            }
-        }, 150); 
     });
 
     socket.on('masa_temizlendi', (data) => {
