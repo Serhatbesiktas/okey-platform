@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/animations.css">
     <link rel="stylesheet" href="css/auth.css">
-    <link rel="stylesheet" href="css/lobi.css?v=YENI_VIP_LOBI">
+    <link rel="stylesheet" href="css/lobi.css">
     <link rel="stylesheet" href="css/masa.css">
     <link rel="stylesheet" href="css/modal.css">
     <link rel="stylesheet" href="css/tema.css">
@@ -339,21 +339,22 @@
         </div>
         
         <div class="masa-sec-baslik">MASA SEÇ</div>
-        
-        <div class="tables-panel" id="masalarAlani"></div>
+        <div class="masalar-panel" id="masalarAlani"></div>
 
         <div class="players-panel">
             <div class="panel-title" style="color:#f2c94c; font-size:14px; margin-bottom:10px;">👥 Lobideki Oyuncular</div>
             <div id="lobidekilerListesi" style="display:flex; flex-direction:column; gap:5px;"></div>
         </div>
 
-        <button onclick="document.getElementById('vipMasaKurPanel').style.display='flex'" class="btn-hemen-oyna" style="bottom: 140px !important; background: linear-gradient(135deg, #ff33aa 0%, #aa33ff 100%) !important; box-shadow: 0 0 15px #ff33aa !important; z-index: 9999;">
-            👑 VIP Masa Kur <span>Özel janjanlı alan</span>
-        </button>
+        <div class="hizli-aksiyon-container">
+            <button onclick="document.getElementById('vipMasaKurPanel').style.display='flex'" class="btn-aksiyon-kart btn-vip-kur">
+                👑 VIP Kur <span>Özel Alan</span>
+            </button>
 
-        <button class="btn-hemen-oyna" id="btnRastgeleOyna" style="z-index: 9998;">
-            ⚡ Hemen Oyna <span>Rastgele Masa</span>
-        </button>
+            <button class="btn-aksiyon-kart btn-rastgele" id="btnRastgeleOyna">
+                ⚡ Hızlı Oyna <span>Rastgele</span>
+            </button>
+        </div>
 
         <div class="alt-menu-container" style="justify-content: space-around;">
             <div class="alt-menu-item active"><div class="alt-menu-ikon">🏠</div><span>Lobi</span></div>
