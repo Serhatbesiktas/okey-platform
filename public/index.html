@@ -124,7 +124,6 @@
         </div>
     </div>
 
-    <!-- REKLAM EKRANI (Aynı bırakıldı) -->
     <div id="reklamEkrani" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:9999999; flex-direction:column; justify-content:center; align-items:center;">
         <div style="text-align:center; border: 2px solid #2ecc71; max-width: 320px; padding: 25px; border-radius: 20px; background: #0b1a12;">
             <h2 style="color:#2ecc71; margin-bottom:10px; font-size:20px;">Sponsorlu İçerik</h2>
@@ -137,7 +136,6 @@
 
     <div id="canliIstekKutusuContainer"></div>
 
-    <!-- 1. YENİ AAA UYARI MODALI -->
     <div id="uyariModalEkrani" class="premium-modal-overlay" style="display:none;">
         <div class="premium-modal-box">
             <div class="modal-icon-wrapper warning-icon">
@@ -151,7 +149,6 @@
         </div>
     </div>
 
-    <!-- 2. YENİ AAA VIP MASA KURMA MODALI -->
     <div id="vipMasaKurPanel" class="premium-modal-overlay" style="display:none;">
         <div class="premium-modal-box">
             <div class="modal-icon-wrapper vip-icon">
@@ -163,7 +160,6 @@
             <div class="premium-form-group">
                 <label class="premium-label">Masa Bahis Miktarı</label>
                 <div class="select-wrapper">
-                    <!-- ID'ler aynı, backend bozulmaz -->
                     <select id="vipMasaBahis" class="premium-select">
                         <option value="10000">10.000 ÇİP</option>
                         <option value="20000" selected>20.000 ÇİP</option>
@@ -176,7 +172,6 @@
             <div class="premium-form-group">
                 <label class="premium-label">Erişim Kilidi</label>
                 <div class="select-wrapper">
-                    <!-- ID'ler aynı -->
                     <select id="vipMasaGizlilik" class="premium-select">
                         <option value="true" selected>Sadece Davet (Kilitli)</option>
                         <option value="false">Herkese Açık (Genel)</option>
@@ -185,36 +180,33 @@
             </div>
 
             <div class="premium-btn-group">
-                <!-- Fonksiyonlar aynı -->
                 <button onclick="vipMasaKurAksiyon()" class="premium-btn btn-gold">Odayı Aç</button>
                 <button onclick="document.getElementById('vipMasaKurPanel').style.display='none'" class="premium-btn btn-dark">İptal</button>
             </div>
         </div>
     </div>
 
-    <!-- 3. YENİ AAA ÇIKIŞ UYARISI MODALI (Modern Confirmation Dialog) -->
     <div id="cikisUyariEkrani" class="premium-modal-overlay" style="display:none;">
         <div class="premium-modal-box">
             <div class="modal-icon-wrapper danger-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
             </div>
             <h2 class="premium-modal-title">Masadan Ayrıl</h2>
-            <p class="premium-modal-desc">Masadan ayrılmak istediğine emin misin?</p>
             
-            <div class="info-box">
+            <p id="cikisUyariDesc" class="premium-modal-desc">Çıkmak istediğine emin misin?</p>
+            
+            <div class="info-box" id="cikisCezaKutusu" style="display:none;">
                 <div class="info-box-item"><div class="info-dot"></div><span>50.000 Çip cezası uygulanacaktır.</span></div>
                 <div class="info-box-item"><div class="info-dot"></div><span>Oyun devam eder.</span></div>
             </div>
 
             <div class="premium-btn-group">
-                <!-- Fonksiyon aynı -->
                 <button id="btnCikisOnayla" class="premium-btn btn-danger">Masadan Ayrıl</button>
                 <button onclick="document.getElementById('cikisUyariEkrani').style.display='none'" class="premium-btn btn-dark">Vazgeç</button>
             </div>
         </div>
     </div>
 
-    <!-- 4. YENİ AAA DAVET GELDİ MODALI -->
     <div id="davetGeldiEkrani" class="premium-modal-overlay" style="display:none;">
         <div class="premium-modal-box">
             <div class="modal-icon-wrapper invite-icon">
@@ -230,7 +222,6 @@
         </div>
     </div>
 
-    <!-- PANELS (Profil, Liderlik, Magaza vb. tasarımları sabit tutuldu) -->
     <div id="gorevlerEkrani" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:999999; flex-direction:column; justify-content:center; align-items:center;">
         <div class="magaza-kutu" style="max-height: 85vh; display: flex; flex-direction: column; width: 95%; max-width: 400px; border:2px solid #2ecc71; box-shadow: 0 0 20px rgba(46, 204, 113, 0.4); border-radius: 15px; padding: 20px;">
             <div class="magaza-header" style="border-bottom: 1px solid #2ecc71; padding-bottom: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
@@ -357,7 +348,6 @@
         </div>
     </div>
 
-    <!-- MAIN UI -->
     <div class="vip-header">
         <div class="profil-bilgi" onclick="if(aktifKullaniciAdi) profiliGoster(aktifKullaniciAdi)" style="cursor:pointer;">
             <div class="profil-avatar" id="vipAvatar">😎</div>
@@ -497,6 +487,23 @@
                     .catch(err => console.log('SW Hatası:', err));
             });
         }
+
+        // 🧠 JS'YE DOKUNMADAN ÇÖZÜLEN ÇIKIŞ CEZA MANTIĞI 
+        document.addEventListener('click', function(e) {
+            if(e.target && (e.target.id === 'lobiyeDonBtn' || e.target.closest('#lobiyeDonBtn'))) {
+                const cezaKutu = document.getElementById('cikisCezaKutusu');
+                const desc = document.getElementById('cikisUyariDesc');
+                if(cezaKutu && desc) {
+                    if (typeof masaOyunBasladiMi !== 'undefined' && masaOyunBasladiMi) {
+                        cezaKutu.style.display = 'block';
+                        desc.innerHTML = '⚠ Oyundan ayrılırsan:';
+                    } else {
+                        cezaKutu.style.display = 'none';
+                        desc.innerHTML = 'Çıkmak istediğine emin misin?';
+                    }
+                }
+            }
+        });
     </script>
 
 </body>
