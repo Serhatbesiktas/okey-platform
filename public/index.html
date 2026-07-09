@@ -196,7 +196,7 @@
             <p id="cikisUyariDesc" class="premium-modal-desc">Çıkmak istediğine emin misin?</p>
             
             <div class="info-box" id="cikisCezaKutusu" style="display:none;">
-                <div class="info-box-item"><div class="info-dot"></div><span>50.000 Çip cezası uygulanacaktır.</span></div>
+                <div class="info-box-item"><div class="info-dot"></div><span id="cikisCezaMetni">Cezası uygulanacaktır.</span></div>
                 <div class="info-box-item"><div class="info-dot"></div><span>Oyun devam eder.</span></div>
             </div>
 
@@ -488,16 +488,36 @@
             });
         }
 
-        // 🧠 JS'YE DOKUNMADAN ÇÖZÜLEN ÇIKIŞ CEZA MANTIĞI 
+        // 🧠 ÇIKIŞ CEZASINI DİNAMİK HESAPLAYAN VE GİZLEYEN AKILLI MOTOR
         document.addEventListener('click', function(e) {
             if(e.target && (e.target.id === 'lobiyeDonBtn' || e.target.closest('#lobiyeDonBtn'))) {
                 const cezaKutu = document.getElementById('cikisCezaKutusu');
                 const desc = document.getElementById('cikisUyariDesc');
+                const cezaMetni = document.getElementById('cikisCezaMetni');
+                
                 if(cezaKutu && desc) {
+                    // Eğer oyun başladıysa ve taş dağıtıldıysa cezayı göster
                     if (typeof masaOyunBasladiMi !== 'undefined' && masaOyunBasladiMi) {
                         cezaKutu.style.display = 'block';
                         desc.innerHTML = '⚠ Oyundan ayrılırsan:';
-                    } else {
+                        
+                        // Masanın isminden bahsi okuyup cezayı dinamik olarak belirliyoruz
+                        let ceza = "50.000"; // Varsayılan ceza
+                        if (typeof suAnkiMasam !== 'undefined' && suAnkiMasam) {
+                            let masaIsmi = suAnkiMasam.toUpperCase();
+                            if(masaIsmi.includes('1M')) ceza = "1.000.000";
+                            else if(masaIsmi.includes('500K')) ceza = "500.000";
+                            else if(masaIsmi.includes('250K')) ceza = "250.000";
+                            else if(masaIsmi.includes('100K')) ceza = "100.000";
+                            else if(masaIsmi.includes('50K')) ceza = "50.000";
+                            else if(masaIsmi.includes('20K')) ceza = "20.000";
+                            else if(masaIsmi.includes('10K')) ceza = "10.000";
+                        }
+                        
+                        if(cezaMetni) cezaMetni.innerText = ceza + " Çip cezası uygulanacaktır.";
+                    } 
+                    // Oyun henüz başlamadıysa ceza kutusunu tamamen gizle
+                    else {
                         cezaKutu.style.display = 'none';
                         desc.innerHTML = 'Çıkmak istediğine emin misin?';
                     }
