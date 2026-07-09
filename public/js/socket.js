@@ -33,7 +33,7 @@ socket.on('cip_guncelle', (cip) => {
     }
 });
 
-// ⸻ AMİRAL GEMİSİ: KOMPAKT, PREMİUM VE 3 SÜTUNLU LOBİ HTML RENDER DÖNGÜSÜ ⸻
+// ⸻ YEPYENİ, KOMPAKT VE TEMİZ MASA RENDER DÖNGÜSÜ ⸻
 socket.on('masalari_guncelle', (lobidekiMasalar) => {
     guncelMasalar = lobidekiMasalar; 
     if(!masalarAlani) return; 
@@ -46,51 +46,28 @@ socket.on('masalari_guncelle', (lobidekiMasalar) => {
         // Mantık fonksiyonları aynı
         const action = benVarim ? `masayaGeriDon('${masaAdi}')` : `masayaOtur('${masaAdi}')`; 
         
-        // İnce ve sade VIP algılama
+        // VIP Algılama
         const isVIP = masaAdi.toUpperCase().includes('VIP') || masaAdi.includes('50K') || masaAdi.includes('100K');
         const vipClass = isVIP ? 'vip-board' : '';
-        const vipBadge = isVIP ? '<div class="vip-badge-tag">👑 VIP</div>' : '';
+        const vipBadge = isVIP ? '<span class="vip-badge-tag">👑 VIP</span>' : '';
 
-        // Aksiyon Butonları Metin ve Sınıfı
-        const txt = benVarim ? 'OTURDUN ✓' : (dolu >= 4 ? 'MASA DOLU' : 'OTUR');
+        // Aksiyon Butonları
+        const txt = benVarim ? 'OTURDUN' : (dolu >= 4 ? 'MASA DOLU' : 'OTUR');
         const btnDisabled = (dolu >= 4 && !benVarim) ? 'disabled' : '';
         const btnClass = dolu >= 4 && !benVarim ? 'disabled' : '';
         const izleBtn = (!benVarim && dolu > 0) ? `<button class="btn-izle" onclick="masayiIzle('${masaAdi}')">İZLE</button>` : '';
 
-        // Orta Masadaki 4 Koltuğu (2x2 Grid) Doldur
-        let koltukHtml = '';
-        const defaultAvatars = ["😀", "😎", "🙂", "🤩"];
-        for(let i = 0; i < 4; i++) {
-            if(koltuklar[i]) {
-                let koz = (globalKozmetikler && globalKozmetikler[koltuklar[i]]) || [];
-                let emoji = defaultAvatars[i % 4];
-                if(koz.includes('neon_tac')) emoji = "👑";
-                koltukHtml += `<div class="mini-koltuk dolu" title="${koltuklar[i]}">${emoji}</div>`;
-            } else {
-                koltukHtml += `<div class="mini-koltuk bos">+</div>`;
-            }
-        }
-
-        // Yeni Kompakt 3 Sütunlu HTML Yerleşimi
+        // Saf Tasarım, Dağınık Emojiler Yok!
         masalarAlani.innerHTML += `
         <div class="masa-kart ${vipClass}">
             <div class="masa-sol">
-                <div class="masa-adi">🎲 ${masaAdi}</div>
-                ${vipBadge}
-            </div>
-            
-            <div class="masa-orta">
-                <div class="mini-masa-oval">
-                    ${koltukHtml}
-                </div>
+                <div class="masa-adi">🎲 ${masaAdi} ${vipBadge}</div>
+                <div class="masa-oyuncu-sayisi">👥 ${dolu} / 4 Oyuncu</div>
             </div>
             
             <div class="masa-sag">
-                <div class="masa-oyuncu-sayisi">👥 ${dolu} / 4</div>
-                <div class="masa-aksiyon">
-                    ${izleBtn}
-                    <button class="btn-otur ${btnClass}" onclick="${action}" ${btnDisabled}>${txt}</button>
-                </div>
+                ${izleBtn}
+                <button class="btn-otur ${btnClass}" onclick="${action}" ${btnDisabled}>${txt}</button>
             </div>
         </div>`;
         
