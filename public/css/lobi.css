@@ -106,25 +106,24 @@
     text-align: center;
 }
 
-/* ⸻ YAN YANA %48 EŞİT AKSİYON KARTLARI ⸻ */
+/* ⸻ YAN YANA EŞİT AKSİYON KARTLARI (Yerleşim Düzeltmesi) ⸻ */
 .hizli-aksiyon-container {
     position: fixed;
-    bottom: 75px; /* Alt menünün hemen üstünde */
+    bottom: 75px;
     left: 0;
     width: 100%;
     padding: 10px 15px;
     display: flex;
-    flex-direction: row; /* Yan yana dizilim */
+    flex-direction: row;
     justify-content: space-between;
     gap: 10px;
     z-index: 9999;
-    /* Kartların arkasında kalan boşluğu kapatan şık zemin geçişi */
     background: linear-gradient(0deg, rgba(5, 13, 8, 0.95) 0%, rgba(5, 13, 8, 0.6) 50%, transparent 100%);
 }
 
 .btn-aksiyon-kart {
-    flex: 1; /* Alanı %50-%50 böler */
-    width: 48%; /* Fallback garanti genişlik */
+    flex: 1;
+    width: 48%;
     border: none;
     padding: 12px 5px;
     border-radius: 12px;
@@ -147,14 +146,12 @@
     background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%) !important;
     color: #fff !important;
     border: 1px solid rgba(155, 89, 182, 0.4) !important;
-    box-shadow: 0 4px 15px rgba(142, 68, 173, 0.3) !important;
 }
 
 .btn-rastgele {
     background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%) !important;
     color: #111 !important;
     border: 1px solid rgba(241, 196, 15, 0.4) !important;
-    box-shadow: 0 4px 15px rgba(241, 196, 15, 0.2) !important;
 }
 
 /* DİĞER LOBİ ÖGELERİ (Bozulmaması için korundu) */
