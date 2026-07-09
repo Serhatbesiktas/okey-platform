@@ -346,12 +346,14 @@
             <div id="lobidekilerListesi" style="display:flex; flex-direction:column; gap:5px;"></div>
         </div>
 
-        <div class="quick-actions">
-            <button onclick="document.getElementById('vipMasaKurPanel').style.display='flex'" class="yeni-aksiyon-btn btn-vip">
+        <!-- 🔥 YENİ YAPI: Eski 'btn-hemen-oyna' class'ı korundu ki JS ve onclick bozulmasın. 
+             Sadece CSS'te important ile ezeceğimiz wrapper içine alındı 🔥 -->
+        <div class="quick-actions-wrapper">
+            <button onclick="document.getElementById('vipMasaKurPanel').style.display='flex'" class="btn-hemen-oyna aksiyon-vip">
                 👑 VIP Masa Kur <span>Özel Alan</span>
             </button>
 
-            <button id="btnRastgeleOyna" class="yeni-aksiyon-btn btn-hizli">
+            <button id="btnRastgeleOyna" class="btn-hemen-oyna aksiyon-hizli">
                 ⚡ Hemen Oyna <span>Rastgele Masa</span>
             </button>
         </div>
