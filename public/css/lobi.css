@@ -16,98 +16,93 @@
 
 /* 🔥 YENİ MODERN GRID MASA LİSTESİ 🔥 */
 .tables-panel { 
-    display: grid; 
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
-    gap: 20px; 
-    padding: 20px; 
+    display: grid !important; 
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important; /* Mobilde masaları çok şık 2'li yan yana dizer */
+    gap: 15px !important; 
+    padding: 15px !important; 
     flex: 1; 
     overflow-y: auto; 
 }
 
 /* 🔥 YENİ MODERN MASA KARTI 🔥 */
 .masa-kart { 
-    background: rgba(20, 30, 48, 0.8); 
-    backdrop-filter: blur(12px); 
-    -webkit-backdrop-filter: blur(12px); 
-    border: 1px solid rgba(255, 255, 255, 0.08); 
-    border-radius: 16px; 
-    padding: 20px; 
-    display: flex; 
-    flex-direction: column; 
-    justify-content: space-between; 
-    align-items: center; 
-    text-align: center;
-    position: relative; 
-    overflow: hidden; 
-    box-shadow: 0 8px 32px rgba(0,0,0,0.3); 
-    transition: all 0.3s ease; 
-    gap: 15px;
+    background: rgba(20, 30, 48, 0.8) !important; 
+    backdrop-filter: blur(12px) !important; 
+    -webkit-backdrop-filter: blur(12px) !important; 
+    border: 1px solid rgba(242, 201, 76, 0.3) !important; 
+    border-radius: 16px !important; 
+    padding: 15px !important; 
+    display: flex !important; 
+    flex-direction: column !important; 
+    justify-content: space-between !important; 
+    align-items: center !important; 
+    text-align: center !important;
+    position: relative !important; 
+    overflow: hidden !important; 
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4) !important; 
+    gap: 10px !important;
+    transition: all 0.3s ease !important;
 }
-.masa-kart:hover { transform: translateY(-5px); border-color: rgba(242, 201, 76, 0.5); box-shadow: 0 12px 40px rgba(242, 201, 76, 0.15); }
+.masa-kart:hover { transform: translateY(-5px) !important; border-color: rgba(242, 201, 76, 0.8) !important; box-shadow: 0 12px 30px rgba(242, 201, 76, 0.25) !important; }
 
 /* Arka plandaki şeritler */
-.masa-watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 140px; height: 65px; border: 2px dashed rgba(255,255,255,0.04); border-radius: 40px; pointer-events: none; opacity: 0.5; }
-.masa-watermark::before, .masa-watermark::after { content: ''; position: absolute; width: 20px; height: 10px; border: 2px solid rgba(255,255,255,0.06); border-radius: 5px; left: 50%; transform: translateX(-50%); }
-.masa-watermark::before { top: -10px; }
-.masa-watermark::after { bottom: -10px; }
+.masa-watermark { position: absolute !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; width: 120px !important; height: 50px !important; border: 2px dashed rgba(255,255,255,0.04) !important; border-radius: 40px !important; pointer-events: none !important; opacity: 0.5 !important; }
 
 /* Masa İsmi Bölümü */
-.kart-sol { display: flex; flex-direction: column; align-items: center; gap: 8px; z-index: 2; width: 100%; }
-.zar-kutu { display: none; /* Modern tasarımda pavyon zarına gerek kalmadı, gizledik */ }
-.masa-kart-isim { font-size: 18px; font-weight: 800; color: #ffffff; letter-spacing: 1px; text-transform: uppercase; margin: 0; }
+.kart-sol { display: flex !important; flex-direction: column !important; align-items: center !important; gap: 5px !important; z-index: 2 !important; width: 100% !important; }
+.zar-kutu { display: none !important; } /* Pavyon zarını kaldırdık */
+.masa-kart-isim { font-size: 17px !important; font-weight: 900 !important; color: #f2c94c !important; letter-spacing: 1px !important; text-transform: uppercase !important; margin: 0 !important; }
 
 /* Oyuncu Sayısı ve Butonlar Bölümü */
-.kart-sag { display: flex; flex-direction: column; align-items: center; gap: 12px; z-index: 2; width: 100%; }
+.kart-sag { display: flex !important; flex-direction: column !important; align-items: center !important; gap: 8px !important; z-index: 2 !important; width: 100% !important; }
 
-/* Yeni Fıstık Yeşili Oyuncu Durum Kutusu */
 .masa-kisi-kutu { 
-    background: rgba(46, 204, 113, 0.1); 
-    color: #2ecc71; 
-    padding: 6px 15px; 
-    border-radius: 8px; 
-    font-size: 14px; 
-    font-weight: bold; 
-    border: none; 
+    background: rgba(46, 204, 113, 0.15) !important; 
+    color: #2ecc71 !important; 
+    padding: 5px 12px !important; 
+    border-radius: 8px !important; 
+    font-size: 13px !important; 
+    font-weight: bold !important; 
+    border: none !important; 
+    width: 100% !important;
 }
 
-/* YENİ VIP OTUR BUTONU (Altın Rengi 100% Genişlik) */
+/* VIP OTUR BUTONU */
 .btn-otur { 
-    background: linear-gradient(135deg, #f2c94c 0%, #f2994a 100%); 
-    color: #111; 
-    border: none; 
-    padding: 12px 20px; 
-    border-radius: 10px; 
-    font-weight: 800; 
-    font-size: 14px; 
-    cursor: pointer; 
-    width: 100%; 
-    transition: all 0.2s ease; 
-    text-transform: uppercase; 
-    box-shadow: 0 4px 15px rgba(242, 201, 76, 0.3); 
+    background: linear-gradient(135deg, #f2c94c 0%, #f2994a 100%) !important; 
+    color: #111 !important; 
+    border: none !important; 
+    padding: 10px !important; 
+    border-radius: 10px !important; 
+    font-weight: 900 !important; 
+    font-size: 13px !important; 
+    cursor: pointer !important; 
+    width: 100% !important; 
+    transition: all 0.2s ease !important; 
+    text-transform: uppercase !important; 
+    box-shadow: 0 4px 15px rgba(242, 201, 76, 0.3) !important; 
 }
-.btn-otur:hover { opacity: 0.95; transform: scale(1.03); }
-.btn-otur:active { transform: scale(0.98); box-shadow: none; }
-.btn-otur.disabled { background: #223329; color: #4f6356; box-shadow: none; cursor: not-allowed; border: 1px solid rgba(255,255,255,0.02); }
+.btn-otur:hover { opacity: 0.95 !important; transform: scale(1.03) !important; }
+.btn-otur:active { transform: scale(0.98) !important; box-shadow: none !important; }
+.btn-otur.disabled { background: #223329 !important; color: #4f6356 !important; box-shadow: none !important; cursor: not-allowed !important; border: 1px solid rgba(255,255,255,0.02) !important; }
 
-/* YENİ İZLE BUTONU (Saydam ve Şık) */
+/* İZLE BUTONU */
 .btn-izle { 
     background: rgba(255, 255, 255, 0.1) !important; 
     color: #fff !important; 
     border: none !important; 
-    padding: 10px 15px !important; 
+    padding: 8px !important; 
     border-radius: 10px !important; 
     font-weight: 800 !important; 
-    font-size: 13px !important; 
+    font-size: 12px !important; 
     cursor: pointer !important; 
     box-shadow: none !important; 
-    transition: all 0.2s ease !important; 
-    width: 100%; 
-    margin-top: 5px; 
-    margin-right: 0 !important;
+    width: 100% !important; 
+    margin: 0 !important;
 }
 .btn-izle:hover { background: rgba(255, 255, 255, 0.2) !important; }
 
-/* ALT MENÜ VE DİĞER EKRANLAR (Aynen Korundu) */
+/* ALT MENÜ (AYNEN KORUNDU) */
 .alt-menu-container { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; background: linear-gradient(0deg, #050d08 0%, #0c1c12 100%); border-top: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-around; align-items: center; padding: 0 10px; z-index: 10; }
 .alt-menu-item { display: flex; flex-direction: column; align-items: center; gap: 5px; color: #52796f; font-size: 10px; font-weight: bold; cursor: pointer; transition: color 0.2s; }
 .alt-menu-item.active { color: #f2c94c; }
