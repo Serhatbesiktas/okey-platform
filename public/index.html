@@ -417,12 +417,21 @@
         <div id="flashBildirim" class="flash-bildirim"></div>
 
         <div id="sonucEkrani" class="premium-modal-overlay" style="display:none;">
-            <div class="sonuc-kutu">
-                <h1 id="sonucBaslik">Oyun Bitti!</h1>
-                <p id="sonucMetin">Kazanan: ...</p>
-                <div id="kazananEliAlani" style="display:flex; justify-content:center; flex-wrap:wrap; gap:2px; margin: 15px 0; min-height: 50px;"></div>
-                <p id="sonucOdul"></p>
-                <button class="sonuc-btn" onclick="document.getElementById('sonucEkrani').style.display='none'">MASAYA DÖN</button>
+            <div class="premium-modal-box sonuc-premium-box">
+                <h1 id="sonucBaslik" class="sonuc-title">Oyun Bitti!</h1>
+                
+                <p id="sonucMetin" class="sonuc-metin">Kazanan: ...</p>
+                <p id="sonucOdul" class="sonuc-odul"></p>
+
+                <div class="kazanan-eli-container">
+                    <h3 class="kazanan-eli-baslik">🀄 Kazananın Eli</h3>
+                    <div id="kazananEliAlani"></div>
+                </div>
+
+                <div class="premium-btn-group">
+                    <button class="premium-btn btn-gold" onclick="document.getElementById('sonucEkrani').style.display='none'">🟨 Tekrar Oyna</button>
+                    <button class="premium-btn btn-dark" onclick="document.getElementById('lobiyeDonBtn').click()">⬛ Lobiye Dön</button>
+                </div>
             </div>
         </div>
 
@@ -496,13 +505,11 @@
                 const cezaMetni = document.getElementById('cikisCezaMetni');
                 
                 if(cezaKutu && desc) {
-                    // Eğer oyun başladıysa ve taş dağıtıldıysa cezayı göster
                     if (typeof masaOyunBasladiMi !== 'undefined' && masaOyunBasladiMi) {
                         cezaKutu.style.display = 'block';
                         desc.innerHTML = '⚠ Oyundan ayrılırsan:';
                         
-                        // Masanın isminden bahsi okuyup cezayı dinamik olarak belirliyoruz
-                        let ceza = "50.000"; // Varsayılan ceza
+                        let ceza = "50.000"; 
                         if (typeof suAnkiMasam !== 'undefined' && suAnkiMasam) {
                             let masaIsmi = suAnkiMasam.toUpperCase();
                             if(masaIsmi.includes('1M')) ceza = "1.000.000";
@@ -516,7 +523,6 @@
                         
                         if(cezaMetni) cezaMetni.innerText = ceza + " Çip cezası uygulanacaktır.";
                     } 
-                    // Oyun henüz başlamadıysa ceza kutusunu tamamen gizle
                     else {
                         cezaKutu.style.display = 'none';
                         desc.innerHTML = 'Çıkmak istediğine emin misin?';
