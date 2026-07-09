@@ -125,211 +125,182 @@
     text-transform: uppercase; 
 }
 
-/* ⸻ YAŞAYAN VE NEFES ALAN MODERM MASA PANELLERİ ⸻ */
+/* ⸻ YENİ KOMPAKT VE PREMİUM KART TASARIMI ⸻ */
 .tables-panel {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    padding: 15px;
+    gap: 12px;
+    padding: 10px 15px;
     flex: 1;
     overflow-y: auto;
 }
 
 .masa-kart {
-    background: rgba(20, 35, 25, 0.4);
-    border: 1px solid rgba(46, 204, 113, 0.15);
-    border-radius: 18px;
-    padding: 16px;
+    background: rgba(14, 28, 19, 0.65);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(46, 204, 113, 0.12);
+    border-radius: 16px;
+    padding: 14px;
     display: flex;
-    flex-direction: column;
-    gap: 14px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.2s;
-    position: relative;
-    overflow: hidden;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .masa-kart:active {
-    transform: scale(0.97);
+    transform: scale(0.98);
 }
 
-/* 👑 MİLYARDER VIP MASA TASARIMI */
 .masa-kart.vip-board {
-    border: 2px solid #f1c40f !important;
-    background: linear-gradient(135deg, rgba(35, 30, 10, 0.5) 0%, rgba(15, 12, 5, 0.6) 100%) !important;
-    box-shadow: 0 0 25px rgba(241, 196, 15, 0.2), 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+    border: 1px solid rgba(241, 196, 15, 0.4);
+    background: rgba(26, 22, 10, 0.65);
+    box-shadow: 0 4px 15px rgba(241, 196, 15, 0.08);
 }
 
-.masa-kart.vip-board::after {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(241, 196, 15, 0.06) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 1;
+/* 1. SOL BÖLÜM: Masa Adı ve Etiketler */
+.masa-sol {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    align-items: flex-start;
+}
+
+.masa-adi {
+    font-size: 14px;
+    font-weight: 800;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
 .vip-badge-tag {
-    background: linear-gradient(135deg, #f1c40f, #f39c12);
-    color: #000;
-    font-size: 10px;
-    font-weight: 900;
-    padding: 2px 8px;
-    border-radius: 6px;
-    box-shadow: 0 2px 8px rgba(241, 196, 15, 0.3);
-    margin-left: 8px;
-    display: inline-block;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.masa-kart-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    z-index: 2;
-}
-
-.masa-unvan-alani {
-    display: flex;
-    align-items: center;
-}
-
-.masa-ikon-baslik {
-    font-size: 15px;
+    border: 1px solid #f1c40f;
+    color: #f1c40f;
+    font-size: 9px;
     font-weight: 800;
-    color: #ffffff;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    padding: 2px 6px;
+    border-radius: 6px;
+    letter-spacing: 0.5px;
+    background: rgba(241, 196, 15, 0.1);
 }
 
-.masa-oyuncu-sayisi {
-    font-size: 12px;
-    font-weight: 600;
-    color: #84a59d;
-    background: rgba(0,0,0,0.3);
-    padding: 4px 10px;
-    border-radius: 8px;
-    border: 1px solid rgba(255,255,255,0.03);
-}
-
-.masa-kart-body {
+/* 2. ORTA BÖLÜM: Masa Zemini ve Koltuklar */
+.masa-orta {
+    flex: 1;
     display: flex;
-    justify-content: flex-start;
+    justify-content: center;
     align-items: center;
-    z-index: 2;
 }
 
-/* REEL AVATAR YUVALARI */
-.slots-container {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    background: rgba(0, 0, 0, 0.2);
-    padding: 10px 14px;
-    border-radius: 14px;
-    width: 100%;
+.mini-masa-oval {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    background: rgba(23, 50, 31, 0.5);
+    border: 1px solid rgba(46, 204, 113, 0.2);
+    padding: 8px 12px;
+    border-radius: 20px;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.3);
 }
 
-.koltuk-circle {
-    width: 40px;
-    height: 40px;
+.mini-koltuk {
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
+    font-size: 13px;
+}
+
+.mini-koltuk.dolu {
+    background: rgba(0,0,0,0.4);
+    border: 1px solid #2ecc71;
+}
+
+.vip-board .mini-koltuk.dolu {
+    border-color: #f1c40f;
+}
+
+.mini-koltuk.bos {
+    background: rgba(255,255,255,0.05);
+    border: 1px dashed rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.3);
     font-size: 14px;
-    font-weight: bold;
-    transition: all 0.3s ease;
-    box-sizing: border-box;
 }
 
-.koltuk-circle.koltuk-dolu {
-    background: linear-gradient(180deg, #1e3f28, #0d1f14);
-    border: 2px solid #2ecc71;
-    color: #ffffff;
-    box-shadow: 0 0 12px rgba(46, 204, 113, 0.3);
-}
-
-.vip-board .koltuk-circle.koltuk-dolu {
-    background: linear-gradient(180deg, #3a2e0b, #151003);
-    border: 2px solid #f1c40f;
-    box-shadow: 0 0 12px rgba(241, 196, 15, 0.3);
-}
-
-.koltuk-circle.koltuk-bos {
-    border: 2px dashed rgba(255, 255, 255, 0.15);
-    background: transparent;
-    color: rgba(255, 255, 255, 0.15);
-    font-size: 16px;
-}
-
-.koltuk-emoji {
-    font-size: 12px;
-    margin-left: 2px;
-}
-
-.masa-kart-footer {
+/* 3. SAĞ BÖLÜM: Aksiyon Butonları */
+.masa-sag {
     display: flex;
-    gap: 10px;
-    width: 100%;
-    z-index: 2;
-}
-
-/* AKSİYON BUTONLARI */
-.masa-kart .btn-izle {
-    background: linear-gradient(180deg, #9b59b6 0%, #8e44ad 100%) !important;
-    color: #fff !important;
-    border: none !important;
-    padding: 10px 16px !important;
-    border-radius: 10px !important;
-    font-weight: 800 !important;
-    font-size: 12px !important;
-    cursor: pointer !important;
-    box-shadow: 0 4px 10px rgba(155, 89, 182, 0.25) !important;
-    transition: all 0.2s ease !important;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.masa-kart .btn-izle:active {
-    transform: scale(0.95);
-}
-
-.masa-kart .btn-otur {
+    flex-direction: column;
+    gap: 6px;
     flex: 1;
+    align-items: flex-end;
+}
+
+.masa-oyuncu-sayisi {
+    font-size: 11px;
+    font-weight: bold;
+    color: #a3c4bc;
+    background: rgba(0,0,0,0.3);
+    padding: 3px 8px;
+    border-radius: 8px;
+}
+
+.masa-aksiyon {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+    max-width: 80px; /* Butonların çok büyük olmasını engeller */
+}
+
+.btn-izle {
+    background: rgba(155, 89, 182, 0.15) !important;
+    color: #d2b4de !important;
+    border: 1px solid rgba(155, 89, 182, 0.4) !important;
+    padding: 6px 10px !important;
+    border-radius: 8px !important;
+    font-weight: 800 !important;
+    font-size: 10px !important;
+    box-shadow: none !important;
+    width: 100%;
+    cursor: pointer;
+}
+
+.btn-otur {
     background: linear-gradient(180deg, #2ecc71 0%, #27ae60 100%) !important;
     color: #fff !important;
     border: none !important;
-    padding: 10px 20px !important;
-    border-radius: 10px !important;
+    padding: 6px 10px !important;
+    border-radius: 8px !important;
     font-weight: 800 !important;
-    font-size: 12px !important;
-    cursor: pointer !important;
-    box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3) !important;
-    transition: all 0.2s ease !important;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    font-size: 10px !important;
+    box-shadow: 0 2px 6px rgba(46, 204, 113, 0.3) !important;
+    width: 100%;
+    cursor: pointer;
 }
 
-.masa-kart .btn-otur:active {
-    transform: scale(0.95);
-}
-
-.masa-kart .btn-otur.disabled {
-    background: rgba(231, 76, 60, 0.12) !important;
+.btn-otur.disabled, .btn-dolu {
+    background: rgba(231, 76, 60, 0.1) !important;
     color: #e74c3c !important;
-    border: 1px solid rgba(231, 76, 60, 0.25) !important;
+    border: 1px solid rgba(231, 76, 60, 0.3) !important;
     box-shadow: none !important;
     cursor: not-allowed !important;
+    padding: 6px 10px !important;
+    border-radius: 8px !important;
+    font-weight: 800 !important;
+    font-size: 10px !important;
+    width: 100%;
 }
 
-/* ALTMENÜ VE DİĞER SABİT ÖGELER */
+/* DİĞER LOBİ ÖGELERİ (Bozulmaması için korundu) */
 .alt-menu-container { 
     position: fixed; 
     bottom: 0; 
