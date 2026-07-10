@@ -1,5 +1,5 @@
 /* =========================================================
-   AAA PREMİUM MODAL TASARIMLARI (Discord / Apple Stili)
+   AAA PREMİUM MODAL TASARIMLARI
 ========================================================= */
 
 body::after { display: none !important; }
@@ -10,7 +10,6 @@ body::after { display: none !important; }
     z-index: 9999999; display: flex; justify-content: center; align-items: center;
     padding: 20px; opacity: 0; animation: overlayFadeIn 220ms ease-out forwards;
 }
-
 @keyframes overlayFadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 .premium-modal-box {
@@ -21,14 +20,9 @@ body::after { display: none !important; }
     animation: modalScaleIn 220ms cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
     position: relative; overflow: hidden;
 }
-
 @keyframes modalScaleIn { from { transform: scale(0.92); } to { transform: scale(1); } }
 
-.modal-icon-wrapper {
-    width: 56px; height: 56px; margin: 0 auto 16px; border-radius: 50%;
-    display: flex; justify-content: center; align-items: center;
-    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
-}
+.modal-icon-wrapper { width: 56px; height: 56px; margin: 0 auto 16px; border-radius: 50%; display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); }
 .modal-icon-wrapper svg { width: 28px; height: 28px; }
 
 .warning-icon { color: #f2c94c; box-shadow: 0 0 20px rgba(242, 201, 76, 0.15); border-color: rgba(242, 201, 76, 0.3); }
@@ -60,22 +54,20 @@ body::after { display: none !important; }
 .btn-dark:hover { background: linear-gradient(135deg, #454b51, #2c3136); }
 .btn-disabled { background: #2f3640 !important; color: #7f8c8d !important; cursor: not-allowed !important; box-shadow: none !important; border: 1px dashed rgba(255,255,255,0.1) !important; }
 
-/* ⸻ AAA PREMIUM OYUN BİTTİ (SONUÇ) EKRANI ⸻ */
+/* ⸻ OYUN BİTTİ EKRANI ⸻ */
 .sonuc-premium-box { max-width: 420px; background: rgba(15, 20, 18, 0.95); border: 1px solid rgba(241, 196, 15, 0.3); box-shadow: 0 30px 60px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.1); padding: 36px 20px; height: auto !important; display: flex; flex-direction: column; gap: 18px; }
 .sonuc-title { color: #f1c40f; font-size: clamp(20px, 6vw, 26px); font-weight: 900; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 0 15px rgba(241, 196, 15, 0.3); margin: 0; white-space: normal; word-wrap: break-word; line-height: 1.4; text-align: center; }
 .sonuc-metin { white-space: pre-wrap; line-height: 1.8; font-size: 14px; font-weight: 700; color: #d2e0dc; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 16px; margin: 0; box-shadow: inset 0 2px 10px rgba(0,0,0,0.3); }
 .sonuc-odul { display: inline-block; background: rgba(46, 204, 113, 0.1); border: 1px solid rgba(46, 204, 113, 0.3); color: #2ecc71; font-size: 24px; font-weight: 900; padding: 12px 28px; border-radius: 12px; margin: 0 auto; box-shadow: 0 0 20px rgba(46, 204, 113, 0.25); }
 .kazanan-eli-container { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 16px; margin: 0; }
 .kazanan-eli-baslik { color: #f1c40f; font-size: 14px; font-weight: 800; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
-
 #kazananEliAlani { display: flex !important; flex-wrap: wrap !important; justify-content: center !important; align-content: center !important; gap: 6px !important; min-height: 80px !important; background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; }
 body #kazananEliAlani .okey-tasi-bitis, body #kazananEliAlani .okey-tasi { position: relative !important; width: clamp(22px, 5.5vw, 32px) !important; height: clamp(32px, 8vw, 44px) !important; margin: 0 !important; transform: scale(1) !important; border-bottom-width: 3px !important; border-radius: 4px !important; font-size: clamp(12px, 4vw, 16px) !important; background: linear-gradient(135deg, #fffff9 0%, #ece5cd 100%) !important; border: 1px solid #dcd3c1 !important; border-bottom: 4px solid #a39882 !important; box-shadow: 0 4px 8px rgba(0,0,0,0.5), inset 0 1px 2px #fff !important; font-family: 'Arial Black', Arial, sans-serif !important; display: flex !important; justify-content: center !important; align-items: center !important; opacity: 0; animation: tileFadeIn 0.3s ease-out forwards; }
 @keyframes tileFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-/* ⸻ AAA PREMİUM PROFİL EKRANI ⸻ */
+/* ⸻ PROFİL EKRANI ⸻ */
 .profil-premium-box { background: rgba(12, 18, 14, 0.95); border: 1px solid rgba(241, 196, 15, 0.3); border-radius: 24px; padding: 30px 24px; width: 100%; max-width: 360px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), inset 0 2px 20px rgba(241, 196, 15, 0.05); text-align: center; transform: scale(0.92); animation: modalScaleIn 220ms cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; position: relative; }
 .profil-close-btn { position: absolute; top: 16px; right: 16px; width: 32px; height: 32px; border-radius: 50%; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #8fa79a; display: flex; justify-content: center; align-items: center; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.2s; z-index: 10; }
-.profil-close-btn:active { transform: scale(0.9); background: #e74c3c; color: #fff; border-color: #e74c3c; }
 .profil-avatar-premium { width: 80px; height: 80px; margin: 0 auto 12px; border-radius: 50%; background: radial-gradient(circle, #1e3f28 0%, #0d1f14 100%); border: 3px solid #f1c40f; box-shadow: 0 0 20px rgba(241, 196, 15, 0.2), inset 0 0 10px rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; font-size: 38px; }
 .profil-isim-premium { font-size: 22px; font-weight: 900; color: #fff; margin-bottom: 6px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .profil-durum-premium { display: inline-block; background: rgba(46, 204, 113, 0.1); border: 1px solid rgba(46, 204, 113, 0.2); padding: 4px 12px; border-radius: 20px; color: #2ecc71 !important; font-size: 11px; font-weight: 800; margin-bottom: 20px; }
@@ -99,7 +91,7 @@ body #kazananEliAlani .okey-tasi-bitis, body #kazananEliAlani .okey-tasi { posit
 .btn-dm { background: linear-gradient(135deg, #3498db, #2980b9); color: #fff; box-shadow: 0 4px 15px rgba(52, 152, 219, 0.2); }
 .skeleton-loader { height: 16px; border-radius: 6px; background: rgba(255, 255, 255, 0.1); background-image: linear-gradient(90deg, rgba(255, 255, 255, 0) 0, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0) 100%); background-size: 200px 100%; animation: shimmer 1.5s infinite linear; }
 
-/* ⸻ AAA PREMİUM ARKADAŞLAR LİSTESİ ⸻ */
+/* ⸻ ARKADAŞLAR LİSTESİ ⸻ */
 .premium-search-box { display: flex; align-items: center; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 12px 16px; margin-bottom: 16px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.2); }
 .premium-search-box span { font-size: 16px; opacity: 0.7; }
 .premium-search-box input { background: transparent; border: none; outline: none; color: #fff; width: 100%; font-size: 14px; margin-left: 10px; font-family: inherit; }
@@ -138,53 +130,63 @@ body #kazananEliAlani .okey-tasi-bitis, body #kazananEliAlani .okey-tasi { posit
 }
 @keyframes pulseRed { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
 
-
 /* =========================================================
-   💬 SOHBET MODALI (STANDART PREMIUM MODAL İSKELETİNDE)
+   🔥 ESKİ ORİJİNAL ÖZEL MESAJLAŞMA TASARIMLARI (RESİMLERDEKİ GİBİ) 🔥
 ========================================================= */
-.chat-premium-box {
-    width: 92%; max-width: 400px; height: 70vh; max-height: 600px;
-    padding: 16px; display: flex; flex-direction: column; gap: 12px;
-    background: rgba(18, 22, 20, 0.98);
-    border: 1px solid rgba(241, 196, 15, 0.4) !important; /* Altın ince çerçeve */
-    border-radius: 20px;
-}
 
-.chat-header {
-    display: flex; justify-content: space-between; align-items: center;
-    border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px;
+/* Mesaj Gönder (İletişim) Popup */
+.eski-mesaj-kutu {
+    background: #0f1210; border: 1px solid #2ecc71; border-radius: 12px;
+    box-shadow: 0 0 20px rgba(46, 204, 113, 0.2); width: 90%; max-width: 350px; padding: 20px;
 }
-.chat-user-info { display: flex; align-items: center; gap: 10px; }
-.chat-avatar { font-size: 24px; }
-.chat-name-status { display: flex; flex-direction: column; align-items: flex-start; }
-.chat-name { color: #fff; font-size: 16px; font-weight: 900; }
-.chat-status { font-size: 11px; font-weight: 800; color: #2ecc71; }
+.eski-mesaj-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+.eski-mesaj-title { color: #fff; font-weight: 900; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+.eski-mesaj-kapat { color: #e74c3c; font-weight: bold; background: none; border: none; font-size: 18px; cursor: pointer; padding: 0; }
+.eski-mesaj-textarea { 
+    width: 100%; height: 80px; background: #000; border: 1px solid #333; 
+    border-radius: 8px; color: #fff; padding: 10px; font-size: 14px; 
+    outline: none; resize: none; box-sizing: border-box;
+}
+.eski-mesaj-sayac { text-align: right; font-size: 10px; color: #888; margin-top: 5px; }
+.eski-mesaj-footer { display: flex; gap: 10px; margin-top: 15px; }
+.eski-btn-gonder { flex: 1; background: linear-gradient(180deg, #3498db, #2980b9); color: #fff; border: none; border-radius: 8px; font-weight: 900; padding: 12px; cursor: pointer; }
+.eski-btn-iptal { flex: 1; background: #e74c3c; color: #fff; border: none; border-radius: 8px; font-weight: 900; padding: 12px; cursor: pointer; }
 
-.chat-history {
-    flex: 1; overflow-y: auto; background: rgba(0,0,0,0.4);
-    border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 10px;
-    border: 1px solid rgba(255,255,255,0.05); scrollbar-width: none;
+/* Gelen Kutusu Popup */
+.eski-inbox-kutu {
+    background: #0f1210; border: 1px solid #f1c40f; border-radius: 12px;
+    box-shadow: 0 0 20px rgba(241,196,15,0.2); width: 95%; max-width: 450px; padding: 20px;
 }
-.chat-history::-webkit-scrollbar { display: none; }
+.eski-inbox-title { color: #f1c40f; font-weight: 900; font-size: 16px; display: flex; align-items: center; gap: 8px; }
+.eski-inbox-item { background: #080a09; border: 1px solid #2ecc71; border-radius: 10px; padding: 12px; margin-bottom: 10px; text-align: left; }
+.eski-inbox-item-header { display: flex; justify-content: space-between; margin-bottom: 8px; align-items: center; }
+.eski-inbox-sender { color: #f1c40f; font-weight: 900; font-size: 14px; }
+.eski-inbox-date { color: #666; font-size: 10px; }
+.eski-inbox-text { color: #ccc; font-size: 13px; margin-bottom: 12px; line-height: 1.4; }
+.eski-inbox-actions { display: flex; gap: 8px; }
+.eski-inbox-btn { padding: 6px 12px; border-radius: 6px; border: none; font-weight: bold; font-size: 11px; color: #fff; cursor: pointer; }
+.eski-btn-cevap { background: #2ecc71; color: #000; }
+.eski-btn-engel { background: #e74c3c; }
+.eski-btn-sil { background: #333; }
+.eski-btn-gordum { background: #34495e; }
 
-.chat-bubble {
-    max-width: 80%; padding: 10px 14px; border-radius: 14px; font-size: 13px; font-weight: 600; line-height: 1.4; word-wrap: break-word; color: #fff; display: flex; flex-direction: column;
+/* Sohbetlerim (Chat History) Popup */
+.eski-chat-kutu {
+    background: #0f1210; border: 1px solid #2ecc71; border-radius: 16px;
+    width: 95%; max-width: 400px; height: 75vh; display: flex; flex-direction: column; padding: 0; overflow: hidden;
 }
-.chat-bubble-me { background: linear-gradient(135deg, #1ea857, #157337); align-self: flex-end; border-bottom-right-radius: 2px; }
-.chat-bubble-them { background: rgba(255,255,255,0.08); align-self: flex-start; border-bottom-left-radius: 2px; border: 1px solid rgba(255,255,255,0.05); }
-.chat-bubble-time { font-size: 9px; opacity: 0.6; align-self: flex-end; margin-top: 4px; font-weight: bold; }
-
-.chat-footer { display: flex; gap: 8px; align-items: center; margin-top: auto; }
-.chat-input {
-    flex: 1; background: rgba(0,0,0,0.5); border: 1px solid rgba(241, 196, 15, 0.4);
-    border-radius: 12px; padding: 12px 14px; color: #fff; font-size: 14px; outline: none;
-}
-.chat-input:focus { border-color: #f1c40f; box-shadow: 0 0 8px rgba(241, 196, 15, 0.3); }
-.chat-send-btn {
-    background: linear-gradient(135deg, #f1c40f, #f39c12); color: #111; border: none;
-    height: 44px; padding: 0 16px; border-radius: 12px; font-weight: 900; font-size: 13px; cursor: pointer; text-transform: uppercase;
-}
-.chat-send-btn:active { transform: scale(0.95); }
+.eski-chat-header { background: #000; padding: 15px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
+.eski-chat-back { color: #ccc; font-weight: bold; font-size: 14px; background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px;}
+.eski-chat-name { color: #fff; font-weight: 900; font-size: 16px; }
+.eski-chat-block { color: #e74c3c; font-size: 18px; background: none; border: none; cursor: pointer; }
+.eski-chat-body { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; background: #0a0e0c; }
+.eski-bubble { max-width: 75%; padding: 10px 14px; border-radius: 12px; font-size: 13px; color: #fff; }
+.eski-bubble-me { background: #0f4c3a; align-self: flex-end; border-bottom-right-radius: 2px; }
+.eski-bubble-them { background: #1e2224; align-self: flex-start; border-bottom-left-radius: 2px; }
+.eski-bubble-time { font-size: 9px; opacity: 0.6; display: block; text-align: right; margin-top: 4px; }
+.eski-chat-footer { padding: 10px; background: #000; border-top: 1px solid #222; display: flex; gap: 10px; align-items: center;}
+.eski-chat-input { flex: 1; background: #111; border: 1px solid #333; border-radius: 20px; padding: 10px 15px; color: #fff; outline: none; font-size: 13px; }
+.eski-chat-send { background: #2ecc71; color: #000; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 18px; cursor: pointer; display: flex; justify-content: center; align-items: center; }
 
 /* Diğer sabit modallar */
 .bildirim-ekrani { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
@@ -207,12 +209,14 @@ body #kazananEliAlani .okey-tasi-bitis, body #kazananEliAlani .okey-tasi { posit
 .lider-sira { font-weight: 900; color: #f2c94c; font-size: 18px; width: 30px; }
 .lider-isim { flex: 1; font-weight: bold; color: #fff; font-size: 14px; }
 .lider-cip { font-weight: 900; color: #2ecc71; font-size: 14px; background: rgba(46, 204, 113, 0.1); padding: 5px 10px; border-radius: 8px; border: 1px solid rgba(46, 204, 113, 0.3); }
+
+/* Orijinal ozelMesajKutusu Stilleri (mesajlar.js icinden cagirilan) */
 #ozelMesajKutusu { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999999; flex-direction: column; justify-content: center; align-items: center; }
-.ozel-mesaj-panel { background: #111; border: 2px solid #3498db; width: 90%; max-width: 400px; height: 80vh; border-radius: 15px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 0 20px rgba(52,152,219,0.4); }
-.ozel-mesaj-header { background: #3498db; color: #fff; padding: 15px; text-align: center; font-weight: bold; font-size: 18px; display: flex; justify-content: space-between; align-items: center; }
-.ozel-mesaj-icerik { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; background: #0a0a0a; }
-.ozel-mesaj-input-alani { display: flex; padding: 10px; background: #1a1a1a; border-top: 1px solid #333; }
-.ozel-mesaj-input-alani input { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #000; color: #fff; outline: none; }
-.ozel-mesaj-input-alani button { background: #3498db; color: #fff; border: none; padding: 0 20px; margin-left: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-.om-gelen { background: #222; border-left: 3px solid #e74c3c; padding: 10px; border-radius: 8px; color: #fff; align-self: flex-start; max-width: 80%; font-size: 13px; }
-.om-giden { background: rgba(52,152,219,0.2); border-right: 3px solid #3498db; padding: 10px; border-radius: 8px; color: #fff; align-self: flex-end; max-width: 80%; font-size: 13px; text-align: right; }
+.ozel-mesaj-panel { background: #0f1210; border: 1px solid #2ecc71; width: 95%; max-width: 400px; height: 75vh; border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 0 20px rgba(46,204,113,0.2); }
+.ozel-mesaj-header { background: #000; color: #fff; padding: 15px; text-align: center; font-weight: 900; font-size: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222;}
+.ozel-mesaj-icerik { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; background: #0a0e0c; }
+.ozel-mesaj-input-alani { display: flex; padding: 10px; background: #000; border-top: 1px solid #222; align-items: center;}
+.ozel-mesaj-input-alani input { flex: 1; padding: 10px 15px; border-radius: 20px; border: 1px solid #333; background: #111; color: #fff; outline: none; font-size: 13px;}
+.ozel-mesaj-input-alani button { background: #2ecc71; color: #000; border: none; width: 40px; height: 40px; margin-left: 10px; border-radius: 50%; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 18px;}
+.om-gelen { background: #1e2224; padding: 10px 14px; border-radius: 12px; border-bottom-left-radius: 2px; color: #fff; align-self: flex-start; max-width: 75%; font-size: 13px; }
+.om-giden { background: #0f4c3a; padding: 10px 14px; border-radius: 12px; border-bottom-right-radius: 2px; color: #fff; align-self: flex-end; max-width: 75%; font-size: 13px; text-align: right; }
