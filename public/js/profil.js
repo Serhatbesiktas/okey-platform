@@ -25,9 +25,7 @@ window.profiliGoster = function(hedefIsim) {
     if(pArkadasBtn) pArkadasBtn.dataset.hedef = hedefIsim; 
     if(pDavetBtn) pDavetBtn.dataset.hedef = hedefIsim;
 
-    if(pDurum) {
-        pDurum.innerHTML = "Çevrimiçi"; 
-    }
+    if(pDurum) pDurum.innerHTML = "Çevrimiçi"; 
     
     let isOnline = (onlineOyuncularListesi && onlineOyuncularListesi.includes(hedefIsim)) || hedefIsim === aktifKullaniciAdi;
     
@@ -40,13 +38,15 @@ window.profiliGoster = function(hedefIsim) {
         <div class="stat-card"><span class="stat-icon">❌</span><div class="stat-info"><span class="stat-lbl">Kaybedilen</span><div class="skeleton-loader" style="width: 40px; height: 20px;"></div></div></div>
     `;
     
-    // BUTON DURUM KONTROLÜ
+    // 👥 ARKADAŞLIK VE BUTON DURUM PROTOKOLÜ (YENİLENDİ)
     if (hedefIsim !== aktifKullaniciAdi) {
         if(pArkadasBtn) {
             pArkadasBtn.style.display = 'flex';
+            
+            // Eğer zaten arkadaşsa: "👥 Arkadaş" etiketi yap ve altına "Sil" butonu koy
             if (benimArkadaslarim && benimArkadaslarim.includes(hedefIsim)) { 
-                pArkadasBtn.innerHTML = "❌ Arkadaştan Çıkar"; 
-                pArkadasBtn.className = "profil-action-btn btn-danger";
+                pArkadasBtn.innerHTML = "👥 Arkadaş (Kaldırmak İçin Tıkla)"; 
+                pArkadasBtn.className = "profil-action-btn btn-disabled";
                 pArkadasBtn.onclick = () => window.arkadasliktanCikarIstek(hedefIsim);
             } else if (window.benimGidenIsteklerim && window.benimGidenIsteklerim.includes(hedefIsim)) {
                 pArkadasBtn.innerHTML = "⏳ İstek Gönderildi"; 
@@ -129,6 +129,6 @@ window.esyaFirlatAksiyon = function(esyaIcon) {
     
     if(!hedef || !suAnkiMasam || hedef === aktifKullaniciAdi || safCip < 5000) return;
     
-    socket.emit('esya_firlat', { masaAdi: suAnkiMasam, kimden: aktifKullaniciAdi, kime: hedef, esya: esyaIcon }); 
+    socket.emit('esya_firlat', { masaAdi: suAnkiMasam, kimden: aktifKullaniciAdi, kime: markup, esya: esyaIcon }); 
     document.getElementById('profilEkrani').style.display = 'none';
 };
