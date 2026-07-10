@@ -31,20 +31,38 @@ window.profiliGoster = function(hedefIsim) {
     
     let isOnline = (onlineOyuncularListesi && onlineOyuncularListesi.includes(hedefIsim)) || hedefIsim === aktifKullaniciAdi;
     
+    // ANINDA SKELETON (YÜKLENİYOR) EFEKTİ GÖSTERİMİ
+    if(pCip) pCip.innerHTML = '<div class="skeleton-loader" style="width: 120px; height: 30px; margin: 0 auto;"></div>';
+    if(pOynanan) pOynanan.innerHTML = '<div class="skeleton-loader" style="width: 40px; height: 20px;"></div>';
+    if(pOran) pOran.innerHTML = '<div class="skeleton-loader" style="width: 40px; height: 20px;"></div>';
+    if(pKazanilan) pKazanilan.innerHTML = `
+        <div class="stat-card"><span class="stat-icon">🏆</span><div class="stat-info"><span class="stat-lbl">Kazanılan</span><div class="skeleton-loader" style="width: 40px; height: 20px;"></div></div></div>
+        <div class="stat-card"><span class="stat-icon">❌</span><div class="stat-info"><span class="stat-lbl">Kaybedilen</span><div class="skeleton-loader" style="width: 40px; height: 20px;"></div></div></div>
+    `;
+    
+    // BUTON DURUM KONTROLÜ
     if (hedefIsim !== aktifKullaniciAdi) {
         if(pArkadasBtn) {
-            pArkadasBtn.style.display = 'block';
+            pArkadasBtn.style.display = 'flex';
             if (benimArkadaslarim && benimArkadaslarim.includes(hedefIsim)) { 
                 pArkadasBtn.innerHTML = "❌ Arkadaştan Çıkar"; 
-                pArkadasBtn.style.background = "linear-gradient(135deg, #e74c3c, #c0392b)"; 
-                pArkadasBtn.style.color = "#fff"; 
+                pArkadasBtn.className = "profil-action-btn btn-danger";
+                pArkadasBtn.onclick = () => window.arkadasliktanCikarIstek(hedefIsim);
+            } else if (window.benimGidenIsteklerim && window.benimGidenIsteklerim.includes(hedefIsim)) {
+                pArkadasBtn.innerHTML = "⏳ İstek Gönderildi"; 
+                pArkadasBtn.className = "profil-action-btn btn-disabled";
+                pArkadasBtn.onclick = null;
+            } else if (window.benimGelenIsteklerim && window.benimGelenIsteklerim.includes(hedefIsim)) {
+                pArkadasBtn.innerHTML = "✅ İsteği Kabul Et"; 
+                pArkadasBtn.className = "profil-action-btn btn-success";
+                pArkadasBtn.onclick = () => window.istekKabulEtMotor(hedefIsim);
             } else { 
                 pArkadasBtn.innerHTML = "➕ Arkadaş Ekle"; 
-                pArkadasBtn.style.background = "linear-gradient(135deg, #f1c40f, #f39c12)"; 
-                pArkadasBtn.style.color = "#111"; 
+                pArkadasBtn.className = "profil-action-btn btn-add-friend";
+                pArkadasBtn.onclick = () => window.arkadasEkleIstek(hedefIsim);
             }
         }
-        if(pDavetBtn) pDavetBtn.style.display = 'block'; 
+        if(pDavetBtn) pDavetBtn.style.display = 'flex'; 
     } else { 
         if(pArkadasBtn) pArkadasBtn.style.display = 'none'; 
         if(pDavetBtn) pDavetBtn.style.display = 'none'; 
@@ -61,24 +79,12 @@ window.profiliGoster = function(hedefIsim) {
         pIsim.style.color = ismRengi; 
         pIsim.style.textShadow = textGlow;
     }
-    
-    if(pCip) pCip.innerText = "..."; 
-    if(pOynanan) pOynanan.innerText = "..."; 
-    
-    // JS Mantığını bozmadan CSS Grid sistemine uyumlu HTML formatı gönderiyoruz
-    if(pKazanilan) pKazanilan.innerHTML = `
-        <div class="stat-card"><span class="stat-icon">🏆</span><div class="stat-info"><span class="stat-lbl">Kazanılan</span><span class="stat-val text-green">...</span></div></div>
-        <div class="stat-card"><span class="stat-icon">❌</span><div class="stat-info"><span class="stat-lbl">Kaybedilen</span><span class="stat-val text-red">...</span></div></div>
-    `;
-    
-    if(pOran) pOran.innerText = "...";
 
     const setStats = (cip, oynanan, kazanilan, oran, ligTxt, ligBg, unvanTxt) => {
-        if(pDurum) { pDurum.innerHTML = "Çevrimiçi"; }
+        if(pDurum) { pDurum.innerHTML = isOnline ? "🟢 Çevrimiçi" : "⚫ Çevrimdışı"; pDurum.style.color = isOnline ? "#2ecc71" : "#7f8c8d"; }
         if(pCip) pCip.innerText = cip.toLocaleString('tr-TR'); 
         if(pOynanan) pOynanan.innerText = oynanan; 
         
-        // JS Mantığını bozmadan CSS Grid sistemine uyumlu HTML formatı gönderiyoruz
         if(pKazanilan) pKazanilan.innerHTML = `
             <div class="stat-card"><span class="stat-icon">🏆</span><div class="stat-info"><span class="stat-lbl">Kazanılan</span><span class="stat-val text-green">${kazanilan}</span></div></div>
             <div class="stat-card"><span class="stat-icon">❌</span><div class="stat-info"><span class="stat-lbl">Kaybedilen</span><span class="stat-val text-red">${oynanan - kazanilan}</span></div></div>
