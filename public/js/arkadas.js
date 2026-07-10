@@ -1,12 +1,10 @@
 // ==========================================
 // BEYCO GAMES - AAA ARKADAŞ SİSTEMİ 
-// (Mesajlaşma mesajlar.js içindedir)
 // ==========================================
 
 window.benimGelenIsteklerim = [];
 window.benimGidenIsteklerim = [];
 
-// ⸻ FİREBASE GERÇEK ZAMANLI DİNLEYİCİSİ ⸻
 function baslatIstekListener() {
     if(typeof auth !== 'undefined' && auth.currentUser && typeof db !== 'undefined') {
         db.collection('kullanicilar').doc(auth.currentUser.uid).onSnapshot(doc => {
@@ -45,7 +43,6 @@ setInterval(() => {
     }
 }, 2000);
 
-// ⸻ TOAST BİLDİRİMİ ⸻
 window.arkadaslikIstegiGeldiToast = function(isim) {
     const container = document.getElementById('arkadasToastContainer');
     if(!container) return;
@@ -64,7 +61,6 @@ window.arkadaslikIstegiGeldiToast = function(isim) {
     setTimeout(() => { if(toast) toast.remove(); }, 10000);
 };
 
-// ⸻ ARKADAŞ İSTEK, KABUL, RED, SİL MOTORLARI ⸻
 window.arkadasEkleIstek = function(hedefIsim) {
     if(isMisafir) return ozelUyariGoster("⚠️ Misafirler istek gönderemez.");
     if(hedefIsim === aktifKullaniciAdi) return ozelUyariGoster("Kendinize istek gönderemezsiniz.");
@@ -116,7 +112,6 @@ window.arkadasliktanCikarIstek = function(hedefIsim) {
     }
 };
 
-// ⸻ ARKADAŞ MENÜSÜ LİSTE RENDER MOTORU ⸻
 window.arkadasAraFiltre = function() {
     let input = document.getElementById('arkadasAraInput'); if(!input) return;
     let filter = input.value.toLowerCase(); let cards = document.querySelectorAll('#arkadasListesiDiv .friend-card');
@@ -150,7 +145,7 @@ window.arkadaslarMenusuAc = function() {
         let cardClass = isOnline ? 'friend-card' : 'friend-card offline-card';
         let davetBtnHtml = isOnline ? `<button class="f-btn f-btn-invite" onclick="masayaDavetEt('${o}')" title="Davet Et">🎮</button>` : '';
 
-        // Orijinal mesaj fonksiyonuna yönlendirildi
+        // ORİJİNAL ÇEKMECE MESAJLAŞMASI KORUNDU
         listeDiv.innerHTML += `
             <div class="${cardClass}">
                 <div class="friend-card-left">
@@ -165,7 +160,7 @@ window.arkadaslarMenusuAc = function() {
                 </div>
                 <div class="friend-actions">
                     <button class="f-btn f-btn-profile" onclick="profiliGoster('${o}')" title="Profil">👤</button>
-                    <button class="f-btn f-btn-msg" onclick="document.getElementById('arkadaslarEkrani').style.display='none'; document.getElementById('eskiMesajHedefIsim').innerText='${o}'; document.getElementById('eskiMesajGonderModal').style.display='flex';" title="Mesaj Gönder">💬</button>
+                    <button class="f-btn f-btn-msg" onclick="document.getElementById('arkadaslarEkrani').style.display='none'; document.getElementById('sohbetCekmecesi').classList.add('acik'); let inp = document.getElementById('sohbetInput'); inp.value = '@${o} '; inp.focus();" title="Mesaj Gönder">💬</button>
                     ${davetBtnHtml}
                 </div>
             </div>`;
