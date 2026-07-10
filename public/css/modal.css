@@ -4,31 +4,13 @@
 
 body::after { display: none !important; }
 
-.premium-modal-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(8, 12, 10, 0.65); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-    z-index: 9999999; display: flex; justify-content: center; align-items: center;
-    padding: 20px; opacity: 0; animation: overlayFadeIn 220ms ease-out forwards;
-}
-
+.premium-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(8, 12, 10, 0.65); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 9999999; display: flex; justify-content: center; align-items: center; padding: 20px; opacity: 0; animation: overlayFadeIn 220ms ease-out forwards; }
 @keyframes overlayFadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-.premium-modal-box {
-    background: rgba(22, 26, 24, 0.95); border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 20px; padding: 32px 24px; width: 100%; max-width: 340px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.05);
-    text-align: center; transform: scale(0.92);
-    animation: modalScaleIn 220ms cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-    position: relative; overflow: hidden;
-}
-
+.premium-modal-box { background: rgba(22, 26, 24, 0.95); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; padding: 32px 24px; width: 100%; max-width: 340px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.05); text-align: center; transform: scale(0.92); animation: modalScaleIn 220ms cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; position: relative; overflow: hidden; }
 @keyframes modalScaleIn { from { transform: scale(0.92); } to { transform: scale(1); } }
 
-.modal-icon-wrapper {
-    width: 56px; height: 56px; margin: 0 auto 16px; border-radius: 50%;
-    display: flex; justify-content: center; align-items: center;
-    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
-}
+.modal-icon-wrapper { width: 56px; height: 56px; margin: 0 auto 16px; border-radius: 50%; display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); }
 .modal-icon-wrapper svg { width: 28px; height: 28px; }
 
 .warning-icon { color: #f2c94c; box-shadow: 0 0 20px rgba(242, 201, 76, 0.15); border-color: rgba(242, 201, 76, 0.3); }
@@ -58,16 +40,10 @@ body::after { display: none !important; }
 .btn-success { background: linear-gradient(135deg, #2ecc71, #27ae60); color: #fff; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.25); }
 .btn-dark { background: linear-gradient(135deg, #3a3f44, #24282b); color: #fff; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
 .btn-dark:hover { background: linear-gradient(135deg, #454b51, #2c3136); }
+.btn-disabled { background: #2f3640 !important; color: #7f8c8d !important; cursor: not-allowed !important; box-shadow: none !important; border: 1px dashed rgba(255,255,255,0.1) !important; }
 
-/* =========================================================
-   🏆 AAA PREMIUM OYUN BİTTİ (SONUÇ) EKRANI 🏆
-========================================================= */
-
-.sonuc-premium-box {
-    max-width: 420px; background: rgba(15, 20, 18, 0.95); border: 1px solid rgba(241, 196, 15, 0.3);
-    box-shadow: 0 30px 60px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.1);
-    padding: 36px 20px; height: auto !important; display: flex; flex-direction: column; gap: 18px;
-}
+/* ⸻ AAA PREMIUM OYUN BİTTİ (SONUÇ) EKRANI ⸻ */
+.sonuc-premium-box { max-width: 420px; background: rgba(15, 20, 18, 0.95); border: 1px solid rgba(241, 196, 15, 0.3); box-shadow: 0 30px 60px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.1); padding: 36px 20px; height: auto !important; display: flex; flex-direction: column; gap: 18px; }
 .sonuc-title { color: #f1c40f; font-size: clamp(20px, 6vw, 26px); font-weight: 900; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 0 15px rgba(241, 196, 15, 0.3); margin: 0; white-space: normal; word-wrap: break-word; line-height: 1.4; text-align: center; }
 .sonuc-metin { white-space: pre-wrap; line-height: 1.8; font-size: 14px; font-weight: 700; color: #d2e0dc; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 16px; margin: 0; box-shadow: inset 0 2px 10px rgba(0,0,0,0.3); }
 .sonuc-odul { display: inline-block; background: rgba(46, 204, 113, 0.1); border: 1px solid rgba(46, 204, 113, 0.3); color: #2ecc71; font-size: 24px; font-weight: 900; padding: 12px 28px; border-radius: 12px; margin: 0 auto; box-shadow: 0 0 20px rgba(46, 204, 113, 0.25); }
@@ -79,101 +55,72 @@ body #kazananEliAlani .okey-tasi-bitis, body #kazananEliAlani .okey-tasi { posit
 body #kazananEliAlani > div:nth-child(1) { animation-delay: 0.05s; } body #kazananEliAlani > div:nth-child(2) { animation-delay: 0.10s; } body #kazananEliAlani > div:nth-child(3) { animation-delay: 0.15s; } body #kazananEliAlani > div:nth-child(4) { animation-delay: 0.20s; } body #kazananEliAlani > div:nth-child(5) { animation-delay: 0.25s; } body #kazananEliAlani > div:nth-child(6) { animation-delay: 0.30s; } body #kazananEliAlani > div:nth-child(7) { animation-delay: 0.35s; } body #kazananEliAlani > div:nth-child(8) { animation-delay: 0.40s; } body #kazananEliAlani > div:nth-child(9) { animation-delay: 0.45s; } body #kazananEliAlani > div:nth-child(10) { animation-delay: 0.50s; } body #kazananEliAlani > div:nth-child(11) { animation-delay: 0.55s; } body #kazananEliAlani > div:nth-child(12) { animation-delay: 0.60s; } body #kazananEliAlani > div:nth-child(13) { animation-delay: 0.65s; } body #kazananEliAlani > div:nth-child(14) { animation-delay: 0.70s; } body #kazananEliAlani > div:nth-child(15) { animation-delay: 0.75s; }
 @keyframes tileFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-/* =========================================================
-   🚀 AAA PREMİUM PROFİL EKRANI
-========================================================= */
-
+/* ⸻ AAA PREMİUM PROFİL EKRANI VE SKELETON LOADER ⸻ */
 .profil-premium-box { background: rgba(12, 18, 14, 0.95); border: 1px solid rgba(241, 196, 15, 0.3); border-radius: 24px; padding: 30px 24px; width: 100%; max-width: 360px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), inset 0 2px 20px rgba(241, 196, 15, 0.05); text-align: center; transform: scale(0.92); animation: modalScaleIn 220ms cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; position: relative; }
 .profil-close-btn { position: absolute; top: 16px; right: 16px; width: 32px; height: 32px; border-radius: 50%; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #8fa79a; display: flex; justify-content: center; align-items: center; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.2s; z-index: 10; }
 .profil-close-btn:active { transform: scale(0.9); background: #e74c3c; color: #fff; border-color: #e74c3c; }
-
 .profil-avatar-premium { width: 80px; height: 80px; margin: 0 auto 12px; border-radius: 50%; background: radial-gradient(circle, #1e3f28 0%, #0d1f14 100%); border: 3px solid #f1c40f; box-shadow: 0 0 20px rgba(241, 196, 15, 0.2), inset 0 0 10px rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; font-size: 38px; }
 .profil-isim-premium { font-size: 22px; font-weight: 900; color: #fff; margin-bottom: 6px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .profil-durum-premium { display: inline-block; background: rgba(46, 204, 113, 0.1); border: 1px solid rgba(46, 204, 113, 0.2); padding: 4px 12px; border-radius: 20px; color: #2ecc71 !important; font-size: 11px; font-weight: 800; margin-bottom: 20px; }
 .profil-rozet-group { display: flex; justify-content: center; gap: 10px; margin-bottom: 24px; }
 .profil-rozet { font-size: 11px; font-weight: 900; padding: 6px 14px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); text-transform: uppercase; letter-spacing: 0.5px; color: #fff; }
-
 .premium-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 24px; }
 .stat-card { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); border-radius: 14px; padding: 12px 10px; display: flex; align-items: center; gap: 10px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.2); text-align: left; }
 .stat-icon { font-size: 20px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
-.stat-info { display: flex; flex-direction: column; }
+.stat-info { display: flex; flex-direction: column; width: 100%;}
 .stat-lbl { font-size: 10px; color: #8fa79a; font-weight: 700; text-transform: uppercase; margin-bottom: 2px; letter-spacing: 0.5px;}
 .stat-val { font-size: 16px; font-weight: 900; color: #fff; }
 .text-green { color: #2ecc71; } .text-red { color: #ff4757; } .text-gold { color: #f1c40f; }
-
 .profil-cip-kutu { background: linear-gradient(135deg, rgba(46, 204, 113, 0.1), rgba(39, 174, 96, 0.05)); border: 1px dashed rgba(46, 204, 113, 0.3); border-radius: 16px; padding: 14px; margin-bottom: 24px; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.05); }
 .profil-cip-lbl { font-size: 10px; color: #2ecc71; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
 .profil-cip-val { font-size: 26px; font-weight: 900; color: #fff; text-shadow: 0 2px 8px rgba(46, 204, 113, 0.3); }
-
 .profil-btn-group { display: flex; flex-direction: column; gap: 10px; }
 .profil-action-btn { border: none; padding: 14px; border-radius: 12px; font-weight: 900; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; display: flex; justify-content: center; align-items: center; gap: 8px; }
 .profil-action-btn:active { transform: scale(0.96); }
-.btn-add-friend { background: linear-gradient(135deg, #f1c40f, #f39c12); color: #111; box-shadow: 0 4px 15px rgba(241, 196, 15, 0.2); }
-.btn-invite { background: linear-gradient(135deg, #2ecc71, #27ae60); color: #fff; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.2); }
-.btn-dm { background: linear-gradient(135deg, #3498db, #2980b9); color: #fff; box-shadow: 0 4px 15px rgba(52, 152, 219, 0.2); }
 
-/* =========================================================
-   🚀 AAA PREMİUM ARKADAŞLAR VE DAVET MENÜSÜ 
-========================================================= */
+/* Skeleton Yükleniyor Efekti */
+.skeleton-loader { height: 16px; border-radius: 6px; background: rgba(255, 255, 255, 0.1); background-image: linear-gradient(90deg, rgba(255, 255, 255, 0) 0, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0) 100%); background-size: 200px 100%; animation: shimmer 1.5s infinite linear; }
+@keyframes shimmer { 0% { background-position: -200px 0; } 100% { background-position: 200px 0; } }
 
-.premium-search-box {
-    display: flex; align-items: center;
-    background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 12px; padding: 12px 16px; margin-bottom: 16px;
-    box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
-}
-
+/* ⸻ AAA PREMİUM ARKADAŞLAR VE DAVET MENÜSÜ ⸻ */
+.premium-search-box { display: flex; align-items: center; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 12px 16px; margin-bottom: 16px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.2); }
 .premium-search-box span { font-size: 16px; opacity: 0.7; }
-.premium-search-box input {
-    background: transparent; border: none; outline: none; color: #fff;
-    width: 100%; font-size: 14px; margin-left: 10px; font-family: inherit;
-}
+.premium-search-box input { background: transparent; border: none; outline: none; color: #fff; width: 100%; font-size: 14px; margin-left: 10px; font-family: inherit; }
 .premium-search-box input::placeholder { color: #8fa79a; }
-
-.friend-card {
-    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 16px; padding: 12px; display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 10px; transition: transform 0.2s, background 0.2s;
-}
+.friend-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; transition: transform 0.2s, background 0.2s; }
 .friend-card:active { transform: scale(0.98); background: rgba(255,255,255,0.06); }
 .offline-card { opacity: 0.6; filter: grayscale(0.8); }
-
 .friend-card-left { display: flex; align-items: center; gap: 12px; }
-.friend-avatar {
-    width: 44px; height: 44px; border-radius: 50%;
-    background: radial-gradient(circle, #1e3f28, #0d1f14);
-    border: 2px solid #2ecc71; display: flex; justify-content: center; align-items: center;
-    font-size: 22px; box-shadow: 0 0 10px rgba(46,204,113,0.2);
-}
+.friend-avatar { width: 44px; height: 44px; border-radius: 50%; background: radial-gradient(circle, #1e3f28, #0d1f14); border: 2px solid #2ecc71; display: flex; justify-content: center; align-items: center; font-size: 22px; box-shadow: 0 0 10px rgba(46,204,113,0.2); }
 .offline-card .friend-avatar { border-color: #7f8c8d; box-shadow: none; }
-
 .friend-info { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
 .friend-name { font-size: 15px; font-weight: 900; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5); letter-spacing: 0.3px; }
-
 .friend-tags { display: flex; gap: 6px; align-items: center; }
 .friend-league { font-size: 9px; font-weight: 800; border: 1px solid; padding: 2px 6px; border-radius: 6px; }
 .status-badge { font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 6px; background: rgba(0,0,0,0.4); }
 .status-badge.online { color: #2ecc71; border: 1px solid rgba(46,204,113,0.3); }
 .status-badge.offline { color: #7f8c8d; border: 1px solid rgba(127,140,141,0.3); }
-
 .friend-actions { display: flex; gap: 8px; }
-.f-btn {
-    width: 36px; height: 36px; border-radius: 10px; border: none;
-    display: flex; justify-content: center; align-items: center; font-size: 16px;
-    cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
-}
+.f-btn { width: 36px; height: 36px; border-radius: 10px; border: none; display: flex; justify-content: center; align-items: center; font-size: 16px; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; }
 .f-btn:active { transform: scale(0.9); }
 .f-btn-profile { background: rgba(255,255,255,0.1); color: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 .f-btn-msg { background: linear-gradient(135deg, #3498db, #2980b9); color: #fff; box-shadow: 0 4px 10px rgba(52,152,219,0.3); }
 .f-btn-invite { background: linear-gradient(135deg, #2ecc71, #27ae60); color: #fff; box-shadow: 0 4px 10px rgba(46,204,113,0.3); }
-
 .empty-friends-state { text-align: center; padding: 40px 10px 20px; }
 .empty-icon { font-size: 56px; margin-bottom: 20px; opacity: 0.8; filter: drop-shadow(0 4px 15px rgba(0,0,0,0.5)); }
 .empty-friends-state h3 { color: #f1c40f; font-size: 20px; margin-bottom: 10px; font-weight: 900; letter-spacing: 1px;}
 .empty-friends-state p { color: #a3c4bc; font-size: 13px; line-height: 1.6; margin-bottom: 24px; font-weight: 600;}
 
+/* ⸻ SAĞ ALT ARKADAŞ İSTEĞİ BİLDİRİMİ (TOAST) ⸻ */
+.arkadas-toast { background: rgba(18, 26, 20, 0.95); border: 1px solid rgba(46, 204, 113, 0.4); border-radius: 16px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); backdrop-filter: blur(10px); display: flex; flex-direction: column; gap: 12px; width: 280px; animation: slideInRight 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; pointer-events: auto; }
+@keyframes slideInRight { from{ opacity:0; transform: translateX(50px); } to{ opacity:1; transform: translateX(0); } }
+.toast-title { color: #f1c40f; font-weight: 800; font-size: 13px; display:flex; align-items:center; gap:6px; letter-spacing: 0.5px;}
+.toast-msg { color: #d2e0dc; font-size: 12px; line-height: 1.4; font-weight: 600;}
+.toast-actions { display: flex; gap: 8px; }
+.toast-btn { flex: 1; padding: 10px; border-radius: 8px; font-weight: 900; font-size: 11px; border: none; cursor: pointer; text-transform: uppercase; transition: transform 0.15s;}
+.toast-btn:active { transform: scale(0.95); }
 
-/* ⸻ DİĞER MODALLAR (KORUNDU) ⸻ */
+/* Diğer sabit modallar */
 .bildirim-ekrani { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
 .bildirim-kutu { background: #1a1a1a; border: 2px solid #3498db; padding: 30px; border-radius: 15px; text-align: center; color: white; max-width: 400px; box-shadow: 0 0 20px rgba(52,152,219,0.5); }
 .bildirim-btn { background: #3498db; color: #fff; border: none; padding: 10px 30px; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.2s; margin-top: 15px; }
