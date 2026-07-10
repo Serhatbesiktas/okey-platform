@@ -9,6 +9,11 @@ window.profiliGoster = function(hedefIsim) {
         return; 
     }
     
+    // Değişkenleri güvenli hale getiriyoruz, undefined ise boş dizi ata (HATA KORUMASI)
+    window.benimArkadaslarim = window.benimArkadaslarim || [];
+    window.benimGidenIsteklerim = window.benimGidenIsteklerim || [];
+    window.benimGelenIsteklerim = window.benimGelenIsteklerim || [];
+
     const pEkrani = document.getElementById('profilEkrani'); 
     const pIsim = document.getElementById('profilIsim'); 
     const pCip = document.getElementById('profilCipMiktari'); 
@@ -28,16 +33,17 @@ window.profiliGoster = function(hedefIsim) {
 
     if(pDurum) pDurum.innerHTML = "Çevrimiçi"; 
     
-    if(pCip) pCip.innerHTML = '<div class="skeleton-loader" style="width: 120px; height: 30px; margin: 0 auto;"></div>';
-    if(pOynanan) pOynanan.innerHTML = '<div class="skeleton-loader" style="width: 40px; height: 20px;"></div>';
-    if(pOran) pOran.innerHTML = '<div class="skeleton-loader" style="width: 40px; height: 20px;"></div>';
+    // Veriler gelene kadar bekliyor... ibaresi koyulur (SKELETON KUTULARI SİLİNDİ)
+    if(pCip) pCip.innerText = '...';
+    if(pOynanan) pOynanan.innerText = '...';
+    if(pOran) pOran.innerText = '...';
     if(pKazanilan) pKazanilan.innerHTML = `
-        <div class="stat-card"><span class="stat-icon">🏆</span><div class="stat-info"><span class="stat-lbl">Kazanılan</span><div class="skeleton-loader" style="width: 40px; height: 20px;"></div></div></div>
-        <div class="stat-card"><span class="stat-icon">❌</span><div class="stat-info"><span class="stat-lbl">Kaybedilen</span><div class="skeleton-loader" style="width: 40px; height: 20px;"></div></div></div>
+        <div class="stat-card"><span class="stat-icon">🏆</span><div class="stat-info"><span class="stat-lbl">Kazanılan</span><span class="stat-val text-green">...</span></div></div>
+        <div class="stat-card"><span class="stat-icon">❌</span><div class="stat-info"><span class="stat-lbl">Kaybedilen</span><span class="stat-val text-red">...</span></div></div>
     `;
     
     if (hedefIsim !== aktifKullaniciAdi) {
-        if (benimArkadaslarim && benimArkadaslarim.includes(hedefIsim)) { 
+        if (window.benimArkadaslarim.includes(hedefIsim)) { 
             if(pArkadasBtn) pArkadasBtn.style.display = 'none';
             if(pDurumKutu) {
                 pDurumKutu.style.display = 'block';
@@ -50,11 +56,11 @@ window.profiliGoster = function(hedefIsim) {
             if(pDurumKutu) pDurumKutu.style.display = 'none';
             if(pArkadasBtn) {
                 pArkadasBtn.style.display = 'flex';
-                if (window.benimGidenIsteklerim && window.benimGidenIsteklerim.includes(hedefIsim)) {
+                if (window.benimGidenIsteklerim.includes(hedefIsim)) {
                     pArkadasBtn.innerHTML = "⏳ İstek Gönderildi"; 
                     pArkadasBtn.className = "profil-action-btn btn-disabled";
                     pArkadasBtn.onclick = null;
-                } else if (window.benimGelenIsteklerim && window.benimGelenIsteklerim.includes(hedefIsim)) {
+                } else if (window.benimGelenIsteklerim.includes(hedefIsim)) {
                     pArkadasBtn.innerHTML = "✅ İsteği Kabul Et"; 
                     pArkadasBtn.className = "profil-action-btn btn-success";
                     pArkadasBtn.onclick = () => window.istekKabulEtMotor(hedefIsim);
@@ -73,7 +79,7 @@ window.profiliGoster = function(hedefIsim) {
     }
 
     let tacIcon = ""; let ismRengi = "#fff"; let textGlow = "0 2px 10px rgba(0,0,0,0.5)";
-    if(globalKozmetikler && globalKozmetikler[hedefIsim]) {
+    if(typeof globalKozmetikler !== 'undefined' && globalKozmetikler[hedefIsim]) {
         if(globalKozmetikler[hedefIsim].includes('neon_tac')) tacIcon = "👑 ";
         if(globalKozmetikler[hedefIsim].includes('atesli_isim')) { ismRengi = "#ff4d4d"; textGlow = "0 0 10px rgba(255, 77, 77, 0.8)"; }
     }
@@ -85,6 +91,11 @@ window.profiliGoster = function(hedefIsim) {
     }
 
     const setStats = (cip, oynanan, kazanilan, oran, ligTxt, ligBg, unvanTxt) => {
+        let isOnline = false;
+        if(typeof onlineOyuncularListesi !== 'undefined') {
+            isOnline = onlineOyuncularListesi.includes(hedefIsim) || hedefIsim === aktifKullaniciAdi;
+        }
+
         if(pDurum) { pDurum.innerHTML = isOnline ? "🟢 Çevrimiçi" : "⚫ Çevrimdışı"; pDurum.style.color = isOnline ? "#2ecc71" : "#7f8c8d"; }
         if(pCip) pCip.innerText = cip.toLocaleString('tr-TR'); 
         if(pOynanan) pOynanan.innerText = oynanan; 
