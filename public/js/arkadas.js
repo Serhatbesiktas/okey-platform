@@ -1,11 +1,10 @@
 // ==========================================
-// BEYCO GAMES - AAA ARKADAŞ & REAL-TIME DM SİSTEMİ
+// BEYCO GAMES - AAA ARKADAŞ SİSTEMİ 
+// (Mesajlaşma mesajlar.js içindedir)
 // ==========================================
 
 window.benimGelenIsteklerim = [];
 window.benimGidenIsteklerim = [];
-window.aktifSohbetHedef = null;
-window.sohbetAbonelikSinyali = null;
 
 // ⸻ FİREBASE GERÇEK ZAMANLI DİNLEYİCİSİ ⸻
 function baslatIstekListener() {
@@ -33,31 +32,6 @@ function baslatIstekListener() {
                 let acikProfil = document.getElementById('profilArkadasBtn')?.dataset?.hedef;
                 if(acikProfil && document.getElementById('profilEkrani').style.display === 'flex') {
                     profiliGoster(acikProfil);
-                }
-            }
-        });
-
-        // 🔴 OKUNMAMIŞ ÖZEL MESAJ BİLDİRİM ROZETİ MOTORU
-        db.collection("ozel_sohbetler").where("katilimcilar", "array-contains", aktifKullaniciAdi).onSnapshot(snap => {
-            let okunmamisVarMi = false;
-            snap.forEach(doc => {
-                let d = doc.data();
-                if(d.sonGonderen !== aktifKullaniciAdi && d.okundu === false) {
-                    okunmamisVarMi = true;
-                }
-            });
-            
-            const badge = document.getElementById('menuSohbetItem');
-            if(badge) {
-                let eskiRozet = badge.querySelector('.unread-msg-badge');
-                if(okunmamisVarMi) {
-                    if(!eskiRozet) {
-                        let r = document.createElement('div');
-                        r.className = 'unread-msg-badge';
-                        badge.appendChild(r);
-                    }
-                } else if(eskiRozet) {
-                    eskiRozet.remove();
                 }
             }
         });
@@ -142,75 +116,6 @@ window.arkadasliktanCikarIstek = function(hedefIsim) {
     }
 };
 
-// ⸻ 🔥 REAL-TIME PREMIUM ORTALANMIŞ MODAL SOHBET MOTORU 🔥 ⸻
-window.acOzelMesaj = function(hedefIsim) {
-    if(!hedefIsim || isMisafir) return;
-    
-    window.aktifSohbetHedef = hedefIsim;
-    document.getElementById('profilEkrani').style.display = 'none';
-    document.getElementById('arkadaslarEkrani').style.display = 'none';
-    
-    // Kapsayıcı Overlay ekranı flexten açılır (Standart Modal)
-    const overlay = document.getElementById('ozelSohbetEkrani');
-    document.getElementById('chatTargetName').innerText = hedefIsim;
-    document.getElementById('chatTargetStatus').innerText = onlineOyuncularListesi.includes(hedefIsim) ? "🟢 Çevrimiçi" : "⚫ Çevrimdışı";
-    overlay.style.display = 'flex';
-
-    const roomId = [aktifKullaniciAdi, hedefIsim].sort().join("__");
-    if(window.sohbetAbonelikSinyali) window.sohbetAbonelikSinyali();
-
-    window.sohbetAbonelikSinyali = db.collection("ozel_sohbetler").doc(roomId).onSnapshot(doc => {
-        const historyDiv = document.getElementById('chatHistory');
-        historyDiv.innerHTML = '';
-        
-        if(doc.exists) {
-            let data = doc.data();
-            let mesajlar = data.mesajlar || [];
-            
-            mesajlar.forEach(m => {
-                let bubbleClass = m.gonderen === aktifKullaniciAdi ? 'chat-bubble chat-bubble-me' : 'chat-bubble chat-bubble-them';
-                let t = new Date(m.tarih);
-                let timeStr = String(t.getHours()).padStart(2,'0') + ':' + String(t.getMinutes()).padStart(2,'0');
-                
-                historyDiv.innerHTML += `
-                    <div class="${bubbleClass}">
-                        <span>${m.metin}</span>
-                        <span class="chat-bubble-time">${timeStr}</span>
-                    </div>`;
-            });
-            historyDiv.scrollTop = historyDiv.scrollHeight;
-
-            if(data.sonGonderen !== aktifKullaniciAdi && data.okundu === false) {
-                db.collection("ozel_sohbetler").doc(roomId).update({ okundu: true });
-            }
-        }
-    });
-};
-
-window.gonderOzelMesaj = function() {
-    const input = document.getElementById('chatInput');
-    if(!input || input.value.trim() === "" || !window.aktifSohbetHedef) return;
-    
-    const metin = input.value.trim();
-    input.value = '';
-
-    const roomId = [aktifKullaniciAdi, window.aktifSohbetHedef].sort().join("__");
-    const yeniMesaj = { gonderen: aktifKullaniciAdi, metin: metin, tarih: Date.now() };
-
-    db.collection("ozel_sohbetler").doc(roomId).set({
-        katilimcilar: [aktifKullaniciAdi, window.aktifSohbetHedef],
-        sonGonderen: aktifKullaniciAdi,
-        okundu: false,
-        mesajlar: firebase.firestore.FieldValue.arrayUnion(yeniMesaj)
-    }, { merge: true });
-};
-
-window.kapatOzelMesaj = function() {
-    document.getElementById('ozelSohbetEkrani').style.display = 'none';
-    window.aktifSohbetHedef = null;
-    if(window.sohbetAbonelikSinyali) { window.sohbetAbonelikSinyali(); window.sohbetAbonelikSinyali = null; }
-};
-
 // ⸻ ARKADAŞ MENÜSÜ LİSTE RENDER MOTORU ⸻
 window.arkadasAraFiltre = function() {
     let input = document.getElementById('arkadasAraInput'); if(!input) return;
@@ -245,6 +150,7 @@ window.arkadaslarMenusuAc = function() {
         let cardClass = isOnline ? 'friend-card' : 'friend-card offline-card';
         let davetBtnHtml = isOnline ? `<button class="f-btn f-btn-invite" onclick="masayaDavetEt('${o}')" title="Davet Et">🎮</button>` : '';
 
+        // Orijinal mesaj fonksiyonuna yönlendirildi
         listeDiv.innerHTML += `
             <div class="${cardClass}">
                 <div class="friend-card-left">
@@ -259,7 +165,7 @@ window.arkadaslarMenusuAc = function() {
                 </div>
                 <div class="friend-actions">
                     <button class="f-btn f-btn-profile" onclick="profiliGoster('${o}')" title="Profil">👤</button>
-                    <button class="f-btn f-btn-msg" onclick="window.acOzelMesaj('${o}')" title="Mesaj Gönder">💬</button>
+                    <button class="f-btn f-btn-msg" onclick="document.getElementById('arkadaslarEkrani').style.display='none'; document.getElementById('eskiMesajHedefIsim').innerText='${o}'; document.getElementById('eskiMesajGonderModal').style.display='flex';" title="Mesaj Gönder">💬</button>
                     ${davetBtnHtml}
                 </div>
             </div>`;
