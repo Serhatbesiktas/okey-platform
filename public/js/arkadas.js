@@ -133,19 +133,21 @@ window.arkadaslarMenusuAc = function() {
     listeDiv.innerHTML = ''; 
 
     let siraliArkadaslar = [...benimArkadaslarim].sort((a, b) => {
-        let aOnline = onlineOyuncularListesi.includes(a); let bOnline = onlineOyuncularListesi.includes(b);
+        let aOnline = typeof onlineOyuncularListesi !== 'undefined' && onlineOyuncularListesi.includes(a); 
+        let bOnline = typeof onlineOyuncularListesi !== 'undefined' && onlineOyuncularListesi.includes(b);
         return (aOnline === bOnline) ? 0 : aOnline ? -1 : 1;
     });
 
     siraliArkadaslar.forEach(o => {
-        let isOnline = onlineOyuncularListesi.includes(o); let koz = globalKozmetikler[o] || []; 
+        let isOnline = typeof onlineOyuncularListesi !== 'undefined' && onlineOyuncularListesi.includes(o); 
+        let koz = (typeof globalKozmetikler !== 'undefined' && globalKozmetikler[o]) || []; 
         let iR = koz.includes('atesli_isim') ? '#ff4757' : '#fff'; let tac = koz.includes('neon_tac') ? '👑 ' : '';
         let ligColors = ["#cd7f32", "#bdc3c7", "#f1c40f", "#3498db"]; let ligNames = ["BRONZ", "GÜMÜŞ", "ALTIN", "ELMAS"];
         let durumHtml = isOnline ? '<span class="status-badge online">🟢 Çevrimiçi</span>' : '<span class="status-badge offline">⚫ Çevrimdışı</span>';
         let cardClass = isOnline ? 'friend-card' : 'friend-card offline-card';
         let davetBtnHtml = isOnline ? `<button class="f-btn f-btn-invite" onclick="masayaDavetEt('${o}')" title="Davet Et">🎮</button>` : '';
 
-        // ORİJİNAL ÇEKMECE MESAJLAŞMASI KORUNDU
+        // Orijinal mesaj fonksiyonuna yönlendirildi
         listeDiv.innerHTML += `
             <div class="${cardClass}">
                 <div class="friend-card-left">
@@ -160,7 +162,7 @@ window.arkadaslarMenusuAc = function() {
                 </div>
                 <div class="friend-actions">
                     <button class="f-btn f-btn-profile" onclick="profiliGoster('${o}')" title="Profil">👤</button>
-                    <button class="f-btn f-btn-msg" onclick="document.getElementById('arkadaslarEkrani').style.display='none'; document.getElementById('sohbetCekmecesi').classList.add('acik'); let inp = document.getElementById('sohbetInput'); inp.value = '@${o} '; inp.focus();" title="Mesaj Gönder">💬</button>
+                    <button class="f-btn f-btn-msg" onclick="document.getElementById('arkadaslarEkrani').style.display='none'; document.getElementById('eskiMesajHedefIsim').innerText='${o}'; document.getElementById('eskiMesajGonderModal').style.display='flex';" title="Mesaj Gönder">💬</button>
                     ${davetBtnHtml}
                 </div>
             </div>`;
@@ -175,29 +177,32 @@ window.davetMenusuAc = function() {
     const listeDiv = document.getElementById('arkadasListesiDiv'); listeDiv.innerHTML = ''; 
 
     let onSay = 0;
-    onlineOyuncularListesi.forEach(o => {
-        if(o === aktifKullaniciAdi || o.startsWith('Misafir_')) return; onSay++;
-        let koz = globalKozmetikler[o] || []; let iR = koz.includes('atesli_isim') ? '#ff4757' : '#fff'; let tac = koz.includes('neon_tac') ? '👑 ' : '';
-        let ligColors = ["#cd7f32", "#bdc3c7", "#f1c40f", "#3498db"]; let ligNames = ["BRONZ", "GÜMÜŞ", "ALTIN", "ELMAS"];
+    if(typeof onlineOyuncularListesi !== 'undefined') {
+        onlineOyuncularListesi.forEach(o => {
+            if(o === aktifKullaniciAdi || o.startsWith('Misafir_')) return; onSay++;
+            let koz = (typeof globalKozmetikler !== 'undefined' && globalKozmetikler[o]) || []; 
+            let iR = koz.includes('atesli_isim') ? '#ff4757' : '#fff'; let tac = koz.includes('neon_tac') ? '👑 ' : '';
+            let ligColors = ["#cd7f32", "#bdc3c7", "#f1c40f", "#3498db"]; let ligNames = ["BRONZ", "GÜMÜŞ", "ALTIN", "ELMAS"];
 
-        listeDiv.innerHTML += `
-            <div class="friend-card">
-                <div class="friend-card-left">
-                    <div class="friend-avatar">😎</div>
-                    <div class="friend-info">
-                        <div class="friend-name" style="color:${iR};">${tac}${o}</div>
-                        <div class="friend-tags">
-                            <span class="friend-league" style="color:${ligColors[o.length%4]}; border-color:${ligColors[o.length%4]}">${ligNames[o.length%4]} LİG</span>
-                            <span class="status-badge online">🟢 Çevrimiçi</span>
+            listeDiv.innerHTML += `
+                <div class="friend-card">
+                    <div class="friend-card-left">
+                        <div class="friend-avatar">😎</div>
+                        <div class="friend-info">
+                            <div class="friend-name" style="color:${iR};">${tac}${o}</div>
+                            <div class="friend-tags">
+                                <span class="friend-league" style="color:${ligColors[o.length%4]}; border-color:${ligColors[o.length%4]}">${ligNames[o.length%4]} LİG</span>
+                                <span class="status-badge online">🟢 Çevrimiçi</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="friend-actions">
-                    <button class="f-btn f-btn-profile" onclick="profiliGoster('${o}')" title="Profil">👤</button>
-                    <button class="f-btn f-btn-invite" onclick="masayaDavetEt('${o}')" title="Masaya Davet Et">🎮</button>
-                </div>
-            </div>`;
-    });
+                    <div class="friend-actions">
+                        <button class="f-btn f-btn-profile" onclick="profiliGoster('${o}')" title="Profil">👤</button>
+                        <button class="f-btn f-btn-invite" onclick="masayaDavetEt('${o}')" title="Masaya Davet Et">🎮</button>
+                    </div>
+                </div>`;
+        });
+    }
     if(onSay === 0) listeDiv.innerHTML = `<div class="empty-friends-state"><div class="empty-icon">🎲</div><h3>Kimse Yok</h3><p>Lobide uygun oyuncu bulunmuyor.</p></div>`;
 };
 
