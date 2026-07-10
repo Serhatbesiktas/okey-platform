@@ -27,7 +27,23 @@
 </head>
 <body class="tema-premium">
 
-    <div id="arkadasToastContainer" style="position:fixed; bottom:85px; right:15px; z-index:9999999; display:flex; flex-direction:column; gap:10px; pointer-events:none;"></div>
+    <div id="arkadasToastContainer"></div>
+
+    <div id="ozelSohbetBottomSheet" class="premium-bottom-sheet" style="display:none;">
+        <div class="bs-header">
+            <div class="bs-user-info">
+                <span id="bsTargetName" class="bs-user-name">...</span>
+                <span id="bsTargetStatus" class="bs-user-status">🟢 Çevrimiçi</span>
+            </div>
+            <button class="profil-close-btn" onclick="window.kapatOzelMesajBS()" style="position:static;">✕</button>
+        </div>
+        <div id="bsChatHistory" class="bs-chat-history">
+            </div>
+        <div class="bs-footer">
+            <input type="text" id="bsChatInput" class="bs-input" placeholder="Mesajınızı yazın..." maxlength="100" onkeydown="if(event.key==='Enter') window.gonderOzelMesajBS()">
+            <button class="bs-send-btn" onclick="window.gonderOzelMesajBS()">Gönder</button>
+        </div>
+    </div>
 
     <div id="splashScreen">
         <div class="splash-logo">👑</div>
@@ -277,7 +293,7 @@
             <div class="profil-btn-group">
                 <button id="profilArkadasBtn" class="profil-action-btn btn-add-friend" onclick="profilArkadasAksiyon()">➕ Arkadaş Ekle</button>
                 <button id="profilDavetBtn" class="profil-action-btn btn-invite" onclick="profilDavetAksiyon()">🎲 Masaya Davet Et</button>
-                <button class="profil-action-btn btn-dm" onclick="document.getElementById('profilEkrani').style.display='none'; document.getElementById('sohbetCekmecesi').classList.add('acik'); let inp = document.getElementById('sohbetInput'); inp.value = '@' + document.getElementById('profilArkadasBtn').dataset.hedef + ' '; inp.focus();">💬 Özel Mesaj Gönder</button>
+                <button class="profil-action-btn btn-dm" onclick="window.acOzelMesajBS(document.getElementById('profilArkadasBtn').dataset.hedef)">💬 Özel Mesaj Gönder</button>
             </div>
         </div>
     </div>
@@ -406,11 +422,11 @@
 
         <div class="alt-menu-container" style="justify-content: space-around;">
             <div class="alt-menu-item active"><div class="alt-menu-ikon">🏠</div><span>Lobi</span></div>
-            <div class="alt-menu-item" onclick="arkadaslarMenusuAc()" style="cursor:pointer;"><div class="alt-menu-ikon">👥</div><span>Arkadaşlar</span></div>
+            <div class="alt-menu-item" onclick="arkadaslarMenusuAc()" style="cursor:pointer; position:relative;"><div class="alt-menu-ikon">👥</div><span>Arkadaşlar</span></div>
             <div class="alt-menu-item" onclick="gorevleriAc()" style="cursor:pointer;"><div class="alt-menu-ikon">📜</div><span style="color:#2ecc71; font-weight:bold;">Görevler</span></div>
             <div class="alt-menu-item" onclick="liderlikTablosunuAc()" style="cursor:pointer;"><div class="alt-menu-ikon">🏆</div><span>En İyiler</span></div>
             <div class="alt-menu-item" onclick="document.getElementById('magazaEkrani').style.display='flex'" style="cursor:pointer;"><div class="alt-menu-ikon">🛒</div><span style="color:#f2c94c;">Mağaza</span></div>
-            <div class="alt-menu-item" onclick="reklamIzleAksiyon()" style="cursor:pointer;"><div class="alt-menu-ikon">📺</div><span style="color:#3498db;">Bedava Çip</span></div>
+            <div class="alt-menu-item" id="menuSohbetItem" onclick="alert('Lobi genel sohbeti için giriş yapmalısın!')" style="cursor:pointer; position:relative;"><div class="alt-menu-ikon">💬</div><span style="color:#3498db;">Sohbet</span></div>
         </div>
     </div>
 
@@ -549,6 +565,36 @@
                 }
             }
         });
+
+        if(typeof socket !== 'undefined') {
+            socket.on('oyun_bitti', (data) => {
+                if(data && data.bitisEli && data.bitisEli.length > 0) {
+                    let html = '';
+                    data.bitisEli.forEach(tas => {
+                        if(!tas) return;
+                        let displaySayi = tas.sayi === 'S' ? '☻' : tas.sayi;
+                        html += `<div class="okey-tasi tas-${tas.renk}">${displaySayi}</div>`;
+                    });
+                    window.gercekBitisHTML = html;
+                } else {
+                    window.gercekBitisHTML = '<span style="color:#a3c4bc; font-size:12px;">El bilgisi alınamadı.</span>';
+                }
+            });
+        }
+
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'childList') {
+                    const target = document.getElementById('kazananEliAlani');
+                    if (target && window.gercekBitisHTML) {
+                        if (target.innerHTML.includes('okey-tasi-bitis')) {
+                            target.innerHTML = window.gercekBitisHTML;
+                        }
+                    }
+                }
+            });
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
     </script>
 
 </body>
