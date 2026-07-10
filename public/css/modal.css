@@ -2,63 +2,33 @@
    AAA PREMİUM MODAL TASARIMLARI (Discord / Apple Stili)
 ========================================================= */
 
-/* ⸻ WATERMARK GİZLEME (Safari / Menü Çakışması Çözümü) ⸻ */
-body::after {
-    display: none !important;
-}
+body::after { display: none !important; }
 
-/* ⸻ ARKA PLAN (Blur & Animasyon) ⸻ */
 .premium-modal-overlay {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(8, 12, 10, 0.65); /* %65 siyah/koyu yeşil */
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    z-index: 9999999;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-    opacity: 0;
-    animation: overlayFadeIn 220ms ease-out forwards;
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(8, 12, 10, 0.65); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    z-index: 9999999; display: flex; justify-content: center; align-items: center;
+    padding: 20px; opacity: 0; animation: overlayFadeIn 220ms ease-out forwards;
 }
 
-@keyframes overlayFadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
+@keyframes overlayFadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-/* ⸻ ANA MODAL KUTUSU ⸻ */
 .premium-modal-box {
-    background: rgba(22, 26, 24, 0.95); /* Apple / Discord koyu teması */
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 20px;
-    padding: 32px 24px;
-    width: 100%;
-    max-width: 340px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.05); /* Yumuşatılmış gölge */
-    text-align: center;
-    transform: scale(0.92);
+    background: rgba(22, 26, 24, 0.95); border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px; padding: 32px 24px; width: 100%; max-width: 340px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.05);
+    text-align: center; transform: scale(0.92);
     animation: modalScaleIn 220ms cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-    position: relative;
-    overflow: hidden;
+    position: relative; overflow: hidden;
 }
 
-@keyframes modalScaleIn {
-    from { transform: scale(0.92); }
-    to { transform: scale(1); }
-}
+@keyframes modalScaleIn { from { transform: scale(0.92); } to { transform: scale(1); } }
 
-/* ⸻ İKONLAR (Premium Işık & SVG) ⸻ */
 .modal-icon-wrapper {
-    width: 56px; height: 56px;
-    margin: 0 auto 16px;
-    border-radius: 50%;
+    width: 56px; height: 56px; margin: 0 auto 16px; border-radius: 50%;
     display: flex; justify-content: center; align-items: center;
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.05);
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
 }
-
 .modal-icon-wrapper svg { width: 28px; height: 28px; }
 
 .warning-icon { color: #f2c94c; box-shadow: 0 0 20px rgba(242, 201, 76, 0.15); border-color: rgba(242, 201, 76, 0.3); }
@@ -66,47 +36,23 @@ body::after {
 .vip-icon { color: #f1c40f; box-shadow: 0 0 20px rgba(241, 196, 15, 0.15); border-color: rgba(241, 196, 15, 0.3); }
 .invite-icon { color: #3498db; box-shadow: 0 0 20px rgba(52, 152, 219, 0.15); border-color: rgba(52, 152, 219, 0.3); }
 
-/* ⸻ YAZILAR ⸻ */
-.premium-modal-title {
-    font-size: 20px;
-    font-weight: 900;
-    color: #fff;
-    margin: 0 0 12px 0;
-    letter-spacing: 0.5px;
-}
+.premium-modal-title { font-size: 20px; font-weight: 900; color: #fff; margin: 0 0 12px 0; letter-spacing: 0.5px; }
+.premium-modal-desc { font-size: 13px; color: #a3c4bc; line-height: 1.5; margin: 0 0 24px 0; }
 
-.premium-modal-desc {
-    font-size: 13px;
-    color: #a3c4bc;
-    line-height: 1.5;
-    margin: 0 0 24px 0;
-}
-
-/* ⸻ BİLGİ KUTUSU ⸻ */
-.info-box {
-    background: rgba(0, 0, 0, 0.25);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    padding: 12px;
-    margin-bottom: 24px;
-    text-align: left;
-}
+.info-box { background: rgba(0, 0, 0, 0.25); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 12px; margin-bottom: 24px; text-align: left; }
 .info-box-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #d2e0dc; margin-bottom: 6px; }
 .info-box-item:last-child { margin-bottom: 0; }
 .info-dot { width: 6px; height: 6px; background: #ff4757; border-radius: 50%; box-shadow: 0 0 5px #ff4757; }
 
-/* ⸻ SELECT (DROPDOWN) ⸻ */
 .premium-form-group { text-align: left; margin-bottom: 16px; }
 .premium-label { display: block; font-size: 11px; font-weight: 700; color: #8fa79a; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
 .premium-select { width: 100%; appearance: none; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(46, 204, 113, 0.3); color: #fff; padding: 14px 16px; border-radius: 12px; font-size: 14px; font-weight: bold; outline: none; cursor: pointer; transition: all 0.2s; background-image: url('data:image/svg+xml;utf8,<svg fill="%232ecc71" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>'); background-repeat: no-repeat; background-position-x: 95%; background-position-y: 50%; }
 .premium-select:focus { border-color: #f1c40f; box-shadow: 0 0 10px rgba(241, 196, 15, 0.2); }
 
-/* ⸻ BUTONLAR ⸻ */
 .premium-btn-group { display: flex; gap: 10px; width: 100%; }
 .premium-btn { flex: 1; border: none; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 12px; font-weight: 900; font-size: 13px; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; text-transform: uppercase; letter-spacing: 0.5px; box-sizing: border-box; }
 .premium-btn:active { transform: scale(0.96); }
 
-/* Buton Varyasyonları */
 .btn-gold { background: linear-gradient(135deg, #f1c40f, #f39c12); color: #111; box-shadow: 0 4px 15px rgba(241, 196, 15, 0.25); }
 .btn-danger { background: linear-gradient(135deg, #ff4757, #cb2d3e); color: #fff; box-shadow: 0 4px 15px rgba(231, 76, 60, 0.25); }
 .btn-success { background: linear-gradient(135deg, #2ecc71, #27ae60); color: #fff; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.25); }
@@ -114,120 +60,36 @@ body::after {
 .btn-dark:hover { background: linear-gradient(135deg, #454b51, #2c3136); }
 
 /* =========================================================
-   🏆 AAA PREMIUM OYUN BİTTİ (SONUÇ) EKRANI
+   🏆 AAA PREMIUM OYUN BİTTİ (SONUÇ) EKRANI 🏆
 ========================================================= */
 
 .sonuc-premium-box {
-    max-width: 480px; background: rgba(15, 20, 18, 0.95);
-    border: 1px solid rgba(241, 196, 15, 0.3);
+    max-width: 420px; background: rgba(15, 20, 18, 0.95); border: 1px solid rgba(241, 196, 15, 0.3);
     box-shadow: 0 30px 60px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.1);
-    padding: 30px 20px; height: auto !important; display: flex; flex-direction: column; gap: 18px;
+    padding: 36px 20px; height: auto !important; display: flex; flex-direction: column; gap: 18px;
 }
-
-.sonuc-title {
-    color: #f1c40f; font-size: clamp(20px, 6vw, 26px); font-weight: 900;
-    text-transform: uppercase; letter-spacing: 1px;
-    text-shadow: 0 0 15px rgba(241, 196, 15, 0.3); margin: 0;
-    white-space: normal; word-wrap: break-word; line-height: 1.4; text-align: center;
-}
-
-.sonuc-metin {
-    white-space: pre-wrap; line-height: 1.8; font-size: 14px; font-weight: 700;
-    color: #d2e0dc; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 12px; padding: 16px; margin: 0; text-align: center; box-shadow: inset 0 2px 10px rgba(0,0,0,0.3);
-}
-
-.sonuc-odul {
-    display: inline-block; background: rgba(46, 204, 113, 0.1);
-    border: 1px solid rgba(46, 204, 113, 0.3); color: #2ecc71;
-    font-size: 24px; font-weight: 900; padding: 12px 28px; border-radius: 12px;
-    margin: 0 auto; box-shadow: 0 0 20px rgba(46, 204, 113, 0.25);
-}
-
+.sonuc-title { color: #f1c40f; font-size: clamp(20px, 6vw, 26px); font-weight: 900; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 0 15px rgba(241, 196, 15, 0.3); margin: 0; white-space: normal; word-wrap: break-word; line-height: 1.4; text-align: center; }
+.sonuc-metin { white-space: pre-wrap; line-height: 1.8; font-size: 14px; font-weight: 700; color: #d2e0dc; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 16px; margin: 0; box-shadow: inset 0 2px 10px rgba(0,0,0,0.3); }
+.sonuc-odul { display: inline-block; background: rgba(46, 204, 113, 0.1); border: 1px solid rgba(46, 204, 113, 0.3); color: #2ecc71; font-size: 24px; font-weight: 900; padding: 12px 28px; border-radius: 12px; margin: 0 auto; box-shadow: 0 0 20px rgba(46, 204, 113, 0.25); }
 .kazanan-eli-container { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 16px; margin: 0; }
 .kazanan-eli-baslik { color: #f1c40f; font-size: 14px; font-weight: 800; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
 
-#kazananEliAlani {
-    display: flex !important; flex-wrap: wrap !important; justify-content: center !important;
-    align-content: center !important; gap: 6px !important; min-height: 80px !important;
-    background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important;
-}
-
-body #kazananEliAlani .okey-tasi-bitis,
-body #kazananEliAlani .okey-tasi {
-    position: relative !important; width: clamp(22px, 5.5vw, 32px) !important; height: clamp(32px, 8vw, 44px) !important;
-    margin: 0 !important; transform: scale(1) !important; border-bottom-width: 3px !important; border-radius: 4px !important;
-    font-size: clamp(12px, 4vw, 16px) !important; background: linear-gradient(135deg, #fffff9 0%, #ece5cd 100%) !important;
-    border: 1px solid #dcd3c1 !important; border-bottom: 4px solid #a39882 !important; box-shadow: 0 4px 8px rgba(0,0,0,0.5), inset 0 1px 2px #fff !important;
-    font-family: 'Arial Black', Arial, sans-serif !important; display: flex !important; justify-content: center !important; align-items: center !important;
-    opacity: 0; animation: tileFadeIn 0.3s ease-out forwards;
-}
-
-body #kazananEliAlani > div:nth-child(1) { animation-delay: 0.05s; }
-body #kazananEliAlani > div:nth-child(2) { animation-delay: 0.10s; }
-body #kazananEliAlani > div:nth-child(3) { animation-delay: 0.15s; }
-body #kazananEliAlani > div:nth-child(4) { animation-delay: 0.20s; }
-body #kazananEliAlani > div:nth-child(5) { animation-delay: 0.25s; }
-body #kazananEliAlani > div:nth-child(6) { animation-delay: 0.30s; }
-body #kazananEliAlani > div:nth-child(7) { animation-delay: 0.35s; }
-body #kazananEliAlani > div:nth-child(8) { animation-delay: 0.40s; }
-body #kazananEliAlani > div:nth-child(9) { animation-delay: 0.45s; }
-body #kazananEliAlani > div:nth-child(10) { animation-delay: 0.50s; }
-body #kazananEliAlani > div:nth-child(11) { animation-delay: 0.55s; }
-body #kazananEliAlani > div:nth-child(12) { animation-delay: 0.60s; }
-body #kazananEliAlani > div:nth-child(13) { animation-delay: 0.65s; }
-body #kazananEliAlani > div:nth-child(14) { animation-delay: 0.70s; }
-body #kazananEliAlani > div:nth-child(15) { animation-delay: 0.75s; }
-
-@keyframes tileFadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-}
+#kazananEliAlani { display: flex !important; flex-wrap: wrap !important; justify-content: center !important; align-content: center !important; gap: 6px !important; min-height: 80px !important; background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; }
+body #kazananEliAlani .okey-tasi-bitis, body #kazananEliAlani .okey-tasi { position: relative !important; width: clamp(22px, 5.5vw, 32px) !important; height: clamp(32px, 8vw, 44px) !important; margin: 0 !important; transform: scale(1) !important; border-bottom-width: 3px !important; border-radius: 4px !important; font-size: clamp(12px, 4vw, 16px) !important; opacity: 0; animation: tileFadeIn 0.3s ease-out forwards; }
+body #kazananEliAlani > div:nth-child(1) { animation-delay: 0.05s; } body #kazananEliAlani > div:nth-child(2) { animation-delay: 0.10s; } body #kazananEliAlani > div:nth-child(3) { animation-delay: 0.15s; } body #kazananEliAlani > div:nth-child(4) { animation-delay: 0.20s; } body #kazananEliAlani > div:nth-child(5) { animation-delay: 0.25s; } body #kazananEliAlani > div:nth-child(6) { animation-delay: 0.30s; } body #kazananEliAlani > div:nth-child(7) { animation-delay: 0.35s; } body #kazananEliAlani > div:nth-child(8) { animation-delay: 0.40s; } body #kazananEliAlani > div:nth-child(9) { animation-delay: 0.45s; } body #kazananEliAlani > div:nth-child(10) { animation-delay: 0.50s; } body #kazananEliAlani > div:nth-child(11) { animation-delay: 0.55s; } body #kazananEliAlani > div:nth-child(12) { animation-delay: 0.60s; } body #kazananEliAlani > div:nth-child(13) { animation-delay: 0.65s; } body #kazananEliAlani > div:nth-child(14) { animation-delay: 0.70s; } body #kazananEliAlani > div:nth-child(15) { animation-delay: 0.75s; }
+@keyframes tileFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
 /* =========================================================
    🚀 AAA PREMİUM PROFİL EKRANI
 ========================================================= */
 
-.profil-premium-box {
-    background: rgba(12, 18, 14, 0.95);
-    border: 1px solid rgba(241, 196, 15, 0.3);
-    border-radius: 24px;
-    padding: 30px 24px;
-    width: 100%;
-    max-width: 360px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), inset 0 2px 20px rgba(241, 196, 15, 0.05);
-    text-align: center;
-    transform: scale(0.92);
-    animation: modalScaleIn 220ms cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-    position: relative;
-}
-
-.profil-close-btn {
-    position: absolute; top: 16px; right: 16px;
-    width: 32px; height: 32px; border-radius: 50%;
-    background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #8fa79a; display: flex; justify-content: center; align-items: center;
-    font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.2s;
-}
+.profil-premium-box { background: rgba(12, 18, 14, 0.95); border: 1px solid rgba(241, 196, 15, 0.3); border-radius: 24px; padding: 30px 24px; width: 100%; max-width: 360px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), inset 0 2px 20px rgba(241, 196, 15, 0.05); text-align: center; transform: scale(0.92); animation: modalScaleIn 220ms cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; position: relative; }
+.profil-close-btn { position: absolute; top: 16px; right: 16px; width: 32px; height: 32px; border-radius: 50%; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #8fa79a; display: flex; justify-content: center; align-items: center; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.2s; z-index: 10; }
 .profil-close-btn:active { transform: scale(0.9); background: #e74c3c; color: #fff; border-color: #e74c3c; }
 
-.profil-avatar-premium {
-    width: 80px; height: 80px; margin: 0 auto 12px;
-    border-radius: 50%; background: radial-gradient(circle, #1e3f28 0%, #0d1f14 100%);
-    border: 3px solid #f1c40f; box-shadow: 0 0 20px rgba(241, 196, 15, 0.2), inset 0 0 10px rgba(0,0,0,0.5);
-    display: flex; justify-content: center; align-items: center; font-size: 38px;
-}
-
-.profil-isim-premium {
-    font-size: 22px; font-weight: 900; color: #fff; margin-bottom: 6px;
-    text-shadow: 0 2px 10px rgba(0,0,0,0.5); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-
-.profil-durum-premium {
-    display: inline-block; background: rgba(46, 204, 113, 0.1); border: 1px solid rgba(46, 204, 113, 0.2);
-    padding: 4px 12px; border-radius: 20px; color: #2ecc71 !important; font-size: 11px; font-weight: 800; margin-bottom: 20px;
-}
-
+.profil-avatar-premium { width: 80px; height: 80px; margin: 0 auto 12px; border-radius: 50%; background: radial-gradient(circle, #1e3f28 0%, #0d1f14 100%); border: 3px solid #f1c40f; box-shadow: 0 0 20px rgba(241, 196, 15, 0.2), inset 0 0 10px rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; font-size: 38px; }
+.profil-isim-premium { font-size: 22px; font-weight: 900; color: #fff; margin-bottom: 6px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.profil-durum-premium { display: inline-block; background: rgba(46, 204, 113, 0.1); border: 1px solid rgba(46, 204, 113, 0.2); padding: 4px 12px; border-radius: 20px; color: #2ecc71 !important; font-size: 11px; font-weight: 800; margin-bottom: 20px; }
 .profil-rozet-group { display: flex; justify-content: center; gap: 10px; margin-bottom: 24px; }
 .profil-rozet { font-size: 11px; font-weight: 900; padding: 6px 14px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); text-transform: uppercase; letter-spacing: 0.5px; color: #fff; }
 
@@ -237,9 +99,7 @@ body #kazananEliAlani > div:nth-child(15) { animation-delay: 0.75s; }
 .stat-info { display: flex; flex-direction: column; }
 .stat-lbl { font-size: 10px; color: #8fa79a; font-weight: 700; text-transform: uppercase; margin-bottom: 2px; letter-spacing: 0.5px;}
 .stat-val { font-size: 16px; font-weight: 900; color: #fff; }
-.text-green { color: #2ecc71; }
-.text-red { color: #ff4757; }
-.text-gold { color: #f1c40f; }
+.text-green { color: #2ecc71; } .text-red { color: #ff4757; } .text-gold { color: #f1c40f; }
 
 .profil-cip-kutu { background: linear-gradient(135deg, rgba(46, 204, 113, 0.1), rgba(39, 174, 96, 0.05)); border: 1px dashed rgba(46, 204, 113, 0.3); border-radius: 16px; padding: 14px; margin-bottom: 24px; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.05); }
 .profil-cip-lbl { font-size: 10px; color: #2ecc71; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
@@ -251,6 +111,67 @@ body #kazananEliAlani > div:nth-child(15) { animation-delay: 0.75s; }
 .btn-add-friend { background: linear-gradient(135deg, #f1c40f, #f39c12); color: #111; box-shadow: 0 4px 15px rgba(241, 196, 15, 0.2); }
 .btn-invite { background: linear-gradient(135deg, #2ecc71, #27ae60); color: #fff; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.2); }
 .btn-dm { background: linear-gradient(135deg, #3498db, #2980b9); color: #fff; box-shadow: 0 4px 15px rgba(52, 152, 219, 0.2); }
+
+/* =========================================================
+   🚀 AAA PREMİUM ARKADAŞLAR VE DAVET MENÜSÜ 
+========================================================= */
+
+.premium-search-box {
+    display: flex; align-items: center;
+    background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px; padding: 12px 16px; margin-bottom: 16px;
+    box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
+}
+
+.premium-search-box span { font-size: 16px; opacity: 0.7; }
+.premium-search-box input {
+    background: transparent; border: none; outline: none; color: #fff;
+    width: 100%; font-size: 14px; margin-left: 10px; font-family: inherit;
+}
+.premium-search-box input::placeholder { color: #8fa79a; }
+
+.friend-card {
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px; padding: 12px; display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 10px; transition: transform 0.2s, background 0.2s;
+}
+.friend-card:active { transform: scale(0.98); background: rgba(255,255,255,0.06); }
+.offline-card { opacity: 0.6; filter: grayscale(0.8); }
+
+.friend-card-left { display: flex; align-items: center; gap: 12px; }
+.friend-avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: radial-gradient(circle, #1e3f28, #0d1f14);
+    border: 2px solid #2ecc71; display: flex; justify-content: center; align-items: center;
+    font-size: 22px; box-shadow: 0 0 10px rgba(46,204,113,0.2);
+}
+.offline-card .friend-avatar { border-color: #7f8c8d; box-shadow: none; }
+
+.friend-info { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+.friend-name { font-size: 15px; font-weight: 900; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5); letter-spacing: 0.3px; }
+
+.friend-tags { display: flex; gap: 6px; align-items: center; }
+.friend-league { font-size: 9px; font-weight: 800; border: 1px solid; padding: 2px 6px; border-radius: 6px; }
+.status-badge { font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 6px; background: rgba(0,0,0,0.4); }
+.status-badge.online { color: #2ecc71; border: 1px solid rgba(46,204,113,0.3); }
+.status-badge.offline { color: #7f8c8d; border: 1px solid rgba(127,140,141,0.3); }
+
+.friend-actions { display: flex; gap: 8px; }
+.f-btn {
+    width: 36px; height: 36px; border-radius: 10px; border: none;
+    display: flex; justify-content: center; align-items: center; font-size: 16px;
+    cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
+}
+.f-btn:active { transform: scale(0.9); }
+.f-btn-profile { background: rgba(255,255,255,0.1); color: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+.f-btn-msg { background: linear-gradient(135deg, #3498db, #2980b9); color: #fff; box-shadow: 0 4px 10px rgba(52,152,219,0.3); }
+.f-btn-invite { background: linear-gradient(135deg, #2ecc71, #27ae60); color: #fff; box-shadow: 0 4px 10px rgba(46,204,113,0.3); }
+
+.empty-friends-state { text-align: center; padding: 40px 10px 20px; }
+.empty-icon { font-size: 56px; margin-bottom: 20px; opacity: 0.8; filter: drop-shadow(0 4px 15px rgba(0,0,0,0.5)); }
+.empty-friends-state h3 { color: #f1c40f; font-size: 20px; margin-bottom: 10px; font-weight: 900; letter-spacing: 1px;}
+.empty-friends-state p { color: #a3c4bc; font-size: 13px; line-height: 1.6; margin-bottom: 24px; font-weight: 600;}
+
 
 /* ⸻ DİĞER MODALLAR (KORUNDU) ⸻ */
 .bildirim-ekrani { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
