@@ -142,25 +142,25 @@ window.arkadasliktanCikarIstek = function(hedefIsim) {
     }
 };
 
-// ⸻ 🔥 REAL-TIME BOTTOM SHEET CHAT MOTORU 🔥 ⸻
-window.acOzelMesajBS = function(hedefIsim) {
+// ⸻ 🔥 REAL-TIME PREMIUM ORTALANMIŞ MODAL SOHBET MOTORU 🔥 ⸻
+window.acOzelMesaj = function(hedefIsim) {
     if(!hedefIsim || isMisafir) return;
     
     window.aktifSohbetHedef = hedefIsim;
     document.getElementById('profilEkrani').style.display = 'none';
     document.getElementById('arkadaslarEkrani').style.display = 'none';
     
-    // Kapsayıcı Overlay ekranı flexten açılır
-    const overlay = document.getElementById('ozelSohbetOverlay');
-    document.getElementById('bsTargetName').innerText = hedefIsim;
-    document.getElementById('bsTargetStatus').innerText = onlineOyuncularListesi.includes(hedefIsim) ? "🟢 Çevrimiçi" : "⚫ Çevrimdışı";
+    // Kapsayıcı Overlay ekranı flexten açılır (Standart Modal)
+    const overlay = document.getElementById('ozelSohbetEkrani');
+    document.getElementById('chatTargetName').innerText = hedefIsim;
+    document.getElementById('chatTargetStatus').innerText = onlineOyuncularListesi.includes(hedefIsim) ? "🟢 Çevrimiçi" : "⚫ Çevrimdışı";
     overlay.style.display = 'flex';
 
     const roomId = [aktifKullaniciAdi, hedefIsim].sort().join("__");
     if(window.sohbetAbonelikSinyali) window.sohbetAbonelikSinyali();
 
     window.sohbetAbonelikSinyali = db.collection("ozel_sohbetler").doc(roomId).onSnapshot(doc => {
-        const historyDiv = document.getElementById('bsChatHistory');
+        const historyDiv = document.getElementById('chatHistory');
         historyDiv.innerHTML = '';
         
         if(doc.exists) {
@@ -168,14 +168,14 @@ window.acOzelMesajBS = function(hedefIsim) {
             let mesajlar = data.mesajlar || [];
             
             mesajlar.forEach(m => {
-                let bubbleClass = m.gonderen === aktifKullaniciAdi ? 'bs-bubble bs-bubble-me' : 'bs-bubble bs-bubble-them';
+                let bubbleClass = m.gonderen === aktifKullaniciAdi ? 'chat-bubble chat-bubble-me' : 'chat-bubble chat-bubble-them';
                 let t = new Date(m.tarih);
                 let timeStr = String(t.getHours()).padStart(2,'0') + ':' + String(t.getMinutes()).padStart(2,'0');
                 
                 historyDiv.innerHTML += `
                     <div class="${bubbleClass}">
                         <span>${m.metin}</span>
-                        <span class="bs-bubble-time">${timeStr}</span>
+                        <span class="chat-bubble-time">${timeStr}</span>
                     </div>`;
             });
             historyDiv.scrollTop = historyDiv.scrollHeight;
@@ -187,8 +187,8 @@ window.acOzelMesajBS = function(hedefIsim) {
     });
 };
 
-window.gonderOzelMesajBS = function() {
-    const input = document.getElementById('bsChatInput');
+window.gonderOzelMesaj = function() {
+    const input = document.getElementById('chatInput');
     if(!input || input.value.trim() === "" || !window.aktifSohbetHedef) return;
     
     const metin = input.value.trim();
@@ -205,8 +205,8 @@ window.gonderOzelMesajBS = function() {
     }, { merge: true });
 };
 
-window.kapatOzelMesajBS = function() {
-    document.getElementById('ozelSohbetOverlay').style.display = 'none';
+window.kapatOzelMesaj = function() {
+    document.getElementById('ozelSohbetEkrani').style.display = 'none';
     window.aktifSohbetHedef = null;
     if(window.sohbetAbonelikSinyali) { window.sohbetAbonelikSinyali(); window.sohbetAbonelikSinyali = null; }
 };
@@ -259,7 +259,7 @@ window.arkadaslarMenusuAc = function() {
                 </div>
                 <div class="friend-actions">
                     <button class="f-btn f-btn-profile" onclick="profiliGoster('${o}')" title="Profil">👤</button>
-                    <button class="f-btn f-btn-msg" onclick="window.acOzelMesajBS('${o}')" title="Mesaj Gönder">💬</button>
+                    <button class="f-btn f-btn-msg" onclick="window.acOzelMesaj('${o}')" title="Mesaj Gönder">💬</button>
                     ${davetBtnHtml}
                 </div>
             </div>`;
