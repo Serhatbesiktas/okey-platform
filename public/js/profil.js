@@ -28,7 +28,6 @@ window.profiliGoster = function(hedefIsim) {
 
     if(pDurum) pDurum.innerHTML = "Çevrimiçi"; 
     
-    // ANINDA SKELETON (YÜKLENİYOR) EFEKTİ GÖSTERİMİ
     if(pCip) pCip.innerHTML = '<div class="skeleton-loader" style="width: 120px; height: 30px; margin: 0 auto;"></div>';
     if(pOynanan) pOynanan.innerHTML = '<div class="skeleton-loader" style="width: 40px; height: 20px;"></div>';
     if(pOran) pOran.innerHTML = '<div class="skeleton-loader" style="width: 40px; height: 20px;"></div>';
@@ -37,10 +36,9 @@ window.profiliGoster = function(hedefIsim) {
         <div class="stat-card"><span class="stat-icon">❌</span><div class="stat-info"><span class="stat-lbl">Kaybedilen</span><div class="skeleton-loader" style="width: 40px; height: 20px;"></div></div></div>
     `;
     
-    // 👥 KURAL 1: ARKADAŞSA ETİKET VE SİLME ALANINI AKTİFLEŞTİR
     if (hedefIsim !== aktifKullaniciAdi) {
         if (benimArkadaslarim && benimArkadaslarim.includes(hedefIsim)) { 
-            if(pArkadasBtn) pArkadasBtn.style.display = 'none'; // Ekle butonu gizlenir
+            if(pArkadasBtn) pArkadasBtn.style.display = 'none';
             if(pDurumKutu) {
                 pDurumKutu.style.display = 'block';
                 pDurumKutu.innerHTML = `
