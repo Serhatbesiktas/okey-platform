@@ -20,14 +20,13 @@ window.profiliGoster = function(hedefIsim) {
     const pUnvan = document.getElementById('profilUnvanBadge'); 
     const pArkadasBtn = document.getElementById('profilArkadasBtn'); 
     const pDavetBtn = document.getElementById('profilDavetBtn');
+    const pDurumKutu = document.getElementById('profilArkadasDurumKutusu');
     
     if(pEkrani) pEkrani.style.display = 'flex'; 
     if(pArkadasBtn) pArkadasBtn.dataset.hedef = hedefIsim; 
     if(pDavetBtn) pDavetBtn.dataset.hedef = hedefIsim;
 
     if(pDurum) pDurum.innerHTML = "Çevrimiçi"; 
-    
-    let isOnline = (onlineOyuncularListesi && onlineOyuncularListesi.includes(hedefIsim)) || hedefIsim === aktifKullaniciAdi;
     
     // ANINDA SKELETON (YÜKLENİYOR) EFEKTİ GÖSTERİMİ
     if(pCip) pCip.innerHTML = '<div class="skeleton-loader" style="width: 120px; height: 30px; margin: 0 auto;"></div>';
@@ -38,34 +37,41 @@ window.profiliGoster = function(hedefIsim) {
         <div class="stat-card"><span class="stat-icon">❌</span><div class="stat-info"><span class="stat-lbl">Kaybedilen</span><div class="skeleton-loader" style="width: 40px; height: 20px;"></div></div></div>
     `;
     
-    // 👥 ARKADAŞLIK VE BUTON DURUM PROTOKOLÜ (YENİLENDİ)
+    // 👥 KURAL 1: ARKADAŞSA ETİKET VE SİLME ALANINI AKTİFLEŞTİR
     if (hedefIsim !== aktifKullaniciAdi) {
-        if(pArkadasBtn) {
-            pArkadasBtn.style.display = 'flex';
-            
-            // Eğer zaten arkadaşsa: "👥 Arkadaş" etiketi yap ve altına "Sil" butonu koy
-            if (benimArkadaslarim && benimArkadaslarim.includes(hedefIsim)) { 
-                pArkadasBtn.innerHTML = "👥 Arkadaş (Kaldırmak İçin Tıkla)"; 
-                pArkadasBtn.className = "profil-action-btn btn-disabled";
-                pArkadasBtn.onclick = () => window.arkadasliktanCikarIstek(hedefIsim);
-            } else if (window.benimGidenIsteklerim && window.benimGidenIsteklerim.includes(hedefIsim)) {
-                pArkadasBtn.innerHTML = "⏳ İstek Gönderildi"; 
-                pArkadasBtn.className = "profil-action-btn btn-disabled";
-                pArkadasBtn.onclick = null;
-            } else if (window.benimGelenIsteklerim && window.benimGelenIsteklerim.includes(hedefIsim)) {
-                pArkadasBtn.innerHTML = "✅ İsteği Kabul Et"; 
-                pArkadasBtn.className = "profil-action-btn btn-success";
-                pArkadasBtn.onclick = () => window.istekKabulEtMotor(hedefIsim);
-            } else { 
-                pArkadasBtn.innerHTML = "➕ Arkadaş Ekle"; 
-                pArkadasBtn.className = "profil-action-btn btn-add-friend";
-                pArkadasBtn.onclick = () => window.arkadasEkleIstek(hedefIsim);
+        if (benimArkadaslarim && benimArkadaslarim.includes(hedefIsim)) { 
+            if(pArkadasBtn) pArkadasBtn.style.display = 'none'; // Ekle butonu gizlenir
+            if(pDurumKutu) {
+                pDurumKutu.style.display = 'block';
+                pDurumKutu.innerHTML = `
+                    <div style="font-size: 13px; font-weight: 800; color: #2ecc71; margin-bottom: 8px;">👥 Arkadaş</div>
+                    <button class="premium-btn btn-danger" style="height: 36px; font-size:11px; border-radius: 8px;" onclick="window.arkadasliktanCikarIstek('${hedefIsim}')">🗑 Arkadaşı Sil</button>
+                `;
+            }
+        } else {
+            if(pDurumKutu) pDurumKutu.style.display = 'none';
+            if(pArkadasBtn) {
+                pArkadasBtn.style.display = 'flex';
+                if (window.benimGidenIsteklerim && window.benimGidenIsteklerim.includes(hedefIsim)) {
+                    pArkadasBtn.innerHTML = "⏳ İstek Gönderildi"; 
+                    pArkadasBtn.className = "profil-action-btn btn-disabled";
+                    pArkadasBtn.onclick = null;
+                } else if (window.benimGelenIsteklerim && window.benimGelenIsteklerim.includes(hedefIsim)) {
+                    pArkadasBtn.innerHTML = "✅ İsteği Kabul Et"; 
+                    pArkadasBtn.className = "profil-action-btn btn-success";
+                    pArkadasBtn.onclick = () => window.istekKabulEtMotor(hedefIsim);
+                } else { 
+                    pArkadasBtn.innerHTML = "➕ Arkadaş Ekle"; 
+                    pArkadasBtn.className = "profil-action-btn btn-add-friend";
+                    pArkadasBtn.onclick = () => window.arkadasEkleIstek(hedefIsim);
+                }
             }
         }
         if(pDavetBtn) pDavetBtn.style.display = 'flex'; 
     } else { 
         if(pArkadasBtn) pArkadasBtn.style.display = 'none'; 
         if(pDavetBtn) pDavetBtn.style.display = 'none'; 
+        if(pDurumKutu) pDurumKutu.style.display = 'none';
     }
 
     let tacIcon = ""; let ismRengi = "#fff"; let textGlow = "0 2px 10px rgba(0,0,0,0.5)";
@@ -129,6 +135,6 @@ window.esyaFirlatAksiyon = function(esyaIcon) {
     
     if(!hedef || !suAnkiMasam || hedef === aktifKullaniciAdi || safCip < 5000) return;
     
-    socket.emit('esya_firlat', { masaAdi: suAnkiMasam, kimden: aktifKullaniciAdi, kime: markup, esya: esyaIcon }); 
+    socket.emit('esya_firlat', { masaAdi: suAnkiMasam, kimden: aktifKullaniciAdi, kime: hedef, esya: esyaIcon }); 
     document.getElementById('profilEkrani').style.display = 'none';
 };
