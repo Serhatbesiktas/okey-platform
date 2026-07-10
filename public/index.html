@@ -30,27 +30,35 @@
     <!-- REAL-TIME BİLDİRİM TOAST ALANI -->
     <div id="arkadasToastContainer" style="position:fixed; bottom:85px; right:15px; z-index:9999999; display:flex; flex-direction:column; gap:10px; pointer-events:none;"></div>
 
-    <!-- 💬 ÖZEL SOHBET MODALI (TAM ORTALANMIŞ STANDART PREMİUM YAPI) -->
-    <div id="ozelSohbetEkrani" class="premium-modal-overlay" style="display:none;" onclick="if(event.target===this) window.kapatOzelMesaj()">
-        <div class="premium-modal-box chat-premium-box">
-            <div class="chat-header">
-                <div class="chat-user-info">
-                    <span class="chat-avatar">🙂</span>
-                    <div class="chat-name-status">
-                        <span id="chatTargetName" class="chat-name">...</span>
-                        <span id="chatTargetStatus" class="chat-status">🟢 Çevrimiçi</span>
-                    </div>
-                </div>
-                <button class="profil-close-btn" onclick="window.kapatOzelMesaj()" style="position:static; width:32px; height:32px; margin:0;">✕</button>
+    <!-- 🔥 ESKİ ORİJİNAL TASARIMLAR (mesajlar.js ile tam uyumlu) 🔥 -->
+
+    <!-- ESKİ MESAJ GÖNDERME MODALI -->
+    <div id="eskiMesajGonderModal" class="premium-modal-overlay" style="display:none; z-index: 100000000;">
+        <div class="eski-mesaj-kutu">
+            <div class="eski-mesaj-header">
+                <div class="eski-mesaj-title">✉ <span id="eskiMesajHedefIsim">OYUNCU</span></div>
+                <button class="eski-mesaj-kapat" onclick="document.getElementById('eskiMesajGonderModal').style.display='none'">✖</button>
             </div>
-            
-            <div id="chatHistory" class="chat-history">
-                <!-- Mesajlar buraya akacak -->
+            <textarea id="eskiMesajGonderInput" class="eski-mesaj-textarea" placeholder="Mesajınızı buraya yazın (Maks. 150 karakter)" maxlength="150" oninput="document.getElementById('eskiMesajCharCount').innerText = this.value.length + ' / 150'"></textarea>
+            <div id="eskiMesajCharCount" class="eski-mesaj-sayac">0 / 150</div>
+            <div class="eski-mesaj-footer">
+                <!-- Orijinal mesajlar.js fonksiyonunuzu tetikler -->
+                <button class="eski-btn-gonder" onclick="if(typeof mesajGonderAcik === 'function') mesajGonderAcik(); else document.getElementById('eskiMesajGonderModal').style.display='none';">GÖNDER</button>
+                <button class="eski-btn-iptal" onclick="document.getElementById('eskiMesajGonderModal').style.display='none'">İPTAL</button>
             </div>
-            
-            <div class="chat-footer">
-                <input type="text" id="chatInput" class="chat-input" placeholder="Mesaj yaz..." maxlength="100" onkeydown="if(event.key==='Enter') window.gonderOzelMesaj()">
-                <button class="chat-send-btn" onclick="window.gonderOzelMesaj()">GÖNDER</button>
+        </div>
+    </div>
+
+    <!-- ESKİ GELEN KUTUSU MODALI -->
+    <div id="eskiGelenKutusuModal" class="premium-modal-overlay" style="display:none; z-index: 100000000;">
+        <div class="eski-inbox-kutu">
+            <div class="eski-mesaj-header">
+                <div class="eski-inbox-title">✉ GELEN KUTUSU</div>
+                <button class="eski-mesaj-kapat" onclick="document.getElementById('eskiGelenKutusuModal').style.display='none'">✖</button>
+            </div>
+            <div id="eskiGelenKutusuListesi" style="max-height: 60vh; overflow-y: auto;">
+                <!-- Örnek Boş Mesaj Kutusu -->
+                <div style="text-align:center; color:#777; padding: 20px;">Gelen kutunuz boş.</div>
             </div>
         </div>
     </div>
@@ -313,7 +321,7 @@
             <div class="profil-btn-group">
                 <button id="profilArkadasBtn" class="profil-action-btn btn-add-friend" onclick="profilArkadasAksiyon()">➕ Arkadaş Ekle</button>
                 <button id="profilDavetBtn" class="profil-action-btn btn-invite" onclick="profilDavetAksiyon()">🎲 Masaya Davet Et</button>
-                <button class="profil-action-btn btn-dm" onclick="window.acOzelMesaj(document.getElementById('profilArkadasBtn').dataset.hedef)">💬 Özel Mesaj Gönder</button>
+                <button class="profil-action-btn btn-dm" onclick="document.getElementById('profilEkrani').style.display='none'; document.getElementById('eskiMesajHedefIsim').innerText=document.getElementById('profilArkadasBtn').dataset.hedef; document.getElementById('eskiMesajGonderModal').style.display='flex';">💬 Özel Mesaj Gönder</button>
             </div>
         </div>
     </div>
@@ -353,58 +361,7 @@
         </div>
     </div>
 
-    <div id="magazaEkrani" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:99999; flex-direction:column; justify-content:center; align-items:center;">
-        <div class="magaza-kutu" style="max-height:85vh; overflow-y:auto; border-radius:15px; padding:20px; background:#0b1a12; width:95%; max-width:600px;">
-            <div class="magaza-header" style="display:flex; justify-content:space-between; border-bottom:1px solid #f1c40f; padding-bottom:10px; margin-bottom:20px;">
-                <h2 style="color:#f1c40f; margin:0;">🛒 VIP MAĞAZA</h2>
-                <button onclick="document.getElementById('magazaEkrani').style.display='none'" style="background:none;border:none;color:#e74c3c;font-size:24px;cursor:pointer;">X</button>
-            </div>
-            
-            <div style="display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none;">
-                <div style="background: rgba(0,0,0,0.5); border: 1px solid #1e3f28; border-radius: 12px; padding: 20px; text-align: center; min-width: 140px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; gap: 10px; flex: 1;">
-                    <div style="font-size: 35px; width: 65px; height: 65px; display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.05); border-radius: 50%; margin-bottom: 5px; border: 3px solid #f2c94c; box-shadow: 0 0 15px #f2c94c;">😎</div>
-                    <h3 style="color: #fff; font-size: 14px;">Altın Çerçeve</h3>
-                    <button id="btn_altin_cerceve" onclick="magazaIslem('altin_cerceve', 500000)" style="background: linear-gradient(180deg, #ffe066 0%, #db9d13 100%); color: #000; border: none; padding: 10px 5px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; width: 100%; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">500.000 ÇİP</button>
-                </div>
-                <div style="background: rgba(0,0,0,0.5); border: 1px solid #1e3f28; border-radius: 12px; padding: 20px; text-align: center; min-width: 140px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; gap: 10px; flex: 1;">
-                    <div style="font-size: 35px; width: 65px; height: 65px; display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.05); border-radius: 50%; margin-bottom: 5px; color: #00ffcc; text-shadow: 0 0 15px #00ffcc;">👑</div>
-                    <h3 style="color: #fff; font-size: 14px;">Neon Kral Tacı</h3>
-                    <button id="btn_neon_tac" onclick="magazaIslem('neon_tac', 1500000)" style="background: linear-gradient(180deg, #ffe066 0%, #db9d13 100%); color: #000; border: none; padding: 10px 5px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; width: 100%; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">1.5M ÇİP</button>
-                </div>
-                <div style="background: rgba(0,0,0,0.5); border: 1px solid #1e3f28; border-radius: 12px; padding: 20px; text-align: center; min-width: 140px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; gap: 10px; flex: 1;">
-                    <div style="font-size: 35px; width: 65px; height: 65px; display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.05); border-radius: 50%; margin-bottom: 5px; color: #ff4d4d; text-shadow: 0 0 15px #ff4d4d;">🔥</div>
-                    <h3 style="color: #fff; font-size: 14px;">Ateşli İsim</h3>
-                    <button id="btn_atesli_isim" onclick="magazaIslem('atesli_isim', 3000000)" style="background: linear-gradient(180deg, #ffe066 0%, #db9d13 100%); color: #000; border: none; padding: 10px 5px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; width: 100%; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">3M ÇİP</button>
-                </div>
-            </div>
-
-            <h3 style="color:#f2c94c; text-align:center; width:100%; margin-top:20px; border-bottom:1px solid #52796f; padding-bottom:5px;">👑 MİLYARDER TEMALARI</h3>
-            
-            <div style="display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; margin-top: 15px;">
-                <div style="background: rgba(0,0,0,0.5); border: 1px solid #ffd700; border-radius: 12px; padding: 20px; text-align: center; min-width: 140px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; gap: 10px; flex: 1;">
-                    <div style="font-size:30px; border:none; box-shadow:none; background:transparent;">👑</div>
-                    <h3 style="font-size:14px; color:#fff;">Kraliyet Altını</h3>
-                    <p style="font-size:10px; color:#aaa; margin-bottom: 10px; padding:0 5px;">Masanı altın yaldızlı bir saraya çevirir.</p>
-                    <button id="btn_tema_royal" onclick="magazaIslem('tema_royal', 10000000)" style="background: linear-gradient(180deg, #ffe066 0%, #db9d13 100%); color: #000; border: none; padding: 10px 5px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; width: 100%; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">10 Milyon ÇİP</button>
-                </div>
-
-                <div style="background: rgba(0,0,0,0.5); border: 1px solid #00f3ff; border-radius: 12px; padding: 20px; text-align: center; min-width: 140px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; gap: 10px; flex: 1;">
-                    <div style="font-size:30px; border:none; box-shadow:none; background:transparent;">🌌</div>
-                    <h3 style="font-size:14px; color:#fff;">Siber Pavyon</h3>
-                    <p style="font-size:10px; color:#aaa; margin-bottom: 10px; padding:0 5px;">Masayı neon mor/mavi siber ortama çevirir.</p>
-                    <button id="btn_tema_neon" onclick="magazaIslem('tema_neon', 20000000)" style="background: linear-gradient(180deg, #ffe066 0%, #db9d13 100%); color: #000; border: none; padding: 10px 5px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; width: 100%; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">20 Milyon ÇİP</button>
-                </div>
-
-                <div style="background: rgba(0,0,0,0.5); border: 1px solid #8b5a2b; border-radius: 12px; padding: 20px; text-align: center; min-width: 140px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; gap: 10px; flex: 1;">
-                    <div style="font-size:30px; border:none; box-shadow:none; background:transparent;">🍷</div>
-                    <h3 style="font-size:14px; color:#fff;">Kızıl Baron</h3>
-                    <p style="font-size:10px; color:#aaa; margin-bottom: 10px; padding:0 5px;">Koyu bordo kadife masa ve ahşap detaylar.</p>
-                    <button id="btn_tema_kizil" onclick="magazaIslem('tema_kizil', 30000000)" style="background: linear-gradient(180deg, #ffe066 0%, #db9d13 100%); color: #000; border: none; padding: 10px 5px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; width: 100%; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">30 Milyon ÇİP</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    <!-- MAIN UI -->
     <div class="vip-header">
         <div class="profil-bilgi" onclick="if(aktifKullaniciAdi) profiliGoster(aktifKullaniciAdi)" style="cursor:pointer;">
             <div class="profil-avatar" id="vipAvatar">😎</div>
@@ -447,17 +404,17 @@
             <div class="alt-menu-item" onclick="arkadaslarMenusuAc()" style="cursor:pointer; position:relative;"><div class="alt-menu-ikon">👥</div><span>Arkadaşlar</span></div>
             <div class="alt-menu-item" onclick="gorevleriAc()" style="cursor:pointer;"><div class="alt-menu-ikon">📜</div><span style="color:#2ecc71; font-weight:bold;">Görevler</span></div>
             <div class="alt-menu-item" onclick="liderlikTablosunuAc()" style="cursor:pointer;"><div class="alt-menu-ikon">🏆</div><span>En İyiler</span></div>
-            <div class="alt-menu-item" onclick="document.getElementById('magazaEkrani').style.display='flex'" style="cursor:pointer;"><div class="alt-menu-ikon">🛒</div><span style="color:#f2c94c;">Mağaza</span></div>
-            <div class="alt-menu-item" id="menuSohbetItem" onclick="alert('Lobi genel sohbeti için giriş yapmalısın!')" style="cursor:pointer; position:relative;"><div class="alt-menu-ikon">💬</div><span style="color:#3498db;">Sohbet</span></div>
+            <div class="alt-menu-item" id="menuSohbetItem" onclick="if(typeof mesajGelenKutusuAc === 'function') mesajGelenKutusuAc(); else document.getElementById('eskiGelenKutusuModal').style.display='flex';" style="cursor:pointer; position:relative;"><div class="alt-menu-ikon">✉️</div><span style="color:#f1c40f;">Mesajlar</span></div>
         </div>
     </div>
 
     <div id="masaEkrani">
-        <button id="sohbetAcBtn" class="pro-sohbet-tetikleyici">💬</button>
+        <button id="sohbetAcBtn" class="pro-sohbet-tetikleyici" onclick="if(typeof mesajGelenKutusuAc === 'function') mesajGelenKutusuAc(); else document.getElementById('eskiGelenKutusuModal').style.display='flex';">✉️</button>
         <div id="anlikMesajAlani" class="anlik-mesaj-alani"></div>
 
+        <!-- ESKİ OYUN İÇİ GENEL SOHBET ÇEKMECESİ (Korundu) -->
         <div id="sohbetCekmecesi" class="sohbet-cekmecesi">
-            <div class="cekmence-header"><span>VIP Sohbet</span><button id="sohbetKapatBtn">X</button></div>
+            <div class="cekmence-header"><span>Masa Sohbeti</span><button id="sohbetKapatBtn">X</button></div>
             <div id="sohbetMesajlari" class="cekmence-mesajlar"></div>
             <div class="cekmence-emojiler">
                 <button onclick="vipEmojiGonder('☕')">☕</button>
@@ -534,6 +491,21 @@
         </div>
     </div>
 
+    <!-- Orijinal ozelMesajKutusu (mesajlar.js ile bağlı eski container korundu) -->
+    <div id="ozelMesajKutusu">
+        <div class="ozel-mesaj-panel">
+            <div class="ozel-mesaj-header">
+                <span id="omBaslikIsim">Sohbet</span>
+                <button onclick="document.getElementById('ozelMesajKutusu').style.display='none'" style="background:none;border:none;color:#e74c3c;font-weight:bold;font-size:18px;cursor:pointer;">X</button>
+            </div>
+            <div class="ozel-mesaj-icerik" id="omMesajlar"></div>
+            <div class="ozel-mesaj-input-alani">
+                <input type="text" id="omGirdi" placeholder="Mesaj yazın..." maxlength="100">
+                <button id="omGonderBtn">Gönder</button>
+            </div>
+        </div>
+    </div>
+
     <!-- OYUNUN ANA JS DOSYALARI -->
     <script src="js/globals.js"></script>
     <script src="js/auth.js"></script>
@@ -543,6 +515,7 @@
     <script src="js/tema.js"></script>
     <script src="js/profil.js"></script>
     <script src="js/arkadas.js"></script> 
+    <!-- mesajlar.js senkronize orijinal dosyandır, çalışmaya devam eder -->
     <script src="js/mesajlar.js"></script>
     <script src="js/muzik.js"></script>
     <script src="js/seyirci.js"></script> 
