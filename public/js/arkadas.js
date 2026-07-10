@@ -10,7 +10,6 @@ window.sohbetAbonelikSinyali = null;
 // ⸻ FİREBASE GERÇEK ZAMANLI DİNLEYİCİSİ ⸻
 function baslatIstekListener() {
     if(typeof auth !== 'undefined' && auth.currentUser && typeof db !== 'undefined') {
-        // Kullanıcı dökümanını anlık dinle
         db.collection('kullanicilar').doc(auth.currentUser.uid).onSnapshot(doc => {
             if(doc.exists) {
                 let data = doc.data();
@@ -102,7 +101,7 @@ window.arkadasEkleIstek = function(hedefIsim) {
     db.collection("kullanicilar").where("isim", "==", hedefIsim).get().then(snap => {
         if(!snap.empty) {
             snap.docs[0].ref.update({ gelenIstekler: firebase.firestore.FieldValue.arrayUnion(aktifKullaniciAdi) });
-            ozelUyariGoster(`✅ İstek gönderildi.`);
+            ozelUyariGoster("✅ İstek gönderildi.");
         }
     });
 };
@@ -151,17 +150,15 @@ window.acOzelMesajBS = function(hedefIsim) {
     document.getElementById('profilEkrani').style.display = 'none';
     document.getElementById('arkadaslarEkrani').style.display = 'none';
     
-    const bs = document.getElementById('ozelSohbetBottomSheet');
+    // Kapsayıcı Overlay ekranı flexten açılır
+    const overlay = document.getElementById('ozelSohbetOverlay');
     document.getElementById('bsTargetName').innerText = hedefIsim;
     document.getElementById('bsTargetStatus').innerText = onlineOyuncularListesi.includes(hedefIsim) ? "🟢 Çevrimiçi" : "⚫ Çevrimdışı";
-    bs.style.display = 'flex';
+    overlay.style.display = 'flex';
 
     const roomId = [aktifKullaniciAdi, hedefIsim].sort().join("__");
-    
-    // Eski aboneliği temizle
     if(window.sohbetAbonelikSinyali) window.sohbetAbonelikSinyali();
 
-    // Sohbet odasını anlık dinle (Real-time)
     window.sohbetAbonelikSinyali = db.collection("ozel_sohbetler").doc(roomId).onSnapshot(doc => {
         const historyDiv = document.getElementById('bsChatHistory');
         historyDiv.innerHTML = '';
@@ -179,12 +176,10 @@ window.acOzelMesajBS = function(hedefIsim) {
                     <div class="${bubbleClass}">
                         <span>${m.metin}</span>
                         <span class="bs-bubble-time">${timeStr}</span>
-                    </div>
-                `;
+                    </div>`;
             });
             historyDiv.scrollTop = historyDiv.scrollHeight;
 
-            // Eğer mesajı karşı taraf attıysa okundu yap
             if(data.sonGonderen !== aktifKullaniciAdi && data.okundu === false) {
                 db.collection("ozel_sohbetler").doc(roomId).update({ okundu: true });
             }
@@ -211,7 +206,7 @@ window.gonderOzelMesajBS = function() {
 };
 
 window.kapatOzelMesajBS = function() {
-    document.getElementById('ozelSohbetBottomSheet').style.display = 'none';
+    document.getElementById('ozelSohbetOverlay').style.display = 'none';
     window.aktifSohbetHedef = null;
     if(window.sohbetAbonelikSinyali) { window.sohbetAbonelikSinyali(); window.sohbetAbonelikSinyali = null; }
 };
