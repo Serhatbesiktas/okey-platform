@@ -26,8 +26,7 @@ window.profiliGoster = function(hedefIsim) {
     if(pDavetBtn) pDavetBtn.dataset.hedef = hedefIsim;
 
     if(pDurum) {
-        pDurum.innerHTML = "🟢 Çevrimiçi"; 
-        pDurum.style.color = "#2ecc71";
+        pDurum.innerHTML = "Çevrimiçi"; 
     }
     
     let isOnline = (onlineOyuncularListesi && onlineOyuncularListesi.includes(hedefIsim)) || hedefIsim === aktifKullaniciAdi;
@@ -37,11 +36,11 @@ window.profiliGoster = function(hedefIsim) {
             pArkadasBtn.style.display = 'block';
             if (benimArkadaslarim && benimArkadaslarim.includes(hedefIsim)) { 
                 pArkadasBtn.innerHTML = "❌ Arkadaştan Çıkar"; 
-                pArkadasBtn.style.background = "linear-gradient(180deg, #e74c3c 0%, #c0392b 100%)"; 
+                pArkadasBtn.style.background = "linear-gradient(135deg, #e74c3c, #c0392b)"; 
                 pArkadasBtn.style.color = "#fff"; 
             } else { 
                 pArkadasBtn.innerHTML = "➕ Arkadaş Ekle"; 
-                pArkadasBtn.style.background = "linear-gradient(180deg, #f1c40f 0%, #f39c12 100%)"; 
+                pArkadasBtn.style.background = "linear-gradient(135deg, #f1c40f, #f39c12)"; 
                 pArkadasBtn.style.color = "#111"; 
             }
         }
@@ -51,7 +50,7 @@ window.profiliGoster = function(hedefIsim) {
         if(pDavetBtn) pDavetBtn.style.display = 'none'; 
     }
 
-    let tacIcon = ""; let ismRengi = "#fff"; let textGlow = "none";
+    let tacIcon = ""; let ismRengi = "#fff"; let textGlow = "0 2px 10px rgba(0,0,0,0.5)";
     if(globalKozmetikler && globalKozmetikler[hedefIsim]) {
         if(globalKozmetikler[hedefIsim].includes('neon_tac')) tacIcon = "👑 ";
         if(globalKozmetikler[hedefIsim].includes('atesli_isim')) { ismRengi = "#ff4d4d"; textGlow = "0 0 10px rgba(255, 77, 77, 0.8)"; }
@@ -65,14 +64,26 @@ window.profiliGoster = function(hedefIsim) {
     
     if(pCip) pCip.innerText = "..."; 
     if(pOynanan) pOynanan.innerText = "..."; 
-    if(pKazanilan) pKazanilan.innerHTML = "..."; 
+    
+    // JS Mantığını bozmadan CSS Grid sistemine uyumlu HTML formatı gönderiyoruz
+    if(pKazanilan) pKazanilan.innerHTML = `
+        <div class="stat-card"><span class="stat-icon">🏆</span><div class="stat-info"><span class="stat-lbl">Kazanılan</span><span class="stat-val text-green">...</span></div></div>
+        <div class="stat-card"><span class="stat-icon">❌</span><div class="stat-info"><span class="stat-lbl">Kaybedilen</span><span class="stat-val text-red">...</span></div></div>
+    `;
+    
     if(pOran) pOran.innerText = "...";
 
     const setStats = (cip, oynanan, kazanilan, oran, ligTxt, ligBg, unvanTxt) => {
-        if(pDurum) { pDurum.innerHTML = "🟢 Çevrimiçi"; pDurum.style.color = "#2ecc71"; }
+        if(pDurum) { pDurum.innerHTML = "Çevrimiçi"; }
         if(pCip) pCip.innerText = cip.toLocaleString('tr-TR'); 
         if(pOynanan) pOynanan.innerText = oynanan; 
-        if(pKazanilan) pKazanilan.innerHTML = kazanilan + ' <span style="color:#777; font-size:14px;">/</span> <span style="color:#e74c3c; font-size:14px;">' + (oynanan - kazanilan) + '</span>'; 
+        
+        // JS Mantığını bozmadan CSS Grid sistemine uyumlu HTML formatı gönderiyoruz
+        if(pKazanilan) pKazanilan.innerHTML = `
+            <div class="stat-card"><span class="stat-icon">🏆</span><div class="stat-info"><span class="stat-lbl">Kazanılan</span><span class="stat-val text-green">${kazanilan}</span></div></div>
+            <div class="stat-card"><span class="stat-icon">❌</span><div class="stat-info"><span class="stat-lbl">Kaybedilen</span><span class="stat-val text-red">${oynanan - kazanilan}</span></div></div>
+        `;
+        
         if(pOran) pOran.innerText = '%' + oran; 
         if(pLig) { pLig.innerText = ligTxt; pLig.style.background = ligBg; }
         if(pUnvan) pUnvan.innerText = unvanTxt;
@@ -105,7 +116,6 @@ window.profiliGoster = function(hedefIsim) {
     } else { setStats(fakeCip, fakeOynanan, fakeKazanilan, fakeOran, lig, ligBg, unvan); }
 };
 
-// 🔥 SİLİNEN EŞYA FIRLATMA MOTORU GERİ GELDİ 🔥
 window.esyaFirlatAksiyon = function(esyaIcon) {
     if(isMisafir) { ozelUyariGoster("⚠️ Eşya fırlatılamaz!"); return; } 
     const hedef = document.getElementById('profilArkadasBtn').dataset.hedef;
