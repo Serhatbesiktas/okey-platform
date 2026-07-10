@@ -420,8 +420,8 @@
             <div class="premium-modal-box sonuc-premium-box">
                 <h1 id="sonucBaslik" class="sonuc-title">Oyun Bitti!</h1>
                 
-                <p id="sonucMetin" class="sonuc-metin">Kazanan: ...</p>
-                <p id="sonucOdul" class="sonuc-odul"></p>
+                <div id="sonucMetin" class="sonuc-metin">Kazanan: ...</div>
+                <div id="sonucOdul" class="sonuc-odul"></div>
 
                 <div class="kazanan-eli-container">
                     <h3 class="kazanan-eli-baslik">🀄 Kazananın Eli</h3>
@@ -430,7 +430,7 @@
 
                 <div class="premium-btn-group">
                     <button class="premium-btn btn-gold" onclick="document.getElementById('sonucEkrani').style.display='none'">🟨 Tekrar Oyna</button>
-                    <button class="premium-btn btn-dark" onclick="document.getElementById('sonucEkrani').style.display='none'; document.getElementById('lobiyeDonBtn').click();">⬛ Lobiye Dön</button>
+                    <button class="premium-btn btn-dark" onclick="document.getElementById('sonucEkrani').style.display='none'; setTimeout(()=>document.getElementById('lobiyeDonBtn').dispatchEvent(new Event('click', {bubbles:true})), 50);">⬛ Lobiye Dön</button>
                 </div>
             </div>
         </div>
@@ -530,6 +530,40 @@
                 }
             }
         });
+
+        // 🧠 OYUN SONU KAZANANIN GERÇEK ELİNİ YAKALAMA VE DÜZGÜN RENDER ETME MOTORU
+        if(typeof socket !== 'undefined') {
+            socket.on('oyun_bitti', (data) => {
+                if(data && data.bitisEli && data.bitisEli.length > 0) {
+                    let html = '';
+                    data.bitisEli.forEach(tas => {
+                        if(!tas) return;
+                        let displaySayi = tas.sayi === 'S' ? '☻' : tas.sayi;
+                        // Gerçek oyun taşlarının class yapısı 1:1 kopyalandı
+                        html += `<div class="okey-tasi tas-${tas.renk}">${displaySayi}</div>`;
+                    });
+                    window.gercekBitisHTML = html;
+                } else {
+                    window.gercekBitisHTML = '<span style="color:#a3c4bc; font-size:12px;">El bilgisi alınamadı.</span>';
+                }
+            });
+        }
+
+        // socket.js içindeki eski animasyon (civiMotoru) bu HTML'i bozmasın diye onu eziyoruz
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'childList') {
+                    const target = document.getElementById('kazananEliAlani');
+                    if (target && window.gercekBitisHTML) {
+                        // socket.js eski okey-tasi-bitis classı ile ekleme yaparsa, onu gerçek HTML ile anında değiştir!
+                        if (target.innerHTML.includes('okey-tasi-bitis')) {
+                            target.innerHTML = window.gercekBitisHTML;
+                        }
+                    }
+                }
+            });
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
     </script>
 
 </body>
