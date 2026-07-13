@@ -83,52 +83,8 @@ window.tasEkle = function(tasData, yuvaId) {
     document.getElementById(yuvaId).appendChild(div); 
 };
 
-// 🔥 GÖSTERGE KONTROL MOTORU (YENİDEN AKTİF VE DÜZELTİLDİ) 🔥
-window.checkGosterge = function() { 
-    const btnGosterge = document.getElementById('gostergeBtn');
-    const gTasiContainer = document.getElementById('gostergeTasi');
-
-    if (!btnGosterge || !gTasiContainer) return;
-
-    // 1. Gösterge hakkı yoksa direkt gizle
-    if (typeof gostergeHakki === 'undefined' || !gostergeHakki) {
-        btnGosterge.style.display = 'none';
-        return;
-    }
-
-    // 2. Ortadaki gösterge taşının rengini ve sayısını bul
-    let gTasi = gTasiContainer.children.length > 0 ? gTasiContainer.children[0] : gTasiContainer;
-    let gRenkClass = Array.from(gTasi.classList).find(c => c.startsWith('tas-'));
-    if (!gRenkClass) return; // Ortada taş yoksa çık
-    
-    let gRenk = gRenkClass.replace('tas-', '');
-    let gSayi = parseInt(gTasi.innerText);
-
-    // 3. Elimdeki taşları tek tek kontrol et (Bende var mı?)
-    let bendeVarMi = false;
-    for (let i = 0; i < 24; i++) {
-        let yuva = document.getElementById('y' + i);
-        if (yuva && yuva.children.length > 0) {
-            let tas = yuva.children[0];
-            let tRenkClass = Array.from(tas.classList).find(c => c.startsWith('tas-'));
-            let tRenk = tRenkClass ? tRenkClass.replace('tas-', '') : '';
-            let tSayi = parseInt(tas.innerText);
-
-            // Eğer ortadaki taş ile elimdeki taş birebir eşleşiyorsa
-            if (tRenk === gRenk && tSayi === gSayi) {
-                bendeVarMi = true;
-                break;
-            }
-        }
-    }
-
-    // 4. Sadece hakkım varsa VE taş gerçekten elimdeyse butonu göster!
-    if (bendeVarMi) {
-        btnGosterge.style.display = 'block';
-    } else {
-        btnGosterge.style.display = 'none';
-    }
-};
+// Pasif bırakıldı, hata yapmasın diye index.html içine taşındı
+window.checkGosterge = function() {}; 
 
 window.elimdekiTasSayisi = function() { let sayi = 0; for(let i=0; i<24; i++) { if(document.getElementById('y'+i).children.length > 0) sayi++; } return sayi; };
 
@@ -187,7 +143,7 @@ window.otomatikTasAt = function(tasElementi) {
     } 
 };
 
-if(typeof oyunuBaslatBtn !== 'undefined' && oyunuBaslatBtn) {
+if(oyunuBaslatBtn) {
     oyunuBaslatBtn.addEventListener('click', () => { 
         oyunuBaslatBtn.disabled = true;
         oyunuBaslatBtn.innerText = "⏳ BAŞLIYOR...";
@@ -199,13 +155,11 @@ if(typeof oyunuBaslatBtn !== 'undefined' && oyunuBaslatBtn) {
     });
 }
 
-if(typeof kalanTasBilgi !== 'undefined' && kalanTasBilgi) {
-    kalanTasBilgi.addEventListener('click', () => { 
-        if (benimSiramMi && window.elimdekiTasSayisi() === 14) { 
-            gostergeHakki = false; socket.emit('ortadan_tas_cek', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi }); sesCal(sesTasCek); 
-        } else if(!benimSiramMi) ozelUyariGoster("Şu an sıra sizde değil!"); else ozelUyariGoster("Önce taşı atmalısınız!"); 
-    });
-}
+kalanTasBilgi?.addEventListener('click', () => { 
+    if (benimSiramMi && window.elimdekiTasSayisi() === 14) { 
+        gostergeHakki = false; socket.emit('ortadan_tas_cek', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi }); sesCal(sesTasCek); 
+    } else if(!benimSiramMi) ozelUyariGoster("Şu an sıra sizde değil!"); else ozelUyariGoster("Önce taşı atmalısınız!"); 
+});
 
 // 🔥 TIKLANINCA YIĞININ ALTINI SİLMEYEN GÜVENLİ KOD 🔥
 document.getElementById('iskartaSol')?.addEventListener('click', function() { 
@@ -235,7 +189,7 @@ if(btnGostergeDOM) {
 
 const sortableOptions = { group: { name: 'istaka', put: (to) => to.el.children.length === 0 }, animation: 100, delay: 0, forceFallback: true, fallbackOnBody: true, fallbackTolerance: 3, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag', easing: "cubic-bezier(0.25, 1, 0.5, 1)", onEnd: function() { sesCal(sesTasKoy); } };
 
-if(typeof ustRaf !== 'undefined' && ustRaf && typeof altRaf !== 'undefined' && altRaf) {
+if(ustRaf && altRaf) {
     for(let i=0; i<12; i++) { 
         const yUst = document.createElement('div'); yUst.className = 'yuva'; yUst.id = 'y'+i; ustRaf.appendChild(yUst); new Sortable(yUst, sortableOptions); 
         const yAlt = document.createElement('div'); yAlt.className = 'yuva'; yAlt.id = 'y'+(i+12); altRaf.appendChild(yAlt); new Sortable(yAlt, sortableOptions); 
@@ -255,7 +209,7 @@ if(document.getElementById('benimIskartam')) {
     });
 }
 
-if(typeof bitisAlani !== 'undefined' && bitisAlani) {
+if(bitisAlani) {
     new Sortable(bitisAlani, { 
         group: { name: 'istaka', put: function (to) { return benimSiramMi && window.elimdekiTasSayisi() === 15; }, pull: false }, 
         animation: 150, forceFallback: true, fallbackOnBody: true, emptyInsertThreshold: 100, 
