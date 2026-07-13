@@ -23,7 +23,6 @@ window.arayuzGuncelle = function() {
     if(aktifKozmetikler.includes('altin_cerceve') && avatar) { avatar.style.border = '3px solid #f2c94c'; avatar.style.boxShadow = '0 0 15px #f2c94c'; }
     if(aktifKozmetikler.includes('atesli_isim') && isimKutu && !izleyiciModu) { isimKutu.style.color = '#ff4d4d'; }
     
-    // 🔥 MAĞAZA BUTONLARINI GÜNCELLEYEN RADAR (TEMALAR DA EKLENDİ) 🔥
     const esyalar = [ 
         {id: 'altin_cerceve', fiyat: '500.000'}, {id: 'neon_tac', fiyat: '1.5M'}, {id: 'atesli_isim', fiyat: '3M'},
         {id: 'tema_royal', fiyat: '10 Milyon'}, {id: 'tema_neon', fiyat: '20 Milyon'}, {id: 'tema_kizil', fiyat: '30 Milyon'}
@@ -38,19 +37,15 @@ window.arayuzGuncelle = function() {
     });
 };
 
-// 🔥 SİLİNEN KOSKOCA MAĞAZA FONKSİYONU GERİ GELDİ 🔥
 window.magazaIslem = function(esyaId, fiyat) {
     if(isMisafir) { ozelUyariGoster("⚠️ Misafir hesaplar mağazayı kullanamaz!"); return; }
     
     if(aktifKozmetikler.includes(esyaId)) {
-        // Çıkar
         aktifKozmetikler = aktifKozmetikler.filter(k => k !== esyaId);
     } else if(benimEnvanterim.includes(esyaId)) {
-        // Kullan
-        if(esyaId.startsWith('tema_')) { aktifKozmetikler = aktifKozmetikler.filter(k => !k.startsWith('tema_')); } // Eski temayı çıkar
+        if(esyaId.startsWith('tema_')) { aktifKozmetikler = aktifKozmetikler.filter(k => !k.startsWith('tema_')); } 
         aktifKozmetikler.push(esyaId);
     } else {
-        // Satın Al
         let safCip = parseInt(String(benimAnlikCipim).replace(/[^0-9]/g, '')) || 0;
         if(safCip < fiyat) { ozelUyariGoster("⚠️ Yetersiz Çip!"); return; }
         
@@ -65,7 +60,6 @@ window.magazaIslem = function(esyaId, fiyat) {
         ozelUyariGoster("🎉 Başarıyla satın alındı!");
     }
 
-    // Veritabanına kaydet ve sunucuya bildir
     if(auth.currentUser && !isMisafir) {
         db.collection("kullanicilar").doc(auth.currentUser.uid).update({
             cip: benimAnlikCipim, envanter: benimEnvanterim, aktifKozmetikler: aktifKozmetikler
@@ -104,6 +98,152 @@ window.gorevOduluAl = function(id, m) {
     if(auth.currentUser) db.collection("kullanicilar").doc(auth.currentUser.uid).update({ cip: benimAnlikCipim }); 
     socket.emit('kullanici_girisi', { isim: aktifKullaniciAdi, cip: benimAnlikCipim, kozmetikler: aktifKozmetikler }); ozelUyariGoster(`🎉 Görev bitti!`); window.renderGorevler(); 
 };
+
+// ==========================================
+// 🔥 FAZ 3: DOPAMİN (KUTLAMA KONFETİSİ) SİSTEMİ EKLENDİ 🔥
+// ==========================================
+window.konfetiPatlat = function() {
+    for (let i = 0; i < 50; i++) {
+        let conf = document.createElement('div');
+        conf.className = 'konfeti-parcacik';
+        let colors = ['#f1c40f', '#e74c3c', '#2ecc71', '#3498db', '#9b59b6'];
+        conf.style.cssText = `position:fixed; left:50%; top:50%; width:10px; height:10px; background:${colors[Math.floor(Math.random() * colors.length)]}; z-index:9999999; border-radius:${Math.random() > 0.5 ? '50%' : '0'}; transform: translate(-50%, -50%); pointer-events:none;`;
+        document.body.appendChild(conf);
+
+        let angle = Math.random() * Math.PI * 2;
+        let velocity = 150 + Math.random() * 200;
+        let tx = Math.cos(angle) * velocity;
+        let ty = Math.sin(angle) * velocity - 100;
+        let rot = Math.random() * 720 - 360;
+
+        conf.animate([
+            { transform: 'translate(-50%, -50%) rotate(0deg)', opacity: 1 },
+            { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) rotate(${rot}deg)`, opacity: 1, offset: 0.7 },
+            { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty+150}px)) rotate(${rot}deg)`, opacity: 0 }
+        ], { duration: 1500 + Math.random() * 1000, easing: 'cubic-bezier(.25, .8, .25, 1)' }).onfinish = () => conf.remove();
+    }
+};
+
+
+// ==========================================
+// 🔥 FAZ 3: GÜNLÜK GİRİŞ ÖDÜLÜ (DAILY BONUS) SİSTEMİ EKLENDİ 🔥
+// ==========================================
+window.gunlukOdulEkraniAc = function() {
+    if(isMisafir) { ozelUyariGoster("⚠️ Günlük VIP ödülü için Kayıt Olun!"); return; }
+    
+    const simdi = new Date().getTime();
+    const sonAlis = window.localStorage.getItem('sonGunlukOdulZamani');
+    
+    const btnCevir = document.getElementById('btnBonusCevir');
+    const gosterge = document.getElementById('dijitalGosterge');
+
+    // 24 Saat (86400000 ms) Cooldown Kontrolü
+    if (sonAlis && (simdi - parseInt(sonAlis)) < 86400000) {
+        let kalanMs = 86400000 - (simdi - parseInt(sonAlis));
+        let saat = Math.floor(kalanMs / (1000 * 60 * 60));
+        let dakika = Math.floor((kalanMs % (1000 * 60 * 60)) / (1000 * 60));
+        gosterge.innerText = "BEKLE";
+        btnCevir.innerHTML = `🔒 YARIN GEL (${saat}s ${dakika}d)`;
+        btnCevir.style.background = "#333";
+        btnCevir.style.color = "#888";
+        btnCevir.disabled = true;
+    } else {
+        gosterge.innerText = "000.000";
+        btnCevir.innerHTML = "🎲 KASAYI ÇEVİR";
+        btnCevir.style.background = "linear-gradient(180deg, #ffe066 0%, #db9d13 100%)";
+        btnCevir.style.color = "#000";
+        btnCevir.disabled = false;
+    }
+
+    document.getElementById('gunlukBonusEkrani').style.display = 'flex';
+};
+
+window.gunlukKasaCevir = function() {
+    const btnCevir = document.getElementById('btnBonusCevir');
+    const gosterge = document.getElementById('dijitalGosterge');
+    btnCevir.disabled = true;
+    
+    // Rastgele ödül belirleme (25.000 ile 100.000 arası)
+    const odul = Math.floor(Math.random() * 75000) + 25000;
+    
+    let hiz = 50;
+    let donmeSayisi = 0;
+    let kasaSesi = setInterval(() => {
+        gosterge.innerText = (Math.floor(Math.random() * 90000) + 10000).toLocaleString('tr-TR');
+        donmeSayisi++;
+        
+        if(donmeSayisi > 30) {
+            clearInterval(kasaSesi);
+            gosterge.innerText = odul.toLocaleString('tr-TR');
+            gosterge.style.color = "#2ecc71";
+            gosterge.style.borderColor = "#2ecc71";
+            
+            btnCevir.innerHTML = "✅ ÖDÜLÜ ALDIN";
+            btnCevir.style.background = "#2ecc71";
+            
+            window.konfetiPatlat();
+            
+            // Çipi hesaba ekle
+            let safCip = parseInt(String(benimAnlikCipim).replace(/[^0-9]/g, '')) || 0; 
+            benimAnlikCipim = safCip + odul; 
+            document.getElementById('benimCipim').innerText = benimAnlikCipim.toLocaleString('tr-TR'); 
+            
+            if(auth.currentUser) {
+                db.collection("kullanicilar").doc(auth.currentUser.uid).update({ cip: benimAnlikCipim });
+            }
+            socket.emit('kullanici_girisi', { isim: aktifKullaniciAdi, cip: benimAnlikCipim, kozmetikler: aktifKozmetikler }); 
+            
+            window.localStorage.setItem('sonGunlukOdulZamani', new Date().getTime().toString());
+            
+            setTimeout(() => { document.getElementById('gunlukBonusEkrani').style.display = 'none'; }, 3000);
+        }
+    }, hiz);
+};
+
+// ==========================================
+// 🔥 FAZ 3: REKLAM İZLE ÇİP KAZAN SİSTEMİ EKLENDİ 🔥
+// ==========================================
+window.reklamIzleAksiyon = function() {
+    if(isMisafir) { ozelUyariGoster("⚠️ Misafirler bu ödülü kullanamaz!"); return; }
+    
+    const re = document.getElementById('reklamEkrani');
+    const sayacEl = document.getElementById('reklamSayac');
+    const kapatBtn = document.getElementById('btnReklamKapat');
+    
+    re.style.display = 'flex';
+    kapatBtn.style.display = 'none';
+    
+    let kalanSure = 15;
+    sayacEl.innerText = kalanSure;
+    
+    let reklamSayaci = setInterval(() => {
+        kalanSure--;
+        sayacEl.innerText = kalanSure;
+        
+        if (kalanSure <= 0) {
+            clearInterval(reklamSayaci);
+            sayacEl.innerText = "BİTTİ";
+            sayacEl.style.color = "#2ecc71";
+            kapatBtn.style.display = 'block';
+        }
+    }, 1000);
+};
+
+window.reklamOduluAl = function() {
+    document.getElementById('reklamEkrani').style.display = 'none';
+    
+    let odul = 25000;
+    let safCip = parseInt(String(benimAnlikCipim).replace(/[^0-9]/g, '')) || 0; 
+    benimAnlikCipim = safCip + odul; 
+    document.getElementById('benimCipim').innerText = benimAnlikCipim.toLocaleString('tr-TR'); 
+    
+    if(auth.currentUser) db.collection("kullanicilar").doc(auth.currentUser.uid).update({ cip: benimAnlikCipim }); 
+    socket.emit('kullanici_girisi', { isim: aktifKullaniciAdi, cip: benimAnlikCipim, kozmetikler: aktifKozmetikler }); 
+    
+    window.konfetiPatlat();
+    ozelUyariGoster("🎉 Sponsor ödülü olarak 25.000 ÇİP kazandın!");
+};
+
 
 window.arkadaslarMenusuAc = function() {
     if(isMisafir) { ozelUyariGoster("⚠️ Misafirler arkadaş kullanamaz."); return; } 
@@ -206,7 +346,7 @@ if(sohbetCekmecesi) {
 }
 window.vipEmojiGonder = function(emoji) { if(isMisafir) return; if(suAnkiMasam) { socket.emit('vip_emoji', { masaAdi: suAnkiMasam, isim: aktifKullaniciAdi, emoji: emoji }); sohbetCekmecesi.classList.remove('acik'); } };
 // ==========================================
-// ONLİNE OYUNCU SAYACI (HTML İÇİNDEN ÇIKARILDI)
+// ONLİNE OYUNCU SAYACI
 // ==========================================
 setInterval(() => {
     const elOnline = document.getElementById('statOnlineRand');
